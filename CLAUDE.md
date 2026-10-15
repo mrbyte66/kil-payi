@@ -5,7 +5,7 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 
 ## Yapı
 
-- `src/game.html`: oyunun tamamı (HTML, CSS, JS). Artifact olarak da bu dosya yayınlanır (https://claude.ai/artifact/SuoGL7rh6SjWXSvh615Lvm).
+- `src/game.html`: oyunun tamamı (HTML, CSS, JS). Tek kaynak bu dosya; `build.sh` onu tam belgeye çevirir. Web (Artifact) sürümü kullanıcı isteğiyle silindi, yeniden yayınlama.
 - `build.sh`: `src/game.html` -> `www/index.html`. `DEBUG=1 ./build.sh` test kancası ekler (`window.__kp`), yayın sürümüne eklenmez.
 - `src/fonts/`: Fredoka ve Nunito (OFL). `node tools/fetch-fonts.mjs` ile indirilir, `www/` sürümü bunları yerelden okur.
 - `tools/sim.mjs`: zorluk simülatörü. `src/game.html` içindeki `TUNE-START`/`TUNE-END` bloğunu okur.
