@@ -4,7 +4,7 @@ Refleks oyunu. Kadran üzerinde dönen ibreyi şeftali bölgedeyken yakala; sür
 
 ## Yapı
 
-- `src/game.html`: oyunun tamamı (HTML, CSS, JS). Artifact olarak bu dosya yayınlanır.
+- `src/game.html`: oyunun tamamı (HTML, CSS, JS). Tek kaynak bu dosyadır.
 - `build.sh`: `src/game.html` dosyasını tam bir belgeye çevirip `www/index.html` üretir (Capacitor bu klasörü kullanacak).
   `DEBUG=1 ./build.sh` test kancası ekler (`window.__kp`), yayın sürümüne eklenmez.
 - `www/`: derlenmiş çıktı.

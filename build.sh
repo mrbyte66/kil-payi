@@ -1,6 +1,6 @@
 #!/bin/sh
-# src/game.html (artifact parçası) -> www/index.html (tam belge, Capacitor bunu paketler).
-# Web sürümü fontları Google Fonts'tan çeker; www sürümü src/fonts içindeki yerel dosyaları kullanır.
+# src/game.html (HTML parçası) -> www/index.html (tam belge, Capacitor bunu paketler).
+# src/game.html Google Fonts bağlantısı içerir; www sürümü src/fonts içindeki yerel dosyaları kullanır.
 # DEBUG=1 ./build.sh  -> test kancası (window.__kp) eklenir ve duraklatma kapatılır; yayın sürümünde eklenmez.
 set -e
 cd "$(dirname "$0")"
