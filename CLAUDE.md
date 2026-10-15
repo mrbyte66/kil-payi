@@ -1,0 +1,32 @@
+# Kıl payı
+
+Android refleks oyunu. Kullanıcı Türkçe konuşuyor ve teknik değil; kararları sen ver, sonucu sade Türkçeyle anlat.
+Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı çalışan oyun. Ücretli SaaS ekleme.
+
+## Yapı
+
+- `src/game.html`: oyunun tamamı (HTML, CSS, JS). Artifact olarak da bu dosya yayınlanır (https://claude.ai/artifact/SuoGL7rh6SjWXSvh615Lvm).
+- `build.sh`: `src/game.html` -> `www/index.html`. `DEBUG=1 ./build.sh` test kancası ekler (`window.__kp`), yayın sürümüne eklenmez.
+- `src/fonts/`: Fredoka ve Nunito (OFL). `node tools/fetch-fonts.mjs` ile indirilir, `www/` sürümü bunları yerelden okur.
+- `tools/sim.mjs`: zorluk simülatörü. `src/game.html` içindeki `TUNE-START`/`TUNE-END` bloğunu okur.
+- `android/`: Capacitor 8.5.3 Android projesi. `capacitor.config.ts` içinde geçici appId `com.mrbyte66.kilpayi` (yayından önce kullanıcıyla kesinleştir).
+
+## Kararlar
+
+- Paketleme: Capacitor. Reklam: `@capacitor-community/admob` (topluluk eklentisi), sürüm kilitli (8.2.1). Sorun çıkarsa kendi köprümüzü yazarız.
+- Geliştirirken yalnızca Google test reklamları kullan; gerçek reklam kimliğiyle kendi cihazında tıklama yapma.
+- Paket sürümleri `--save-exact` ile kilitli. Anahtar dosyaları (`*.keystore`, `*.jks`) depoya girmemeli.
+- Sunucu gerektiren özellik ekleme (skor tablosu gibi). İleride Google Play Games Services düşünülebilir.
+
+## Ortam notları (bu makine)
+
+- Node 22, Java 21 (JAVA_HOME=$(/usr/libexec/java_home)), Android SDK `~/Library/Android/sdk` (platform 34, build-tools 34/35, emülatör Pixel_8_API_33 arm64). cmdline-tools yok.
+- Capacitor 8 için SDK platform 36 gerekir (compileSdk/targetSdk 36); AGP kendisi indirmeye çalışır, lisans kabulü gerekebilir (kullanıcıya sor).
+- Bu ağda Java, `release-assets.githubusercontent.com` adresine bağlanamıyor (curl bağlanıyor). Gradle dağıtımı bu yüzden curl ile
+  `~/.gradle/wrapper/dists/gradle-8.14.3-all/<hash>/gradle-8.14.3-all.zip` konumuna elle indirildi. Benzer GitHub kaynaklı indirmeler de takılabilir.
+
+## Çalışma kuralları
+
+- Oyun mantığını değiştirince `node tools/sim.mjs 2500` ile zorluk dengesini kontrol et.
+- Arayüz değişikliklerinde açık ve koyu tema, telefon genişliği ve mevcut tasarım dili (lila + şeftali, yuvarlak formlar) korunmalı.
+- Dal: Android çalışması `android-capacitor` dalında; `main` dokunulmamış.

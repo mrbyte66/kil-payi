@@ -1,0 +1,22 @@
+{
+  "name": "kil-payi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kıl payı: Android refleks oyunu",
+  "scripts": {
+    "build": "./build.sh",
+    "sync": "./build.sh && cap sync android",
+    "sim": "node tools/sim.mjs 2500"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/status-bar": "8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}
