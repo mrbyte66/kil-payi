@@ -1,0 +1,874 @@
+<title>Kıl payı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Tasarım planı
+   Renk: lila (ana) + şeftali (hedef bölge); uyarı için gül. Nötrler lilaya çalar.
+   Yazı: Fredoka (başlık, sayılar), Nunito (metin). Yuvarlak formlar, hap butonlar.
+   Düzen: kronometre kadranı ortada, üstte süre kapsülü, üstte duran katmanlar buzlu cam. */
+:root{
+  --bg:#F5F2FC;--bg-2:#E9E3F7;--surface:#FFFFFF;--track:#E3DCF5;--tick:#B4AAD5;--line:#D8D0EC;
+  --ink:#29233F;--ink-2:#615A7C;--ink-3:#8F87AB;
+  --lilac:#8E7CF2;--lilac-soft:#DCD5FB;--btn:#6D58E0;--on-btn:#FFFFFF;
+  --peach:#FFA473;--peach-deep:#FF7D43;--peach-soft:#FFD9C5;
+  --rose:#FF5C84;--rose-soft:#FFD2DC;
+  --blob-1:#E2DBFB;--blob-2:#EBDDF9;
+  --glass:rgba(255,255,255,.64);--glass-edge:rgba(255,255,255,.85);--scrim:rgba(41,35,63,.18);
+  --shadow-s:0 1px 2px rgba(41,35,63,.06),0 6px 16px rgba(41,35,63,.08);
+  --shadow-m:0 2px 6px rgba(41,35,63,.07),0 20px 48px rgba(41,35,63,.16);
+  --r-s:16px;--r-m:24px;--r-l:32px;--r-pill:999px;
+  --fs-12:.75rem;--fs-14:.875rem;--fs-16:1rem;--fs-20:1.25rem;--fs-28:1.75rem;--fs-72:4.5rem;
+  --dur-fast:180ms;--dur-base:300ms;--dur-slow:550ms;--ease:cubic-bezier(.2,.8,.2,1);
+  --font-display:"Fredoka","SF Pro Rounded",ui-rounded,"Nunito",system-ui,sans-serif;
+  --font-body:"Nunito","SF Pro Rounded",ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16132E;--bg-2:#0F0D22;--surface:#26204D;--track:#312B5C;--tick:#5E5796;--line:#3D3770;
+  --ink:#F4F1FF;--ink-2:#BBB4DC;--ink-3:#8780AE;
+  --lilac:#AA9CFF;--lilac-soft:#3B327A;--btn:#BBAEFF;--on-btn:#1B1644;
+  --peach:#FFB088;--peach-deep:#FF9560;--peach-soft:#6B4148;
+  --rose:#FF7C9E;--rose-soft:#5C2D49;
+  --blob-1:#2B2463;--blob-2:#382A6C;
+  --glass:rgba(38,32,77,.62);--glass-edge:rgba(255,255,255,.16);--scrim:rgba(7,5,22,.5);
+  --shadow-s:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.28);
+  --shadow-m:0 2px 6px rgba(0,0,0,.3),0 20px 48px rgba(0,0,0,.45);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16132E;--bg-2:#0F0D22;--surface:#26204D;--track:#312B5C;--tick:#5E5796;--line:#3D3770;
+  --ink:#F4F1FF;--ink-2:#BBB4DC;--ink-3:#8780AE;
+  --lilac:#AA9CFF;--lilac-soft:#3B327A;--btn:#BBAEFF;--on-btn:#1B1644;
+  --peach:#FFB088;--peach-deep:#FF9560;--peach-soft:#6B4148;
+  --rose:#FF7C9E;--rose-soft:#5C2D49;
+  --blob-1:#2B2463;--blob-2:#382A6C;
+  --glass:rgba(38,32,77,.62);--glass-edge:rgba(255,255,255,.16);--scrim:rgba(7,5,22,.5);
+  --shadow-s:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.28);
+  --shadow-m:0 2px 6px rgba(0,0,0,.3),0 20px 48px rgba(0,0,0,.45);
+  color-scheme:dark}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+html{background:var(--bg)}
+body{margin:0;display:flex;justify-content:center;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:var(--fs-16);line-height:1.35;overflow:hidden;overscroll-behavior:none;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+#app{position:relative;width:100%;max-width:460px;height:100%;overflow:hidden;background:var(--bg)}
+@media (min-width:600px){body{align-items:center;background:var(--bg-2)}#app{height:min(100%,860px);border-radius:var(--r-l);box-shadow:var(--shadow-m)}}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+svg.ic{width:20px;height:20px;flex:none;display:block}
+svg.ic .f{fill:currentColor}
+svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+.amb{position:absolute;inset:0;overflow:hidden;pointer-events:none;transition:opacity var(--dur-slow) var(--ease)}
+#app.playing .amb{opacity:.4}
+.amb i{position:absolute;display:block;border-radius:50%;will-change:transform}
+.amb i:nth-child(1){width:70%;aspect-ratio:1;left:-24%;top:-10%;background:var(--blob-1);animation:drift-a 24s ease-in-out infinite alternate}
+.amb i:nth-child(2){width:54%;aspect-ratio:1;right:-18%;top:38%;background:var(--blob-2);animation:drift-b 28s ease-in-out infinite alternate}
+.amb i:nth-child(3){width:62%;aspect-ratio:1;left:6%;bottom:-24%;background:var(--blob-1);animation:drift-c 32s ease-in-out infinite alternate}
+@keyframes drift-a{to{transform:translate3d(14%,10%,0) scale(1.1)}}
+@keyframes drift-b{to{transform:translate3d(-16%,-8%,0) scale(.92)}}
+@keyframes drift-c{to{transform:translate3d(12%,-12%,0) scale(1.12)}}
+
+.hud{position:absolute;left:0;right:0;top:0;padding:18px 20px 0;display:flex;flex-direction:column;gap:10px;pointer-events:none;opacity:0;transform:translateY(-10px);transition:opacity var(--dur-base) var(--ease),transform var(--dur-slow) var(--ease)}
+.hud.on{opacity:1;transform:none}
+.gauge-row{display:flex;align-items:center;gap:12px}
+.gauge{position:relative;flex:1;height:30px;border-radius:var(--r-pill);background:var(--track);overflow:hidden}
+.fill{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:var(--r-pill);background:var(--lilac)}
+.gauge.warn .fill{background:var(--peach)}
+.gauge.crit .fill{background:var(--rose)}
+.notch{position:absolute;top:7px;bottom:7px;width:3px;margin-left:-1px;border-radius:2px;background:var(--rose)}
+.tleft{min-width:52px;text-align:right;font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);font-variant-numeric:tabular-nums;color:var(--ink)}
+.hud-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.zone{font-weight:800;font-size:var(--fs-12);color:var(--ink-2);transition:color var(--dur-fast)}
+.zone.hot{color:var(--rose)}
+
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 14px;border-radius:var(--r-pill);background:var(--surface);color:var(--ink-2);font-weight:800;font-size:var(--fs-14);box-shadow:var(--shadow-s)}
+.chip b{font-family:var(--font-display);font-weight:600;font-size:var(--fs-16);color:var(--ink);font-variant-numeric:tabular-nums}
+.chip{white-space:nowrap}
+.chip.sm{min-height:30px;padding:0 12px;font-size:var(--fs-12)}
+.chip.sm b{font-size:var(--fs-14)}
+
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:20px 20px 24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--dur-fast) var(--ease),visibility 0s linear var(--dur-fast)}
+.scr.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity var(--dur-base) var(--ease),visibility 0s}
+.scr.on .rise{animation:rise var(--dur-slow) var(--ease) both;animation-delay:calc(var(--i,0)*90ms + 80ms)}
+@keyframes rise{from{opacity:.5;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+
+.menu-head{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
+.topbar{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.title{margin:0;font-family:var(--font-display);font-weight:700;font-size:clamp(2.25rem,10vw,3rem);letter-spacing:-.01em;line-height:1.05;text-align:center}
+.tagline{margin:0;max-width:300px;color:var(--ink-2);font-weight:700;font-size:var(--fs-16);text-align:center;text-wrap:balance}
+.grow{flex:1}
+.menu-foot{width:100%;display:flex;flex-direction:column;align-items:center;gap:16px}
+.stat-row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+
+.btn{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 26px;border-radius:var(--r-pill);font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);line-height:1;color:var(--ink);background:var(--surface);box-shadow:var(--shadow-s);transition:transform var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),opacity var(--dur-fast)}
+.btn:active{transform:translateY(0) scale(.97);box-shadow:var(--shadow-s)}
+.btn:focus-visible,.icon-btn:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+.btn.primary{background:var(--btn);color:var(--on-btn)}
+.btn.big{width:min(100%,280px);min-height:64px;font-size:var(--fs-28)}
+.btn.quiet{background:transparent;box-shadow:none;color:var(--ink-2);min-height:44px;font-family:var(--font-body);font-weight:800;font-size:var(--fs-16)}
+.btn[aria-disabled="true"]{opacity:.55}
+@media (hover:hover){.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-m)}.btn.quiet:hover{box-shadow:none;transform:none;color:var(--ink)}}
+.icon-btn{appearance:none;border:0;cursor:pointer;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--ink-2);box-shadow:var(--shadow-s);transition:transform var(--dur-fast) var(--ease)}
+.icon-btn:active{transform:scale(.94)}
+@keyframes breathe{50%{transform:scale(1.04)}}
+.breathe{animation:breathe 2.4s ease-in-out infinite}
+
+.scr.dim{background:var(--scrim);justify-content:center}
+.card{width:min(100%,380px);padding:26px 20px 20px;border-radius:var(--r-l);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.scr.on .card{animation:card-in var(--dur-slow) var(--ease) both}
+@keyframes card-in{from{opacity:0;transform:translateY(28px) scale(.95)}to{opacity:1;transform:none}}
+.glass{background:var(--glass);border:1px solid var(--glass-edge);box-shadow:var(--shadow-m);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass{background:var(--surface)}}
+.eyebrow{margin:0;font-weight:800;font-size:var(--fs-14);color:var(--ink-2)}
+.big-score{font-family:var(--font-display);font-weight:700;font-size:var(--fs-72);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.delta{margin:0;font-weight:800;font-size:var(--fs-16);color:var(--ink-2)}
+.delta.win{color:var(--btn)}
+.near-msg{margin:0;padding:7px 14px;border-radius:var(--r-pill);background:var(--rose-soft);color:var(--ink);font-weight:800;font-size:var(--fs-14)}
+.cont{width:100%;padding:14px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);display:flex;flex-direction:column;gap:12px;text-align:left}
+.cont-head{display:flex;flex-direction:column;gap:2px}
+.cont-head b{font-family:var(--font-display);font-weight:600;font-size:var(--fs-20)}
+.cont-head span{color:var(--ink-2);font-weight:700;font-size:var(--fs-14)}
+.cont-actions{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+.cont-actions .btn{min-height:52px;padding:0 12px;font-size:var(--fs-16);white-space:nowrap;background:var(--bg);box-shadow:none}
+.cont-actions .btn.ad{background:var(--btn);color:var(--on-btn)}
+.ad-badge{margin:0;padding:6px 12px;border-radius:var(--r-pill);background:var(--lilac-soft);color:var(--ink);font-weight:800;font-size:var(--fs-12)}
+.ad-text{margin:0;color:var(--ink-2);font-weight:700;font-size:var(--fs-14);max-width:280px;text-wrap:balance}
+.ad-bar{width:100%;height:12px;border-radius:var(--r-pill);background:var(--track);overflow:hidden}
+.ad-bar i{display:block;height:100%;width:0;border-radius:inherit;background:var(--btn)}
+.toast{position:absolute;left:50%;bottom:28px;max-width:calc(100% - 40px);padding:12px 18px;border-radius:var(--r-pill);background:var(--glass);border:1px solid var(--glass-edge);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow-m);font-weight:800;font-size:var(--fs-14);color:var(--ink);text-align:center;opacity:0;transform:translate(-50%,16px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-base) var(--ease)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}}
+@media (prefers-reduced-motion:reduce){.amb i,.breathe{animation:none}.scr.on .rise,.scr.on .card{animation-duration:1ms;animation-delay:0s}.btn,.icon-btn,.hud{transition:none}}
+</style>
+
+<div id="app">
+  <div class="amb" aria-hidden="true"><i></i><i></i><i></i></div>
+  <canvas id="cv" role="img" aria-label="Oyun alanı: kronometre kadranında dönen ibre ve şeftali renkli hedef bölge"></canvas>
+
+  <div class="hud" id="hud" aria-hidden="true">
+    <div class="gauge-row">
+      <div class="gauge"><div class="fill" id="fill"></div><span class="notch" id="notch"></span></div>
+      <span class="tleft" id="tleft">6,0</span>
+    </div>
+    <div class="hud-row">
+      <span class="zone" id="zone"></span>
+      <span class="chip sm" id="hudBest"></span>
+    </div>
+  </div>
+
+  <section class="scr on" id="menu" aria-label="Ana ekran">
+    <header class="menu-head" id="menuHead">
+      <div class="topbar rise" style="--i:0">
+        <span class="chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><b id="coinN">0</b></span>
+        <button class="icon-btn" id="sndBtn" type="button" aria-label="Ses"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M4 9.5v5h3.6L12.5 19V5L7.6 9.5H4z"/><path class="s" id="sndWaves" d="M16 9a4.2 4.2 0 0 1 0 6M18.6 6.4a8 8 0 0 1 0 11.2"/></svg></button>
+      </div>
+      <h1 class="title rise" style="--i:1" data-i18n="title">Kıl payı</h1>
+      <p class="tagline rise" style="--i:2" data-i18n="tagline">Süre bitmek üzereyken vur, puan ×3.</p>
+    </header>
+    <div class="grow"></div>
+    <footer class="menu-foot" id="menuFoot">
+      <div class="stat-row rise" style="--i:3">
+        <span class="chip"><span data-i18n="best">En iyi</span><b id="menuBest">0</b></span>
+        <span class="chip"><span data-i18n="runs">Oyun</span><b id="menuRuns">0</b></span>
+      </div>
+      <button class="btn primary big breathe rise" style="--i:4" id="playBtn" type="button" data-i18n="play">Oyna</button>
+    </footer>
+  </section>
+
+  <section class="scr dim" id="over" aria-label="Sonuç" aria-hidden="true">
+    <div class="card glass">
+      <p class="eyebrow rise" style="--i:0" id="ovTitle"></p>
+      <div class="big-score rise" style="--i:1" id="ovScore">0</div>
+      <p class="delta rise" style="--i:2" id="ovDelta"></p>
+      <p class="near-msg rise" style="--i:3" id="ovNear" hidden></p>
+      <div class="stat-row rise" style="--i:4" id="ovStats"></div>
+      <div class="cont rise" style="--i:5" id="cont">
+        <div class="cont-head"><b data-i18n="contTitle">İkinci şans</b><span id="contSub"></span></div>
+        <div class="cont-actions">
+          <button class="btn ad" id="adBtn" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M8 5.5v13l11-6.5z"/></svg><span data-i18n="watchAd">Reklam izle</span></button>
+          <button class="btn" id="coinBtn" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><span id="coinCost">25</span></button>
+        </div>
+      </div>
+      <button class="btn primary big rise" style="--i:6" id="againBtn" type="button" data-i18n="again">Tekrar dene</button>
+      <button class="btn quiet rise" style="--i:7" id="homeBtn" type="button" data-i18n="home">Ana ekran</button>
+    </div>
+  </section>
+
+  <section class="scr dim" id="pause" aria-label="Duraklatıldı" aria-hidden="true">
+    <div class="card glass">
+      <p class="eyebrow rise" style="--i:0" data-i18n="paused">Duraklatıldı</p>
+      <button class="btn primary big rise" style="--i:1" id="resumeBtn" type="button" data-i18n="resume">Devam et</button>
+    </div>
+  </section>
+
+  <section class="scr dim" id="ad" aria-label="Reklam" aria-hidden="true">
+    <div class="card glass">
+      <p class="ad-badge rise" style="--i:0" data-i18n="adBadge">Reklam (demo)</p>
+      <p class="ad-text rise" style="--i:1" data-i18n="adText"></p>
+      <div class="ad-bar rise" style="--i:2"><i id="adFill"></i></div>
+      <p class="eyebrow rise" style="--i:3" data-i18n="adWait">Ödülün hazırlanıyor…</p>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="sr" id="live" aria-live="polite"></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const TAU = Math.PI * 2, HALF = Math.PI / 2;
+const $ = id => document.getElementById(id);
+const rnd = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
+const norm = a => { a %= TAU; return a < 0 ? a + TAU : a; };
+const angd = (a, b) => { const d = norm(a - b); return d > Math.PI ? TAU - d : d; };
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* ---------- ayarlar: oyun dengesi ve zorluk eğrisi tek yerde ---------- */
+/*TUNE-START*/
+const CFG = {
+  maxTime: 8, startTime: 6,
+  hitGain: 0.85, perfectBonus: 0.15, reliefGain: 0.25, nearGain: 1.5, nearAt: 1.0, missCost: 1.0,
+  perfectFrac: 0.32, grace: 0.05,
+  spawnMin: 1.0, spawnMax: 2.6,
+  contTime: 4, contCoins: 25, contSlow: 3, contSlowMul: 0.7,
+  coinDiv: 4, nearCoin: 2, adSeconds: 3, tutHits: 5
+};
+/* Zorluk dalgalı: taban yavaşça yükselir, her dalga (period vuruş) önce yükselir sonra gevşer.
+   adapt: oyuncu iyi oynadıkça yükselir, hata yaptıkça düşer. mercy: hatadan sonra kısa süre nefes verir. */
+const DIFF = {
+  period: 10, rise: 0.6,
+  trendMax: 0.72, trendTau: 75,
+  ampMax: 0.35, ampStart: 0.3, ampTau: 20,
+  omegaMin: 2.2, omegaMax: 4.2, hwMax: 0.5, hwMin: 0.15,
+  adaptUp: 0.01, adaptDown: 0.03, adaptCap: 0.12,
+  mercyHit: 0.6, mercyDecay: 0.7, mercyDrop: 0.25,
+  fatigueFrom: 100, fatigueRate: 0.004, fatigueCap: 0.6
+};
+const drainAt = n => 1 + Math.min(DIFF.fatigueCap, Math.max(0, n - DIFF.fatigueFrom) * DIFF.fatigueRate);
+const wavePhase = n => (n % DIFF.period) / DIFF.period;
+const smooth = p => p * p * (3 - 2 * p);
+const waveShape = p => p < DIFF.rise ? smooth(p / DIFF.rise) : 1 - smooth((p - DIFF.rise) / (1 - DIFF.rise));
+const intensity = (n, adapt, mercy) => {
+  const trend = DIFF.trendMax * (1 - Math.exp(-n / DIFF.trendTau));
+  const amp = DIFF.ampMax * (DIFF.ampStart + (1 - DIFF.ampStart) * (1 - Math.exp(-n / DIFF.ampTau)));
+  const v = trend + amp * waveShape(wavePhase(n)) + adapt - DIFF.mercyDrop * mercy;
+  return Math.max(0, Math.min(1, v));
+};
+const planGate = (n, adapt, mercy) => {
+  const I = intensity(n, adapt, mercy);
+  return {
+    I,
+    omega: DIFF.omegaMin + (DIFF.omegaMax - DIFF.omegaMin) * I,
+    hw: DIFF.hwMax - (DIFF.hwMax - DIFF.hwMin) * I,
+    relief: wavePhase(n) > DIFF.rise + 1e-9
+  };
+};
+const resolveHit = (S, d) => {
+  const perfect = d <= S.hw * CFG.perfectFrac;
+  const near = S.time < CFG.nearAt;
+  const pts = (perfect ? 2 : 1) * (near ? 3 : 1);
+  S.score += pts; S.n++; S.combo++; S.maxCombo = Math.max(S.maxCombo, S.combo);
+  S.time = Math.min(CFG.maxTime, S.time + (near ? CFG.nearGain : CFG.hitGain + (perfect ? CFG.perfectBonus : 0) + (S.relief ? CFG.reliefGain : 0)));
+  if (near) S.near++;
+  S.adapt = Math.min(DIFF.adaptCap, S.adapt + (perfect ? DIFF.adaptUp : DIFF.adaptUp * 0.3));
+  S.mercy *= DIFF.mercyDecay;
+  return { perfect, near, pts };
+};
+const resolveMiss = S => {
+  S.combo = 0;
+  S.time = Math.max(0, S.time - CFG.missCost);
+  S.adapt = Math.max(-DIFF.adaptCap, S.adapt - DIFF.adaptDown);
+  S.mercy = Math.min(1, S.mercy + DIFF.mercyHit);
+};
+/*TUNE-END*/
+
+/* ---------- dil ---------- */
+const LANG = ((navigator.language || 'tr') + '').toLowerCase().indexOf('tr') === 0 ? 'tr' : 'en';
+const STR = {
+  tr: {
+    title: 'Kıl payı', tagline: 'Süre bitmek üzereyken vur, puan ×3.', play: 'Oyna', best: 'En iyi', runs: 'Oyun',
+    zone: 'Son 1 sn: ×3', perfect: 'Mükemmel', near: 'Kıl payı ×3', miss: 'Iska', reverse: 'Ters yön', breath: 'Nefes al',
+    tut1: 'Şeftali bölgedeyken dokun', tut2: 'Süre bitmek üzereyken vur: ×3',
+    over: 'Süre bitti', overInside: 'Tam hedefteydin', overClose: 'Hedefe {s} sn kala bitti',
+    newBest: 'Yeni rekor', toBest: 'En iyine {n} puan kaldı',
+    statNear: 'Kıl payı', statCombo: 'Seri', statCoins: 'Kazanılan',
+    contTitle: 'İkinci şans', contSub: '+{s} sn ile devam et', watchAd: 'Reklam izle', again: 'Tekrar dene', home: 'Ana ekran',
+    paused: 'Duraklatıldı', resume: 'Devam et',
+    adBadge: 'Reklam (demo)', adText: 'Gerçek sürümde burada kısa bir video oynar. Bitince ödülün hazır.', adWait: 'Ödülün hazırlanıyor…',
+    notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', sound: 'Ses', score: 'puan',
+    soundOn: 'Sesi kapat', soundOff: 'Sesi aç', overSr: 'Süre bitti. Skor {n}.',
+    play_aria: 'Oyun alanı'
+  },
+  en: {
+    title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs',
+    zone: 'Last 1 s: ×3', perfect: 'Perfect', near: 'Close call ×3', miss: 'Miss', reverse: 'Reversed', breath: 'Catch your breath',
+    tut1: 'Tap when the pointer is in the peach zone', tut2: 'Hit it as time runs out: ×3',
+    over: 'Time is up', overInside: 'You were right on it', overClose: 'Missed it by {s} s',
+    newBest: 'New best', toBest: '{n} away from your best',
+    statNear: 'Close calls', statCombo: 'Best streak', statCoins: 'Earned',
+    contTitle: 'Second chance', contSub: 'Keep going with +{s} s', watchAd: 'Watch ad', again: 'Try again', home: 'Home',
+    paused: 'Paused', resume: 'Resume',
+    adBadge: 'Ad (demo)', adText: 'In the real version a short video plays here. Your reward is ready when it ends.', adWait: 'Preparing your reward…',
+    notEnough: 'Not enough coins. Watch an ad to keep going.', sound: 'Sound', score: 'pts',
+    soundOn: 'Mute sound', soundOff: 'Unmute sound', overSr: 'Time is up. Score {n}.',
+    play_aria: 'Play area'
+  }
+};
+const t = (k, v) => {
+  let s = STR[LANG][k]; if (s === undefined) s = STR.tr[k]; if (s === undefined) s = k;
+  if (v) for (const x in v) s = s.replace('{' + x + '}', v[x]);
+  return s;
+};
+const f1 = n => n.toFixed(1).replace('.', LANG === 'tr' ? ',' : '.');
+
+/* ---------- kayıt ---------- */
+const save = { best: 0, coins: 0, runs: 0, snd: true, vib: true, tut: false };
+try {
+  const raw = localStorage.getItem('kilpayi.v1');
+  if (raw) { const o = JSON.parse(raw); Object.keys(save).forEach(k => { if (o && o[k] !== undefined) save[k] = o[k]; }); }
+} catch (e) {}
+const persist = () => { try { localStorage.setItem('kilpayi.v1', JSON.stringify(save)); } catch (e) {} };
+
+/* ---------- palet: renkler CSS değişkenlerinden okunur, açık/koyu tema kendiliğinden izlenir ---------- */
+const P = {};
+let FD = 'sans-serif', FB = 'sans-serif';
+const readPalette = () => {
+  const cs = getComputedStyle(document.documentElement);
+  ['bg', 'surface', 'track', 'tick', 'ink', 'ink-2', 'lilac', 'lilac-soft', 'btn', 'peach', 'peach-deep', 'peach-soft', 'rose', 'rose-soft']
+    .forEach(k => { P[k] = cs.getPropertyValue('--' + k).trim() || '#888888'; });
+  FD = cs.getPropertyValue('--font-display').trim() || 'sans-serif';
+  FB = cs.getPropertyValue('--font-body').trim() || 'sans-serif';
+};
+readPalette();
+try {
+  if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette);
+  new MutationObserver(readPalette).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+} catch (e) {}
+
+/* ---------- ses: dosya yok, her şey üretiliyor ---------- */
+const Snd = {
+  ctx: null, master: null,
+  unlock() {
+    if (!this.ctx) {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) { this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = 0.5; this.master.connect(this.ctx.destination); }
+      } catch (e) {}
+    }
+    if (this.ctx && this.ctx.state === 'suspended') { try { this.ctx.resume(); } catch (e) {} }
+  },
+  tone(f, d, type, v, to, delay) {
+    if (!save.snd || !this.ctx) return;
+    try {
+      const c = this.ctx, t0 = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+      o.type = type || 'sine'; o.frequency.setValueAtTime(f, t0);
+      if (to) o.frequency.exponentialRampToValueAtTime(to, t0 + d);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(v || 0.2, t0 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+      o.connect(g); g.connect(this.master); o.start(t0); o.stop(t0 + d + 0.03);
+    } catch (e) {}
+  },
+  hit(combo, perfect) {
+    const sc = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
+    const f = 392 * Math.pow(2, sc[Math.min(combo, sc.length - 1)] / 12);
+    this.tone(f, 0.18, 'triangle', 0.2);
+    if (perfect) this.tone(f * 2, 0.22, 'sine', 0.1, null, 0.02);
+  },
+  near() { this.tone(220, 0.28, 'sawtooth', 0.09, 1100); this.tone(1320, 0.3, 'sine', 0.14, null, 0.08); this.tone(1760, 0.32, 'sine', 0.1, null, 0.15); },
+  miss() { this.tone(150, 0.16, 'square', 0.08, 90); },
+  over() { this.tone(440, 0.5, 'sine', 0.18, 110); },
+  warn() { this.tone(1180, 0.05, 'sine', 0.05); },
+  ui() { this.tone(660, 0.08, 'triangle', 0.12); },
+  rev() { this.tone(520, 0.12, 'triangle', 0.1, 780); }
+};
+
+/* ---------- platform köprüsü: web'de demo, Android'de gerçek reklam/titreşim ---------- */
+const Platform = {
+  vibrate(p) {
+    if (!save.vib) return;
+    try {
+      if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
+      if (navigator.vibrate) navigator.vibrate(p);
+    } catch (e) {}
+  },
+  track(name, params) { try { if (window.console && console.debug) console.debug('[kp]', name, params || ''); } catch (e) {} },
+  rewardedAd(done) {
+    const el = $('ad'), bar = $('adFill'), t0 = performance.now(), dur = CFG.adSeconds * 1000;
+    bar.style.width = '0%'; show(el);
+    const step = () => {
+      const p = Math.min(1, (performance.now() - t0) / dur);
+      bar.style.width = (p * 100).toFixed(1) + '%';
+      if (p < 1) requestAnimationFrame(step); else { hide(el); done(true); }
+    };
+    requestAnimationFrame(step);
+  }
+};
+
+/* ---------- arayüz yardımcıları ---------- */
+const app = $('app'), cv = $('cv'), ctx = cv.getContext('2d');
+const hudEl = $('hud'), fillEl = $('fill'), tleftEl = $('tleft'), zoneEl = $('zone'), hudBestEl = $('hudBest');
+const menuEl = $('menu'), overEl = $('over'), pauseEl = $('pause'), adEl = $('ad'), toastEl = $('toast');
+const gaugeEl = fillEl.parentNode;
+const show = el => { el.classList.add('on'); el.removeAttribute('aria-hidden'); };
+const hide = el => { el.classList.remove('on'); el.setAttribute('aria-hidden', 'true'); };
+let toastTimer = 0;
+const toast = msg => {
+  toastEl.textContent = msg; toastEl.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('on'), 2400);
+};
+const countUp = (el, to, ms) => {
+  const t0 = performance.now();
+  const s = now => {
+    const p = clamp((now - t0) / ms, 0, 1);
+    el.textContent = String(Math.round(to * easeOut(p)));
+    if (p < 1) requestAnimationFrame(s);
+  };
+  requestAnimationFrame(s);
+};
+const applyI18n = () => {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  cv.setAttribute('aria-label', t('play_aria'));
+  zoneEl.textContent = t('zone');
+  $('notch').style.left = (CFG.nearAt / CFG.maxTime * 100).toFixed(2) + '%';
+};
+const refreshSound = () => {
+  const b = $('sndBtn');
+  b.setAttribute('aria-label', save.snd ? t('soundOn') : t('soundOff'));
+  $('sndWaves').style.opacity = save.snd ? '1' : '0.25';
+};
+const refreshStats = () => {
+  $('coinN').textContent = String(save.coins);
+  $('menuBest').textContent = String(save.best);
+  $('menuRuns').textContent = String(save.runs);
+  hudBestEl.innerHTML = t('best') + ' <b>' + save.best + '</b>';
+};
+
+/* ---------- oyun durumu ---------- */
+const G = {
+  mode: 'menu', clock: 0,
+  time: 0, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0,
+  ang: 0.4, dir: 1, omega: DIFF.omegaMin, slow: 0,
+  ta: 1.0, hw: 0.45, gateT: 1,
+  adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false,
+  shake: 0, flash: 0, flashKind: 'rose', tscale: 1, tsT: 0,
+  parts: [], pops: [], rips: [], revT: 0, beep: 0, scorePulse: 0,
+  continued: false, runCounted: false, coinsGiven: 0, gain: 0, deadT: 0, overAt: 0,
+  nearMsg: '', newBest: false
+};
+const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100 };
+
+const spawnGate = first => {
+  const p = planGate(G.n, G.adapt, G.mercy);
+  G.hw = p.hw; G.omega = p.omega; G.I = p.I; G.relief = p.relief;
+  G.ta = norm(G.ang + G.dir * (first ? rnd(1.6, 2.3) : rnd(CFG.spawnMin, CFG.spawnMax)));
+  G.gateT = 0;
+};
+const shake = s => { if (!RM) G.shake = Math.max(G.shake, s); };
+const flash = (kind, s) => { if (!RM) { G.flashKind = kind; G.flash = s; } };
+const gatePos = a => ({ x: view.cx + Math.cos(a - HALF) * view.r, y: view.cy + Math.sin(a - HALF) * view.r });
+const burst = (x, y, n, cols, speed) => {
+  const k = RM ? 0.4 : 1;
+  for (let i = 0; i < Math.round(n * k); i++) {
+    const a = rnd(0, TAU), s = rnd(speed * 0.35, speed);
+    G.parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: rnd(0.45, 0.85), r: rnd(2.5, 5.5), c: cols[(Math.random() * cols.length) | 0] });
+  }
+};
+const pop = (txt, kind) => {
+  let slot = 0;
+  for (const p of G.pops) if (p.t < 0.4) slot++;
+  G.pops.push({ txt, kind, t: 0, max: 0.95, off: Math.min(2, slot) * 36 });
+};
+
+/* ---------- akış ---------- */
+const relayout = snap => {
+  const w = view.w, h = view.h, cx = w / 2;
+  let cy, r;
+  if (G.mode === 'menu') {
+    const top = app.getBoundingClientRect().top;
+    const hb = $('menuHead').getBoundingClientRect().bottom - top;
+    const ft = $('menuFoot').getBoundingClientRect().top - top;
+    cy = (hb + ft) / 2;
+    r = Math.min(w * 0.29, (ft - hb) / 2 - 36);
+  } else {
+    cy = h * 0.5 + 8;
+    r = Math.min(w * 0.335, h * 0.22);
+  }
+  r = Math.max(56, r);
+  view.tcx = cx; view.tcy = cy; view.tr = r;
+  if (snap) { view.cx = cx; view.cy = cy; view.r = r; }
+};
+const resize = () => {
+  const b = app.getBoundingClientRect();
+  view.w = b.width; view.h = b.height; view.dpr = Math.min(3, window.devicePixelRatio || 1);
+  cv.width = Math.max(1, Math.round(view.w * view.dpr));
+  cv.height = Math.max(1, Math.round(view.h * view.dpr));
+  relayout(true);
+};
+
+const start = () => {
+  Snd.ui();
+  Object.assign(G, {
+    mode: 'play', time: CFG.startTime, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0,
+    continued: false, runCounted: false, coinsGiven: 0, gain: 0, shake: 0, flash: 0, tscale: 1, tsT: 0,
+    revT: 0, beep: 0, scorePulse: 0, parts: [], pops: [], rips: [], nearMsg: '',
+    adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false
+  });
+  spawnGate(true);
+  hide(menuEl); hide(overEl); hide(pauseEl);
+  app.classList.add('playing');
+  hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
+  relayout(false);
+  updateHud();
+  Platform.track('run_start', { run: save.runs + 1 });
+};
+
+const goMenu = () => {
+  G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0;
+  hide(overEl); hide(pauseEl);
+  app.classList.remove('playing');
+  hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
+  show(menuEl);
+  refreshStats();
+  requestAnimationFrame(() => relayout(false));
+};
+
+const tap = () => {
+  if (G.mode !== 'play') return;
+  const d = angd(G.ang, G.ta);
+  if (d <= G.hw + CFG.grace) hit(d); else miss();
+};
+
+const hit = d => {
+  const wasRelief = G.relief;
+  const { perfect, near, pts } = resolveHit(G, d);
+  G.scorePulse = 1;
+  const p = gatePos(G.ta);
+  const cols = near ? [P.rose, P['rose-soft'], P.peach] : (perfect ? [P['peach-deep'], P.peach, P.lilac] : [P.peach, P.lilac, P['peach-soft']]);
+  burst(p.x, p.y, near ? 26 : (perfect ? 18 : 11), cols, near ? 260 : 190);
+  G.rips.push({ x: p.x, y: p.y, t: 0, max: near ? 0.7 : 0.5, r0: 10, r1: near ? 90 : 56, c: near ? P.rose : P.peach });
+  if (near) {
+    pop(t('near'), 'near'); shake(0.35); flash('rose', 0.22);
+    if (!RM) { G.tscale = 0.3; G.tsT = 0.14; }
+    Snd.near(); Platform.vibrate([18, 30, 40]);
+  } else {
+    pop(perfect ? t('perfect') : '+' + pts, perfect ? 'perfect' : 'plain');
+    Snd.hit(G.combo - 1, perfect); Platform.vibrate(perfect ? 14 : 8);
+  }
+  if (G.n >= DIFF.period && G.n % DIFF.period === 0) {
+    G.dir = -G.dir; G.revT = 0.8; pop(t('reverse'), 'rev'); Snd.rev();
+  }
+  spawnGate(false);
+  if (G.relief && !wasRelief) pop(t('breath'), 'rev');
+  if (G.n === 1) refreshStats();
+};
+
+const miss = () => {
+  resolveMiss(G);
+  shake(0.2); flash('rose', 0.14);
+  pop(t('miss'), 'miss'); Snd.miss(); Platform.vibrate(28);
+  if (G.time <= 0) die();
+};
+
+const die = () => {
+  if (G.mode !== 'play') return;
+  G.mode = 'dead'; G.deadT = 0.6;
+  const w = G.omega * (G.slow > 0 ? CFG.contSlowMul : 1);
+  const inside = angd(G.ang, G.ta) <= G.hw;
+  const secs = (norm((G.ta - G.ang) * G.dir) - G.hw) / w;
+  G.nearMsg = inside ? t('overInside') : (secs > 0 && secs <= 0.6 ? t('overClose', { s: f1(Math.max(0.1, secs)) }) : '');
+  shake(0.5); flash('rose', 0.3); Snd.over(); Platform.vibrate([30, 40, 60]);
+  G.newBest = G.score > save.best;
+  if (G.newBest) save.best = G.score;
+  if (!G.runCounted) { save.runs++; G.runCounted = true; }
+  const total = Math.floor(G.score / CFG.coinDiv) + G.near * CFG.nearCoin;
+  G.gain = total - G.coinsGiven; G.coinsGiven = total; save.coins += G.gain;
+  if (!save.tut && G.n >= CFG.tutHits) save.tut = true;
+  persist(); refreshStats();
+  Platform.track('run_end', { score: G.score, hits: G.n, near: G.near, continued: G.continued });
+};
+
+const showOver = () => {
+  G.mode = 'over'; G.overAt = performance.now();
+  $('ovTitle').textContent = t('over');
+  countUp($('ovScore'), G.score, 600);
+  const d = $('ovDelta');
+  d.hidden = G.score === 0;
+  if (G.newBest && G.score > 0) { d.textContent = t('newBest'); d.className = 'delta win rise'; }
+  else { d.textContent = t('toBest', { n: Math.max(1, save.best - G.score) }); d.className = 'delta rise'; }
+  const nm = $('ovNear');
+  if (G.nearMsg) { nm.textContent = G.nearMsg; nm.hidden = false; } else { nm.hidden = true; }
+  const coinIcon = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach);width:16px;height:16px"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg>';
+  const chips = [];
+  if (G.near > 0) chips.push('<span class="chip sm">' + t('statNear') + ' <b>' + G.near + '</b></span>');
+  if (G.maxCombo >= 3) chips.push('<span class="chip sm">' + t('statCombo') + ' <b>' + G.maxCombo + '</b></span>');
+  if (G.gain > 0) chips.push('<span class="chip sm">' + coinIcon + '<b>+' + G.gain + '</b></span>');
+  const st = $('ovStats');
+  st.innerHTML = chips.join(''); st.hidden = chips.length === 0;
+  const canCont = !G.continued && G.score >= 3;
+  $('cont').hidden = !canCont;
+  $('contSub').textContent = t('contSub', { s: CFG.contTime });
+  $('coinCost').textContent = String(CFG.contCoins);
+  $('coinBtn').setAttribute('aria-disabled', save.coins < CFG.contCoins ? 'true' : 'false');
+  $('live').textContent = t('overSr', { n: G.score });
+  show(overEl);
+};
+
+const doContinue = () => {
+  G.mode = 'play'; G.continued = true; G.time = CFG.contTime; G.slow = CFG.contSlow;
+  G.combo = 0; G.tscale = 1; G.tsT = 0;
+  G.ang = norm(G.ta - G.dir * 1.3);
+  G.gateT = 0;
+  hide(overEl);
+  pop('+' + CFG.contTime + ' ' + (LANG === 'tr' ? 'sn' : 's'), 'perfect');
+  Snd.ui(); relayout(false); updateHud();
+  Platform.track('continue', { score: G.score });
+};
+
+const pause = () => { if (G.mode !== 'play'/*NOPAUSE*/) return; G.mode = 'pause'; show(pauseEl); };
+const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'play'; Snd.ui(); };
+
+let lastT = '';
+const updateHud = () => {
+  const f = clamp(G.time / CFG.maxTime, 0, 1);
+  fillEl.style.width = (f * 100).toFixed(1) + '%';
+  const s = f1(Math.max(0, G.time));
+  if (s !== lastT) { lastT = s; tleftEl.textContent = s; }
+  const crit = G.time < CFG.nearAt, warn = !crit && G.time < 2.5;
+  gaugeEl.classList.toggle('crit', crit);
+  gaugeEl.classList.toggle('warn', warn);
+  zoneEl.classList.toggle('hot', crit && G.mode === 'play');
+};
+
+/* ---------- güncelleme ---------- */
+const update = raw => {
+  G.clock += raw;
+  const k = Math.min(1, raw * 9);
+  view.cx += (view.tcx - view.cx) * k; view.cy += (view.tcy - view.cy) * k; view.r += (view.tr - view.r) * k;
+  if (G.tsT > 0) { G.tsT -= raw; if (G.tsT <= 0) G.tscale = 1; }
+  const dt = raw * G.tscale;
+
+  if (G.mode === 'menu') {
+    G.ang = norm(G.ang + 1.0 * dt);
+    G.gateT = Math.min(1, G.gateT + raw * 2);
+  } else if (G.mode === 'play') {
+    const w = G.omega * (G.slow > 0 ? CFG.contSlowMul : 1);
+    G.ang = norm(G.ang + G.dir * w * dt);
+    G.time -= dt * drainAt(G.n);
+    if (G.slow > 0) G.slow -= raw;
+    if (G.revT > 0) G.revT -= raw;
+    G.gateT = Math.min(1, G.gateT + raw * 4);
+    if (G.time < CFG.nearAt) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
+    if (G.time <= 0) { G.time = 0; die(); }
+    updateHud();
+  } else if (G.mode === 'dead') {
+    G.deadT -= raw;
+    updateHud();
+    if (G.deadT <= 0) showOver();
+  }
+
+  G.shake = Math.max(0, G.shake - raw);
+  G.flash = Math.max(0, G.flash - raw);
+  G.scorePulse = Math.max(0, G.scorePulse - raw * 5);
+  G.Ivis += (G.I - G.Ivis) * Math.min(1, raw * 3);
+  const decay = Math.exp(-3.2 * raw);
+  for (const p of G.parts) { p.life += raw; p.x += p.vx * raw; p.y += p.vy * raw; p.vx *= decay; p.vy = p.vy * decay + 140 * raw; }
+  G.parts = G.parts.filter(p => p.life < p.max);
+  for (const r of G.rips) r.t += raw;
+  G.rips = G.rips.filter(r => r.t < r.max);
+  for (const p of G.pops) p.t += raw;
+  G.pops = G.pops.filter(p => p.t < p.max);
+};
+
+/* ---------- çizim ---------- */
+const arc = (c, x, y, r, a0, a1) => { c.beginPath(); c.arc(x, y, r, a0, a1); c.stroke(); };
+const mixHex = (a, b, k) => {
+  if (a.charAt(0) !== '#' || a.length !== 7 || b.charAt(0) !== '#' || b.length !== 7) return a;
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ch = s => Math.round(((pa >> s) & 255) * (1 - k) + ((pb >> s) & 255) * k);
+  return 'rgb(' + ch(16) + ',' + ch(8) + ',' + ch(0) + ')';
+};
+const pill = (c, txt, x, y, bg, fg, size) => {
+  c.font = '800 ' + size + 'px ' + FB;
+  const w = c.measureText(txt).width + size * 1.7, h = size * 2.1;
+  const px = clamp(x, w / 2 + 8, view.w - w / 2 - 8);
+  c.fillStyle = bg;
+  c.beginPath();
+  if (c.roundRect) c.roundRect(px - w / 2, y - h / 2, w, h, h / 2);
+  else c.rect(px - w / 2, y - h / 2, w, h);
+  c.fill();
+  c.fillStyle = fg; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(txt, px, y + 1);
+};
+
+const render = () => {
+  const c = ctx, cx = view.cx, cy = view.cy, R = view.r, RW = Math.max(14, R * 0.2);
+  c.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+  c.clearRect(0, 0, view.w, view.h);
+  c.save();
+  if (G.shake > 0) { const m = Math.min(9, G.shake * 20); c.translate((Math.random() - 0.5) * m, (Math.random() - 0.5) * m); }
+
+  const r0 = R + RW / 2 + 10;
+  const iv = G.mode === 'menu' ? 0 : G.Ivis;
+  c.lineCap = 'round'; c.strokeStyle = mixHex(P.tick, P.rose, 0.8 * iv);
+  for (let i = 0; i < 60; i++) {
+    const a = i / 60 * TAU - HALF, long = i % 5 === 0, r1 = r0 + (long ? 13 + 5 * iv : 7 + 3 * iv), ca = Math.cos(a), sa = Math.sin(a);
+    c.globalAlpha = long ? 0.95 : 0.55 + 0.3 * iv; c.lineWidth = (long ? 2.6 : 1.6) + 0.6 * iv;
+    c.beginPath(); c.moveTo(cx + ca * r0, cy + sa * r0); c.lineTo(cx + ca * r1, cy + sa * r1); c.stroke();
+  }
+  c.globalAlpha = 1;
+
+  c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
+  c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
+
+  if (G.mode === 'play' && G.time < CFG.nearAt) {
+    const b = 0.5 + 0.5 * Math.sin(G.clock * 16);
+    c.globalAlpha = 0.35 + 0.4 * b; c.strokeStyle = P.rose; c.lineWidth = 3;
+    c.beginPath(); c.arc(cx, cy, R + RW / 2 + 3 + 3 * b, 0, TAU); c.stroke();
+    c.globalAlpha = 1;
+  }
+
+  const gk = easeOut(clamp(G.gateT / 0.25, 0, 1));
+  if (gk > 0) {
+    const hw = G.hw * (0.35 + 0.65 * gk);
+    c.globalAlpha = gk;
+    c.lineWidth = RW + 10; c.strokeStyle = P['peach-soft']; arc(c, cx, cy, R, G.ta - hw - HALF, G.ta + hw - HALF);
+    c.lineWidth = RW; c.strokeStyle = P.peach; arc(c, cx, cy, R, G.ta - hw - HALF, G.ta + hw - HALF);
+    c.strokeStyle = P['peach-deep']; arc(c, cx, cy, R, G.ta - hw * CFG.perfectFrac - HALF, G.ta + hw * CFG.perfectFrac - HALF);
+    c.globalAlpha = 1;
+  }
+
+  const a = G.ang - HALF, dir = G.dir;
+  c.lineWidth = RW * 0.5; c.strokeStyle = P.lilac;
+  for (let i = 0; i < 10; i++) {
+    const s0 = a - dir * i * 0.05, s1 = a - dir * (i + 1) * 0.05;
+    c.globalAlpha = (1 - i / 10) * 0.45;
+    arc(c, cx, cy, R, Math.min(s0, s1), Math.max(s0, s1));
+  }
+  c.globalAlpha = 1;
+  const px = cx + Math.cos(a) * R, py = cy + Math.sin(a) * R;
+  c.lineCap = 'round'; c.lineWidth = 3; c.strokeStyle = P.ink;
+  c.beginPath(); c.moveTo(cx + Math.cos(a) * R * 0.62, cy + Math.sin(a) * R * 0.62); c.lineTo(px, py); c.stroke();
+  c.fillStyle = P.ink; c.beginPath(); c.arc(px, py, RW * 0.5 + 2, 0, TAU); c.fill();
+  c.fillStyle = P.surface; c.beginPath(); c.arc(px, py, RW * 0.17, 0, TAU); c.fill();
+
+  for (const r of G.rips) {
+    const p = r.t / r.max;
+    c.globalAlpha = (1 - p) * 0.85; c.strokeStyle = r.c; c.lineWidth = 3;
+    c.beginPath(); c.arc(r.x, r.y, r.r0 + (r.r1 - r.r0) * easeOut(p), 0, TAU); c.stroke();
+  }
+  for (const p of G.parts) {
+    const q = p.life / p.max;
+    c.globalAlpha = 1 - q; c.fillStyle = p.c;
+    c.beginPath(); c.arc(p.x, p.y, p.r * (1 - 0.45 * q), 0, TAU); c.fill();
+  }
+  c.globalAlpha = 1;
+
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  if (G.mode === 'menu') {
+    c.fillStyle = P.ink; c.font = '600 ' + Math.round(R * 0.6) + 'px ' + FD;
+    c.fillText(String(save.best), cx, cy - R * 0.04);
+    c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
+    c.fillText(t('best'), cx, cy + R * 0.36);
+  } else {
+    const sc = 1 + 0.2 * G.scorePulse;
+    c.save(); c.translate(cx, cy - R * 0.04); c.scale(sc, sc);
+    c.fillStyle = P.ink; c.font = '600 ' + Math.round(R * 0.6) + 'px ' + FD;
+    c.fillText(String(G.score), 0, 0);
+    c.restore();
+    c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
+    c.fillText(t('score'), cx, cy + R * 0.36);
+  }
+
+  if (G.mode === 'play' && !save.tut && G.n < CFG.tutHits) {
+    pill(c, G.n < 2 ? t('tut1') : t('tut2'), cx, cy + r0 + 13 + 40, P.surface, P.ink, 14);
+  }
+  const topY = cy - (r0 + 13) - 30;
+  for (const p of G.pops) {
+    const k = p.t / p.max, rise = 34 * easeOut(Math.min(1, k * 1.4));
+    const al = k < 0.12 ? k / 0.12 : (k > 0.65 ? (1 - k) / 0.35 : 1);
+    const sc = 0.85 + 0.15 * Math.min(1, k / 0.15);
+    let bg = P.surface, fg = P.ink;
+    if (p.kind === 'near') { bg = P.rose; fg = '#FFFFFF'; }
+    else if (p.kind === 'perfect') { bg = P['peach-soft']; fg = P.ink; }
+    else if (p.kind === 'rev') { bg = P['lilac-soft']; fg = P.ink; }
+    else if (p.kind === 'miss') { bg = P.track; fg = P['ink-2']; }
+    c.save(); c.globalAlpha = al; c.translate(cx, topY - rise - p.off); c.scale(sc, sc);
+    pill(c, p.txt, 0, 0, bg, fg, p.kind === 'near' ? 17 : 15);
+    c.restore();
+  }
+  c.restore();
+
+  if (G.flash > 0) {
+    c.globalAlpha = Math.min(0.22, G.flash * 0.7);
+    c.fillStyle = G.flashKind === 'rose' ? P.rose : P.peach;
+    c.fillRect(0, 0, view.w, view.h);
+    c.globalAlpha = 1;
+  }
+};
+
+/* ---------- giriş ---------- */
+app.addEventListener('pointerdown', e => {
+  Snd.unlock();
+  if (e.target.closest && e.target.closest('button')) return;
+  if (G.mode === 'play') tap();
+  else if (G.mode === 'menu') start();
+  else if (G.mode === 'over' && performance.now() - G.overAt > 700) start();
+  else if (G.mode === 'pause') resume();
+});
+window.addEventListener('keydown', e => {
+  if (e.repeat || (e.code !== 'Space' && e.code !== 'Enter')) return;
+  const ae = document.activeElement;
+  if (ae && ae.tagName === 'BUTTON') return;
+  e.preventDefault(); Snd.unlock();
+  if (G.mode === 'play') tap();
+  else if (G.mode === 'menu') start();
+  else if (G.mode === 'over' && performance.now() - G.overAt > 500) start();
+  else if (G.mode === 'pause') resume();
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+$('playBtn').addEventListener('click', () => { Snd.unlock(); start(); });
+$('againBtn').addEventListener('click', () => { Snd.unlock(); start(); });
+$('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
+$('resumeBtn').addEventListener('click', resume);
+$('sndBtn').addEventListener('click', () => { Snd.unlock(); save.snd = !save.snd; persist(); refreshSound(); Snd.ui(); });
+$('adBtn').addEventListener('click', () => {
+  if (G.mode !== 'over') return;
+  Snd.unlock(); G.mode = 'ad'; hide(overEl);
+  Platform.rewardedAd(ok => { if (ok) doContinue(); else { G.mode = 'over'; show(overEl); } });
+});
+$('coinBtn').addEventListener('click', () => {
+  if (G.mode !== 'over') return;
+  Snd.unlock();
+  if (save.coins < CFG.contCoins) { toast(t('notEnough')); return; }
+  save.coins -= CFG.contCoins; persist(); refreshStats(); doContinue();
+});
+
+/* ---------- açılış ---------- */
+applyI18n(); refreshSound(); refreshStats();
+resize();
+if (window.ResizeObserver) new ResizeObserver(resize).observe(app); else window.addEventListener('resize', resize);
+if (document.fonts && document.fonts.load) {
+  Promise.all([document.fonts.load('600 40px Fredoka'), document.fonts.load('800 14px Nunito')]).then(() => { readPalette(); relayout(false); }).catch(() => {});
+}
+setTimeout(() => relayout(true), 120);
+/*DEBUG*/
+
+let last = 0;
+const frame = ts => {
+  if (!last) last = ts;
+  const raw = Math.min(0.05, (ts - last) / 1000); last = ts;
+  update(raw); render();
+  requestAnimationFrame(frame);
+};
+requestAnimationFrame(frame);
+})();
+</script>

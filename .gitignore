@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# Derleme çıktısı: ./build.sh ile src/game.html dosyasından üretilir
+www/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Android / Capacitor derleme çıktıları
+android/.gradle/
+android/build/
+android/app/build/
+android/capacitor-cordova-android-plugins/
+android/local.properties
+android/.idea/
+android/captures/
+*.apk
+*.aab
+
+# İmzalama anahtarları ve gizli dosyalar: ASLA depoya girmemeli
+*.keystore
+*.jks
+keystore.properties
+.env
+.env.*
+
+# Günlükler
+*.log
