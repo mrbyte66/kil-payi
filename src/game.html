@@ -8,7 +8,7 @@
 /* Tasarım planı
    Renk: lila (ana) + şeftali (hedef bölge); uyarı için gül. Nötrler lilaya çalar.
    Yazı: Fredoka (başlık, sayılar), Nunito (metin). Yuvarlak formlar, hap butonlar.
-   Düzen: kronometre kadranı ortada, üstte süre kapsülü, üstte duran katmanlar buzlu cam. */
+   Düzen: kronometre kadranı ortada, üstte süre kapsülü, altta alet çubuğu, üstte duran katmanlar buzlu cam. */
 :root{
   --bg:#F5F2FC;--bg-2:#E9E3F7;--surface:#FFFFFF;--track:#E3DCF5;--tick:#B4AAD5;--line:#D8D0EC;
   --ink:#29233F;--ink-2:#615A7C;--ink-3:#8F87AB;
@@ -80,9 +80,10 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .gauge.crit .fill{background:var(--rose)}
 .notch{position:absolute;top:7px;bottom:7px;width:3px;margin-left:-1px;border-radius:2px;background:var(--rose)}
 .tleft{min-width:52px;text-align:right;font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);font-variant-numeric:tabular-nums;color:var(--ink)}
-.hud-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.zone{font-weight:800;font-size:var(--fs-12);color:var(--ink-2);transition:color var(--dur-fast)}
+.hud-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.zone{font-weight:800;font-size:var(--fs-12);color:var(--ink-2);transition:color var(--dur-fast);white-space:nowrap}
 .zone.hot{color:var(--rose)}
+.fx{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1;min-width:0}
 
 .chip{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 14px;border-radius:var(--r-pill);background:var(--surface);color:var(--ink-2);font-weight:800;font-size:var(--fs-14);box-shadow:var(--shadow-s)}
 .chip b{font-family:var(--font-display);font-weight:600;font-size:var(--fs-16);color:var(--ink);font-variant-numeric:tabular-nums}
@@ -97,6 +98,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
 .menu-head{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
 .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.tb-right{display:flex;gap:10px}
 .title{margin:0;font-family:var(--font-display);font-weight:700;font-size:clamp(2.25rem,10vw,3rem);letter-spacing:-.01em;line-height:1.05;text-align:center}
 .tagline{margin:0;max-width:300px;color:var(--ink-2);font-weight:700;font-size:var(--fs-16);text-align:center;text-wrap:balance}
 .grow{flex:1}
@@ -105,7 +107,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
 .btn{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 26px;border-radius:var(--r-pill);font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);line-height:1;color:var(--ink);background:var(--surface);box-shadow:var(--shadow-s);transition:transform var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),opacity var(--dur-fast)}
 .btn:active{transform:translateY(0) scale(.97);box-shadow:var(--shadow-s)}
-.btn:focus-visible,.icon-btn:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+.btn:focus-visible,.icon-btn:focus-visible,.tool:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
 .btn.primary{background:var(--btn);color:var(--on-btn)}
 .btn.big{width:min(100%,280px);min-height:64px;font-size:var(--fs-28)}
 .btn.quiet{background:transparent;box-shadow:none;color:var(--ink-2);min-height:44px;font-family:var(--font-body);font-weight:800;font-size:var(--fs-16)}
@@ -115,6 +117,16 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .icon-btn:active{transform:scale(.94)}
 @keyframes breathe{50%{transform:scale(1.04)}}
 .breathe{animation:breathe 2.4s ease-in-out infinite}
+
+.tools{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 18px;display:flex;justify-content:center;gap:16px;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-slow) var(--ease)}
+.tools.on{opacity:1;transform:none;pointer-events:auto}
+.tool{appearance:none;border:0;position:relative;width:58px;height:58px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-s);display:grid;place-items:center;cursor:pointer;transition:transform var(--dur-fast) var(--ease),opacity var(--dur-fast)}
+.tool:active{transform:scale(.92)}
+.tool.empty{opacity:.55}
+.tool svg{width:28px;height:28px;display:block}
+.tool .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tool .badge{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--btn);color:var(--on-btn);font:800 12px/22px var(--font-body);text-align:center;font-variant-numeric:tabular-nums}
+.tool.empty .badge{background:var(--track);color:var(--ink-2)}
 
 .scr.dim{background:var(--scrim);justify-content:center}
 .card{width:min(100%,380px);padding:26px 20px 20px;border-radius:var(--r-l);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
@@ -134,15 +146,35 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .cont-actions{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
 .cont-actions .btn{min-height:52px;padding:0 12px;font-size:var(--fs-16);white-space:nowrap;background:var(--bg);box-shadow:none}
 .cont-actions .btn.ad{background:var(--btn);color:var(--on-btn)}
+.row2{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+
+.shop{max-height:min(100%,760px);gap:10px;padding:20px 16px 14px}
+.shop-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.shop-head h2{margin:0;font-family:var(--font-display);font-weight:600;font-size:var(--fs-28);line-height:1.1}
+.shop-list{width:100%;display:flex;flex-direction:column;gap:10px;overflow:auto;min-height:0;padding:2px}
+.trow{display:grid;grid-template-columns:48px 1fr;gap:2px 12px;padding:12px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);text-align:left}
+.trow .ti{grid-row:1/3;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:var(--lilac-soft);color:var(--btn)}
+.trow .ti svg{width:26px;height:26px}
+.trow .ti .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.trow .nm{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--font-display);font-weight:600;font-size:var(--fs-16)}
+.trow .ds{color:var(--ink-2);font-weight:700;font-size:var(--fs-12);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.trow .ac{grid-column:1/3;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.trow .ac .btn{min-height:42px;font-size:var(--fs-14);padding:0 10px;background:var(--bg);box-shadow:none;white-space:nowrap}
+.trow .ac .btn[aria-disabled="true"]{opacity:.5}
+.pips{display:inline-flex;gap:4px;align-items:center}
+.pips i{width:8px;height:8px;border-radius:50%;background:var(--track)}
+.pips i.on{background:var(--lilac)}
+.stock{font-family:var(--font-display);font-weight:600;color:var(--ink);font-size:var(--fs-14);white-space:nowrap}
+
 .ad-badge{margin:0;padding:6px 12px;border-radius:var(--r-pill);background:var(--lilac-soft);color:var(--ink);font-weight:800;font-size:var(--fs-12)}
 .ad-text{margin:0;color:var(--ink-2);font-weight:700;font-size:var(--fs-14);max-width:280px;text-wrap:balance}
 .ad-bar{width:100%;height:12px;border-radius:var(--r-pill);background:var(--track);overflow:hidden}
 .ad-bar i{display:block;height:100%;width:0;border-radius:inherit;background:var(--btn)}
-.toast{position:absolute;left:50%;bottom:28px;max-width:calc(100% - 40px);padding:12px 18px;border-radius:var(--r-pill);background:var(--glass);border:1px solid var(--glass-edge);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow-m);font-weight:800;font-size:var(--fs-14);color:var(--ink);text-align:center;opacity:0;transform:translate(-50%,16px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-base) var(--ease)}
+.toast{position:absolute;left:50%;bottom:92px;max-width:calc(100% - 40px);padding:12px 18px;border-radius:var(--r-pill);background:var(--glass);border:1px solid var(--glass-edge);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow-m);font-weight:800;font-size:var(--fs-14);color:var(--ink);text-align:center;opacity:0;transform:translate(-50%,16px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-base) var(--ease);z-index:5}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
-@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}}
-@media (prefers-reduced-motion:reduce){.amb i,.breathe{animation:none}.scr.on .rise,.scr.on .card{animation-duration:1ms;animation-delay:0s}.btn,.icon-btn,.hud{transition:none}}
+@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tool{width:52px;height:52px}}
+@media (prefers-reduced-motion:reduce){.amb i,.breathe{animation:none}.scr.on .rise,.scr.on .card{animation-duration:1ms;animation-delay:0s}.btn,.icon-btn,.hud,.tools,.tool{transition:none}}
 </style>
 
 <div id="app">
@@ -156,15 +188,26 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     </div>
     <div class="hud-row">
       <span class="zone" id="zone"></span>
+      <span class="fx" id="fx"></span>
       <span class="chip sm" id="hudBest"></span>
     </div>
+  </div>
+
+  <div class="tools" id="tools" role="group" aria-label="Aletler">
+    <button class="tool" data-tool="steto" type="button" style="color:var(--btn)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M6 3v5a5 5 0 0 0 10 0V3M11 13v2.5a4 4 0 0 0 8 0V14"/><circle class="s" cx="19" cy="12" r="2"/></svg><b class="badge">0</b></button>
+    <button class="tool" data-tool="kron" type="button" style="color:var(--peach-deep)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="s" cx="12" cy="13.5" r="7"/><path class="s" d="M12 13.5V10M10 3h4M12 3v3.5"/></svg><b class="badge">0</b></button>
+    <button class="tool" data-tool="kalkan" type="button" style="color:var(--rose)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3z"/></svg><b class="badge">0</b></button>
+    <button class="tool" data-tool="kum" type="button" style="color:var(--lilac)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M7 3h10M7 21h10M8 3c0 5 4 5 4 9s-4 4-4 9M16 3c0 5-4 5-4 9s4 4 4 9"/></svg><b class="badge">0</b></button>
   </div>
 
   <section class="scr on" id="menu" aria-label="Ana ekran">
     <header class="menu-head" id="menuHead">
       <div class="topbar rise" style="--i:0">
         <span class="chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><b id="coinN">0</b></span>
-        <button class="icon-btn" id="sndBtn" type="button" aria-label="Ses"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M4 9.5v5h3.6L12.5 19V5L7.6 9.5H4z"/><path class="s" id="sndWaves" d="M16 9a4.2 4.2 0 0 1 0 6M18.6 6.4a8 8 0 0 1 0 11.2"/></svg></button>
+        <span class="tb-right">
+          <button class="icon-btn" id="bagBtn" type="button" aria-label="Alet çantası"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg></button>
+          <button class="icon-btn" id="sndBtn" type="button" aria-label="Ses"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M4 9.5v5h3.6L12.5 19V5L7.6 9.5H4z"/><path class="s" id="sndWaves" d="M16 9a4.2 4.2 0 0 1 0 6M18.6 6.4a8 8 0 0 1 0 11.2"/></svg></button>
+        </span>
       </div>
       <h1 class="title rise" style="--i:1" data-i18n="title">Kıl payı</h1>
       <p class="tagline rise" style="--i:2" data-i18n="tagline">Süre bitmek üzereyken vur, puan ×3.</p>
@@ -194,7 +237,10 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
         </div>
       </div>
       <button class="btn primary big rise" style="--i:6" id="againBtn" type="button" data-i18n="again">Tekrar dene</button>
-      <button class="btn quiet rise" style="--i:7" id="homeBtn" type="button" data-i18n="home">Ana ekran</button>
+      <div class="row2 rise" style="--i:7">
+        <button class="btn quiet" id="bagBtn2" type="button" data-i18n="bag">Alet çantası</button>
+        <button class="btn quiet" id="homeBtn" type="button" data-i18n="home">Ana ekran</button>
+      </div>
     </div>
   </section>
 
@@ -202,6 +248,18 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     <div class="card glass">
       <p class="eyebrow rise" style="--i:0" data-i18n="paused">Duraklatıldı</p>
       <button class="btn primary big rise" style="--i:1" id="resumeBtn" type="button" data-i18n="resume">Devam et</button>
+    </div>
+  </section>
+
+  <section class="scr dim" id="shop" aria-label="Alet çantası" aria-hidden="true">
+    <div class="card glass shop">
+      <div class="shop-head">
+        <h2 data-i18n="bag">Alet çantası</h2>
+        <span class="chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><b id="shopCoins">0</b></span>
+      </div>
+      <div class="shop-list" id="shopList"></div>
+      <button class="btn" id="shopAd" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M8 5.5v13l11-6.5z"/></svg><span id="shopAdT"></span></button>
+      <button class="btn quiet" id="shopClose" type="button" data-i18n="close">Kapat</button>
     </div>
   </section>
 
@@ -235,11 +293,11 @@ const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)'
 /*TUNE-START*/
 const CFG = {
   maxTime: 8, startTime: 6,
-  hitGain: 0.85, perfectBonus: 0.15, reliefGain: 0.25, nearGain: 1.5, nearAt: 1.0, missCost: 1.0,
+  hitGain: 0.85, perfectBonus: 0.15, reliefGain: 0.25, nearGain: 1.5, nearAt: 1.0, missCost: 1.0, trapCost: 1.5,
   perfectFrac: 0.32, grace: 0.05,
   spawnMin: 1.0, spawnMax: 2.6,
   contTime: 4, contCoins: 25, contSlow: 3, contSlowMul: 0.7,
-  coinDiv: 4, nearCoin: 2, adSeconds: 3, tutHits: 5
+  coinDiv: 4, nearCoin: 2, adSeconds: 3, tutHits: 5, adCoins: 20
 };
 /* Zorluk dalgalı: taban yavaşça yükselir, her dalga (period vuruş) önce yükselir sonra gevşer.
    adapt: oyuncu iyi oynadıkça yükselir, hata yaptıkça düşer. mercy: hatadan sonra kısa süre nefes verir. */
@@ -251,6 +309,26 @@ const DIFF = {
   adaptUp: 0.01, adaptDown: 0.03, adaptCap: 0.12,
   mercyHit: 0.6, mercyDecay: 0.7, mercyDrop: 0.25,
   fatigueFrom: 100, fatigueRate: 0.004, fatigueCap: 0.6
+};
+/* Kilit türleri: min = ilk kez açılması için bir oyunda gereken vuruş sayısı, w = seçilme ağırlığı,
+   gain = vuruş başına süre çarpanı, hwMul/omMul = hedef genişliği ve ibre hızı çarpanı. */
+const KINDS = ['tek', 'cift', 'kayan', 'tuzak', 'iki'];
+const KIND = {
+  tek:   { min: 0,  w: 0.7, gain: 1.0,  hwMul: 1.0,  omMul: 1.0 },
+  cift:  { min: 8,  w: 0.6, gain: 0.8,  hwMul: 1.15, omMul: 1.0 },
+  kayan: { min: 16, w: 0.5, gain: 1.0,  hwMul: 1.2,  omMul: 0.92 },
+  tuzak: { min: 26, w: 0.5, gain: 1.0,  hwMul: 1.0,  omMul: 1.0 },
+  iki:   { min: 38, w: 0.4, gain: 0.65, hwMul: 1.25, omMul: 0.82 }
+};
+const kindOpen = (k, n, unl) => k === 'tek' || (unl && unl[k] ? n >= 6 + 2 * KINDS.indexOf(k) : n >= KIND[k].min);
+const pickKind = (n, relief, unl, last, r) => {
+  if (relief) return 'tek';
+  const open = KINDS.filter(k => kindOpen(k, n, unl) && !(k === last && k !== 'tek'));
+  let sum = 0;
+  for (const k of open) sum += KIND[k].w;
+  let x = r * sum;
+  for (const k of open) { x -= KIND[k].w; if (x <= 0) return k; }
+  return 'tek';
 };
 const drainAt = n => 1 + Math.min(DIFF.fatigueCap, Math.max(0, n - DIFF.fatigueFrom) * DIFF.fatigueRate);
 const wavePhase = n => (n % DIFF.period) / DIFF.period;
@@ -276,22 +354,39 @@ const resolveHit = (S, d) => {
   const near = S.time < CFG.nearAt;
   const pts = (perfect ? 2 : 1) * (near ? 3 : 1);
   S.score += pts; S.n++; S.combo++; S.maxCombo = Math.max(S.maxCombo, S.combo);
-  S.time = Math.min(CFG.maxTime, S.time + (near ? CFG.nearGain : CFG.hitGain + (perfect ? CFG.perfectBonus : 0) + (S.relief ? CFG.reliefGain : 0)));
+  const g = near ? CFG.nearGain : (CFG.hitGain + (perfect ? CFG.perfectBonus : 0) + (S.relief ? CFG.reliefGain : 0)) * (S.gainMul || 1);
+  S.time = Math.min(CFG.maxTime, S.time + g);
   if (near) S.near++;
   S.adapt = Math.min(DIFF.adaptCap, S.adapt + (perfect ? DIFF.adaptUp : DIFF.adaptUp * 0.3));
   S.mercy *= DIFF.mercyDecay;
   return { perfect, near, pts };
 };
-const resolveMiss = S => {
+const resolveMiss = (S, cost) => {
   S.combo = 0;
-  S.time = Math.max(0, S.time - CFG.missCost);
+  S.time = Math.max(0, S.time - (cost || CFG.missCost));
   S.adapt = Math.max(-DIFF.adaptCap, S.adapt - DIFF.adaptDown);
   S.mercy = Math.min(1, S.mercy + DIFF.mercyHit);
 };
 /*TUNE-END*/
 
+/* ---------- aletler: etki gücü seviyeyle artar ---------- */
+const TOOL_IDS = ['steto', 'kron', 'kalkan', 'kum'];
+const TOOL = {
+  steto:  { price: 30, up: [0, 90, 220], eff: l => 2 + l },
+  kron:   { price: 30, up: [0, 90, 220], eff: l => 2 + l },
+  kalkan: { price: 40, up: [0, 120, 260], eff: l => (l >= 3 ? 2 : 1) },
+  kum:    { price: 30, up: [0, 90, 220], eff: l => 3 + l }
+};
+const TOOL_ICON = {
+  steto: '<path class="s" d="M6 3v5a5 5 0 0 0 10 0V3M11 13v2.5a4 4 0 0 0 8 0V14"/><circle class="s" cx="19" cy="12" r="2"/>',
+  kron: '<circle class="s" cx="12" cy="13.5" r="7"/><path class="s" d="M12 13.5V10M10 3h4M12 3v3.5"/>',
+  kalkan: '<path class="s" d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3z"/>',
+  kum: '<path class="s" d="M7 3h10M7 21h10M8 3c0 5 4 5 4 9s-4 4-4 9M16 3c0 5-4 5-4 9s4 4 4 9"/>'
+};
+
 /* ---------- dil ---------- */
 const LANG = ((navigator.language || 'tr') + '').toLowerCase().indexOf('tr') === 0 ? 'tr' : 'en';
+const SN = LANG === 'tr' ? 'sn' : 's';
 const STR = {
   tr: {
     title: 'Kıl payı', tagline: 'Süre bitmek üzereyken vur, puan ×3.', play: 'Oyna', best: 'En iyi', runs: 'Oyun',
@@ -304,9 +399,19 @@ const STR = {
     paused: 'Duraklatıldı', resume: 'Devam et',
     adBadge: 'Reklam (demo)', adText: 'Gerçek sürümde burada kısa bir video oynar. Bitince ödülün hazır.', adWait: 'Ödülün hazırlanıyor…',
     adBadgeReal: 'Reklam', adLoading: 'Reklam hazırlanıyor, birazdan başlayacak.', adFail: 'Reklam şu an yüklenemedi. Biraz sonra tekrar dene.',
-    notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', sound: 'Ses', score: 'puan',
+    notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', coinShort: 'Yeterli coin yok.', sound: 'Ses', score: 'puan',
     soundOn: 'Sesi kapat', soundOff: 'Sesi aç', overSr: 'Süre bitti. Skor {n}.',
-    play_aria: 'Oyun alanı'
+    play_aria: 'Oyun alanı',
+    k_cift: 'Çift pim', k_kayan: 'Kayan pim', k_tuzak: 'Tuzak pim', k_iki: 'İki halka',
+    introNew: 'Yeni kilit: {k}',
+    hint_cift: 'İki hedefi de vur', hint_kayan: 'Hedef kayıyor, zamanlamayı ayarla',
+    hint_tuzak: 'Gül rengi bölgeye dokunma', hint_iki: 'Sol yarı dış halka, sağ yarı iç halka', ringL: 'Sol: dış', ringR: 'Sağ: iç',
+    alarm: 'Alarm', shieldSave: 'Kalkan kurtardı',
+    bag: 'Alet çantası', close: 'Kapat', stock: 'Stok', buy: '+1 al', upgrade: 'Yükselt', maxed: 'En üst seviye',
+    tool_steto: 'Stetoskop', tool_kron: 'Kronometre', tool_kalkan: 'Kalkan', tool_kum: 'Kum saati',
+    d_steto: 'Sonraki {n} hedef daha geniş', d_kron: 'Süreye +{n} sn', d_kalkan: 'Sonraki {n} hatada ceza yok', d_kalkan1: 'Sonraki hatada ceza yok', d_kum: 'İbre {n} sn yavaşlar',
+    toolEmpty: 'Stokta yok. Alet çantasından alabilirsin.', shopAd: 'Reklam izle, +{n} coin', gotCoins: '+{n} coin',
+    fxSteto: 'Geniş {n}', fxShield: 'Kalkan {n}', fxSlow: 'Yavaş {n} sn'
   },
   en: {
     title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs',
@@ -319,9 +424,19 @@ const STR = {
     paused: 'Paused', resume: 'Resume',
     adBadge: 'Ad (demo)', adText: 'In the real version a short video plays here. Your reward is ready when it ends.', adWait: 'Preparing your reward…',
     adBadgeReal: 'Ad', adLoading: 'Getting your ad ready, it starts in a moment.', adFail: "The ad couldn't load right now. Try again in a moment.",
-    notEnough: 'Not enough coins. Watch an ad to keep going.', sound: 'Sound', score: 'pts',
+    notEnough: 'Not enough coins. Watch an ad to keep going.', coinShort: 'Not enough coins.', sound: 'Sound', score: 'pts',
     soundOn: 'Mute sound', soundOff: 'Unmute sound', overSr: 'Time is up. Score {n}.',
-    play_aria: 'Play area'
+    play_aria: 'Play area',
+    k_cift: 'Double pin', k_kayan: 'Sliding pin', k_tuzak: 'Trap pin', k_iki: 'Twin rings',
+    introNew: 'New lock: {k}',
+    hint_cift: 'Hit both targets', hint_kayan: 'The target slides, adjust your timing',
+    hint_tuzak: 'Stay off the rose zone', hint_iki: 'Left half: outer ring, right half: inner ring', ringL: 'Left: outer', ringR: 'Right: inner',
+    alarm: 'Alarm', shieldSave: 'Shield saved you',
+    bag: 'Toolbag', close: 'Close', stock: 'Stock', buy: 'Buy +1', upgrade: 'Upgrade', maxed: 'Max level',
+    tool_steto: 'Stethoscope', tool_kron: 'Stopwatch', tool_kalkan: 'Shield', tool_kum: 'Hourglass',
+    d_steto: 'Next {n} targets are wider', d_kron: '+{n} s on the clock', d_kalkan: 'No penalty for the next {n} mistakes', d_kalkan1: 'No penalty for the next mistake', d_kum: 'Pointer slows for {n} s',
+    toolEmpty: 'Out of stock. Get more in the toolbag.', shopAd: 'Watch ad, +{n} coins', gotCoins: '+{n} coins',
+    fxSteto: 'Wide {n}', fxShield: 'Shield {n}', fxSlow: 'Slow {n} s'
   }
 };
 const t = (k, v) => {
@@ -330,13 +445,22 @@ const t = (k, v) => {
   return s;
 };
 const f1 = n => n.toFixed(1).replace('.', LANG === 'tr' ? ',' : '.');
+const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const save = { best: 0, coins: 0, runs: 0, snd: true, vib: true, tut: false };
+const save = {
+  best: 0, coins: 0, runs: 0, snd: true, vib: true, tut: false,
+  tools: { steto: { n: 1, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 1, l: 1 }, kum: { n: 1, l: 1 } },
+  unl: {}, seen: {}
+};
 try {
   const raw = localStorage.getItem('kilpayi.v1');
   if (raw) { const o = JSON.parse(raw); Object.keys(save).forEach(k => { if (o && o[k] !== undefined) save[k] = o[k]; }); }
 } catch (e) {}
+TOOL_IDS.forEach(id => {
+  const s = save.tools[id] || (save.tools[id] = { n: 1, l: 1 });
+  s.n = Math.max(0, s.n | 0); s.l = clamp(s.l | 0 || 1, 1, 3);
+});
 const persist = () => { try { localStorage.setItem('kilpayi.v1', JSON.stringify(save)); } catch (e) {} };
 
 /* ---------- palet: renkler CSS değişkenlerinden okunur, açık/koyu tema kendiliğinden izlenir ---------- */
@@ -389,10 +513,13 @@ const Snd = {
   },
   near() { this.tone(220, 0.28, 'sawtooth', 0.09, 1100); this.tone(1320, 0.3, 'sine', 0.14, null, 0.08); this.tone(1760, 0.32, 'sine', 0.1, null, 0.15); },
   miss() { this.tone(150, 0.16, 'square', 0.08, 90); },
+  alarm() { this.tone(300, 0.14, 'square', 0.09, 180); this.tone(300, 0.14, 'square', 0.09, 180, 0.17); },
   over() { this.tone(440, 0.5, 'sine', 0.18, 110); },
   warn() { this.tone(1180, 0.05, 'sine', 0.05); },
   ui() { this.tone(660, 0.08, 'triangle', 0.12); },
-  rev() { this.tone(520, 0.12, 'triangle', 0.1, 780); }
+  rev() { this.tone(520, 0.12, 'triangle', 0.1, 780); },
+  fanfare() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.22, 'triangle', 0.14, null, i * 0.08)); },
+  tool() { this.tone(500, 0.1, 'triangle', 0.14, 900); this.tone(900, 0.14, 'sine', 0.1, null, 0.08); }
 };
 
 /* ---------- platform köprüsü: web'de demo, Android'de gerçek reklam/titreşim ---------- */
@@ -476,8 +603,8 @@ const Platform = {
 
 /* ---------- arayüz yardımcıları ---------- */
 const app = $('app'), cv = $('cv'), ctx = cv.getContext('2d');
-const hudEl = $('hud'), fillEl = $('fill'), tleftEl = $('tleft'), zoneEl = $('zone'), hudBestEl = $('hudBest');
-const menuEl = $('menu'), overEl = $('over'), pauseEl = $('pause'), adEl = $('ad'), toastEl = $('toast');
+const hudEl = $('hud'), fillEl = $('fill'), tleftEl = $('tleft'), zoneEl = $('zone'), hudBestEl = $('hudBest'), fxEl = $('fx'), toolsEl = $('tools');
+const menuEl = $('menu'), overEl = $('over'), pauseEl = $('pause'), adEl = $('ad'), shopEl = $('shop'), toastEl = $('toast');
 const gaugeEl = fillEl.parentNode;
 const show = el => { el.classList.add('on'); el.removeAttribute('aria-hidden'); };
 const hide = el => { el.classList.remove('on'); el.setAttribute('aria-hidden', 'true'); };
@@ -501,26 +628,41 @@ const applyI18n = () => {
   cv.setAttribute('aria-label', t('play_aria'));
   zoneEl.textContent = t('zone');
   $('notch').style.left = (CFG.nearAt / CFG.maxTime * 100).toFixed(2) + '%';
+  $('bagBtn').setAttribute('aria-label', t('bag'));
+  toolsEl.setAttribute('aria-label', t('bag'));
+  toolsEl.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-label', t('tool_' + b.getAttribute('data-tool'))));
 };
 const refreshSound = () => {
   const b = $('sndBtn');
   b.setAttribute('aria-label', save.snd ? t('soundOn') : t('soundOff'));
   $('sndWaves').style.opacity = save.snd ? '1' : '0.25';
 };
+const updateTools = () => {
+  toolsEl.querySelectorAll('.tool').forEach(b => {
+    const s = save.tools[b.getAttribute('data-tool')];
+    b.querySelector('.badge').textContent = String(s.n);
+    b.classList.toggle('empty', s.n <= 0);
+  });
+};
 const refreshStats = () => {
   $('coinN').textContent = String(save.coins);
+  $('shopCoins').textContent = String(save.coins);
   $('menuBest').textContent = String(save.best);
   $('menuRuns').textContent = String(save.runs);
   hudBestEl.innerHTML = t('best') + ' <b>' + save.best + '</b>';
+  updateTools();
 };
 
 /* ---------- oyun durumu ---------- */
+const MENU_PINS = [{ kind: 'gate', ring: 0, c0: 1.0, amp: 0, f: 0, ph: 0, hw: 0.45, done: false }];
 const G = {
-  mode: 'menu', clock: 0,
+  mode: 'menu', clock: 0, pt: 0,
   time: 0, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0,
-  ang: 0.4, dir: 1, omega: DIFF.omegaMin, slow: 0,
-  ta: 1.0, hw: 0.45, gateT: 1,
+  ang: 0.4, dir: 1, omega: DIFF.omegaMin, ang2: 0, dir2: -1, omega2: 2, slow: 0,
+  kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, gateT: 1,
+  ta: 1.0, hw: 0.45,
   adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false,
+  boost: 0, glove: 0, waveSeen: 0, pendingRev: false, introKind: null, hint: null,
   shake: 0, flash: 0, flashKind: 'rose', tscale: 1, tsT: 0,
   parts: [], pops: [], rips: [], revT: 0, beep: 0, scorePulse: 0,
   continued: false, runCounted: false, coinsGiven: 0, gain: 0, deadT: 0, overAt: 0,
@@ -528,15 +670,72 @@ const G = {
 };
 const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100 };
 
-const spawnGate = first => {
-  const p = planGate(G.n, G.adapt, G.mercy);
-  G.hw = p.hw; G.omega = p.omega; G.I = p.I; G.relief = p.relief;
-  G.ta = norm(G.ang + G.dir * (first ? rnd(1.6, 2.3) : rnd(CFG.spawnMin, CFG.spawnMax)));
-  G.gateT = 0;
+const pinCenter = p => p.amp ? norm(p.c0 + p.amp * Math.sin(TAU * p.f * G.pt + p.ph)) : p.c0;
+const syncPrimary = () => {
+  for (const p of G.pins) if (p.kind === 'gate' && !p.done && p.ring === 0) { G.ta = pinCenter(p); G.hw = p.hw; return; }
 };
+const ahead = (ang, dir, d) => norm(ang + dir * d);
+
+const introduce = (kind, isNew) => {
+  const seen = save.seen[kind] || 0;
+  if (!isNew && seen >= 2) return;
+  save.seen[kind] = seen + 1; persist();
+  const lines = [];
+  if (isNew) lines.push({ txt: t('introNew', { k: t('k_' + kind) }), bg: 'lilac-soft' });
+  lines.push({ txt: t('hint_' + kind), bg: 'surface' });
+  G.hint = { lines, t: 0, max: isNew ? 4.4 : 3 };
+};
+
+const spawnChallenge = (first, force) => {
+  const plan = planGate(G.n, G.adapt, G.mercy);
+  const kind = first ? 'tek' : (force || pickKind(G.n, plan.relief, save.unl, G.lastKind, Math.random()));
+  const prevKind = G.kind;
+  const km = KIND[kind];
+  const boost = G.boost > 0 ? 1.4 : 1;
+  G.kind = kind; G.lastKind = kind; G.gainMul = km.gain;
+  G.I = plan.I; G.relief = plan.relief;
+  G.omega = plan.omega * km.omMul;
+  const hw = Math.min(0.8, plan.hw * km.hwMul * boost);
+  const gate = (ring, c, h) => ({ kind: 'gate', ring, c0: c, amp: 0, f: 0, ph: 0, hw: h, done: false });
+  const pins = [];
+  if (kind === 'tek') {
+    pins.push(gate(0, ahead(G.ang, G.dir, first ? rnd(1.6, 2.3) : rnd(CFG.spawnMin, CFG.spawnMax)), hw));
+  } else if (kind === 'cift') {
+    const a = ahead(G.ang, G.dir, rnd(1.0, 2.0));
+    pins.push(gate(0, a, hw), gate(0, ahead(a, G.dir, hw * 2 + rnd(0.3, 0.8)), hw));
+  } else if (kind === 'kayan') {
+    const p = gate(0, ahead(G.ang, G.dir, rnd(1.4, 2.6)), hw);
+    p.amp = rnd(0.45, 0.8); p.f = rnd(0.32, 0.5); p.ph = rnd(0, TAU);
+    pins.push(p);
+  } else if (kind === 'tuzak') {
+    const a = ahead(G.ang, G.dir, rnd(1.2, 2.4));
+    pins.push(gate(0, a, hw));
+    const th = hw * 1.1;
+    let c = a, tries = 0;
+    do {
+      const side = Math.random() < 0.5 ? 1 : -1;
+      c = norm(a + side * (hw + th + rnd(0.35, 0.9))); tries++;
+    } while (tries < 8 && angd(c, G.ang) < th + 0.5);
+    pins.push({ kind: 'trap', ring: 0, c0: c, amp: 0, f: 0, ph: 0, hw: th, done: false });
+  } else if (kind === 'iki') {
+    if (prevKind !== 'iki') G.ang2 = norm(G.ang + Math.PI);
+    G.dir2 = -G.dir; G.omega2 = G.omega * 0.85;
+    pins.push(gate(0, ahead(G.ang, G.dir, rnd(1.0, 2.2)), hw));
+    pins.push(gate(1, ahead(G.ang2, G.dir2, rnd(1.0, 2.0)), Math.min(0.85, hw * 1.15)));
+  }
+  G.pins = pins; G.gateT = 0;
+  syncPrimary();
+  if (kind !== 'tek' && !first) introduce(kind, force === kind && !!G.introNew);
+  G.introNew = false;
+};
+
 const shake = s => { if (!RM) G.shake = Math.max(G.shake, s); };
 const flash = (kind, s) => { if (!RM) { G.flashKind = kind; G.flash = s; } };
-const gatePos = a => ({ x: view.cx + Math.cos(a - HALF) * view.r, y: view.cy + Math.sin(a - HALF) * view.r });
+const ringR = ring => ring ? view.r * 0.6 : view.r;
+const pinXY = p => {
+  const a = pinCenter(p) - HALF, r = ringR(p.ring);
+  return { x: view.cx + Math.cos(a) * r, y: view.cy + Math.sin(a) * r };
+};
 const burst = (x, y, n, cols, speed) => {
   const k = RM ? 0.4 : 1;
   for (let i = 0; i < Math.round(n * k); i++) {
@@ -561,8 +760,13 @@ const relayout = snap => {
     cy = (hb + ft) / 2;
     r = Math.min(w * 0.29, (ft - hb) / 2 - 36);
   } else {
-    cy = h * 0.5 + 8;
-    r = Math.min(w * 0.335, h * 0.22);
+    cy = h * 0.46;
+    r = Math.min(w * 0.33, h * 0.2);
+    /* kısa ekranlarda halka + iki satırlık ipucu, HUD ile alet çubuğu arasına sığmalı */
+    const hudB = (hudEl.offsetTop + hudEl.offsetHeight) || 88;
+    const room = (h - (toolsEl.offsetHeight || 88) + 8) - 4 - (hudB + 8);
+    const rFit = (room - 138) / 2.2;
+    if (rFit < r) { r = rFit; cy = hudB + 8 + 18 + 1.1 * Math.max(56, r) + 10; }
   }
   r = Math.max(56, r);
   view.tcx = cx; view.tcy = cy; view.tr = r;
@@ -582,38 +786,66 @@ const start = () => {
     mode: 'play', time: CFG.startTime, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0,
     continued: false, runCounted: false, coinsGiven: 0, gain: 0, shake: 0, flash: 0, tscale: 1, tsT: 0,
     revT: 0, beep: 0, scorePulse: 0, parts: [], pops: [], rips: [], nearMsg: '',
-    adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false
+    adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false, pt: 0,
+    kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, boost: 0, glove: 0, waveSeen: 0, pendingRev: false,
+    introKind: null, introNew: false, hint: null, dir2: -1
   });
-  spawnGate(true);
-  hide(menuEl); hide(overEl); hide(pauseEl);
+  spawnChallenge(true);
+  hide(menuEl); hide(overEl); hide(pauseEl); hide(shopEl);
   app.classList.add('playing');
   hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
+  toolsEl.classList.add('on');
   relayout(false);
-  updateHud();
+  updateTools(); updateHud();
   Platform.track('run_start', { run: save.runs + 1 });
 };
 
 const goMenu = () => {
-  G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0;
-  hide(overEl); hide(pauseEl);
+  G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0; G.kind = 'tek'; G.hint = null;
+  hide(overEl); hide(pauseEl); hide(shopEl);
   app.classList.remove('playing');
   hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
+  toolsEl.classList.remove('on');
   show(menuEl);
   refreshStats();
   requestAnimationFrame(() => relayout(false));
 };
 
-const tap = () => {
+const tap = x => {
   if (G.mode !== 'play') return;
-  const d = angd(G.ang, G.ta);
-  if (d <= G.hw + CFG.grace) hit(d); else miss();
+  const ring = G.kind === 'iki' && x != null && x >= view.cx ? 1 : 0;
+  const ang = ring ? G.ang2 : G.ang;
+  let best = null, bd = 9;
+  for (const p of G.pins) {
+    if (p.kind !== 'gate' || p.done || p.ring !== ring) continue;
+    const d = angd(ang, pinCenter(p));
+    if (d <= p.hw + CFG.grace && d < bd) { best = p; bd = d; }
+  }
+  if (best) { hit(bd, best); return; }
+  for (const p of G.pins) {
+    if (p.kind === 'trap' && p.ring === ring && angd(ang, pinCenter(p)) <= p.hw) { trap(); return; }
+  }
+  miss();
 };
 
-const hit = d => {
+const checkUnlock = () => {
+  for (const k of KINDS) {
+    if (k === 'tek' || save.unl[k] || G.n < KIND[k].min) continue;
+    save.unl[k] = true; persist();
+    G.introKind = k; G.introNew = true;
+    Snd.fanfare(); Platform.track('unlock', { kind: k, hits: G.n });
+    return;
+  }
+};
+
+const hit = (d, pin) => {
   const wasRelief = G.relief;
+  pin.done = true;
+  G.hw = pin.hw;
   const { perfect, near, pts } = resolveHit(G, d);
   G.scorePulse = 1;
-  const p = gatePos(G.ta);
+  if (G.boost > 0) G.boost--;
+  const p = pinXY(pin);
   const cols = near ? [P.rose, P['rose-soft'], P.peach] : (perfect ? [P['peach-deep'], P.peach, P.lilac] : [P.peach, P.lilac, P['peach-soft']]);
   burst(p.x, p.y, near ? 26 : (perfect ? 18 : 11), cols, near ? 260 : 190);
   G.rips.push({ x: p.x, y: p.y, t: 0, max: near ? 0.7 : 0.5, r0: 10, r1: near ? 90 : 56, c: near ? P.rose : P.peach });
@@ -625,24 +857,72 @@ const hit = d => {
     pop(perfect ? t('perfect') : '+' + pts, perfect ? 'perfect' : 'plain');
     Snd.hit(G.combo - 1, perfect); Platform.haptic(perfect ? 'medium' : 'light');
   }
-  if (G.n >= DIFF.period && G.n % DIFF.period === 0) {
-    G.dir = -G.dir; G.revT = 0.8; pop(t('reverse'), 'rev'); Snd.rev();
+  const wave = Math.floor(G.n / DIFF.period);
+  if (wave > G.waveSeen) { G.waveSeen = wave; if (wave >= 1) G.pendingRev = true; }
+  if (G.pins.every(q => q.kind !== 'gate' || q.done)) {
+    if (G.pendingRev) {
+      G.pendingRev = false;
+      G.dir = -G.dir; G.revT = 0.8; pop(t('reverse'), 'rev'); Snd.rev();
+    }
+    checkUnlock();
+    const force = G.introKind; G.introKind = null;
+    spawnChallenge(false, force);
+    if (G.relief && !wasRelief) pop(t('breath'), 'rev');
+  } else {
+    syncPrimary();
   }
-  spawnGate(false);
-  if (G.relief && !wasRelief) pop(t('breath'), 'rev');
   if (G.n === 1) refreshStats();
 };
 
 const miss = () => {
+  if (G.glove > 0) {
+    G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
+    return;
+  }
   resolveMiss(G);
   shake(0.2); flash('rose', 0.14);
   pop(t('miss'), 'miss'); Snd.miss(); Platform.haptic('warn');
   if (G.time <= 0) die();
 };
 
+const trap = () => {
+  if (G.glove > 0) {
+    G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
+    return;
+  }
+  resolveMiss(G, CFG.trapCost);
+  shake(0.4); flash('rose', 0.24);
+  pop(t('alarm'), 'near'); Snd.alarm(); Platform.haptic('error');
+  if (G.time <= 0) die();
+};
+
+const useTool = id => {
+  if (G.mode !== 'play') return;
+  const s = save.tools[id];
+  if (!s) return;
+  if (s.n <= 0) { toast(t('toolEmpty')); return; }
+  s.n--; persist();
+  const e = TOOL[id].eff(s.l);
+  if (id === 'steto') {
+    G.boost = Math.max(G.boost, e);
+    for (const p of G.pins) if (p.kind === 'gate' && !p.done) p.hw = Math.min(0.8, p.hw * 1.4);
+  } else if (id === 'kron') {
+    G.time = Math.min(CFG.maxTime, G.time + e);
+  } else if (id === 'kalkan') {
+    G.glove += e;
+  } else if (id === 'kum') {
+    G.slow = Math.max(G.slow, e);
+  }
+  pop(toolDesc(id, e), 'perfect');
+  Snd.tool(); Platform.haptic('medium');
+  updateTools(); updateHud();
+  Platform.track('tool_use', { id, level: s.l });
+};
+
 const die = () => {
   if (G.mode !== 'play') return;
   G.mode = 'dead'; G.deadT = 0.6;
+  toolsEl.classList.remove('on');
   const w = G.omega * (G.slow > 0 ? CFG.contSlowMul : 1);
   const inside = angd(G.ang, G.ta) <= G.hw;
   const secs = (norm((G.ta - G.ang) * G.dir) - G.hw) / w;
@@ -655,7 +935,7 @@ const die = () => {
   G.gain = total - G.coinsGiven; G.coinsGiven = total; save.coins += G.gain;
   if (!save.tut && G.n >= CFG.tutHits) save.tut = true;
   persist(); refreshStats();
-  Platform.track('run_end', { score: G.score, hits: G.n, near: G.near, continued: G.continued });
+  Platform.track('run_end', { score: G.score, hits: G.n, near: G.near, continued: G.continued, kind: G.kind });
 };
 
 const showOver = () => {
@@ -687,10 +967,14 @@ const showOver = () => {
 const doContinue = () => {
   G.mode = 'play'; G.continued = true; G.time = CFG.contTime; G.slow = CFG.contSlow;
   G.combo = 0; G.tscale = 1; G.tsT = 0;
-  G.ang = norm(G.ta - G.dir * 1.3);
+  const g0 = G.pins.find(p => p.kind === 'gate' && !p.done && p.ring === 0);
+  if (g0) G.ang = norm(pinCenter(g0) - G.dir * 1.3);
+  const g1 = G.pins.find(p => p.kind === 'gate' && !p.done && p.ring === 1);
+  if (g1) G.ang2 = norm(pinCenter(g1) - G.dir2 * 1.3);
   G.gateT = 0;
   hide(overEl);
-  pop('+' + CFG.contTime + ' ' + (LANG === 'tr' ? 'sn' : 's'), 'perfect');
+  toolsEl.classList.add('on');
+  pop('+' + CFG.contTime + ' ' + SN, 'perfect');
   Snd.ui(); relayout(false); updateHud();
   Platform.track('continue', { score: G.score });
 };
@@ -698,7 +982,59 @@ const doContinue = () => {
 const pause = () => { if (G.mode !== 'play'/*NOPAUSE*/) return; G.mode = 'pause'; show(pauseEl); };
 const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'play'; Snd.ui(); };
 
-let lastT = '';
+/* ---------- alet çantası ---------- */
+const pipsHtml = l => '<span class="pips" aria-hidden="true">' + [1, 2, 3].map(i => '<i class="' + (i <= l ? 'on' : '') + '"></i>').join('') + '</span>';
+const renderShop = () => {
+  $('shopCoins').textContent = String(save.coins);
+  $('shopList').innerHTML = TOOL_IDS.map(id => {
+    const s = save.tools[id], T = TOOL[id];
+    const maxed = s.l >= 3, upCost = T.up[s.l];
+    const eff = T.eff(s.l);
+    return '<div class="trow" data-id="' + id + '">' +
+      '<div class="ti"><svg viewBox="0 0 24 24" aria-hidden="true">' + TOOL_ICON[id] + '</svg></div>' +
+      '<div class="nm"><span>' + t('tool_' + id) + '</span><span class="stock">' + t('stock') + ' ' + s.n + '</span></div>' +
+      '<div class="ds"><span>' + toolDesc(id, eff) + '</span>' + pipsHtml(s.l) + '</div>' +
+      '<div class="ac">' +
+        '<button class="btn" type="button" data-act="buy" aria-disabled="' + (save.coins < T.price) + '">' + t('buy') + ' · ' + T.price + '</button>' +
+        '<button class="btn" type="button" data-act="up" aria-disabled="' + (maxed || save.coins < upCost) + '">' + (maxed ? t('maxed') : t('upgrade') + ' · ' + upCost) + '</button>' +
+      '</div></div>';
+  }).join('');
+  $('shopAdT').textContent = t('shopAd', { n: CFG.adCoins });
+};
+let shopFrom = 'menu';
+const openShop = from => {
+  shopFrom = from;
+  if (from === 'over') hide(overEl);
+  if (from === 'menu') hide(menuEl);
+  renderShop(); show(shopEl);
+  Snd.ui();
+};
+const closeShop = () => {
+  hide(shopEl);
+  if (shopFrom === 'over') show(overEl); else show(menuEl);
+  refreshStats();
+  requestAnimationFrame(() => relayout(false));
+  Snd.ui();
+};
+$('shopList').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('button[data-act]');
+  if (!b) return;
+  const id = b.closest('.trow').getAttribute('data-id'), s = save.tools[id], T = TOOL[id];
+  Snd.unlock();
+  if (b.getAttribute('data-act') === 'buy') {
+    if (save.coins < T.price) { toast(t('coinShort')); return; }
+    save.coins -= T.price; s.n++;
+  } else {
+    if (s.l >= 3) return;
+    const cost = T.up[s.l];
+    if (save.coins < cost) { toast(t('coinShort')); return; }
+    save.coins -= cost; s.l++;
+  }
+  persist(); refreshStats(); renderShop(); Snd.tool();
+  Platform.track('shop', { id, act: b.getAttribute('data-act') });
+});
+
+let lastT = '', lastFx = '';
 const updateHud = () => {
   const f = clamp(G.time / CFG.maxTime, 0, 1);
   fillEl.style.width = (f * 100).toFixed(1) + '%';
@@ -708,6 +1044,12 @@ const updateHud = () => {
   gaugeEl.classList.toggle('crit', crit);
   gaugeEl.classList.toggle('warn', warn);
   zoneEl.classList.toggle('hot', crit && G.mode === 'play');
+  const fx = [];
+  if (G.boost > 0) fx.push(t('fxSteto', { n: G.boost }));
+  if (G.glove > 0) fx.push(t('fxShield', { n: G.glove }));
+  if (G.slow > 0) fx.push(t('fxSlow', { n: Math.ceil(G.slow) }));
+  const key = fx.join('|');
+  if (key !== lastFx) { lastFx = key; fxEl.innerHTML = fx.map(x => '<span class="chip sm">' + x + '</span>').join(''); }
 };
 
 /* ---------- güncelleme ---------- */
@@ -722,12 +1064,15 @@ const update = raw => {
     G.ang = norm(G.ang + 1.0 * dt);
     G.gateT = Math.min(1, G.gateT + raw * 2);
   } else if (G.mode === 'play') {
-    const w = G.omega * (G.slow > 0 ? CFG.contSlowMul : 1);
-    G.ang = norm(G.ang + G.dir * w * dt);
+    const sl = G.slow > 0 ? CFG.contSlowMul : 1;
+    G.pt += dt;
+    G.ang = norm(G.ang + G.dir * G.omega * sl * dt);
+    if (G.kind === 'iki') G.ang2 = norm(G.ang2 + G.dir2 * G.omega2 * sl * dt);
     G.time -= dt * drainAt(G.n);
     if (G.slow > 0) G.slow -= raw;
     if (G.revT > 0) G.revT -= raw;
     G.gateT = Math.min(1, G.gateT + raw * 4);
+    syncPrimary();
     if (G.time < CFG.nearAt) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
     if (G.time <= 0) { G.time = 0; die(); }
     updateHud();
@@ -737,6 +1082,7 @@ const update = raw => {
     if (G.deadT <= 0) showOver();
   }
 
+  if (G.hint) { G.hint.t += raw; if (G.hint.t > G.hint.max) G.hint = null; }
   G.shake = Math.max(0, G.shake - raw);
   G.flash = Math.max(0, G.flash - raw);
   G.scorePulse = Math.max(0, G.scorePulse - raw * 5);
@@ -770,9 +1116,66 @@ const pill = (c, txt, x, y, bg, fg, size) => {
   c.fillStyle = fg; c.textAlign = 'center'; c.textBaseline = 'middle';
   c.fillText(txt, px, y + 1);
 };
+const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
+  const ce = pinCenter(p), hw = p.hw * (0.35 + 0.65 * gk);
+  const a0 = ce - hw - HALF, a1 = ce + hw - HALF;
+  c.lineCap = 'butt';
+  if (p.kind === 'trap') {
+    c.globalAlpha = gk;
+    c.lineWidth = RWr + 10; c.strokeStyle = P['rose-soft']; arc(c, cx, cy, Rr, a0, a1);
+    c.lineWidth = RWr; c.strokeStyle = P.rose; arc(c, cx, cy, Rr, a0, a1);
+    const mx = cx + Math.cos(ce - HALF) * Rr, my = cy + Math.sin(ce - HALF) * Rr, s = RWr * 0.22;
+    c.strokeStyle = '#FFFFFF'; c.lineWidth = 3; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(mx - s, my - s); c.lineTo(mx + s, my + s); c.moveTo(mx + s, my - s); c.lineTo(mx - s, my + s); c.stroke();
+    c.globalAlpha = 1;
+    return;
+  }
+  if (p.amp) {
+    c.globalAlpha = 0.45 * gk; c.strokeStyle = P.lilac; c.lineWidth = 3; c.lineCap = 'round';
+    arc(c, cx, cy, Rr - RWr / 2 - 6, p.c0 - p.amp - HALF, p.c0 + p.amp - HALF);
+    c.globalAlpha = 1;
+  }
+  if (p.done) {
+    c.globalAlpha = 0.5;
+    c.lineWidth = RWr; c.strokeStyle = P.lilac; arc(c, cx, cy, Rr, a0, a1);
+    const mx = cx + Math.cos(ce - HALF) * Rr, my = cy + Math.sin(ce - HALF) * Rr, s = RWr * 0.2;
+    c.globalAlpha = 0.9; c.strokeStyle = '#FFFFFF'; c.lineWidth = 3; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(mx - s, my + s * 0.1); c.lineTo(mx - s * 0.3, my + s * 0.8); c.lineTo(mx + s, my - s * 0.7); c.stroke();
+    c.globalAlpha = 1;
+    return;
+  }
+  c.globalAlpha = gk;
+  c.lineWidth = RWr + 10; c.strokeStyle = P['peach-soft']; arc(c, cx, cy, Rr, a0, a1);
+  c.lineWidth = RWr; c.strokeStyle = P.peach; arc(c, cx, cy, Rr, a0, a1);
+  c.strokeStyle = P['peach-deep']; arc(c, cx, cy, Rr, ce - hw * CFG.perfectFrac - HALF, ce + hw * CFG.perfectFrac - HALF);
+  if (numbered) {
+    const mx = cx + Math.cos(ce - HALF) * (Rr - RWr * 1.15), my = cy + Math.sin(ce - HALF) * (Rr - RWr * 1.15);
+    c.fillStyle = P.surface; c.beginPath(); c.arc(mx, my, RWr * 0.42, 0, TAU); c.fill();
+    c.fillStyle = P.ink; c.font = '800 ' + Math.round(RWr * 0.55) + 'px ' + FB; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(String(idx + 1), mx, my + 1);
+  }
+  c.globalAlpha = 1;
+};
+const drawPointer = (c, cx, cy, Rr, RWr, ang, dir, col, trailCol) => {
+  const a = ang - HALF;
+  c.lineCap = 'butt'; c.lineWidth = RWr * 0.5; c.strokeStyle = trailCol;
+  for (let i = 0; i < 10; i++) {
+    const s0 = a - dir * i * 0.05, s1 = a - dir * (i + 1) * 0.05;
+    c.globalAlpha = (1 - i / 10) * 0.45;
+    arc(c, cx, cy, Rr, Math.min(s0, s1), Math.max(s0, s1));
+  }
+  c.globalAlpha = 1;
+  const px = cx + Math.cos(a) * Rr, py = cy + Math.sin(a) * Rr;
+  c.lineCap = 'round'; c.lineWidth = 3; c.strokeStyle = col;
+  c.beginPath(); c.moveTo(cx + Math.cos(a) * Rr * 0.62, cy + Math.sin(a) * Rr * 0.62); c.lineTo(px, py); c.stroke();
+  c.fillStyle = col; c.beginPath(); c.arc(px, py, RWr * 0.5 + 2, 0, TAU); c.fill();
+  c.fillStyle = P.surface; c.beginPath(); c.arc(px, py, RWr * 0.17, 0, TAU); c.fill();
+};
 
 const render = () => {
   const c = ctx, cx = view.cx, cy = view.cy, R = view.r, RW = Math.max(14, R * 0.2);
+  const two = G.mode !== 'menu' && G.kind === 'iki';
+  const R2 = R * 0.6, RW2 = RW * 0.8;
   c.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
   c.clearRect(0, 0, view.w, view.h);
   c.save();
@@ -790,6 +1193,7 @@ const render = () => {
 
   c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
   c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
+  if (two) { c.lineWidth = RW2; c.beginPath(); c.arc(cx, cy, R2, 0, TAU); c.stroke(); }
 
   if (G.mode === 'play' && G.time < CFG.nearAt) {
     const b = 0.5 + 0.5 * Math.sin(G.clock * 16);
@@ -799,28 +1203,18 @@ const render = () => {
   }
 
   const gk = easeOut(clamp(G.gateT / 0.25, 0, 1));
+  const pins = G.mode === 'menu' ? MENU_PINS : G.pins;
   if (gk > 0) {
-    const hw = G.hw * (0.35 + 0.65 * gk);
-    c.globalAlpha = gk;
-    c.lineWidth = RW + 10; c.strokeStyle = P['peach-soft']; arc(c, cx, cy, R, G.ta - hw - HALF, G.ta + hw - HALF);
-    c.lineWidth = RW; c.strokeStyle = P.peach; arc(c, cx, cy, R, G.ta - hw - HALF, G.ta + hw - HALF);
-    c.strokeStyle = P['peach-deep']; arc(c, cx, cy, R, G.ta - hw * CFG.perfectFrac - HALF, G.ta + hw * CFG.perfectFrac - HALF);
-    c.globalAlpha = 1;
+    let gi = 0;
+    for (const p of pins) {
+      const num = G.kind === 'cift' && p.kind === 'gate' && G.mode !== 'menu';
+      drawPin(c, cx, cy, p.ring ? R2 : R, p.ring ? RW2 : RW, p, gk, gi, num);
+      if (p.kind === 'gate') gi++;
+    }
   }
 
-  const a = G.ang - HALF, dir = G.dir;
-  c.lineWidth = RW * 0.5; c.strokeStyle = P.lilac;
-  for (let i = 0; i < 10; i++) {
-    const s0 = a - dir * i * 0.05, s1 = a - dir * (i + 1) * 0.05;
-    c.globalAlpha = (1 - i / 10) * 0.45;
-    arc(c, cx, cy, R, Math.min(s0, s1), Math.max(s0, s1));
-  }
-  c.globalAlpha = 1;
-  const px = cx + Math.cos(a) * R, py = cy + Math.sin(a) * R;
-  c.lineCap = 'round'; c.lineWidth = 3; c.strokeStyle = P.ink;
-  c.beginPath(); c.moveTo(cx + Math.cos(a) * R * 0.62, cy + Math.sin(a) * R * 0.62); c.lineTo(px, py); c.stroke();
-  c.fillStyle = P.ink; c.beginPath(); c.arc(px, py, RW * 0.5 + 2, 0, TAU); c.fill();
-  c.fillStyle = P.surface; c.beginPath(); c.arc(px, py, RW * 0.17, 0, TAU); c.fill();
+  drawPointer(c, cx, cy, R, RW, G.ang, G.dir, P.ink, P.lilac);
+  if (two) drawPointer(c, cx, cy, R2, RW2, G.ang2, G.dir2, P.btn, P.lilac);
 
   for (const r of G.rips) {
     const p = r.t / r.max;
@@ -835,23 +1229,38 @@ const render = () => {
   c.globalAlpha = 1;
 
   c.textAlign = 'center'; c.textBaseline = 'middle';
+  const big = Math.round(R * (two ? 0.34 : 0.6));
   if (G.mode === 'menu') {
-    c.fillStyle = P.ink; c.font = '600 ' + Math.round(R * 0.6) + 'px ' + FD;
+    c.fillStyle = P.ink; c.font = '600 ' + big + 'px ' + FD;
     c.fillText(String(save.best), cx, cy - R * 0.04);
     c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
     c.fillText(t('best'), cx, cy + R * 0.36);
   } else {
     const sc = 1 + 0.2 * G.scorePulse;
-    c.save(); c.translate(cx, cy - R * 0.04); c.scale(sc, sc);
-    c.fillStyle = P.ink; c.font = '600 ' + Math.round(R * 0.6) + 'px ' + FD;
+    c.save(); c.translate(cx, cy - (two ? 0 : R * 0.04)); c.scale(sc, sc);
+    c.fillStyle = P.ink; c.font = '600 ' + big + 'px ' + FD;
     c.fillText(String(G.score), 0, 0);
     c.restore();
-    c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
-    c.fillText(t('score'), cx, cy + R * 0.36);
+    if (!two) {
+      c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
+      c.fillText(t('score'), cx, cy + R * 0.36);
+    }
   }
 
-  if (G.mode === 'play' && !save.tut && G.n < CFG.tutHits) {
-    pill(c, G.n < 2 ? t('tut1') : t('tut2'), cx, cy + r0 + 13 + 40, P.surface, P.ink, 14);
+  const lineY = cy + r0 + 13 + 36;
+  if (G.mode === 'play') {
+    if (G.hint) {
+      const al = G.hint.t < 0.2 ? G.hint.t / 0.2 : (G.hint.t > G.hint.max - 0.5 ? (G.hint.max - G.hint.t) / 0.5 : 1);
+      c.globalAlpha = clamp(al, 0, 1);
+      G.hint.lines.forEach((ln, i) => pill(c, ln.txt, cx, lineY + i * 36, P[ln.bg], P.ink, 14));
+      c.globalAlpha = 1;
+    } else if (!save.tut && G.n < CFG.tutHits) {
+      pill(c, G.n < 2 ? t('tut1') : t('tut2'), cx, lineY, P.surface, P.ink, 14);
+    }
+    if (two && !G.hint) {
+      pill(c, t('ringL'), cx - view.w * 0.26, lineY, P['lilac-soft'], P.ink, 13);
+      pill(c, t('ringR'), cx + view.w * 0.26, lineY, P['lilac-soft'], P.ink, 13);
+    }
   }
   const topY = cy - (r0 + 13) - 30;
   for (const p of G.pops) {
@@ -878,20 +1287,32 @@ const render = () => {
 };
 
 /* ---------- giriş ---------- */
+const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on');
 app.addEventListener('pointerdown', e => {
   Snd.unlock();
-  if (e.target.closest && e.target.closest('button')) return;
-  if (G.mode === 'play') tap();
+  const tg = e.target;
+  if (tg.closest && (tg.closest('button') || tg.closest('#tools'))) return;
+  if (overlayOpen()) return;
+  if (G.mode === 'play') tap(e.clientX - app.getBoundingClientRect().left);
   else if (G.mode === 'menu') start();
   else if (G.mode === 'over' && performance.now() - G.overAt > 700) start();
   else if (G.mode === 'pause') resume();
 });
+toolsEl.addEventListener('pointerdown', e => {
+  const b = e.target.closest && e.target.closest('button.tool');
+  if (!b) return;
+  e.preventDefault(); Snd.unlock();
+  useTool(b.getAttribute('data-tool'));
+});
 window.addEventListener('keydown', e => {
-  if (e.repeat || (e.code !== 'Space' && e.code !== 'Enter')) return;
+  if (e.repeat) return;
   const ae = document.activeElement;
   if (ae && ae.tagName === 'BUTTON') return;
+  const left = e.code === 'ArrowLeft' || e.code === 'KeyA', right = e.code === 'ArrowRight' || e.code === 'KeyL';
+  if (e.code !== 'Space' && e.code !== 'Enter' && !left && !right) return;
   e.preventDefault(); Snd.unlock();
-  if (G.mode === 'play') tap();
+  if (overlayOpen()) return;
+  if (G.mode === 'play') tap(right ? view.w : (left ? 0 : null));
   else if (G.mode === 'menu') start();
   else if (G.mode === 'over' && performance.now() - G.overAt > 500) start();
   else if (G.mode === 'pause') resume();
@@ -902,6 +1323,16 @@ $('playBtn').addEventListener('click', () => { Snd.unlock(); start(); });
 $('againBtn').addEventListener('click', () => { Snd.unlock(); start(); });
 $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
 $('resumeBtn').addEventListener('click', resume);
+$('bagBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
+$('bagBtn2').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'over') openShop('over'); });
+$('shopClose').addEventListener('click', closeShop);
+$('shopAd').addEventListener('click', () => {
+  Snd.unlock();
+  Platform.rewardedAd((ok, why) => {
+    if (ok) { save.coins += CFG.adCoins; persist(); refreshStats(); renderShop(); toast(t('gotCoins', { n: CFG.adCoins })); Snd.fanfare(); }
+    else if (why !== 'closed') toast(t('adFail'));
+  });
+});
 $('sndBtn').addEventListener('click', () => { Snd.unlock(); save.snd = !save.snd; persist(); refreshSound(); Snd.ui(); });
 $('adBtn').addEventListener('click', () => {
   if (G.mode !== 'over') return;
@@ -937,7 +1368,9 @@ if (AppP) {
   try {
     AppP.addListener('pause', () => pause());
     AppP.addListener('backButton', () => {
-      if (G.mode === 'play') pause();
+      if (adEl.classList.contains('on')) return;
+      if (shopEl.classList.contains('on')) closeShop();
+      else if (G.mode === 'play') pause();
       else if (G.mode === 'pause') resume();
       else if (G.mode === 'over') goMenu();
       else if (G.mode === 'menu') AppP.exitApp();
@@ -950,7 +1383,9 @@ let last = 0;
 const frame = ts => {
   if (!last) last = ts;
   const raw = Math.min(0.05, (ts - last) / 1000); last = ts;
-  update(raw); render();
+  try { update(raw); render(); } catch (e) {
+    if (!frame.failed) { frame.failed = true; try { console.error('[kp] kare hatası', e && e.stack ? e.stack : e); } catch (x) {} }
+  }
   requestAnimationFrame(frame);
 };
 requestAnimationFrame(frame);
