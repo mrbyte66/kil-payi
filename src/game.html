@@ -1,7 +1,9 @@
 <title>Kıl payı</title>
+<!--FONTS-START-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<!--FONTS-END-->
 <style>
 /* Tasarım planı
    Renk: lila (ana) + şeftali (hedef bölge); uyarı için gül. Nötrler lilaya çalar.
@@ -205,8 +207,8 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
   <section class="scr dim" id="ad" aria-label="Reklam" aria-hidden="true">
     <div class="card glass">
-      <p class="ad-badge rise" style="--i:0" data-i18n="adBadge">Reklam (demo)</p>
-      <p class="ad-text rise" style="--i:1" data-i18n="adText"></p>
+      <p class="ad-badge rise" style="--i:0" id="adBadgeEl" data-i18n="adBadge">Reklam (demo)</p>
+      <p class="ad-text rise" style="--i:1" id="adTextEl" data-i18n="adText"></p>
       <div class="ad-bar rise" style="--i:2"><i id="adFill"></i></div>
       <p class="eyebrow rise" style="--i:3" data-i18n="adWait">Ödülün hazırlanıyor…</p>
     </div>
@@ -301,6 +303,7 @@ const STR = {
     contTitle: 'İkinci şans', contSub: '+{s} sn ile devam et', watchAd: 'Reklam izle', again: 'Tekrar dene', home: 'Ana ekran',
     paused: 'Duraklatıldı', resume: 'Devam et',
     adBadge: 'Reklam (demo)', adText: 'Gerçek sürümde burada kısa bir video oynar. Bitince ödülün hazır.', adWait: 'Ödülün hazırlanıyor…',
+    adBadgeReal: 'Reklam', adLoading: 'Reklam hazırlanıyor, birazdan başlayacak.', adFail: 'Reklam şu an yüklenemedi. Biraz sonra tekrar dene.',
     notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', sound: 'Ses', score: 'puan',
     soundOn: 'Sesi kapat', soundOff: 'Sesi aç', overSr: 'Süre bitti. Skor {n}.',
     play_aria: 'Oyun alanı'
@@ -315,6 +318,7 @@ const STR = {
     contTitle: 'Second chance', contSub: 'Keep going with +{s} s', watchAd: 'Watch ad', again: 'Try again', home: 'Home',
     paused: 'Paused', resume: 'Resume',
     adBadge: 'Ad (demo)', adText: 'In the real version a short video plays here. Your reward is ready when it ends.', adWait: 'Preparing your reward…',
+    adBadgeReal: 'Ad', adLoading: 'Getting your ad ready, it starts in a moment.', adFail: "The ad couldn't load right now. Try again in a moment.",
     notEnough: 'Not enough coins. Watch an ad to keep going.', sound: 'Sound', score: 'pts',
     soundOn: 'Mute sound', soundOff: 'Unmute sound', overSr: 'Time is up. Score {n}.',
     play_aria: 'Play area'
@@ -338,12 +342,14 @@ const persist = () => { try { localStorage.setItem('kilpayi.v1', JSON.stringify(
 /* ---------- palet: renkler CSS değişkenlerinden okunur, açık/koyu tema kendiliğinden izlenir ---------- */
 const P = {};
 let FD = 'sans-serif', FB = 'sans-serif';
+let onPalette = () => {};
 const readPalette = () => {
   const cs = getComputedStyle(document.documentElement);
   ['bg', 'surface', 'track', 'tick', 'ink', 'ink-2', 'lilac', 'lilac-soft', 'btn', 'peach', 'peach-deep', 'peach-soft', 'rose', 'rose-soft']
     .forEach(k => { P[k] = cs.getPropertyValue('--' + k).trim() || '#888888'; });
   FD = cs.getPropertyValue('--font-display').trim() || 'sans-serif';
   FB = cs.getPropertyValue('--font-body').trim() || 'sans-serif';
+  onPalette();
 };
 readPalette();
 try {
@@ -390,24 +396,81 @@ const Snd = {
 };
 
 /* ---------- platform köprüsü: web'de demo, Android'de gerçek reklam/titreşim ---------- */
+const CAP = window.Capacitor;
+const NATIVE = !!(CAP && CAP.isNativePlatform && CAP.isNativePlatform());
+const ADS = { test: true, rewardedId: 'ca-app-pub-3940256099942544/5224354917' };
+const plugins = {};
+const plugin = name => {
+  if (!NATIVE) return null;
+  if (!(name in plugins)) {
+    try { plugins[name] = CAP.registerPlugin ? CAP.registerPlugin(name) : ((CAP.Plugins && CAP.Plugins[name]) || null); } catch (e) { plugins[name] = null; }
+  }
+  return plugins[name];
+};
+let adMobReady = null;
+const adMobInit = A => adMobReady || (adMobReady = A.initialize({ initializeForTesting: ADS.test }).then(() => true, () => false));
+
 const Platform = {
-  vibrate(p) {
+  native: NATIVE,
+  haptic(kind) {
     if (!save.vib) return;
+    const H = plugin('Haptics');
+    if (H) {
+      try {
+        if (kind === 'light') H.impact({ style: 'LIGHT' });
+        else if (kind === 'medium') H.impact({ style: 'MEDIUM' });
+        else if (kind === 'heavy') H.impact({ style: 'HEAVY' });
+        else if (kind === 'warn') H.notification({ type: 'WARNING' });
+        else if (kind === 'error') H.notification({ type: 'ERROR' });
+      } catch (e) {}
+      return;
+    }
+    const pat = { light: 8, medium: 14, heavy: [18, 30, 40], warn: 28, error: [30, 40, 60] }[kind];
     try {
       if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
-      if (navigator.vibrate) navigator.vibrate(p);
+      if (navigator.vibrate) navigator.vibrate(pat);
     } catch (e) {}
   },
   track(name, params) { try { if (window.console && console.debug) console.debug('[kp]', name, params || ''); } catch (e) {} },
   rewardedAd(done) {
-    const el = $('ad'), bar = $('adFill'), t0 = performance.now(), dur = CFG.adSeconds * 1000;
-    bar.style.width = '0%'; show(el);
-    const step = () => {
-      const p = Math.min(1, (performance.now() - t0) / dur);
-      bar.style.width = (p * 100).toFixed(1) + '%';
-      if (p < 1) requestAnimationFrame(step); else { hide(el); done(true); }
+    const A = plugin('AdMob'), el = $('ad'), bar = $('adFill');
+    if (!A) {
+      const t0 = performance.now(), dur = CFG.adSeconds * 1000;
+      bar.style.width = '0%'; show(el);
+      const step = () => {
+        const p = Math.min(1, (performance.now() - t0) / dur);
+        bar.style.width = (p * 100).toFixed(1) + '%';
+        if (p < 1) requestAnimationFrame(step); else { hide(el); done(true); }
+      };
+      requestAnimationFrame(step);
+      return;
+    }
+    $('adBadgeEl').textContent = t('adBadgeReal'); $('adTextEl').textContent = t('adLoading');
+    el.classList.add('real'); bar.style.width = '35%'; show(el);
+    const handles = [];
+    let settled = false, earned = false, timer = 0;
+    const finish = (ok, why) => {
+      if (settled) return;
+      settled = true; clearTimeout(timer);
+      handles.forEach(h => { try { h.remove(); } catch (e) {} });
+      el.classList.remove('real'); hide(el);
+      $('adBadgeEl').textContent = t('adBadge'); $('adTextEl').textContent = t('adText');
+      done(ok, why);
     };
-    requestAnimationFrame(step);
+    timer = setTimeout(() => finish(false, 'fail'), 25000);
+    (async () => {
+      try {
+        if (!(await adMobInit(A))) { finish(false, 'fail'); return; }
+        handles.push(await A.addListener('onRewardedVideoAdShowed', () => { clearTimeout(timer); }));
+        handles.push(await A.addListener('onRewardedVideoAdReward', () => { earned = true; }));
+        handles.push(await A.addListener('onRewardedVideoAdDismissed', () => finish(earned, earned ? 'ok' : 'closed')));
+        handles.push(await A.addListener('onRewardedVideoAdFailedToShow', () => finish(false, 'fail')));
+        handles.push(await A.addListener('onRewardedVideoAdFailedToLoad', () => finish(false, 'fail')));
+        await A.prepareRewardVideoAd({ adId: ADS.rewardedId, isTesting: ADS.test });
+        const item = await A.showRewardVideoAd();
+        if (item) earned = true;
+      } catch (e) { finish(false, 'fail'); }
+    })();
   }
 };
 
@@ -557,10 +620,10 @@ const hit = d => {
   if (near) {
     pop(t('near'), 'near'); shake(0.35); flash('rose', 0.22);
     if (!RM) { G.tscale = 0.3; G.tsT = 0.14; }
-    Snd.near(); Platform.vibrate([18, 30, 40]);
+    Snd.near(); Platform.haptic('heavy');
   } else {
     pop(perfect ? t('perfect') : '+' + pts, perfect ? 'perfect' : 'plain');
-    Snd.hit(G.combo - 1, perfect); Platform.vibrate(perfect ? 14 : 8);
+    Snd.hit(G.combo - 1, perfect); Platform.haptic(perfect ? 'medium' : 'light');
   }
   if (G.n >= DIFF.period && G.n % DIFF.period === 0) {
     G.dir = -G.dir; G.revT = 0.8; pop(t('reverse'), 'rev'); Snd.rev();
@@ -573,7 +636,7 @@ const hit = d => {
 const miss = () => {
   resolveMiss(G);
   shake(0.2); flash('rose', 0.14);
-  pop(t('miss'), 'miss'); Snd.miss(); Platform.vibrate(28);
+  pop(t('miss'), 'miss'); Snd.miss(); Platform.haptic('warn');
   if (G.time <= 0) die();
 };
 
@@ -584,7 +647,7 @@ const die = () => {
   const inside = angd(G.ang, G.ta) <= G.hw;
   const secs = (norm((G.ta - G.ang) * G.dir) - G.hw) / w;
   G.nearMsg = inside ? t('overInside') : (secs > 0 && secs <= 0.6 ? t('overClose', { s: f1(Math.max(0.1, secs)) }) : '');
-  shake(0.5); flash('rose', 0.3); Snd.over(); Platform.vibrate([30, 40, 60]);
+  shake(0.5); flash('rose', 0.3); Snd.over(); Platform.haptic('error');
   G.newBest = G.score > save.best;
   if (G.newBest) save.best = G.score;
   if (!G.runCounted) { save.runs++; G.runCounted = true; }
@@ -843,7 +906,7 @@ $('sndBtn').addEventListener('click', () => { Snd.unlock(); save.snd = !save.snd
 $('adBtn').addEventListener('click', () => {
   if (G.mode !== 'over') return;
   Snd.unlock(); G.mode = 'ad'; hide(overEl);
-  Platform.rewardedAd(ok => { if (ok) doContinue(); else { G.mode = 'over'; show(overEl); } });
+  Platform.rewardedAd((ok, why) => { if (ok) doContinue(); else { G.mode = 'over'; show(overEl); if (why !== 'closed') toast(t('adFail')); } });
 });
 $('coinBtn').addEventListener('click', () => {
   if (G.mode !== 'over') return;
@@ -860,6 +923,27 @@ if (document.fonts && document.fonts.load) {
   Promise.all([document.fonts.load('600 40px Fredoka'), document.fonts.load('800 14px Nunito')]).then(() => { readPalette(); relayout(false); }).catch(() => {});
 }
 setTimeout(() => relayout(true), 120);
+const AppP = plugin('App'), StatusP = plugin('StatusBar');
+const bgIsDark = () => {
+  const v = parseInt((P.bg || '#ffffff').slice(1), 16);
+  return (0.299 * ((v >> 16) & 255) + 0.587 * ((v >> 8) & 255) + 0.114 * (v & 255)) < 128;
+};
+onPalette = () => {
+  if (!StatusP) return;
+  try { StatusP.setStyle({ style: bgIsDark() ? 'DARK' : 'LIGHT' }); } catch (e) {}
+};
+onPalette();
+if (AppP) {
+  try {
+    AppP.addListener('pause', () => pause());
+    AppP.addListener('backButton', () => {
+      if (G.mode === 'play') pause();
+      else if (G.mode === 'pause') resume();
+      else if (G.mode === 'over') goMenu();
+      else if (G.mode === 'menu') AppP.exitApp();
+    });
+  } catch (e) {}
+}
 /*DEBUG*/
 
 let last = 0;

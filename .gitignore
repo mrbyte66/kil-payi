@@ -28,3 +28,9 @@ keystore.properties
 
 # Günlükler
 *.log
+
+# Derlenmiş APK kopyaları
+dist/
+
+# IDE
+.idea/

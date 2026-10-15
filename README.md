@@ -39,6 +39,30 @@ DIFF_OVERRIDE='{"rise":0.7}' node tools/sim.mjs 2500 yeni   # parametre denemesi
 Simülasyon, gerçek oyunla aynı `TUNE` bloğunu okur. Oyuncular zamanlama sapması (sigma) ve dikkat kaybı olasılığıyla modellenir;
 gerçek oyuncu verisi geldiğinde bu değerler yeniden kalibre edilmelidir.
 
+## Android
+
+Capacitor 8 ile paketlenir. Gereken: Node 22, Java 21, Android SDK (`ANDROID_HOME`, platform 36).
+
+```sh
+npm install                      # ilk kurulumda
+./build.sh && npx cap sync android
+cd android && ./gradlew assembleDebug
+# APK: android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Emülatörde denemek için:
+
+```sh
+~/Library/Android/sdk/emulator/emulator -avd Pixel_8_API_33 -no-window -no-audio &
+~/Library/Android/sdk/platform-tools/adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Notlar:
+
+- `DEBUG=1 ./build.sh` ile derlenen sürümde `window.__kp` vardır; WebView'e `adb forward tcp:9222 localabstract:webview_devtools_remote_<pid>` ile bağlanıp oyun durumunu sürebilirsin.
+- Reklam kimlikleri Google'ın herkese açık TEST kimlikleridir (`src/game.html` içinde `ADS`, `AndroidManifest.xml` içinde `APPLICATION_ID`). Yayından önce gerçek kimliklerle değiştirilecek.
+- Bazı ağlarda Java, `release-assets.githubusercontent.com` adresine bağlanamaz. Gradle dağıtımı takılırsa zip dosyasını curl ile `~/.gradle/wrapper/dists/...` içine koy.
+
 ## Platform köprüsü
 
 `Platform` nesnesi web'de demo davranır: `rewardedAd` sahte bir reklam gösterir, `vibrate` tarayıcı titreşimini kullanır,
