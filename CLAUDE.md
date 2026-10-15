@@ -18,6 +18,12 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 - Paket sürümleri `--save-exact` ile kilitli. Anahtar dosyaları (`*.keystore`, `*.jks`) depoya girmemeli.
 - Sunucu gerektiren özellik ekleme (skor tablosu gibi). İleride Google Play Games Services düşünülebilir.
 
+## Oyun sistemleri
+
+- Kilit türleri `KIND` tablosunda (TUNE bloğu); spawn mantığı `spawnChallenge`, vuruş mantığı `tap`/`hit`/`trap`. Tür ekleyince `tools/sim.mjs` içindeki yaklaşık modeli de güncelle.
+- Aletler `TOOL` tablosunda; stok ve seviye `save.tools`. Alet çubuğu oyun alanının altında ve oyun dokunuşu almaz (kasıtlı, kazara kullanımı önler).
+- Hikaye/harita yok; kullanıcı gereksiz buldu. Eklenmesi önerilmesin.
+
 ## Ortam notları (bu makine)
 
 - Node 22, Java 21 (JAVA_HOME=$(/usr/libexec/java_home)), Android SDK `~/Library/Android/sdk` (platform 34, build-tools 34/35, emülatör Pixel_8_API_33 arm64). cmdline-tools yok.

@@ -12,7 +12,7 @@ FONTS_LOCAL='<link rel="stylesheet" href="fonts/fonts.css">'
 {
   printf '%s\n' "$HEAD"
   if [ "${DEBUG:-0}" = "1" ]; then
-    sed -e 's#/\*DEBUG\*/#window.__kp={G:G,CFG:CFG,save:save,view:view,tap:tap,start:start,die:die,hit:hit,miss:miss,showOver:showOver};#' \
+    sed -e 's#/\*DEBUG\*/#window.__kp={G:G,CFG:CFG,save:save,view:view,tap:tap,start:start,die:die,hit:hit,miss:miss,showOver:showOver,spawn:spawnChallenge,useTool:useTool,pinCenter:pinCenter,KIND:KIND};#' \
         -e 's#/\*NOPAUSE\*/# || true#' \
         -e '/<!--FONTS-START-->/,/<!--FONTS-END-->/c\
 '"$FONTS_LOCAL" src/game.html

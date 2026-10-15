@@ -27,11 +27,18 @@ Sonra `http://localhost:8000` adresini aç. Telefon boyutunda denemek için tara
   sonra 3 vuruş gevşer ("Nefes al"). `adapt` iyi oynayan oyuncuyu hafifçe zorlaştırır, `mercy` hatadan sonra kısa süre rahatlatır.
   `fatigueFrom` sonrası süre biraz daha hızlı akar, böylece çok uzun oyunlar sonunda biter.
 
+### Kilit türleri ve aletler
+
+- **Türler (`KIND`):** tek pim, çift pim, kayan pim, tuzak pim, iki halka. Bir oyunda belirli bir vuruş sayısına ulaşınca tür kalıcı olarak açılır, sonraki oyunlarda daha erken karışır. Dalganın "nefes" bölümünde hep tek pim gelir.
+- **Aletler (`TOOL`):** stetoskop (hedefi genişletir), kronometre (+süre), kalkan (ıskayı bağışlar), kum saati (ibreyi yavaşlatır). Stok ve seviye cihazda saklanır; coin ile alınır ve yükseltilir, ödüllü reklam coin verir.
+- Kayıt anahtarı `kilpayi.v1`; yeni alanlar (`tools`, `unl`, `seen`) eski kayıtla uyumludur.
+
 ### Simülasyon
 
 ```sh
-node tools/sim.mjs 2500          # eski ve yeni modeli 5 beceri düzeyinde karşılaştırır
-node tools/sim.mjs 2500 yeni     # yalnızca yeni model, dalga konumuna göre vurma oranları
+node tools/sim.mjs 2000          # eski, yalnızca tek pim, ilk oyun ve kariyer modellerini karşılaştırır
+node tools/sim.mjs 2000 yeni     # yalnızca yeni model (ilk oyun); tür başına vurma oranı ve dağılım
+node tools/sim.mjs 2000 kariyer  # tüm türler zaten açık
 node tools/sim.mjs curve         # zorluk eğrisi verisi (JSON)
 DIFF_OVERRIDE='{"rise":0.7}' node tools/sim.mjs 2500 yeni   # parametre denemesi
 ```
