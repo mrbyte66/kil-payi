@@ -9,6 +9,7 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 - `build.sh`: `src/game.html` -> `www/index.html`. `DEBUG=1 ./build.sh` test kancası ekler (`window.__kp`), yayın sürümüne eklenmez.
 - `src/fonts/`: Fredoka ve Nunito (OFL). `node tools/fetch-fonts.mjs` ile indirilir, `www/` sürümü bunları yerelden okur.
 - `tools/sim.mjs`: zorluk simülatörü. `src/game.html` içindeki `TUNE-START`/`TUNE-END` bloğunu okur.
+- `CHANGELOG.md`: sürüm notları (Türkçe, kullanıcı gözüyle). `tools/release.sh`: sürüm APK'sını `dist/kil-payi-v<sürüm>.apk` adıyla üretir.
 - `android/`: Capacitor 8.5.3 Android projesi. `capacitor.config.ts` içinde geçici appId `com.mrbyte66.kilpayi` (yayından önce kullanıcıyla kesinleştir).
 
 ## Kararlar
@@ -38,6 +39,14 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 - Capacitor 8 için SDK platform 36 gerekir (compileSdk/targetSdk 36); AGP kendisi indirmeye çalışır, lisans kabulü gerekebilir (kullanıcıya sor).
 - Bu ağda Java, `release-assets.githubusercontent.com` adresine bağlanamıyor (curl bağlanıyor). Gradle dağıtımı bu yüzden curl ile
   `~/.gradle/wrapper/dists/gradle-8.14.3-all/<hash>/gradle-8.14.3-all.zip` konumuna elle indirildi. Benzer GitHub kaynaklı indirmeler de takılabilir.
+
+## Sürüm süreci
+
+- Sürüm adları `V0.x.y`. Kullanıcı sürümleri bu adlarla anar ("V0.4.0'daki şu seviyeyi koru"), bu yüzden APK'yı hep sürüm adıyla ver: `dist/kil-payi-v0.x.y.apk`.
+  Sürüm adı `android/app/build.gradle` içindeki `versionName`; her sürümde `versionCode` da bir artar. Eski sürümlerin APK'larını silme (`dist/` git'te yok).
+- Her sürümde sırayla: `CHANGELOG.md`'yi güncelle, `./tools/release.sh` ile APK üret, commit'le, `git tag -a v0.x.y -m "..."`,
+  `git push origin android-capacitor --tags` (kullanıcı her sürümde push'lamamı istedi), sonra APK'yı Wi-Fi/QR ve SendUserFile ile ver.
+- Büyük değişiklikte önce görsel tasarım göster, kullanıcı onaylayınca kodla.
 
 ## Çalışma kuralları
 

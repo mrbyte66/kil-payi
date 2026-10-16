@@ -62,6 +62,11 @@ bot gerçek oyun kodunu hızlandırılmış zamanla oynar ve beceri düzeyine g�
 Simülasyon, gerçek oyunla aynı `TUNE` bloğunu okur. Oyuncular zamanlama sapması (sigma) ve dikkat kaybı olasılığıyla modellenir;
 gerçek oyuncu verisi geldiğinde bu değerler yeniden kalibre edilmelidir.
 
+## Sürümler
+
+Sürüm adları `V0.x.y` biçimindedir; değişiklik listesi `CHANGELOG.md` içindedir ve git'te her sürüm `v0.x.y` etiketini taşır.
+`./tools/release.sh` sürüm APK'sını `dist/kil-payi-v<sürüm>.apk` adıyla üretir (sürüm adı `android/app/build.gradle` içindeki `versionName`).
+
 ## Android
 
 Capacitor 8 ile paketlenir. Gereken: Node 22, Java 21, Android SDK (`ANDROID_HOME`, platform 36).
