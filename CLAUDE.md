@@ -25,7 +25,7 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 - Seviyeler (`LEVEL`: rahat, normal, usta) ve seri çarpanı (`comboMult`) TUNE bloğunda, sim ile paylaşılır. Seviye çarpanlarını değiştirince `node tools/sim.mjs 2000 seviye` çalıştır; hedef: Rahat'ta bir beceri düzeyi, Normal'in bir alt düzeyi gibi oynasın.
 - Her seviyenin rekoru ayrı (`save.bests`); `save.best` kaldırıldı, eski kayıt Normal'e taşınır.
 - Övgü ve laf satırları `LINES` içinde (TR ve EN). Yeni satır eklerken iki dili de doldur; ton hafif şakacı kalsın, aşağılayıcı olmasın. Kullanıcı özellikle "Senin yapacağın iş değil" tarzı laf istedi.
-- İki halkada dokunuş ekranın neresinde olursa olsun hedefteki ibreyi vurur (sol/sağ kuralı kaldırıldı); iç halka lila, dış halka şeftali boyanır. Çift pimde iki hedef arası da açıldı. Nedeni: arkadaşlardan "iki tane olan böyle olmamalı" geri bildirimi geldi, hangisini (iki halka mı çift pim mi) kastettikleri doğrulanmadı.
+- İki halkada dokunuş ekranın neresinde olursa olsun hedefteki ibreyi vurur (sol/sağ kuralı kaldırıldı); iç halka lila, dış halka şeftali boyanır. Çift pimde iki hedef arası da açıldı. Nedeni: arkadaşlardan "iki tane olan böyle olmamalı" geri bildirimi geldi; kullanıcı bunun iki halka olduğunu doğruladı (çift pimdeki açma önlem olarak yapıldı, şikâyet konusu değildi). Ayrıntıyı (sol/sağ kuralı mı, iki ibreyi aynı anda izlemek mi) arkadaşlar söylemedi; yeni sürümden sonra tekrar sor.
 - Hikaye/harita yok; kullanıcı gereksiz buldu. Eklenmesi önerilmesin.
 
 ## Ortam notları (bu makine)
