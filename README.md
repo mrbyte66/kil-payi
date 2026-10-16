@@ -6,8 +6,11 @@ Refleks oyunu. Kadran üzerinde dönen ibreyi şeftali bölgedeyken yakala; sür
 
 - `src/game.html`: oyunun tamamı (HTML, CSS, JS). Tek kaynak bu dosyadır.
 - `build.sh`: `src/game.html` dosyasını tam bir belgeye çevirip `www/index.html` üretir (Capacitor bu klasörü kullanacak).
-  `DEBUG=1 ./build.sh` test kancası ekler (`window.__kp`), yayın sürümüne eklenmez.
+  `DEBUG=1 ./build.sh` test kancası ekler (`window.__kp`) ve duraklatmayı kapatır; `DEBUG=2` kancayı ekler ama duraklatma açık kalır
+  (ana ekran, ekran kilidi, geri tuşu denemeleri için). İkisi de yayın sürümüne girmez.
 - `www/`: derlenmiş çıktı.
+- `docs/yolculuk-tasarimi.md`: onaylı yolculuk tasarımı, süreler, kilit çiftleri, yapım durumu ve bot ölçümleri.
+- `tools/`: `sim.mjs` (eski vuruş sayısına bağlı zorluk simülatörü), `bot.js` (yolculuğu gerçek kodla oynatan bot).
 
 ## Çalıştırma
 
@@ -29,7 +32,12 @@ Sonra `http://localhost:8000` adresini aç. Telefon boyutunda denemek için tara
 
 ### Kilit türleri ve aletler
 
-- **Türler (`KIND`):** tek pim, çift pim, kayan pim, tuzak pim, iki halka. Bir oyunda belirli bir vuruş sayısına ulaşınca tür kalıcı olarak açılır, sonraki oyunlarda daha erken karışır. Dalganın "nefes" bölümünde hep tek pim gelir.
+- **Yolculuk:** oyun 10 seviyedir (yaklaşık 15 dk). Her seviyede 3 kilit olayı vardır (iyi kilit ✚ engel ikizi, ★ güçlenme, karışım); ardından
+  süre donan, cezasız, puan ×2 **cennet** ve süre hızlı eriyen, cezası ağır **cehennem** bölümü gelir (ikisi de 10 + seviye sn), sonra sonraki seviye.
+  Tema yumuşak geçişle altın-krem ya da kızıl-siyaha döner. Bir seviyeyi bitirince **kamp** açılır (menüde "Kamp · Seviye N"). Duraklatma her şeyi dondurur,
+  devam edince 3-2-1 sayılır. Zamanlar ve olaylar `JOURNEY`/`JEVENTS` (TUNE bloğu); ayrıntı `docs/yolculuk-tasarimi.md`. Şimdilik Seviye 1-3'ün kilitleri
+  yapıldı (çift ✚ tuzak, kayan ✚ kayan tuzak, nefes ✚ diken); kalanı fazlar halinde eklenecek.
+- **Eski türler (`KIND`):** vuruş sayısına bağlı eski açılış modeli yalnızca `tools/sim.mjs` tarafından kullanılır; oyunda yolculuk (`JKIND`, `JEVENTS`) geçerlidir.
 - **Aletler (`TOOL`):** stetoskop (hedefi genişletir), kronometre (+süre), kalkan (ıskayı bağışlar), kum saati (ibreyi yavaşlatır). Stok ve seviye cihazda saklanır; coin ile alınır ve yükseltilir, ödüllü reklam coin verir.
 - **Seri (kombo, `COMBO`):** ardışık vuruşlar puan çarpanı kazandırır (5, 10, 20 ve 35. vuruşta ×2, ×3, ×4, ×5). Iska seriyi sıfırlar, kalkan korur. Çarpan yalnızca puanı etkiler; coin ham puandan hesaplanır, ekonomi değişmez.
 - **Seviyeler (`LEVEL`):** Rahat, Normal, Usta. Hedef genişliği, ibre hızı, süre kazancı, ıska bedeli, kilit eşikleri, başlangıç süresi ve coin çarpanı seviyeye göre değişir. Her seviyenin rekoru ayrıdır (`save.bests`). Üç kısa oyundan sonra "Rahat mod", iki uzun oyundan sonra "Usta mod" önerisi çıkar.
@@ -47,6 +55,9 @@ node tools/sim.mjs 2000 seviye   # rahat, normal ve usta seviyeleri, her beceri 
 node tools/sim.mjs curve         # zorluk eğrisi verisi (JSON)
 DIFF_OVERRIDE='{"rise":0.7}' node tools/sim.mjs 2500 yeni   # parametre denemesi
 ```
+
+Yolculuk için ayrı bir bot var: `DEBUG=1 ./build.sh` ile derlenen sayfada `tools/bot.js` içeriğini konsola yapıştırıp `bulk(['normal'], 40)` çalıştır;
+bot gerçek oyun kodunu hızlandırılmış zamanla oynar ve beceri düzeyine göre kaç saniyede, hangi seviyede öldüğünü verir (sonuçlar `docs/yolculuk-tasarimi.md` içinde).
 
 Simülasyon, gerçek oyunla aynı `TUNE` bloğunu okur. Oyuncular zamanlama sapması (sigma) ve dikkat kaybı olasılığıyla modellenir;
 gerçek oyuncu verisi geldiğinde bu değerler yeniden kalibre edilmelidir.
