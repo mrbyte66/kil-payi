@@ -147,6 +147,15 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .cont-actions .btn{min-height:52px;padding:0 12px;font-size:var(--fs-16);white-space:nowrap;background:var(--bg);box-shadow:none}
 .cont-actions .btn.ad{background:var(--btn);color:var(--on-btn)}
 .row2{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.seg{display:flex;gap:4px;padding:4px;border-radius:var(--r-pill);background:var(--surface);box-shadow:var(--shadow-s)}
+.seg button{appearance:none;border:0;cursor:pointer;min-height:40px;padding:0 18px;border-radius:var(--r-pill);background:transparent;color:var(--ink-2);font-family:var(--font-display);font-weight:600;font-size:var(--fs-16);line-height:1;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
+.seg button[aria-checked="true"]{background:var(--btn);color:var(--on-btn)}
+.seg button:focus-visible{outline:3px solid var(--lilac);outline-offset:2px}
+.tip{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 6px 6px 16px;border-radius:var(--r-pill);background:var(--lilac-soft);color:var(--ink);font-weight:800;font-size:var(--fs-14);text-align:left}
+.tip .btn{min-height:36px;padding:0 14px;font-size:var(--fs-14);background:var(--surface);box-shadow:none;white-space:nowrap}
+.eyebrow.mood{font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);color:var(--ink)}
+.eyebrow.mood.good{color:var(--btn)}
+.eyebrow.mood.bad{color:var(--rose)}
 
 .shop{max-height:min(100%,760px);gap:10px;padding:20px 16px 14px}
 .shop-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -173,7 +182,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .toast{position:absolute;left:50%;bottom:92px;max-width:calc(100% - 40px);padding:12px 18px;border-radius:var(--r-pill);background:var(--glass);border:1px solid var(--glass-edge);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow-m);font-weight:800;font-size:var(--fs-14);color:var(--ink);text-align:center;opacity:0;transform:translate(-50%,16px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-base) var(--ease);z-index:5}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
-@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tool{width:52px;height:52px}}
+@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tool{width:52px;height:52px}.tagline{display:none}.seg button{min-height:36px;padding:0 14px}.menu-foot{gap:12px}}
 @media (prefers-reduced-motion:reduce){.amb i,.breathe{animation:none}.scr.on .rise,.scr.on .card{animation-duration:1ms;animation-delay:0s}.btn,.icon-btn,.hud,.tools,.tool{transition:none}}
 </style>
 
@@ -218,7 +227,12 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
         <span class="chip"><span data-i18n="best">En iyi</span><b id="menuBest">0</b></span>
         <span class="chip"><span data-i18n="runs">Oyun</span><b id="menuRuns">0</b></span>
       </div>
-      <button class="btn primary big breathe rise" style="--i:4" id="playBtn" type="button" data-i18n="play">Oyna</button>
+      <div class="seg rise" style="--i:4" id="lvlSeg" role="radiogroup" aria-label="Zorluk">
+        <button type="button" role="radio" data-lvl="rahat" aria-checked="false" data-i18n="lv_rahat">Rahat</button>
+        <button type="button" role="radio" data-lvl="normal" aria-checked="true" data-i18n="lv_normal">Normal</button>
+        <button type="button" role="radio" data-lvl="usta" aria-checked="false" data-i18n="lv_usta">Usta</button>
+      </div>
+      <button class="btn primary big breathe rise" style="--i:5" id="playBtn" type="button" data-i18n="play">Oyna</button>
     </footer>
   </section>
 
@@ -228,6 +242,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
       <div class="big-score rise" style="--i:1" id="ovScore">0</div>
       <p class="delta rise" style="--i:2" id="ovDelta"></p>
       <p class="near-msg rise" style="--i:3" id="ovNear" hidden></p>
+      <div class="tip rise" style="--i:3" id="ovTip" hidden><span id="ovTipT"></span><button class="btn" id="ovTipBtn" type="button"></button></div>
       <div class="stat-row rise" style="--i:4" id="ovStats"></div>
       <div class="cont rise" style="--i:5" id="cont">
         <div class="cont-head"><b data-i18n="contTitle">İkinci şans</b><span id="contSub"></span></div>
@@ -320,10 +335,22 @@ const KIND = {
   tuzak: { min: 26, w: 0.5, gain: 1.0,  hwMul: 1.0,  omMul: 1.0 },
   iki:   { min: 38, w: 0.4, gain: 0.65, hwMul: 1.25, omMul: 0.82 }
 };
-const kindOpen = (k, n, unl) => k === 'tek' || (unl && unl[k] ? n >= 6 + 2 * KINDS.indexOf(k) : n >= KIND[k].min);
-const pickKind = (n, relief, unl, last, r) => {
+/* Seviyeler: hw = hedef genişliği, om = ibre hızı, gain = vuruş başına süre, miss ve trap = ıska ve tuzak bedeli çarpanı,
+   kind = kilit eşiği çarpanı, startT = başlangıç süresi, coin = coin kazancı çarpanı. */
+const LEVELS = ['rahat', 'normal', 'usta'];
+const LEVEL = {
+  rahat:  { hw: 1.2,  om: 0.88, gain: 1.15, miss: 0.7, trap: 0.7,  kind: 1.4, startT: 7,   coin: 0.7 },
+  normal: { hw: 1,    om: 1,    gain: 1,    miss: 1,   trap: 1,    kind: 1,   startT: 6,   coin: 1 },
+  usta:   { hw: 0.88, om: 1.1,  gain: 0.92, miss: 1.2, trap: 1.35, kind: 0.6, startT: 5.5, coin: 1.4 }
+};
+/* Seri (kombo): ardışık vuruşlar puan çarpanı kazandırır, ıska seriyi sıfırlar. tiers: çarpanın arttığı seri sayıları. */
+const COMBO = { tiers: [5, 10, 20, 35] };
+const comboMult = c => { let m = 1; for (const x of COMBO.tiers) if (c >= x) m++; return m; };
+const kindMin = (k, unl, km) => Math.round((unl && unl[k] ? 6 + 2 * KINDS.indexOf(k) : KIND[k].min) * (km || 1));
+const kindOpen = (k, n, unl, km) => k === 'tek' || n >= kindMin(k, unl, km);
+const pickKind = (n, relief, unl, last, r, km) => {
   if (relief) return 'tek';
-  const open = KINDS.filter(k => kindOpen(k, n, unl) && !(k === last && k !== 'tek'));
+  const open = KINDS.filter(k => kindOpen(k, n, unl, km) && !(k === last && k !== 'tek'));
   let sum = 0;
   for (const k of open) sum += KIND[k].w;
   let x = r * sum;
@@ -352,14 +379,16 @@ const planGate = (n, adapt, mercy) => {
 const resolveHit = (S, d) => {
   const perfect = d <= S.hw * CFG.perfectFrac;
   const near = S.time < CFG.nearAt;
-  const pts = (perfect ? 2 : 1) * (near ? 3 : 1);
-  S.score += pts; S.n++; S.combo++; S.maxCombo = Math.max(S.maxCombo, S.combo);
+  const base = (perfect ? 2 : 1) * (near ? 3 : 1);
+  S.n++; S.combo++; S.maxCombo = Math.max(S.maxCombo, S.combo);
+  const mult = comboMult(S.combo), pts = base * mult;
+  S.score += pts; S.raw = (S.raw || 0) + base;
   const g = near ? CFG.nearGain : (CFG.hitGain + (perfect ? CFG.perfectBonus : 0) + (S.relief ? CFG.reliefGain : 0)) * (S.gainMul || 1);
   S.time = Math.min(CFG.maxTime, S.time + g);
   if (near) S.near++;
   S.adapt = Math.min(DIFF.adaptCap, S.adapt + (perfect ? DIFF.adaptUp : DIFF.adaptUp * 0.3));
   S.mercy *= DIFF.mercyDecay;
-  return { perfect, near, pts };
+  return { perfect, near, pts, base, mult };
 };
 const resolveMiss = (S, cost) => {
   S.combo = 0;
@@ -405,7 +434,9 @@ const STR = {
     k_cift: 'Çift pim', k_kayan: 'Kayan pim', k_tuzak: 'Tuzak pim', k_iki: 'İki halka',
     introNew: 'Yeni kilit: {k}',
     hint_cift: 'İki hedefi de vur', hint_kayan: 'Hedef kayıyor, zamanlamayı ayarla',
-    hint_tuzak: 'Gül rengi bölgeye dokunma', hint_iki: 'Sol yarı dış halka, sağ yarı iç halka', ringL: 'Sol: dış', ringR: 'Sağ: iç',
+    hint_tuzak: 'Gül rengi bölgeye dokunma', hint_iki: 'Her ibreyi kendi hedefinde yakala', hint_combo: 'Arka arkaya vur, puan çarpanı artsın',
+    level: 'Zorluk', lv_rahat: 'Rahat', lv_normal: 'Normal', lv_usta: 'Usta', lvPicked: '{l} modu seçildi',
+    tipEasy: 'Zor mu geldi?', tipEasyBtn: 'Rahat mod', tipHard: 'Çok kolay mı?', tipHardBtn: 'Usta mod',
     alarm: 'Alarm', shieldSave: 'Kalkan kurtardı',
     bag: 'Alet çantası', close: 'Kapat', stock: 'Stok', buy: '+1 al', upgrade: 'Yükselt', maxed: 'En üst seviye',
     tool_steto: 'Stetoskop', tool_kron: 'Kronometre', tool_kalkan: 'Kalkan', tool_kum: 'Kum saati',
@@ -430,7 +461,9 @@ const STR = {
     k_cift: 'Double pin', k_kayan: 'Sliding pin', k_tuzak: 'Trap pin', k_iki: 'Twin rings',
     introNew: 'New lock: {k}',
     hint_cift: 'Hit both targets', hint_kayan: 'The target slides, adjust your timing',
-    hint_tuzak: 'Stay off the rose zone', hint_iki: 'Left half: outer ring, right half: inner ring', ringL: 'Left: outer', ringR: 'Right: inner',
+    hint_tuzak: 'Stay off the rose zone', hint_iki: 'Catch each pointer in its own target', hint_combo: 'Hit again and again to raise your multiplier',
+    level: 'Difficulty', lv_rahat: 'Easy', lv_normal: 'Normal', lv_usta: 'Master', lvPicked: '{l} mode selected',
+    tipEasy: 'Too hard?', tipEasyBtn: 'Easy mode', tipHard: 'Too easy?', tipHardBtn: 'Master mode',
     alarm: 'Alarm', shieldSave: 'Shield saved you',
     bag: 'Toolbag', close: 'Close', stock: 'Stock', buy: 'Buy +1', upgrade: 'Upgrade', maxed: 'Max level',
     tool_steto: 'Stethoscope', tool_kron: 'Stopwatch', tool_kalkan: 'Shield', tool_kum: 'Hourglass',
@@ -445,18 +478,75 @@ const t = (k, v) => {
   return s;
 };
 const f1 = n => n.toFixed(1).replace('.', LANG === 'tr' ? ',' : '.');
+/* Övgü ve laf atma satırları: seri kilometre taşlarında övgü, ıskada hafif laf, oyun sonunda duruma göre başlık. */
+const MILESTONES = [5, 10, 15, 20, 25, 35, 50, 75, 100];
+const LINES = {
+  tr: {
+    praise: {
+      5: ['Güzel!', 'Harika!', 'Tamamdır!'], 10: ['Muhteşem!', 'Süper gidiyorsun!', 'Çok iyisin!'],
+      15: ['Wow!', 'Vay be!', 'Ooo!'], 20: ['Efsane!', 'Durdurulamıyorsun!'], 25: ['İnanılmaz!', 'Alev alev!'],
+      35: ['Delisin!', 'Bu nasıl refleks!'], 50: ['Makine misin sen?', 'Sen kimsin?!'],
+      75: ['Yok artık!', 'Şaka gibi!'], 100: ['Efsanelerin efsanesi!', 'Ustalara selam!']
+    },
+    near: ['Buz gibi sinirler!', 'Tam zamanında!', 'Nefes kesti!'],
+    perf: { 3: ['Nişancı!'], 6: ['Keskin nişancı!'], 10: ['Gözün lazer!'] },
+    miss: ['Senin yapacağın iş değil', 'Elin mi titredi?', 'Bu iş sende değil galiba', 'Yazık, çok yazık', 'Uyuyor muydun?', 'Hedef orada, sen neredesin?', 'Refleksler tatile çıkmış', 'Hadi ama!'],
+    again: ['Yine mi?', 'Yok, olmuyor bu iş', 'Biraz dinlen istersen', 'Bırak da başkası denesin'],
+    broke: ['Seri bozuldu!', 'Eyvah, seri gitti!', 'Olamaz, seri uçtu!'],
+    overGood: ['Rekor kırdın, efsanesin!', 'Yeni rekor, helal olsun!', 'Bu nasıl oyun!'],
+    overGreat: ['Efsane oyun!', 'Ustalara selam!', 'Parmaklarına sağlık!'],
+    overBad: ['Senin yapacağın iş değil', 'Bu iş sende değil galiba', 'Isınma turuydu, değil mi?']
+  },
+  en: {
+    praise: {
+      5: ['Nice!', 'Great!', 'Sweet!'], 10: ['Awesome!', 'On fire!', 'You are good!'],
+      15: ['Wow!', 'Whoa!', 'Oooh!'], 20: ['Legendary!', "Can't stop you!"], 25: ['Unreal!', 'Blazing!'],
+      35: ['Insane!', 'What reflexes!'], 50: ['Are you a machine?', 'Who are you?!'],
+      75: ['No way!', 'Unbelievable!'], 100: ['Legend of legends!', 'Hail to the masters!']
+    },
+    near: ['Nerves of steel!', 'Right on time!', 'Breathtaking!'],
+    perf: { 3: ['Sharpshooter!'], 6: ['Eagle eye!'], 10: ['Laser eyes!'] },
+    miss: ['Not your job, buddy', 'Shaky hands?', 'Maybe not your game', 'Oof, what a pity', 'Were you napping?', "The target's right there!", 'Reflexes on vacation', 'Come on!'],
+    again: ['Again?', "That's not happening", 'Take a breather', 'Let someone else try'],
+    broke: ['Streak lost!', 'Oh no, the streak is gone!', 'There goes the streak!'],
+    overGood: ['New record, legend!', 'You broke the record!', 'What a run!'],
+    overGreat: ['Legendary run!', 'Hail to the masters!', 'Fingers of steel!'],
+    overBad: ['Not your job, buddy', 'Maybe not your game', 'That was a warm-up, right?']
+  }
+};
+const lastPick = {};
+const pickLine = (k, sub) => {
+  const src = LINES[LANG], a = (sub !== undefined ? src[k][sub] : src[k]) || [''];
+  const key = k + (sub !== undefined ? sub : '');
+  let i = (Math.random() * a.length) | 0;
+  if (a.length > 1 && lastPick[key] === i) i = (i + 1) % a.length;
+  lastPick[key] = i; return a[i];
+};
+const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0 ? 100 : 0);
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
 const save = {
-  best: 0, coins: 0, runs: 0, snd: true, vib: true, tut: false,
+  coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
+  bests: { rahat: 0, normal: 0, usta: 0 },
   tools: { steto: { n: 1, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 1, l: 1 }, kum: { n: 1, l: 1 } },
-  unl: {}, seen: {}
+  unl: {}, seen: {}, tips: {}, low: 0, high: 0
 };
 try {
   const raw = localStorage.getItem('kilpayi.v1');
-  if (raw) { const o = JSON.parse(raw); Object.keys(save).forEach(k => { if (o && o[k] !== undefined) save[k] = o[k]; }); }
+  if (raw) {
+    const o = JSON.parse(raw);
+    Object.keys(save).forEach(k => { if (o && o[k] !== undefined) save[k] = o[k]; });
+    if (o && !o.bests && typeof o.best === 'number') save.bests = { rahat: 0, normal: o.best | 0, usta: 0 };
+  }
 } catch (e) {}
+if (!save.bests || typeof save.bests !== 'object') save.bests = {};
+LEVELS.forEach(l => { save.bests[l] = Math.max(0, save.bests[l] | 0); });
+if (LEVELS.indexOf(save.lvl) < 0) save.lvl = 'normal';
+if (!save.tips || typeof save.tips !== 'object') save.tips = {};
+save.low = save.low | 0; save.high = save.high | 0;
+const LV = () => LEVEL[save.lvl];
+const bestNow = () => save.bests[save.lvl];
 TOOL_IDS.forEach(id => {
   const s = save.tools[id] || (save.tools[id] = { n: 1, l: 1 });
   s.n = Math.max(0, s.n | 0); s.l = clamp(s.l | 0 || 1, 1, 3);
@@ -469,7 +559,7 @@ let FD = 'sans-serif', FB = 'sans-serif';
 let onPalette = () => {};
 const readPalette = () => {
   const cs = getComputedStyle(document.documentElement);
-  ['bg', 'surface', 'track', 'tick', 'ink', 'ink-2', 'lilac', 'lilac-soft', 'btn', 'peach', 'peach-deep', 'peach-soft', 'rose', 'rose-soft']
+  ['bg', 'surface', 'track', 'tick', 'ink', 'ink-2', 'lilac', 'lilac-soft', 'btn', 'on-btn', 'peach', 'peach-deep', 'peach-soft', 'rose', 'rose-soft']
     .forEach(k => { P[k] = cs.getPropertyValue('--' + k).trim() || '#888888'; });
   FD = cs.getPropertyValue('--font-display').trim() || 'sans-serif';
   FB = cs.getPropertyValue('--font-body').trim() || 'sans-serif';
@@ -519,7 +609,8 @@ const Snd = {
   ui() { this.tone(660, 0.08, 'triangle', 0.12); },
   rev() { this.tone(520, 0.12, 'triangle', 0.1, 780); },
   fanfare() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.22, 'triangle', 0.14, null, i * 0.08)); },
-  tool() { this.tone(500, 0.1, 'triangle', 0.14, 900); this.tone(900, 0.14, 'sine', 0.1, null, 0.08); }
+  tool() { this.tone(500, 0.1, 'triangle', 0.14, 900); this.tone(900, 0.14, 'sine', 0.1, null, 0.08); },
+  combo(m) { const f = [523, 659, 784, 988, 1175][Math.min(4, Math.max(0, m - 1))]; this.tone(f, 0.14, 'triangle', 0.14); this.tone(f * 1.5, 0.2, 'sine', 0.12, null, 0.07); this.tone(f * 2, 0.26, 'sine', 0.1, null, 0.14); }
 };
 
 /* ---------- platform köprüsü: web'de demo, Android'de gerçek reklam/titreşim ---------- */
@@ -629,6 +720,7 @@ const applyI18n = () => {
   zoneEl.textContent = t('zone');
   $('notch').style.left = (CFG.nearAt / CFG.maxTime * 100).toFixed(2) + '%';
   $('bagBtn').setAttribute('aria-label', t('bag'));
+  $('lvlSeg').setAttribute('aria-label', t('level'));
   toolsEl.setAttribute('aria-label', t('bag'));
   toolsEl.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-label', t('tool_' + b.getAttribute('data-tool'))));
 };
@@ -636,6 +728,9 @@ const refreshSound = () => {
   const b = $('sndBtn');
   b.setAttribute('aria-label', save.snd ? t('soundOn') : t('soundOff'));
   $('sndWaves').style.opacity = save.snd ? '1' : '0.25';
+};
+const refreshLevel = () => {
+  $('lvlSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', b.getAttribute('data-lvl') === save.lvl ? 'true' : 'false'));
 };
 const updateTools = () => {
   toolsEl.querySelectorAll('.tool').forEach(b => {
@@ -647,9 +742,9 @@ const updateTools = () => {
 const refreshStats = () => {
   $('coinN').textContent = String(save.coins);
   $('shopCoins').textContent = String(save.coins);
-  $('menuBest').textContent = String(save.best);
+  $('menuBest').textContent = String(bestNow());
   $('menuRuns').textContent = String(save.runs);
-  hudBestEl.innerHTML = t('best') + ' <b>' + save.best + '</b>';
+  hudBestEl.innerHTML = t('best') + ' <b>' + bestNow() + '</b>';
   updateTools();
 };
 
@@ -666,7 +761,7 @@ const G = {
   shake: 0, flash: 0, flashKind: 'rose', tscale: 1, tsT: 0,
   parts: [], pops: [], rips: [], revT: 0, beep: 0, scorePulse: 0,
   continued: false, runCounted: false, coinsGiven: 0, gain: 0, deadT: 0, overAt: 0,
-  nearMsg: '', newBest: false
+  nearMsg: '', newBest: false, raw: 0, perf: 0, missRun: 0, lastRoast: -99
 };
 const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100 };
 
@@ -688,21 +783,22 @@ const introduce = (kind, isNew) => {
 
 const spawnChallenge = (first, force) => {
   const plan = planGate(G.n, G.adapt, G.mercy);
-  const kind = first ? 'tek' : (force || pickKind(G.n, plan.relief, save.unl, G.lastKind, Math.random()));
+  const lv = LV();
+  const kind = first ? 'tek' : (force || pickKind(G.n, plan.relief, save.unl, G.lastKind, Math.random(), lv.kind));
   const prevKind = G.kind;
   const km = KIND[kind];
   const boost = G.boost > 0 ? 1.4 : 1;
-  G.kind = kind; G.lastKind = kind; G.gainMul = km.gain;
+  G.kind = kind; G.lastKind = kind; G.gainMul = km.gain * lv.gain;
   G.I = plan.I; G.relief = plan.relief;
-  G.omega = plan.omega * km.omMul;
-  const hw = Math.min(0.8, plan.hw * km.hwMul * boost);
+  G.omega = plan.omega * km.omMul * lv.om;
+  const hw = Math.min(0.8, plan.hw * km.hwMul * boost * lv.hw);
   const gate = (ring, c, h) => ({ kind: 'gate', ring, c0: c, amp: 0, f: 0, ph: 0, hw: h, done: false });
   const pins = [];
   if (kind === 'tek') {
     pins.push(gate(0, ahead(G.ang, G.dir, first ? rnd(1.6, 2.3) : rnd(CFG.spawnMin, CFG.spawnMax)), hw));
   } else if (kind === 'cift') {
     const a = ahead(G.ang, G.dir, rnd(1.0, 2.0));
-    pins.push(gate(0, a, hw), gate(0, ahead(a, G.dir, hw * 2 + rnd(0.3, 0.8)), hw));
+    pins.push(gate(0, a, hw), gate(0, ahead(a, G.dir, hw * 2 + rnd(0.5, 1.0)), hw));
   } else if (kind === 'kayan') {
     const p = gate(0, ahead(G.ang, G.dir, rnd(1.4, 2.6)), hw);
     p.amp = rnd(0.45, 0.8); p.f = rnd(0.32, 0.5); p.ph = rnd(0, TAU);
@@ -746,7 +842,7 @@ const burst = (x, y, n, cols, speed) => {
 const pop = (txt, kind) => {
   let slot = 0;
   for (const p of G.pops) if (p.t < 0.4) slot++;
-  G.pops.push({ txt, kind, t: 0, max: 0.95, off: Math.min(2, slot) * 36 });
+  G.pops.push({ txt, kind, t: 0, max: kind === 'hype' || kind === 'roast' ? 1.25 : 0.95, off: Math.min(2, slot) * 36 });
 };
 
 /* ---------- akış ---------- */
@@ -783,7 +879,7 @@ const resize = () => {
 const start = () => {
   Snd.ui();
   Object.assign(G, {
-    mode: 'play', time: CFG.startTime, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0,
+    mode: 'play', time: LV().startT, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
     continued: false, runCounted: false, coinsGiven: 0, gain: 0, shake: 0, flash: 0, tscale: 1, tsT: 0,
     revT: 0, beep: 0, scorePulse: 0, parts: [], pops: [], rips: [], nearMsg: '',
     adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false, pt: 0,
@@ -811,26 +907,25 @@ const goMenu = () => {
   requestAnimationFrame(() => relayout(false));
 };
 
-const tap = x => {
+/* Dokunuş: hangi ibre hedefindeyse onu vurur. İki halkada ikisi birden hedefteyse hedefine daha yakın olan sayılır. */
+const tap = () => {
   if (G.mode !== 'play') return;
-  const ring = G.kind === 'iki' && x != null && x >= view.cx ? 1 : 0;
-  const ang = ring ? G.ang2 : G.ang;
-  let best = null, bd = 9;
+  let best = null, bn = 9, bd = 0;
   for (const p of G.pins) {
-    if (p.kind !== 'gate' || p.done || p.ring !== ring) continue;
-    const d = angd(ang, pinCenter(p));
-    if (d <= p.hw + CFG.grace && d < bd) { best = p; bd = d; }
+    if (p.kind !== 'gate' || p.done) continue;
+    const d = angd(p.ring ? G.ang2 : G.ang, pinCenter(p));
+    if (d <= p.hw + CFG.grace && d / p.hw < bn) { best = p; bn = d / p.hw; bd = d; }
   }
   if (best) { hit(bd, best); return; }
   for (const p of G.pins) {
-    if (p.kind === 'trap' && p.ring === ring && angd(ang, pinCenter(p)) <= p.hw) { trap(); return; }
+    if (p.kind === 'trap' && angd(G.ang, pinCenter(p)) <= p.hw) { trap(); return; }
   }
   miss();
 };
 
 const checkUnlock = () => {
   for (const k of KINDS) {
-    if (k === 'tek' || save.unl[k] || G.n < KIND[k].min) continue;
+    if (k === 'tek' || save.unl[k] || G.n < kindMin(k, null, LV().kind)) continue;
     save.unl[k] = true; persist();
     G.introKind = k; G.introNew = true;
     Snd.fanfare(); Platform.track('unlock', { kind: k, hits: G.n });
@@ -838,12 +933,36 @@ const checkUnlock = () => {
   }
 };
 
+const PERF_AT = [3, 6, 10];
+const tierCol = m => [P.lilac, P.peach, P['peach-deep'], P.rose, P.btn][Math.min(4, Math.max(0, m - 1))];
+/* Seri kilometre taşlarında övgü, çarpan artınca büyük efekt; kıl payında ve art arda mükemmelde ara sıra ek övgü. */
+const cheer = (mult, prevMult, near, perfect) => {
+  const c = G.combo, key = praiseKey(c);
+  if (key) {
+    const up = mult > prevMult, col = tierCol(mult);
+    pop(pickLine('praise', key) + (up ? '  ×' + mult : ''), 'hype');
+    Snd.combo(mult); Platform.haptic('heavy');
+    G.rips.push({ x: view.cx, y: view.cy, t: 0, max: 0.8, r0: view.r * 0.35, r1: view.r * 1.3, c: col });
+    burst(view.cx, view.cy, up ? 34 : 20, [col, P.peach, P['peach-soft']], 320);
+    if (c === COMBO.tiers[0] && !save.seen.combo && !G.hint) {
+      save.seen.combo = 1; persist();
+      G.hint = { lines: [{ txt: t('hint_combo'), bg: 'lilac-soft' }], t: 0, max: 3.2 };
+    }
+  } else if (near && Math.random() < 0.35) {
+    pop(pickLine('near'), 'hype');
+  } else if (perfect && PERF_AT.indexOf(G.perf) >= 0) {
+    pop(pickLine('perf', G.perf), 'hype');
+  }
+};
+
 const hit = (d, pin) => {
   const wasRelief = G.relief;
   pin.done = true;
   G.hw = pin.hw;
-  const { perfect, near, pts } = resolveHit(G, d);
-  G.scorePulse = 1;
+  const { perfect, near, pts, mult } = resolveHit(G, d);
+  const prevMult = comboMult(G.combo - 1);
+  G.scorePulse = 1; G.missRun = 0;
+  G.perf = perfect ? G.perf + 1 : 0;
   if (G.boost > 0) G.boost--;
   const p = pinXY(pin);
   const cols = near ? [P.rose, P['rose-soft'], P.peach] : (perfect ? [P['peach-deep'], P.peach, P.lilac] : [P.peach, P.lilac, P['peach-soft']]);
@@ -857,6 +976,7 @@ const hit = (d, pin) => {
     pop(perfect ? t('perfect') : '+' + pts, perfect ? 'perfect' : 'plain');
     Snd.hit(G.combo - 1, perfect); Platform.haptic(perfect ? 'medium' : 'light');
   }
+  cheer(mult, prevMult, near, perfect);
   const wave = Math.floor(G.n / DIFF.period);
   if (wave > G.waveSeen) { G.waveSeen = wave; if (wave >= 1) G.pendingRev = true; }
   if (G.pins.every(q => q.kind !== 'gate' || q.done)) {
@@ -874,14 +994,28 @@ const hit = (d, pin) => {
   if (G.n === 1) refreshStats();
 };
 
+/* Iskada: seri bozulduysa söyle, arka arkaya ıskada ve ara sıra laf at; çoğu zaman düz "Iska". */
+const scold = was => {
+  const now = G.clock;
+  let txt = '', kind = 'roast';
+  if (was >= COMBO.tiers[0]) txt = pickLine('broke');
+  else if (G.missRun >= 2 && now - G.lastRoast > 2) txt = pickLine('again');
+  else if (now - G.lastRoast > 4 && Math.random() < 0.45) txt = pickLine('miss');
+  if (txt) G.lastRoast = now; else { txt = t('miss'); kind = 'miss'; }
+  pop(txt, kind);
+};
+
 const miss = () => {
   if (G.glove > 0) {
     G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
     return;
   }
-  resolveMiss(G);
+  const was = G.combo;
+  resolveMiss(G, CFG.missCost * LV().miss);
+  G.perf = 0; G.missRun++;
   shake(0.2); flash('rose', 0.14);
-  pop(t('miss'), 'miss'); Snd.miss(); Platform.haptic('warn');
+  scold(was);
+  Snd.miss(); Platform.haptic('warn');
   if (G.time <= 0) die();
 };
 
@@ -890,9 +1024,12 @@ const trap = () => {
     G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
     return;
   }
-  resolveMiss(G, CFG.trapCost);
+  const was = G.combo;
+  resolveMiss(G, CFG.trapCost * LV().trap);
+  G.perf = 0; G.missRun++;
   shake(0.4); flash('rose', 0.24);
   pop(t('alarm'), 'near'); Snd.alarm(); Platform.haptic('error');
+  if (was >= COMBO.tiers[0]) pop(pickLine('broke'), 'roast');
   if (G.time <= 0) die();
 };
 
@@ -928,24 +1065,46 @@ const die = () => {
   const secs = (norm((G.ta - G.ang) * G.dir) - G.hw) / w;
   G.nearMsg = inside ? t('overInside') : (secs > 0 && secs <= 0.6 ? t('overClose', { s: f1(Math.max(0.1, secs)) }) : '');
   shake(0.5); flash('rose', 0.3); Snd.over(); Platform.haptic('error');
-  G.newBest = G.score > save.best;
-  if (G.newBest) save.best = G.score;
-  if (!G.runCounted) { save.runs++; G.runCounted = true; }
-  const total = Math.floor(G.score / CFG.coinDiv) + G.near * CFG.nearCoin;
+  G.newBest = G.score > bestNow();
+  if (G.newBest) save.bests[save.lvl] = G.score;
+  if (!G.runCounted) {
+    save.runs++; G.runCounted = true;
+    save.low = G.n < 10 ? save.low + 1 : 0;
+    if (save.lvl === 'normal') save.high = G.n >= 60 ? save.high + 1 : 0;
+  }
+  const total = Math.round((Math.floor(G.raw / CFG.coinDiv) + G.near * CFG.nearCoin) * LV().coin);
   G.gain = total - G.coinsGiven; G.coinsGiven = total; save.coins += G.gain;
   if (!save.tut && G.n >= CFG.tutHits) save.tut = true;
   persist(); refreshStats();
-  Platform.track('run_end', { score: G.score, hits: G.n, near: G.near, continued: G.continued, kind: G.kind });
+  Platform.track('run_end', { score: G.score, hits: G.n, near: G.near, combo: G.maxCombo, level: save.lvl, continued: G.continued, kind: G.kind });
 };
 
+/* Oyun sonu başlığı: rekor ve uzun oyunda övgü, çok kısa oyunda laf, aksi halde düz "Süre bitti". */
+const overMood = () => {
+  if (G.newBest && G.n >= 10) return ['good', pickLine('overGood')];
+  if (G.n >= 40) return ['good', pickLine('overGreat')];
+  if (G.n < 5) return ['bad', pickLine('overBad')];
+  return ['', t('over')];
+};
 const showOver = () => {
   G.mode = 'over'; G.overAt = performance.now();
-  $('ovTitle').textContent = t('over');
+  const [mood, line] = overMood();
+  const ovT = $('ovTitle'); ovT.textContent = line; ovT.className = 'eyebrow rise' + (mood ? ' mood ' + mood : '');
+  const tipEl = $('ovTip');
+  let tk = '';
+  if (save.lvl !== 'rahat' && save.low >= 3 && !save.tips.easy) tk = 'easy';
+  else if (save.lvl === 'normal' && save.high >= 2 && !save.tips.hard) tk = 'hard';
+  if (tk) {
+    save.tips[tk] = true; persist();
+    $('ovTipT').textContent = t(tk === 'easy' ? 'tipEasy' : 'tipHard');
+    $('ovTipBtn').textContent = t(tk === 'easy' ? 'tipEasyBtn' : 'tipHardBtn');
+    tipEl.setAttribute('data-to', tk === 'easy' ? 'rahat' : 'usta'); tipEl.hidden = false;
+  } else tipEl.hidden = true;
   countUp($('ovScore'), G.score, 600);
   const d = $('ovDelta');
   d.hidden = G.score === 0;
   if (G.newBest && G.score > 0) { d.textContent = t('newBest'); d.className = 'delta win rise'; }
-  else { d.textContent = t('toBest', { n: Math.max(1, save.best - G.score) }); d.className = 'delta rise'; }
+  else { d.textContent = t('toBest', { n: Math.max(1, bestNow() - G.score) }); d.className = 'delta rise'; }
   const nm = $('ovNear');
   if (G.nearMsg) { nm.textContent = G.nearMsg; nm.hidden = false; } else { nm.hidden = true; }
   const coinIcon = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach);width:16px;height:16px"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg>';
@@ -955,7 +1114,7 @@ const showOver = () => {
   if (G.gain > 0) chips.push('<span class="chip sm">' + coinIcon + '<b>+' + G.gain + '</b></span>');
   const st = $('ovStats');
   st.innerHTML = chips.join(''); st.hidden = chips.length === 0;
-  const canCont = !G.continued && G.score >= 3;
+  const canCont = !G.continued && G.n >= 3;
   $('cont').hidden = !canCont;
   $('contSub').textContent = t('contSub', { s: CFG.contTime });
   $('coinCost').textContent = String(CFG.contCoins);
@@ -1104,10 +1263,14 @@ const mixHex = (a, b, k) => {
   const ch = s => Math.round(((pa >> s) & 255) * (1 - k) + ((pb >> s) & 255) * k);
   return 'rgb(' + ch(16) + ',' + ch(8) + ',' + ch(0) + ')';
 };
-const pill = (c, txt, x, y, bg, fg, size) => {
+const onColor = hex => {
+  const v = parseInt((hex || '#ffffff').slice(1), 16);
+  return (0.299 * ((v >> 16) & 255) + 0.587 * ((v >> 8) & 255) + 0.114 * (v & 255)) > 150 ? '#29233F' : '#FFFFFF';
+};
+const pill = (c, txt, x, y, bg, fg, size, free) => {
   c.font = '800 ' + size + 'px ' + FB;
   const w = c.measureText(txt).width + size * 1.7, h = size * 2.1;
-  const px = clamp(x, w / 2 + 8, view.w - w / 2 - 8);
+  const px = free ? x : clamp(x, w / 2 + 8, view.w - w / 2 - 8);
   c.fillStyle = bg;
   c.beginPath();
   if (c.roundRect) c.roundRect(px - w / 2, y - h / 2, w, h, h / 2);
@@ -1144,10 +1307,11 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
     c.globalAlpha = 1;
     return;
   }
+  const pc = p.ring ? [P['lilac-soft'], P.lilac, P.btn] : [P['peach-soft'], P.peach, P['peach-deep']];
   c.globalAlpha = gk;
-  c.lineWidth = RWr + 10; c.strokeStyle = P['peach-soft']; arc(c, cx, cy, Rr, a0, a1);
-  c.lineWidth = RWr; c.strokeStyle = P.peach; arc(c, cx, cy, Rr, a0, a1);
-  c.strokeStyle = P['peach-deep']; arc(c, cx, cy, Rr, ce - hw * CFG.perfectFrac - HALF, ce + hw * CFG.perfectFrac - HALF);
+  c.lineWidth = RWr + 10; c.strokeStyle = pc[0]; arc(c, cx, cy, Rr, a0, a1);
+  c.lineWidth = RWr; c.strokeStyle = pc[1]; arc(c, cx, cy, Rr, a0, a1);
+  c.strokeStyle = pc[2]; arc(c, cx, cy, Rr, ce - hw * CFG.perfectFrac - HALF, ce + hw * CFG.perfectFrac - HALF);
   if (numbered) {
     const mx = cx + Math.cos(ce - HALF) * (Rr - RWr * 1.15), my = cy + Math.sin(ce - HALF) * (Rr - RWr * 1.15);
     c.fillStyle = P.surface; c.beginPath(); c.arc(mx, my, RWr * 0.42, 0, TAU); c.fill();
@@ -1194,6 +1358,12 @@ const render = () => {
   c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
   c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
   if (two) { c.lineWidth = RW2; c.beginPath(); c.arc(cx, cy, R2, 0, TAU); c.stroke(); }
+  const mult = G.mode === 'play' || G.mode === 'dead' ? comboMult(G.combo) : 1;
+  if (mult >= 2) {
+    c.globalAlpha = Math.min(0.4, 0.07 + 0.03 * mult + 0.12 * G.scorePulse); c.fillStyle = tierCol(mult);
+    c.beginPath(); c.arc(cx, cy, two ? R2 - RW2 / 2 - 4 : R - RW / 2 - 4, 0, TAU); c.fill();
+    c.globalAlpha = 1;
+  }
 
   if (G.mode === 'play' && G.time < CFG.nearAt) {
     const b = 0.5 + 0.5 * Math.sin(G.clock * 16);
@@ -1213,8 +1383,9 @@ const render = () => {
     }
   }
 
-  drawPointer(c, cx, cy, R, RW, G.ang, G.dir, P.ink, P.lilac);
-  if (two) drawPointer(c, cx, cy, R2, RW2, G.ang2, G.dir2, P.btn, P.lilac);
+  const trail = mult >= 2 ? tierCol(mult) : P.lilac;
+  drawPointer(c, cx, cy, R, RW, G.ang, G.dir, P.ink, trail);
+  if (two) drawPointer(c, cx, cy, R2, RW2, G.ang2, G.dir2, P.btn, trail);
 
   for (const r of G.rips) {
     const p = r.t / r.max;
@@ -1230,18 +1401,28 @@ const render = () => {
 
   c.textAlign = 'center'; c.textBaseline = 'middle';
   const big = Math.round(R * (two ? 0.34 : 0.6));
+  const fitFont = (txt, size, maxW) => {
+    c.font = '600 ' + size + 'px ' + FD;
+    const w = c.measureText(txt).width;
+    if (w > maxW) c.font = '600 ' + Math.max(10, Math.floor(size * maxW / w)) + 'px ' + FD;
+  };
   if (G.mode === 'menu') {
-    c.fillStyle = P.ink; c.font = '600 ' + big + 'px ' + FD;
-    c.fillText(String(save.best), cx, cy - R * 0.04);
+    const txt = String(bestNow());
+    c.fillStyle = P.ink; fitFont(txt, big, R * 1.5);
+    c.fillText(txt, cx, cy - R * 0.04);
     c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
     c.fillText(t('best'), cx, cy + R * 0.36);
   } else {
-    const sc = 1 + 0.2 * G.scorePulse;
+    const sc = 1 + (0.2 + 0.04 * mult) * G.scorePulse;
+    const txt = String(G.score);
     c.save(); c.translate(cx, cy - (two ? 0 : R * 0.04)); c.scale(sc, sc);
-    c.fillStyle = P.ink; c.font = '600 ' + big + 'px ' + FD;
-    c.fillText(String(G.score), 0, 0);
+    c.fillStyle = P.ink; fitFont(txt, big, R * (two ? 0.95 : 1.5));
+    c.fillText(txt, 0, 0);
     c.restore();
-    if (!two) {
+    if (mult >= 2) {
+      const col = tierCol(mult);
+      pill(c, '×' + mult + ' · ' + G.combo, cx, cy + R * (two ? 0.3 : 0.4), col, onColor(col), Math.max(11, Math.round(R * (two ? 0.1 : 0.12))));
+    } else if (!two) {
       c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
       c.fillText(t('score'), cx, cy + R * 0.36);
     }
@@ -1257,10 +1438,6 @@ const render = () => {
     } else if (!save.tut && G.n < CFG.tutHits) {
       pill(c, G.n < 2 ? t('tut1') : t('tut2'), cx, lineY, P.surface, P.ink, 14);
     }
-    if (two && !G.hint) {
-      pill(c, t('ringL'), cx - view.w * 0.26, lineY, P['lilac-soft'], P.ink, 13);
-      pill(c, t('ringR'), cx + view.w * 0.26, lineY, P['lilac-soft'], P.ink, 13);
-    }
   }
   const topY = cy - (r0 + 13) - 30;
   for (const p of G.pops) {
@@ -1272,8 +1449,13 @@ const render = () => {
     else if (p.kind === 'perfect') { bg = P['peach-soft']; fg = P.ink; }
     else if (p.kind === 'rev') { bg = P['lilac-soft']; fg = P.ink; }
     else if (p.kind === 'miss') { bg = P.track; fg = P['ink-2']; }
-    c.save(); c.globalAlpha = al; c.translate(cx, topY - rise - p.off); c.scale(sc, sc);
-    pill(c, p.txt, 0, 0, bg, fg, p.kind === 'near' ? 17 : 15);
+    else if (p.kind === 'hype') { bg = P.btn; fg = P['on-btn'] || '#FFFFFF'; }
+    else if (p.kind === 'roast') { bg = P['rose-soft']; fg = P.ink; }
+    const psz = p.kind === 'near' ? 17 : (p.kind === 'hype' ? 18 : 15);
+    c.font = '800 ' + psz + 'px ' + FB;
+    const pw = c.measureText(p.txt).width + psz * 1.7;
+    c.save(); c.globalAlpha = al; c.translate(clamp(cx, pw / 2 + 8, view.w - pw / 2 - 8), topY - rise - p.off); c.scale(sc, sc);
+    pill(c, p.txt, 0, 0, bg, fg, psz, true);
     c.restore();
   }
   c.restore();
@@ -1319,6 +1501,21 @@ window.addEventListener('keydown', e => {
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 
+const setLevel = l => {
+  if (LEVELS.indexOf(l) < 0 || l === save.lvl) return;
+  save.lvl = l; persist(); refreshLevel(); refreshStats();
+  Platform.track('level', { level: l });
+};
+$('lvlSeg').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('button[data-lvl]');
+  if (!b) return;
+  Snd.unlock(); Snd.ui(); setLevel(b.getAttribute('data-lvl'));
+});
+$('ovTipBtn').addEventListener('click', () => {
+  const to = $('ovTip').getAttribute('data-to');
+  Snd.unlock(); Snd.ui(); setLevel(to); $('ovTip').hidden = true;
+  toast(t('lvPicked', { l: t('lv_' + to) }));
+});
 $('playBtn').addEventListener('click', () => { Snd.unlock(); start(); });
 $('againBtn').addEventListener('click', () => { Snd.unlock(); start(); });
 $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
@@ -1347,7 +1544,7 @@ $('coinBtn').addEventListener('click', () => {
 });
 
 /* ---------- açılış ---------- */
-applyI18n(); refreshSound(); refreshStats();
+applyI18n(); refreshSound(); refreshLevel(); refreshStats();
 resize();
 if (window.ResizeObserver) new ResizeObserver(resize).observe(app); else window.addEventListener('resize', resize);
 if (document.fonts && document.fonts.load) {

@@ -4,6 +4,7 @@
 // Kullanım: node tools/sim.mjs                 (eski ve yeni model karşılaştırması)
 //           node tools/sim.mjs 2500 yeni       (yalnızca yeni model, ilk oyun)
 //           node tools/sim.mjs 2500 kariyer    (yalnızca yeni model, tüm türler zaten açılmış)
+//           node tools/sim.mjs 2500 seviye     (rahat / normal / usta seviyeleri, ilk oyun)
 //           node tools/sim.mjs curve           (zorluk eğrisi verisi, JSON)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,13 +13,14 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const src = fs.readFileSync(path.join(here, '..', 'src', 'game.html'), 'utf8');
 const block = src.split('/*TUNE-START*/')[1].split('/*TUNE-END*/')[0];
-const TUNE = new Function(block + '\nreturn { CFG, DIFF, KINDS, KIND, planGate, resolveHit, resolveMiss, drainAt, pickKind };')();
+const TUNE = new Function(block + '\nreturn { CFG, DIFF, KINDS, KIND, LEVELS, LEVEL, COMBO, comboMult, kindMin, planGate, resolveHit, resolveMiss, drainAt, pickKind };')();
 const { CFG, DIFF, KINDS, KIND } = TUNE;
 // Deneme için: DIFF_OVERRIDE='{"rise":0.6}' CFG_OVERRIDE='{"hitGain":0.8}' KIND_OVERRIDE='{"iki":{"w":0.2}}' node tools/sim.mjs 2000 yeni
 if (process.env.DIFF_OVERRIDE) Object.assign(DIFF, JSON.parse(process.env.DIFF_OVERRIDE));
 if (process.env.CFG_OVERRIDE) Object.assign(CFG, JSON.parse(process.env.CFG_OVERRIDE));
 if (process.env.KIND_OVERRIDE) { const o = JSON.parse(process.env.KIND_OVERRIDE); for (const k in o) Object.assign(KIND[k], o[k]); }
 const TAU = Math.PI * 2;
+const IKI_SIGMA = Number(process.env.IKI_SIGMA) || 1.2;   // iki halka: iki ibreyi aynı anda izlemenin zamanlama maliyeti
 
 const mulberry32 = a => () => {
   a |= 0; a = a + 0x6D2B79F5 | 0;
@@ -73,7 +75,8 @@ const attempt = (st, sk, o, drainFn) => {
       return { dead: false, tTap, offset, firstTry };
     }
     const inTrap = o.trap && Math.abs(tTap - o.trap.t) <= o.trap.w;
-    TUNE.resolveMiss(S, inTrap ? CFG.trapCost : CFG.missCost);
+    const lv = st.LV;
+    TUNE.resolveMiss(S, inTrap ? CFG.trapCost * lv.trap : CFG.missCost * lv.miss);
     firstTry = false; retry = true;
     if (S.time <= 0) return { dead: true };
     tArr = offset < 0 ? Math.max(0.08, -offset / o.omega) : (TAU - offset) / o.omega;
@@ -83,8 +86,9 @@ const attempt = (st, sk, o, drainFn) => {
 };
 
 const playRun = (model, sk, opts) => {
-  const S = { time: CFG.startTime, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, adapt: 0, mercy: 0, hw: 0, omega: 0, I: 0, relief: false, gainMul: 1 };
-  const st = { S, clock: 0, gates: [] };
+  const LV = model === 'eski' ? TUNE.LEVEL.normal : TUNE.LEVEL[opts.level || 'normal'];
+  const S = { time: model === 'eski' ? CFG.startTime : LV.startT, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, adapt: 0, mercy: 0, hw: 0, omega: 0, I: 0, relief: false, gainMul: 1 };
+  const st = { S, clock: 0, gates: [], LV };
   const drainFn = model === 'eski' ? () => 1 : TUNE.drainAt;
   const kinds = {};
   let last = 'tek', first = true;
@@ -95,11 +99,11 @@ const playRun = (model, sk, opts) => {
     if (model === 'eski') { plan = oldPlan(S.n); }
     else {
       plan = TUNE.planGate(S.n, S.adapt, S.mercy);
-      kind = (first || model === 'yeni-tek') ? 'tek' : TUNE.pickKind(S.n, plan.relief, unl, last, rand());
+      kind = (first || model === 'yeni-tek') ? 'tek' : TUNE.pickKind(S.n, plan.relief, unl, last, rand(), LV.kind);
     }
     const km = KIND[kind];
-    const omega = plan.omega * km.omMul, hw = Math.min(0.8, plan.hw * km.hwMul);
-    S.relief = plan.relief; S.I = plan.I; S.hw = hw; S.gainMul = km.gain;
+    const omega = plan.omega * km.omMul * (model === 'eski' ? 1 : LV.om), hw = Math.min(0.8, plan.hw * km.hwMul * (model === 'eski' ? 1 : LV.hw));
+    S.relief = plan.relief; S.I = plan.I; S.hw = hw; S.gainMul = km.gain * (model === 'eski' ? 1 : LV.gain);
     kinds[kind] = (kinds[kind] || 0) + 1;
     last = kind;
     const dist = first ? U(1.6, 2.3) : U(CFG.spawnMin, CFG.spawnMax);
@@ -108,7 +112,7 @@ const playRun = (model, sk, opts) => {
     if (kind === 'tek') {
       if (attempt(st, sk, { ...base, tArr: dist / omega }, drainFn).dead) return done('sure');
     } else if (kind === 'cift') {
-      const d1 = U(1.0, 2.0), cd = hw * 2 + U(0.3, 0.8);
+      const d1 = U(1.0, 2.0), cd = hw * 2 + U(0.5, 1.0);
       const r1 = attempt(st, sk, { ...base, tArr: d1 / omega, sigmaMul: 1.1 }, drainFn);
       if (r1.dead) return done('sure');
       const rem = Math.max(0.12, (cd - r1.offset) / omega);
@@ -126,13 +130,13 @@ const playRun = (model, sk, opts) => {
       const tA = dA / omega, tB = dB / omB;
       const early = tA <= tB;
       const first1 = early
-        ? attempt(st, sk, { ...base, tArr: tA, sigmaMul: 1.3 }, drainFn)
-        : attempt(st, sk, { ...base, omega: omB, hw: hwB, tArr: tB, sigmaMul: 1.3 }, drainFn);
+        ? attempt(st, sk, { ...base, tArr: tA, sigmaMul: IKI_SIGMA }, drainFn)
+        : attempt(st, sk, { ...base, omega: omB, hw: hwB, tArr: tB, sigmaMul: IKI_SIGMA }, drainFn);
       if (first1.dead) return done('sure');
       const t1 = early ? tA : tB, t2 = early ? tB : tA;
       const second = early
-        ? { ...base, omega: omB, hw: hwB, tArr: Math.max(0.15, t2 - t1), sigmaMul: 1.3 }
-        : { ...base, tArr: Math.max(0.15, t2 - t1), sigmaMul: 1.3 };
+        ? { ...base, omega: omB, hw: hwB, tArr: Math.max(0.15, t2 - t1), sigmaMul: IKI_SIGMA }
+        : { ...base, tArr: Math.max(0.15, t2 - t1), sigmaMul: IKI_SIGMA };
       if (attempt(st, sk, second, drainFn).dead) return done('sure');
     }
   }
@@ -193,6 +197,22 @@ if (process.argv[2] === 'curve') {
   const runs = Number(process.argv[2]) || 2000;
   const only = process.argv[3];
   const rows = [];
+  if (only === 'seviye') {
+    console.log('seviye   beceri      hamle(p10/p50/p90)   süre sn (ort/p50/p90)  >30s  >60s  >2dk  kıl payı');
+    for (const s of Object.keys(SKILLS)) {
+      for (const lvName of TUNE.LEVELS) {
+        const r = evaluate('yeni', s, runs, { level: lvName });
+        console.log(
+          lvName.padEnd(8), s.padEnd(10),
+          `${fmt(r.nP10)}/${fmt(r.nP50)}/${fmt(r.nP90)}`.padEnd(20),
+          `${fmt(r.durMean)}/${fmt(r.durP50)}/${fmt(r.durP90)}`.padEnd(22),
+          `${fmt(r.over30 * 100)}%`.padEnd(6), `${fmt(r.over60 * 100)}%`.padEnd(6), `${fmt(r.over120 * 100)}%`.padEnd(6), fmt(r.nearMean, 1)
+        );
+      }
+      console.log('');
+    }
+    process.exit(0);
+  }
   const plan = only === 'yeni' ? [['yeni', false]] : only === 'kariyer' ? [['yeni', true]] : [['eski', false], ['yeni-tek', false], ['yeni', false], ['yeni', true]];
   for (const [m, career] of plan) {
     for (const s of Object.keys(SKILLS)) {

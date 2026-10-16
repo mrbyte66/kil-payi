@@ -31,7 +31,11 @@ Sonra `http://localhost:8000` adresini aç. Telefon boyutunda denemek için tara
 
 - **Türler (`KIND`):** tek pim, çift pim, kayan pim, tuzak pim, iki halka. Bir oyunda belirli bir vuruş sayısına ulaşınca tür kalıcı olarak açılır, sonraki oyunlarda daha erken karışır. Dalganın "nefes" bölümünde hep tek pim gelir.
 - **Aletler (`TOOL`):** stetoskop (hedefi genişletir), kronometre (+süre), kalkan (ıskayı bağışlar), kum saati (ibreyi yavaşlatır). Stok ve seviye cihazda saklanır; coin ile alınır ve yükseltilir, ödüllü reklam coin verir.
-- Kayıt anahtarı `kilpayi.v1`; yeni alanlar (`tools`, `unl`, `seen`) eski kayıtla uyumludur.
+- **Seri (kombo, `COMBO`):** ardışık vuruşlar puan çarpanı kazandırır (5, 10, 20 ve 35. vuruşta ×2, ×3, ×4, ×5). Iska seriyi sıfırlar, kalkan korur. Çarpan yalnızca puanı etkiler; coin ham puandan hesaplanır, ekonomi değişmez.
+- **Seviyeler (`LEVEL`):** Rahat, Normal, Usta. Hedef genişliği, ibre hızı, süre kazancı, ıska bedeli, kilit eşikleri, başlangıç süresi ve coin çarpanı seviyeye göre değişir. Her seviyenin rekoru ayrıdır (`save.bests`). Üç kısa oyundan sonra "Rahat mod", iki uzun oyundan sonra "Usta mod" önerisi çıkar.
+- **Övgü ve laf satırları (`LINES`):** seri kilometre taşlarında övgü ("Wow!"), ıskada hafif laf ("Senin yapacağın iş değil"), oyun sonunda duruma göre başlık. Türkçe ve İngilizce.
+- **İki halka:** dokunuş ekranın neresinde olursa olsun hedefindeki ibreyi vurur; iki ibre de hedefteyse hedefine daha yakın olan sayılır.
+- Kayıt anahtarı `kilpayi.v1`; yeni alanlar (`tools`, `unl`, `seen`, `lvl`, `bests`, `tips`) eski kayıtla uyumludur. Eski `best` değeri Normal seviyenin rekoruna taşınır.
 
 ### Simülasyon
 
@@ -39,6 +43,7 @@ Sonra `http://localhost:8000` adresini aç. Telefon boyutunda denemek için tara
 node tools/sim.mjs 2000          # eski, yalnızca tek pim, ilk oyun ve kariyer modellerini karşılaştırır
 node tools/sim.mjs 2000 yeni     # yalnızca yeni model (ilk oyun); tür başına vurma oranı ve dağılım
 node tools/sim.mjs 2000 kariyer  # tüm türler zaten açık
+node tools/sim.mjs 2000 seviye   # rahat, normal ve usta seviyeleri, her beceri düzeyi için
 node tools/sim.mjs curve         # zorluk eğrisi verisi (JSON)
 DIFF_OVERRIDE='{"rise":0.7}' node tools/sim.mjs 2500 yeni   # parametre denemesi
 ```
