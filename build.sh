@@ -2,6 +2,7 @@
 # src/game.html (HTML parçası) -> www/index.html (tam belge, Capacitor bunu paketler).
 # src/game.html Google Fonts bağlantısı içerir; www sürümü src/fonts içindeki yerel dosyaları kullanır.
 # DEBUG=1 ./build.sh  -> test kancası (window.__kp) eklenir ve duraklatma kapatılır; yayın sürümünde eklenmez.
+# DEBUG=2 ./build.sh  -> test kancası var, duraklatma açık (ana ekran, ekran kilidi, geri tuşu denemeleri için).
 set -e
 cd "$(dirname "$0")"
 mkdir -p www
@@ -11,9 +12,10 @@ FONTS_LOCAL='<link rel="stylesheet" href="fonts/fonts.css">'
 
 {
   printf '%s\n' "$HEAD"
-  if [ "${DEBUG:-0}" = "1" ]; then
-    sed -e 's#/\*DEBUG\*/#window.__kp={G:G,CFG:CFG,save:save,view:view,tap:tap,start:start,die:die,hit:hit,miss:miss,showOver:showOver,spawn:spawnChallenge,useTool:useTool,pinCenter:pinCenter,KIND:KIND,LEVEL:LEVEL,comboMult:comboMult,LV:LV,bestNow:bestNow,setLevel:setLevel,scold:scold,cheer:cheer,pickLine:pickLine,tierCol:tierCol};#' \
-        -e 's#/\*NOPAUSE\*/# || true#' \
+  if [ "${DEBUG:-0}" != "0" ]; then
+    if [ "$DEBUG" = "2" ]; then NOPAUSE='s#/\*NOPAUSE\*/##'; else NOPAUSE='s#/\*NOPAUSE\*/# || true#'; fi
+    sed -e 's#/\*DEBUG\*/#window.__kp={G:G,CFG:CFG,save:save,view:view,tap:tap,start:start,die:die,hit:hit,miss:miss,showOver:showOver,spawn:spawnChallenge,useTool:useTool,pinCenter:pinCenter,KIND:KIND,LEVEL:LEVEL,comboMult:comboMult,LV:LV,bestNow:bestNow,setLevel:setLevel,scold:scold,cheer:cheer,pickLine:pickLine,tierCol:tierCol,trap:trap,pinHw:pinHw,JOURNEY:JOURNEY,JEVENTS:JEVENTS,jPhaseAt:jPhaseAt,jStart:jStart,fireEvent:fireEvent,applyEvents:applyEvents,resume:resume,pause:pause,th:function(){return[thWh,thWx]},jump:function(x){G.jt=x},update:update,render:render,phaseMod:phaseMod,hellK:hellK};#' \
+        -e "$NOPAUSE" \
         -e '/<!--FONTS-START-->/,/<!--FONTS-END-->/c\
 '"$FONTS_LOCAL" src/game.html
   else

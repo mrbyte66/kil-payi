@@ -20,12 +20,16 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 
 ## Oyun sistemleri
 
-- Kilit türleri `KIND` tablosunda (TUNE bloğu); spawn mantığı `spawnChallenge`, vuruş mantığı `tap`/`hit`/`trap`. Tür ekleyince `tools/sim.mjs` içindeki yaklaşık modeli de güncelle.
+- Oyunda geçerli olan kilit modeli yolculuktur: `JKIND` (iyi kilitler), `JTWIN` (engel ikizleri), `JEVENTS` (hangi seviyede ne açılır), `MIXES` (karışımlar); spawn `spawnChallenge`, vuruş `tap`/`hit`/`trap`, tür açılışı `fireEvent`. Yeni tür eklerken `IMPL_GOOD`/`IMPL_TWIN` tablolarına da ekle (yapılmamış türlerin olayı atlanır). `KIND` tablosu eski modeldir, yalnızca `tools/sim.mjs` kullanır.
+- Yolculuk zorluğunu `tools/bot.js` ile ölç (DEBUG=1 derlemesinde); kilit eklediğin her fazdan sonra çalıştır, tuzakların hedeflerin üstüne düşmediğinden emin ol.
 - Aletler `TOOL` tablosunda; stok ve seviye `save.tools`. Alet çubuğu oyun alanının altında ve oyun dokunuşu almaz (kasıtlı, kazara kullanımı önler).
 - Seviyeler (`LEVEL`: rahat, normal, usta) ve seri çarpanı (`comboMult`) TUNE bloğunda, sim ile paylaşılır. Seviye çarpanlarını değiştirince `node tools/sim.mjs 2000 seviye` çalıştır; hedef: Rahat'ta bir beceri düzeyi, Normal'in bir alt düzeyi gibi oynasın.
 - Her seviyenin rekoru ayrı (`save.bests`); `save.best` kaldırıldı, eski kayıt Normal'e taşınır.
 - Övgü ve laf satırları `LINES` içinde (TR ve EN). Yeni satır eklerken iki dili de doldur; ton hafif şakacı kalsın, aşağılayıcı olmasın. Kullanıcı özellikle "Senin yapacağın iş değil" tarzı laf istedi.
 - İki halkada dokunuş ekranın neresinde olursa olsun hedefteki ibreyi vurur (sol/sağ kuralı kaldırıldı); iç halka lila, dış halka şeftali boyanır. Çift pimde iki hedef arası da açıldı. Nedeni: arkadaşlardan "iki tane olan böyle olmamalı" geri bildirimi geldi; kullanıcı bunun iki halka olduğunu doğruladı (çift pimdeki açma önlem olarak yapıldı, şikâyet konusu değildi). Ayrıntıyı (sol/sağ kuralı mı, iki ibreyi aynı anda izlemek mi) arkadaşlar söylemedi; yeni sürümden sonra tekrar sor.
+- **Yolculuk (onaylı tasarım):** `docs/yolculuk-tasarimi.md`. 10 seviye, her seviyede iyi kilit ✚ engel ikizi, ardından cennet ve cehennem
+  bölümü (10 + seviye sn), kontrastlı temalar ve yumuşak geçiş. Süreler kullanıcı tarafından "şimdilik kesin" kabul edildi; yolculuk süre
+  ekonomisi simülasyonu bilerek ertelendi (cehennemin gücü seviyeyle artar: `JOURNEY.hell0/hellStep`, bot ölçümü belgede). Yeni özellik eklerken önce o belgeyi oku, bitince belgedeki "Yapım sırası ve durum" bölümünü güncelle. Faz 1 (iskelet + Seviye 1-3) tamam, sıradaki Faz 2.
 - Hikaye/harita yok; kullanıcı gereksiz buldu. Eklenmesi önerilmesin.
 
 ## Ortam notları (bu makine)

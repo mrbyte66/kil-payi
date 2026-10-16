@@ -81,6 +81,16 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .notch{position:absolute;top:7px;bottom:7px;width:3px;margin-left:-1px;border-radius:2px;background:var(--rose)}
 .tleft{min-width:52px;text-align:right;font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);font-variant-numeric:tabular-nums;color:var(--ink)}
 .hud-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hud-row2{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px}
+.path{display:flex;gap:5px;align-items:center;justify-content:center;flex:1;min-width:0}
+.path i{width:6px;height:6px;border-radius:50%;background:var(--track);flex:none;transition:background var(--dur-base) var(--ease),transform var(--dur-base) var(--ease)}
+.path i.on{background:var(--ink-3)}
+.path i.cur{background:var(--btn);transform:scale(1.6)}
+.sect{display:inline-flex;align-items:center;min-height:24px;padding:0 10px;border-radius:var(--r-pill);font-weight:800;font-size:var(--fs-12);white-space:nowrap;opacity:0;transform:translateY(-4px);transition:opacity var(--dur-base) var(--ease),transform var(--dur-base) var(--ease)}
+.sect.on{opacity:1;transform:none}
+.sect.h{background:#F4B63F;color:#4A3500}
+.sect.x{background:#D9503A;color:#fff}
+@media (max-width:380px){.path{display:none}}
 .zone{font-weight:800;font-size:var(--fs-12);color:var(--ink-2);transition:color var(--dur-fast);white-space:nowrap}
 .zone.hot{color:var(--rose)}
 .fx{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1;min-width:0}
@@ -200,6 +210,11 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
       <span class="fx" id="fx"></span>
       <span class="chip sm" id="hudBest"></span>
     </div>
+    <div class="hud-row2">
+      <span class="chip sm" id="lvlChip"></span>
+      <span class="path" id="path" aria-hidden="true"></span>
+      <span class="sect" id="sect"></span>
+    </div>
   </div>
 
   <div class="tools" id="tools" role="group" aria-label="Aletler">
@@ -226,6 +241,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
       <div class="stat-row rise" style="--i:3">
         <span class="chip"><span data-i18n="best">En iyi</span><b id="menuBest">0</b></span>
         <span class="chip"><span data-i18n="runs">Oyun</span><b id="menuRuns">0</b></span>
+        <span class="chip" id="menuLvlChip" hidden><span data-i18n="bestLvl">Seviye</span><b id="menuBestL">0</b></span>
       </div>
       <div class="seg rise" style="--i:4" id="lvlSeg" role="radiogroup" aria-label="Zorluk">
         <button type="button" role="radio" data-lvl="rahat" aria-checked="false" data-i18n="lv_rahat">Rahat</button>
@@ -233,6 +249,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
         <button type="button" role="radio" data-lvl="usta" aria-checked="false" data-i18n="lv_usta">Usta</button>
       </div>
       <button class="btn primary big breathe rise" style="--i:5" id="playBtn" type="button" data-i18n="play">Oyna</button>
+      <button class="btn quiet rise" style="--i:6" id="campBtn" type="button" hidden></button>
     </footer>
   </section>
 
@@ -381,7 +398,7 @@ const resolveHit = (S, d) => {
   const near = S.time < CFG.nearAt;
   const base = (perfect ? 2 : 1) * (near ? 3 : 1);
   S.n++; S.combo++; S.maxCombo = Math.max(S.maxCombo, S.combo);
-  const mult = comboMult(S.combo), pts = base * mult;
+  const mult = S.comboOff ? 1 : comboMult(S.combo), pts = base * mult * (S.ptsMul || 1);
   S.score += pts; S.raw = (S.raw || 0) + base;
   const g = near ? CFG.nearGain : (CFG.hitGain + (perfect ? CFG.perfectBonus : 0) + (S.relief ? CFG.reliefGain : 0)) * (S.gainMul || 1);
   S.time = Math.min(CFG.maxTime, S.time + g);
@@ -395,6 +412,81 @@ const resolveMiss = (S, cost) => {
   S.time = Math.max(0, S.time - (cost || CFG.missCost));
   S.adapt = Math.max(-DIFF.adaptCap, S.adapt - DIFF.adaptDown);
   S.mercy = Math.min(1, S.mercy + DIFF.mercyHit);
+};
+/* Yolculuk: 10 seviye; her seviye normal bölüm, cennet (10 + seviye sn), cehennem (aynı süre). Süreler docs/yolculuk-tasarimi.md ile aynı. */
+const JOURNEY = {
+  normal: [45, 52, 56, 58, 60, 60, 62, 62, 65, 70],
+  ib0: 0.05, ibs: 0.07, ibEnd: 0.03,
+  /* Cehennemin gücü seviyeyle artar: 1. seviyede hell0 kadar, her seviyede hellStep artar, 6. seviyede tam güç. */
+  hell0: 0.4, hellStep: 0.12,
+  phase: {
+    normal: { hwM: 1,   omM: 1,    drain: 1,    pen: 1, dI: 0,     twin: 0.3,  pts: 1, coinHit: 0 },
+    heaven: { hwM: 1.3, omM: 0.85, drain: 0,    pen: 0, dI: -0.25, twin: 0,    pts: 2, coinHit: 0.5, bonusT: 3 },
+    hell:   { hwM: 0.8, omM: 1.2,  drain: 1.25, pen: 2, dI: 0.15,  twin: 0.75, pts: 1, coinHit: 1,   bonusT: 3 }
+  }
+};
+const hellK = L => Math.min(1, JOURNEY.hell0 + JOURNEY.hellStep * (Math.min(L, 6) - 1));
+const phaseMod = (ph, L) => {
+  const b = JOURNEY.phase[ph] || JOURNEY.phase.normal;
+  if (ph !== 'hell') return b;
+  const n = JOURNEY.phase.normal, k = hellK(L), lp = (a, c) => a + (c - a) * k;
+  return { hwM: lp(n.hwM, b.hwM), omM: lp(n.omM, b.omM), drain: lp(n.drain, b.drain), pen: lp(n.pen, b.pen), dI: lp(n.dI, b.dI), twin: lp(n.twin, b.twin), pts: b.pts, coinHit: b.coinHit, bonusT: b.bonusT };
+};
+const heavenLen = L => 10 + Math.min(L, 10);
+const jNormal = L => JOURNEY.normal[Math.min(L, 10) - 1];
+const jLen = L => jNormal(L) + 2 * heavenLen(L);
+const jStart = L => { let a = 0; for (let i = 1; i < L; i++) a += jLen(i); return a; };
+const jPhaseAt = t => {
+  let L = 1, s = 0, len = jLen(1);
+  while (t >= s + len) { s += len; L++; len = jLen(L); }
+  const u = t - s, nl = jNormal(L), hl = heavenLen(L);
+  if (u < nl) return { L, ph: 'normal', left: nl - u, start: s };
+  if (u < nl + hl) return { L, ph: 'heaven', left: nl + hl - u, start: s };
+  return { L, ph: 'hell', left: len - u, start: s };
+};
+/* Kilit olayları: [seviye, normal bölümün oranı, olay]. good + twin: iyi kilit ve engel ikizi birlikte açılır;
+   star: bir kilit bir basamak güçlenir; combo: seri çarpanı açılır; mix: karışım. Yapılmamış kilitler oyunda atlanır. */
+const JEVENTS = [
+  [1, 0, { good: 'tek' }], [1, 0.4, { good: 'cift', twin: 'tuzak' }], [1, 0.75, { combo: 1 }],
+  [2, 0, { good: 'kayan', twin: 'kayanT' }], [2, 0.4, { star: 1 }], [2, 0.75, { mix: 1 }],
+  [3, 0, { good: 'nefes', twin: 'diken' }], [3, 0.4, { star: 1 }], [3, 0.75, { mix: 1 }],
+  [4, 0, { good: 'kasa', twin: 'alarm' }], [4, 0.4, { good: 'ritim', twin: 'sahte' }], [4, 0.75, { star: 1 }],
+  [5, 0, { good: 'iki', twin: 'kilitli' }], [5, 0.4, { star: 1 }], [5, 0.75, { mix: 1 }],
+  [6, 0, { good: 'altin', twin: 'lanetli' }], [6, 0.4, { star: 1 }], [6, 0.75, { mix: 1 }],
+  [7, 0, { good: 'hayalet', twin: 'hayaletT' }], [7, 0.4, { star: 1 }], [7, 0.75, { mix: 1 }],
+  [8, 0, { good: 'gelgit', twin: 'girdap' }], [8, 0.4, { good: 'sarkac', twin: 'balyoz' }], [8, 0.75, { star: 1 }],
+  [9, 0, { good: 'renk', twin: 'renkY' }], [9, 0.4, { good: 'sis', twin: 'zehirli' }], [9, 0.75, { star: 1 }],
+  [10, 0, { good: 'tutbirak', twin: 'sicak' }], [10, 0.4, { mix: 1 }], [10, 0.75, { star: 1 }]
+].map(([L, f, e]) => Object.assign({ t: jStart(L) + f * jNormal(L), L }, e));
+/* Yolculuktaki iyi kilitler (yapılmış olanlar) ve engel ikizleri. w: seçilme ağırlığı, hwMul/omMul: hedef genişliği ve ibre hızı, gain: süre çarpanı. */
+const JKIND = {
+  tek:   { w: 0.7, hwMul: 1.0,  omMul: 1.0,  gain: 1.0 },
+  cift:  { w: 0.6, hwMul: 1.15, omMul: 1.0,  gain: 0.8 },
+  kayan: { w: 0.5, hwMul: 1.2,  omMul: 0.92, gain: 1.0 },
+  nefes: { w: 0.5, hwMul: 0.9,  omMul: 1.0,  gain: 1.0 },
+  iki:   { w: 0.4, hwMul: 1.25, omMul: 0.82, gain: 0.65 }
+};
+const JTWIN = { tek: 'tuzak', cift: 'tuzak', kayan: 'kayanT', nefes: 'diken', iki: 'kilitli' };
+const pickJ = (open, relief, last, r, ph) => {
+  if (relief || !open.length) return 'tek';
+  const newest = open[open.length - 1];
+  const cand = open.filter(k => !(k === last && k !== 'tek'));
+  const ws = cand.map(k => JKIND[k].w * (ph === 'heaven' && k === newest ? 3 : 1));
+  let x = r * ws.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < cand.length; i++) { x -= ws[i]; if (x <= 0) return cand[i]; }
+  return 'tek';
+};
+const planJourney = (L, ph, n, adapt, mercy) => {
+  const wp = wavePhase(n), pm = phaseMod(ph, L);
+  const wave = DIFF.ampMax * (0.4 + 0.6 * (1 - Math.exp(-n / DIFF.ampTau))) * waveShape(wp);
+  const base = JOURNEY.ib0 + JOURNEY.ibs * (Math.min(L, 10) - 1) + JOURNEY.ibEnd * Math.max(0, L - 10);
+  const I = Math.max(0, Math.min(1, base + wave + adapt - DIFF.mercyDrop * mercy + pm.dI));
+  return {
+    I,
+    omega: DIFF.omegaMin + (DIFF.omegaMax - DIFF.omegaMin) * I,
+    hw: DIFF.hwMax - (DIFF.hwMax - DIFF.hwMin) * I,
+    relief: ph === 'normal' && wp > DIFF.rise + 1e-9
+  };
 };
 /*TUNE-END*/
 
@@ -418,7 +510,7 @@ const LANG = ((navigator.language || 'tr') + '').toLowerCase().indexOf('tr') ===
 const SN = LANG === 'tr' ? 'sn' : 's';
 const STR = {
   tr: {
-    title: 'Kıl payı', tagline: 'Süre bitmek üzereyken vur, puan ×3.', play: 'Oyna', best: 'En iyi', runs: 'Oyun',
+    title: 'Kıl payı', tagline: 'Süre bitmek üzereyken vur, puan ×3.', play: 'Oyna', best: 'En iyi', runs: 'Oyun', bestLvl: 'Seviye',
     zone: 'Son 1 sn: ×3', perfect: 'Mükemmel', near: 'Kıl payı ×3', miss: 'Iska', reverse: 'Ters yön', breath: 'Nefes al',
     tut1: 'Şeftali bölgedeyken dokun', tut2: 'Süre bitmek üzereyken vur: ×3',
     over: 'Süre bitti', overInside: 'Tam hedefteydin', overClose: 'Hedefe {s} sn kala bitti',
@@ -431,21 +523,29 @@ const STR = {
     notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', coinShort: 'Yeterli coin yok.', sound: 'Ses', score: 'puan',
     soundOn: 'Sesi kapat', soundOff: 'Sesi aç', overSr: 'Süre bitti. Skor {n}.',
     play_aria: 'Oyun alanı',
-    k_cift: 'Çift pim', k_kayan: 'Kayan pim', k_tuzak: 'Tuzak pim', k_iki: 'İki halka',
+    k_cift: 'Çift pim', k_kayan: 'Kayan pim', k_iki: 'İki halka',
     introNew: 'Yeni kilit: {k}',
     hint_cift: 'İki hedefi de vur', hint_kayan: 'Hedef kayıyor, zamanlamayı ayarla',
     hint_tuzak: 'Gül rengi bölgeye dokunma', hint_iki: 'Her ibreyi kendi hedefinde yakala', hint_combo: 'Arka arkaya vur, puan çarpanı artsın',
     level: 'Zorluk', lv_rahat: 'Rahat', lv_normal: 'Normal', lv_usta: 'Usta', lvPicked: '{l} modu seçildi',
     tipEasy: 'Zor mu geldi?', tipEasyBtn: 'Rahat mod', tipHard: 'Çok kolay mı?', tipHardBtn: 'Usta mod',
+    lvlChip: 'Seviye {n}/10', lvlEnd: 'Seviye {n}', sectHeaven: 'Cennet · {s} sn', sectHell: 'Cehennem · {s} sn',
+    bnHeaven: 'Cennet bölümü', bnHeavenSub: 'Puan ×2 · ceza yok', bnHell: 'Cehennem bölümü', bnHellSub: 'Ceza ×{p} · süre hızlı erir', bnLevel: 'Seviye {n}',
+    rwHeaven: 'Cennet ödülü +{n} coin', rwHell: 'Cehennemden sağ çıktın +{n} coin', rwTool: 'Hediye: {t}',
+    camp: 'Kamp · Seviye {n}', campRun: 'Kamp oyunu', overLevel: 'Seviye {n}',
+    k_tuzak: 'Tuzak pim', k_kayanT: 'Kayan tuzak', k_nefes: 'Nefes pim', k_diken: 'Diken',
+    hint_nefes: 'Hedef nefes alır, açıkken vur', hint_diken: 'Dikenler açıkken dokunma', hint_kayanT: 'Kayan tuzak hedefin üstünden geçer',
+    evPair: 'Yeni kilit: {a} + {b}', evSolo: 'Yeni kilit: {a}', evStar: 'Güçlendi: {k}', evCombo: 'Seri çarpanı açıldı: art arda vur', evMix: 'Karışım: {a} + {b}', breathBonus: 'Tam açık +1',
+    narrow: 'Hedefler daraldı', done: 'Yolculuk tamamlandı!', doneSub: 'Sonsuz mod başladı',
     alarm: 'Alarm', shieldSave: 'Kalkan kurtardı',
     bag: 'Alet çantası', close: 'Kapat', stock: 'Stok', buy: '+1 al', upgrade: 'Yükselt', maxed: 'En üst seviye',
     tool_steto: 'Stetoskop', tool_kron: 'Kronometre', tool_kalkan: 'Kalkan', tool_kum: 'Kum saati',
     d_steto: 'Sonraki {n} hedef daha geniş', d_kron: 'Süreye +{n} sn', d_kalkan: 'Sonraki {n} hatada ceza yok', d_kalkan1: 'Sonraki hatada ceza yok', d_kum: 'İbre {n} sn yavaşlar',
     toolEmpty: 'Stokta yok. Alet çantasından alabilirsin.', shopAd: 'Reklam izle, +{n} coin', gotCoins: '+{n} coin',
-    fxSteto: 'Geniş {n}', fxShield: 'Kalkan {n}', fxSlow: 'Yavaş {n} sn'
+    fxSteto: 'Geniş {n}', fxShield: 'Kalkan {n}', fxSlow: 'Yavaş {n} sn', fxNarrow: 'Dar {n} sn'
   },
   en: {
-    title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs',
+    title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs', bestLvl: 'Level',
     zone: 'Last 1 s: ×3', perfect: 'Perfect', near: 'Close call ×3', miss: 'Miss', reverse: 'Reversed', breath: 'Catch your breath',
     tut1: 'Tap when the pointer is in the peach zone', tut2: 'Hit it as time runs out: ×3',
     over: 'Time is up', overInside: 'You were right on it', overClose: 'Missed it by {s} s',
@@ -458,18 +558,26 @@ const STR = {
     notEnough: 'Not enough coins. Watch an ad to keep going.', coinShort: 'Not enough coins.', sound: 'Sound', score: 'pts',
     soundOn: 'Mute sound', soundOff: 'Unmute sound', overSr: 'Time is up. Score {n}.',
     play_aria: 'Play area',
-    k_cift: 'Double pin', k_kayan: 'Sliding pin', k_tuzak: 'Trap pin', k_iki: 'Twin rings',
+    k_cift: 'Double pin', k_kayan: 'Sliding pin', k_iki: 'Twin rings',
     introNew: 'New lock: {k}',
     hint_cift: 'Hit both targets', hint_kayan: 'The target slides, adjust your timing',
     hint_tuzak: 'Stay off the rose zone', hint_iki: 'Catch each pointer in its own target', hint_combo: 'Hit again and again to raise your multiplier',
     level: 'Difficulty', lv_rahat: 'Easy', lv_normal: 'Normal', lv_usta: 'Master', lvPicked: '{l} mode selected',
     tipEasy: 'Too hard?', tipEasyBtn: 'Easy mode', tipHard: 'Too easy?', tipHardBtn: 'Master mode',
+    lvlChip: 'Level {n}/10', lvlEnd: 'Level {n}', sectHeaven: 'Heaven · {s} s', sectHell: 'Hell · {s} s',
+    bnHeaven: 'Heaven round', bnHeavenSub: 'Points ×2 · no penalties', bnHell: 'Hell round', bnHellSub: 'Penalties ×{p} · time melts faster', bnLevel: 'Level {n}',
+    rwHeaven: 'Heaven reward +{n} coins', rwHell: 'You survived hell +{n} coins', rwTool: 'Gift: {t}',
+    camp: 'Camp · Level {n}', campRun: 'Camp run', overLevel: 'Level {n}',
+    k_tuzak: 'Trap pin', k_kayanT: 'Sliding trap', k_nefes: 'Breathing pin', k_diken: 'Thorns',
+    hint_nefes: 'The target breathes, hit it while open', hint_diken: "Don't touch while thorns are out", hint_kayanT: 'The sliding trap crosses the target',
+    evPair: 'New lock: {a} + {b}', evSolo: 'New lock: {a}', evStar: 'Stronger: {k}', evCombo: 'Combo multiplier unlocked: hit again and again', evMix: 'Mix: {a} + {b}', breathBonus: 'Wide open +1',
+    narrow: 'Targets narrowed', done: 'Journey complete!', doneSub: 'Endless mode begins',
     alarm: 'Alarm', shieldSave: 'Shield saved you',
     bag: 'Toolbag', close: 'Close', stock: 'Stock', buy: 'Buy +1', upgrade: 'Upgrade', maxed: 'Max level',
     tool_steto: 'Stethoscope', tool_kron: 'Stopwatch', tool_kalkan: 'Shield', tool_kum: 'Hourglass',
     d_steto: 'Next {n} targets are wider', d_kron: '+{n} s on the clock', d_kalkan: 'No penalty for the next {n} mistakes', d_kalkan1: 'No penalty for the next mistake', d_kum: 'Pointer slows for {n} s',
     toolEmpty: 'Out of stock. Get more in the toolbag.', shopAd: 'Watch ad, +{n} coins', gotCoins: '+{n} coins',
-    fxSteto: 'Wide {n}', fxShield: 'Shield {n}', fxSlow: 'Slow {n} s'
+    fxSteto: 'Wide {n}', fxShield: 'Shield {n}', fxSlow: 'Slow {n} s', fxNarrow: 'Narrow {n} s'
   }
 };
 const t = (k, v) => {
@@ -478,6 +586,7 @@ const t = (k, v) => {
   return s;
 };
 const f1 = n => n.toFixed(1).replace('.', LANG === 'tr' ? ',' : '.');
+const fx = n => String(Math.round(n * 10) / 10).replace('.', LANG === 'tr' ? ',' : '.');
 /* Övgü ve laf atma satırları: seri kilometre taşlarında övgü, ıskada hafif laf, oyun sonunda duruma göre başlık. */
 const MILESTONES = [5, 10, 15, 20, 25, 35, 50, 75, 100];
 const LINES = {
@@ -530,7 +639,7 @@ const save = {
   coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
   bests: { rahat: 0, normal: 0, usta: 0 },
   tools: { steto: { n: 1, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 1, l: 1 }, kum: { n: 1, l: 1 } },
-  unl: {}, seen: {}, tips: {}, low: 0, high: 0
+  unl: {}, seen: {}, tips: {}, low: 0, high: 0, camp: 1, bestL: 0
 };
 try {
   const raw = localStorage.getItem('kilpayi.v1');
@@ -545,6 +654,7 @@ LEVELS.forEach(l => { save.bests[l] = Math.max(0, save.bests[l] | 0); });
 if (LEVELS.indexOf(save.lvl) < 0) save.lvl = 'normal';
 if (!save.tips || typeof save.tips !== 'object') save.tips = {};
 save.low = save.low | 0; save.high = save.high | 0;
+save.camp = Math.max(1, save.camp | 0); save.bestL = save.bestL | 0;
 const LV = () => LEVEL[save.lvl];
 const bestNow = () => save.bests[save.lvl];
 TOOL_IDS.forEach(id => {
@@ -555,14 +665,61 @@ const persist = () => { try { localStorage.setItem('kilpayi.v1', JSON.stringify(
 
 /* ---------- palet: renkler CSS değişkenlerinden okunur, açık/koyu tema kendiliğinden izlenir ---------- */
 const P = {};
+const P_KEYS = { bg: 1, surface: 1, track: 1, tick: 1, ink: 1, 'ink-2': 1, lilac: 1, 'lilac-soft': 1, btn: 1, 'on-btn': 1, peach: 1, 'peach-deep': 1, 'peach-soft': 1, rose: 1, 'rose-soft': 1 };
 let FD = 'sans-serif', FB = 'sans-serif';
 let onPalette = () => {};
+
+/* Cennet ve cehennem temaları: normal temaya (sistem açık/koyu) yumuşak karışır, koyu moda geçer gibi. */
+const TH_KEYS = ['bg', 'bg-2', 'surface', 'track', 'tick', 'line', 'ink', 'ink-2', 'ink-3', 'lilac', 'lilac-soft', 'btn', 'on-btn', 'peach', 'peach-deep', 'peach-soft', 'rose', 'rose-soft', 'blob-1', 'blob-2', 'glass', 'glass-edge', 'scrim'];
+const THEME_H = {
+  bg: '#FFF8E0', 'bg-2': '#FFEFC2', surface: '#FFFFFF', track: '#F6E7B8', tick: '#CFA84A', line: '#EBD79A',
+  ink: '#4A3500', 'ink-2': '#8C6A16', 'ink-3': '#B08C3C', lilac: '#F4B63F', 'lilac-soft': '#FBE3A6', btn: '#D9971A', 'on-btn': '#FFFFFF',
+  peach: '#F4B63F', 'peach-deep': '#C98A12', 'peach-soft': '#FBE3A6', rose: '#FF8A5C', 'rose-soft': '#FFD9C2',
+  'blob-1': '#FFE9B2', 'blob-2': '#FFF1CC', glass: 'rgba(255,250,232,.72)', 'glass-edge': 'rgba(255,255,255,.9)', scrim: 'rgba(120,80,0,.16)'
+};
+const THEME_X = {
+  bg: '#18080C', 'bg-2': '#0F0507', surface: '#3A161E', track: '#3A161E', tick: '#8A4A44', line: '#5A2A2A',
+  ink: '#FFE9E2', 'ink-2': '#D6A096', 'ink-3': '#A8706A', lilac: '#FF5C38', 'lilac-soft': '#5A2118', btn: '#FF6A3D', 'on-btn': '#FFFFFF',
+  peach: '#FF7A45', 'peach-deep': '#FFC478', 'peach-soft': '#7A2D23', rose: '#FF4D8A', 'rose-soft': '#6A1F3A',
+  'blob-1': '#34101A', 'blob-2': '#481216', glass: 'rgba(52,14,20,.72)', 'glass-edge': 'rgba(255,160,130,.22)', scrim: 'rgba(8,2,4,.55)'
+};
+const parseCol = str => {
+  const s = (str || '').trim();
+  if (s.charAt(0) === '#') {
+    const h = s.length === 4 ? s.slice(1).replace(/./g, x => x + x) : s.slice(1), v = parseInt(h, 16);
+    return [(v >> 16) & 255, (v >> 8) & 255, v & 255, 1];
+  }
+  const m = s.match(/rgba?\(([^)]+)\)/);
+  if (m) { const a = m[1].split(',').map(parseFloat); return [a[0], a[1], a[2], a.length > 3 ? a[3] : 1]; }
+  return [136, 136, 136, 1];
+};
+const toCss = a => {
+  const r = Math.round(a[0]), g = Math.round(a[1]), b = Math.round(a[2]);
+  if (a[3] >= 0.999) return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + a[3].toFixed(3) + ')';
+};
+const TH_H = {}, TH_X = {}, BASE = {};
+TH_KEYS.forEach(k => { TH_H[k] = parseCol(THEME_H[k]); TH_X[k] = parseCol(THEME_X[k]); });
+let thWh = 0, thWx = 0, thLast = [-1, -1];
+const applyTheme = force => {
+  if (!force && Math.abs(thWh - thLast[0]) < 0.002 && Math.abs(thWx - thLast[1]) < 0.002) return;
+  thLast = [thWh, thWx];
+  const root = document.documentElement, wb = Math.max(0, 1 - thWh - thWx), off = thWh < 0.002 && thWx < 0.002;
+  TH_KEYS.forEach(k => {
+    const b = BASE[k], h = TH_H[k], x = TH_X[k], o = [0, 0, 0, 0];
+    for (let i = 0; i < 4; i++) o[i] = b[i] * wb + h[i] * thWh + x[i] * thWx;
+    const css = toCss(o);
+    if (off) root.style.removeProperty('--' + k); else root.style.setProperty('--' + k, css);
+    if (P_KEYS[k]) P[k] = css;
+  });
+};
 const readPalette = () => {
-  const cs = getComputedStyle(document.documentElement);
-  ['bg', 'surface', 'track', 'tick', 'ink', 'ink-2', 'lilac', 'lilac-soft', 'btn', 'on-btn', 'peach', 'peach-deep', 'peach-soft', 'rose', 'rose-soft']
-    .forEach(k => { P[k] = cs.getPropertyValue('--' + k).trim() || '#888888'; });
+  const root = document.documentElement, cs = getComputedStyle(root), had = thWh > 0.002 || thWx > 0.002;
+  if (had) TH_KEYS.forEach(k => root.style.removeProperty('--' + k));
+  TH_KEYS.forEach(k => { BASE[k] = parseCol(cs.getPropertyValue('--' + k)); });
   FD = cs.getPropertyValue('--font-display').trim() || 'sans-serif';
   FB = cs.getPropertyValue('--font-body').trim() || 'sans-serif';
+  applyTheme(true);
   onPalette();
 };
 readPalette();
@@ -610,6 +767,10 @@ const Snd = {
   rev() { this.tone(520, 0.12, 'triangle', 0.1, 780); },
   fanfare() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.22, 'triangle', 0.14, null, i * 0.08)); },
   tool() { this.tone(500, 0.1, 'triangle', 0.14, 900); this.tone(900, 0.14, 'sine', 0.1, null, 0.08); },
+  heaven() { [659, 784, 988, 1319].forEach((f, i) => this.tone(f, 0.3, 'triangle', 0.13, null, i * 0.09)); },
+  hell() { this.tone(110, 0.7, 'sawtooth', 0.12, 55); this.tone(82, 0.9, 'square', 0.07, 41, 0.05); },
+  level() { [523, 659, 784].forEach((f, i) => this.tone(f, 0.16, 'triangle', 0.12, null, i * 0.07)); },
+  tick(go) { this.tone(go ? 988 : 660, go ? 0.2 : 0.09, 'triangle', 0.13); },
   combo(m) { const f = [523, 659, 784, 988, 1175][Math.min(4, Math.max(0, m - 1))]; this.tone(f, 0.14, 'triangle', 0.14); this.tone(f * 1.5, 0.2, 'sine', 0.12, null, 0.07); this.tone(f * 2, 0.26, 'sine', 0.1, null, 0.14); }
 };
 
@@ -697,6 +858,8 @@ const app = $('app'), cv = $('cv'), ctx = cv.getContext('2d');
 const hudEl = $('hud'), fillEl = $('fill'), tleftEl = $('tleft'), zoneEl = $('zone'), hudBestEl = $('hudBest'), fxEl = $('fx'), toolsEl = $('tools');
 const menuEl = $('menu'), overEl = $('over'), pauseEl = $('pause'), adEl = $('ad'), shopEl = $('shop'), toastEl = $('toast');
 const gaugeEl = fillEl.parentNode;
+const lvlChipEl = $('lvlChip'), pathEl = $('path'), sectEl = $('sect'), campEl = $('campBtn');
+pathEl.innerHTML = '<i></i>'.repeat(10);
 const show = el => { el.classList.add('on'); el.removeAttribute('aria-hidden'); };
 const hide = el => { el.classList.remove('on'); el.setAttribute('aria-hidden', 'true'); };
 let toastTimer = 0;
@@ -744,7 +907,11 @@ const refreshStats = () => {
   $('shopCoins').textContent = String(save.coins);
   $('menuBest').textContent = String(bestNow());
   $('menuRuns').textContent = String(save.runs);
+  $('menuLvlChip').hidden = save.bestL < 1;
+  $('menuBestL').textContent = String(Math.min(save.bestL, 10));
   hudBestEl.innerHTML = t('best') + ' <b>' + bestNow() + '</b>';
+  campEl.hidden = save.camp <= 1;
+  campEl.textContent = t('camp', { n: Math.min(save.camp, 11) });
   updateTools();
 };
 
@@ -757,21 +924,35 @@ const G = {
   kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, gateT: 1,
   ta: 1.0, hw: 0.45,
   adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false,
-  boost: 0, glove: 0, waveSeen: 0, pendingRev: false, introKind: null, hint: null,
+  boost: 0, glove: 0, waveSeen: 0, pendingRev: false, hint: null,
   shake: 0, flash: 0, flashKind: 'rose', tscale: 1, tsT: 0,
   parts: [], pops: [], rips: [], revT: 0, beep: 0, scorePulse: 0,
   continued: false, runCounted: false, coinsGiven: 0, gain: 0, deadT: 0, overAt: 0,
-  nearMsg: '', newBest: false, raw: 0, perf: 0, missRun: 0, lastRoast: -99
+  nearMsg: '', newBest: false, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
+  jt: 0, L: 1, ph: 'normal', phLeft: 45, open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
+  campRun: false, startL: 1, banner: null, count: 0, thT: { h: 0, x: 0 }, thDirty: false, ec: 0, sp: [], em: []
 };
 const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100 };
 
 const pinCenter = p => p.amp ? norm(p.c0 + p.amp * Math.sin(TAU * p.f * G.pt + p.ph)) : p.c0;
+/* O anki yarı genişlik: nefes alan hedef ve dikenler nefes alır, diken yedikten sonra hedefler kısa süre daralır. */
+const pinHw = (p, vis) => {
+  let h = p.hw;
+  if (p.br) {
+    const f = 0.5 - 0.5 * Math.cos(TAU * G.pt / p.br.P + p.br.ph);
+    h *= 1 - p.br.a * (p.br.inv ? 1 - f : f);
+  }
+  if (p.sp && !vis && h < p.hw * 0.25) return 0;
+  if (p.kind === 'gate' && G.narrow > 0) h *= 0.8;
+  return h;
+};
 const syncPrimary = () => {
-  for (const p of G.pins) if (p.kind === 'gate' && !p.done && p.ring === 0) { G.ta = pinCenter(p); G.hw = p.hw; return; }
+  for (const p of G.pins) if (p.kind === 'gate' && !p.done && p.ring === 0) { G.ta = pinCenter(p); G.hw = pinHw(p); return; }
 };
 const ahead = (ang, dir, d) => norm(ang + dir * d);
 
 const introduce = (kind, isNew) => {
+  if (G.hint) return;
   const seen = save.seen[kind] || 0;
   if (!isNew && seen >= 2) return;
   save.seen[kind] = seen + 1; persist();
@@ -781,48 +962,151 @@ const introduce = (kind, isNew) => {
   G.hint = { lines, t: 0, max: isNew ? 4.4 : 3 };
 };
 
+/* ---------- yolculuk: kilit olayları, cennet ve cehennem, seviye atlama ---------- */
+const IMPL_GOOD = { tek: 1, cift: 1, kayan: 1, nefes: 1, iki: 1 };
+/* Karışım olayları: seviye -> [ana kilit, katılan]. Yapılmamış kilitler için olay atlanır. */
+const MIXES = { 2: ['cift', 'kayan'], 3: ['nefes', 'tuzak'], 5: ['iki', 'tuzak'] };
+const IMPL_TWIN = { tuzak: 1, kayanT: 1, diken: 1 };
+const STAR_KINDS = { cift: 1, kayan: 1, nefes: 1 };
+const banner = (title, sub, kind) => { G.banner = { title, sub: sub || '', kind: kind || '', t: 0 }; };
+const fireEvent = (e, silent) => {
+  const lines = [];
+  if (e.good) {
+    const tw = e.twin && IMPL_TWIN[e.twin] ? e.twin : '';
+    let ok = false;
+    if (IMPL_GOOD[e.good] && G.open.indexOf(e.good) < 0) { G.open.push(e.good); ok = true; }
+    if (tw && !G.eng[tw]) { G.eng[tw] = true; ok = true; }
+    if (ok && !silent && e.good !== 'tek') {
+      lines.push({ txt: tw ? t('evPair', { a: t('k_' + e.good), b: t('k_' + tw) }) : t('evSolo', { a: t('k_' + e.good) }), bg: 'lilac-soft' });
+      if (STR[LANG]['hint_' + e.good] !== undefined) lines.push({ txt: t('hint_' + e.good), bg: 'surface' });
+    }
+  } else if (e.combo) {
+    G.comboOn = true;
+    if (!silent) lines.push({ txt: t('evCombo'), bg: 'lilac-soft' });
+  } else if (e.star) {
+    const cand = G.open.filter(k => STAR_KINDS[k] && (G.stars[k] | 0) < 2);
+    if (cand.length) {
+      cand.sort((a, b) => (G.stars[a] | 0) - (G.stars[b] | 0));
+      const k = cand[0]; G.stars[k] = (G.stars[k] | 0) + 1;
+      if (!silent) lines.push({ txt: t('evStar', { k: t('k_' + k) }), bg: 'lilac-soft' });
+    }
+  } else if (e.mix) {
+    const m = MIXES[e.L];
+    if (m && G.open.indexOf(m[0]) >= 0) {
+      G.mixes.push(m);
+      if (!silent) lines.push({ txt: t('evMix', { a: t('k_' + m[0]), b: t('k_' + m[1]) }), bg: 'lilac-soft' });
+    }
+  }
+  if (lines.length) { G.hint = { lines, t: 0, max: 4.4 }; Snd.fanfare(); Platform.haptic('medium'); }
+};
+const applyEvents = silent => { while (G.evi < JEVENTS.length && JEVENTS[G.evi].t <= G.jt) fireEvent(JEVENTS[G.evi++], silent); };
+const giftTool = () => {
+  const id = TOOL_IDS[(Math.random() * TOOL_IDS.length) | 0];
+  save.tools[id].n++; updateTools();
+  pop(t('rwTool', { t: t('tool_' + id) }), 'hype');
+};
+const rewardHeaven = L => {
+  const c = 5 + 2 * L;
+  save.coins += c; G.time = Math.min(CFG.maxTime, G.time + JOURNEY.phase.heaven.bonusT);
+  pop(t('rwHeaven', { n: c }), 'hype');
+  if (L % 3 === 0) giftTool();
+  persist(); refreshStats();
+};
+const rewardHell = L => {
+  const c = 2 * (5 + 2 * Math.min(L, 10));
+  save.coins += c; G.time = Math.min(CFG.maxTime, G.time + JOURNEY.phase.hell.bonusT);
+  pop(t('rwHell', { n: c }), 'hype');
+  persist(); refreshStats();
+};
+const levelUp = () => {
+  save.camp = Math.max(save.camp, G.L); save.bestL = Math.max(save.bestL, G.L);
+  if (G.L === 11) { save.coins += 100; persist(); refreshStats(); banner(t('done'), t('doneSub')); }
+  else banner(t('bnLevel', { n: G.L }), '');
+  persist(); Snd.level(); Platform.haptic('medium');
+  Platform.track('journey_level', { level: G.L, score: G.score });
+};
+const phaseChange = pi => {
+  const prev = G.ph, prevL = G.L;
+  G.L = pi.L; G.ph = pi.ph;
+  G.ptsMul = phaseMod(pi.ph, pi.L).pts;
+  if (pi.ph === 'heaven') {
+    G.thT = { h: 1, x: 0 }; banner(t('bnHeaven'), t('bnHeavenSub'), 'h'); Snd.heaven(); Platform.haptic('medium');
+  } else if (pi.ph === 'hell') {
+    rewardHeaven(prevL);
+    G.thT = { h: 0, x: 1 }; banner(t('bnHell'), t('bnHellSub', { p: fx(phaseMod('hell', pi.L).pen) }), 'x'); Snd.hell(); Platform.haptic('heavy');
+  } else {
+    if (prev === 'hell') { rewardHell(prevL); levelUp(); }
+    G.thT = { h: 0, x: 0 };
+  }
+  G.thDirty = true;
+  spawnChallenge(false);
+};
+
+/* Engel ikizi: iyi kilidin yanına ya da üstüne konan tuzak. */
+const addTwin = (tw, pins, hw) => {
+  const g0 = pins.find(p => p.kind === 'gate'), th = hw * 1.1;
+  if (!g0) return;
+  if (tw === 'tuzak') {
+    /* tuzak, başka bir hedefin üstüne ya da ibrenin hemen önüne düşmesin */
+    const gates = pins.filter(p => p.kind === 'gate' && p.ring === 0);
+    let c = -1;
+    for (let tries = 0; tries < 16 && c < 0; tries++) {
+      const side = Math.random() < 0.5 ? 1 : -1, cand = norm(g0.c0 + side * (hw + th + rnd(0.35, 1.4)));
+      if (angd(cand, G.ang) >= th + 0.5 && gates.every(g => angd(cand, g.c0) >= g.hw + th + 0.2)) c = cand;
+    }
+    if (c < 0) return;
+    pins.push({ kind: 'trap', tw, ring: 0, c0: c, amp: 0, f: 0, ph: 0, hw: th, done: false });
+  } else if (tw === 'kayanT') {
+    pins.push({ kind: 'trap', tw, ring: 0, c0: g0.c0, amp: 0.95, f: 0.33, ph: rnd(0, TAU), hw: 0.28, prio: true, pen: 1.0, done: false });
+  } else if (tw === 'diken') {
+    pins.push({ kind: 'trap', tw, ring: 0, c0: g0.c0, amp: 0, f: 0, ph: 0, hw: Math.max(g0.hw, 0.3), sp: true, prio: true, pen: 1.5, narrow: true, br: { a: 0.9, P: g0.br ? g0.br.P : 1.4, ph: g0.br ? g0.br.ph : rnd(0, TAU), inv: true }, done: false });
+  }
+};
+
 const spawnChallenge = (first, force) => {
-  const plan = planGate(G.n, G.adapt, G.mercy);
-  const lv = LV();
-  const kind = first ? 'tek' : (force || pickKind(G.n, plan.relief, save.unl, G.lastKind, Math.random(), lv.kind));
+  const lv = LV(), pm = phaseMod(G.ph, G.L);
+  const plan = planJourney(G.L, G.ph, G.n, G.adapt, G.mercy);
+  let mix = null;
+  if (!first && !force && !plan.relief && G.mixes.length && Math.random() < 0.28) {
+    mix = G.mixes[(Math.random() * G.mixes.length) | 0];
+    if (mix[1] === 'tuzak' && pm.twin === 0) mix = null;
+  }
+  const kind = first ? 'tek' : (force || (mix ? mix[0] : pickJ(G.open, plan.relief, G.lastKind, Math.random(), G.ph)));
   const prevKind = G.kind;
-  const km = KIND[kind];
+  const km = JKIND[kind] || JKIND.tek;
   const boost = G.boost > 0 ? 1.4 : 1;
   G.kind = kind; G.lastKind = kind; G.gainMul = km.gain * lv.gain;
   G.I = plan.I; G.relief = plan.relief;
-  G.omega = plan.omega * km.omMul * lv.om;
-  const hw = Math.min(0.8, plan.hw * km.hwMul * boost * lv.hw);
+  G.omega = plan.omega * km.omMul * lv.om * pm.omM;
+  const hw = Math.min(0.8, plan.hw * km.hwMul * boost * lv.hw * pm.hwM);
+  const star = G.stars[kind] | 0;
   const gate = (ring, c, h) => ({ kind: 'gate', ring, c0: c, amp: 0, f: 0, ph: 0, hw: h, done: false });
   const pins = [];
-  if (kind === 'tek') {
-    pins.push(gate(0, ahead(G.ang, G.dir, first ? rnd(1.6, 2.3) : rnd(CFG.spawnMin, CFG.spawnMax)), hw));
-  } else if (kind === 'cift') {
+  if (kind === 'cift') {
     const a = ahead(G.ang, G.dir, rnd(1.0, 2.0));
-    pins.push(gate(0, a, hw), gate(0, ahead(a, G.dir, hw * 2 + rnd(0.5, 1.0)), hw));
+    pins.push(gate(0, a, hw), gate(0, ahead(a, G.dir, hw * 2 + rnd(0.5 - 0.1 * star, 1.0 - 0.2 * star)), hw));
   } else if (kind === 'kayan') {
     const p = gate(0, ahead(G.ang, G.dir, rnd(1.4, 2.6)), hw);
-    p.amp = rnd(0.45, 0.8); p.f = rnd(0.32, 0.5); p.ph = rnd(0, TAU);
+    p.amp = rnd(0.45, 0.8) * (1 + 0.1 * star); p.f = rnd(0.32, 0.5) * (1 + 0.08 * star); p.ph = rnd(0, TAU);
     pins.push(p);
-  } else if (kind === 'tuzak') {
-    const a = ahead(G.ang, G.dir, rnd(1.2, 2.4));
-    pins.push(gate(0, a, hw));
-    const th = hw * 1.1;
-    let c = a, tries = 0;
-    do {
-      const side = Math.random() < 0.5 ? 1 : -1;
-      c = norm(a + side * (hw + th + rnd(0.35, 0.9))); tries++;
-    } while (tries < 8 && angd(c, G.ang) < th + 0.5);
-    pins.push({ kind: 'trap', ring: 0, c0: c, amp: 0, f: 0, ph: 0, hw: th, done: false });
+  } else if (kind === 'nefes') {
+    const p = gate(0, ahead(G.ang, G.dir, rnd(CFG.spawnMin, CFG.spawnMax)), hw);
+    p.br = { a: [0.3, 0.5, 0.62][star], P: [1.7, 1.2, 0.9][star], ph: rnd(0, TAU) };
+    pins.push(p);
   } else if (kind === 'iki') {
     if (prevKind !== 'iki') G.ang2 = norm(G.ang + Math.PI);
     G.dir2 = -G.dir; G.omega2 = G.omega * 0.85;
     pins.push(gate(0, ahead(G.ang, G.dir, rnd(1.0, 2.2)), hw));
     pins.push(gate(1, ahead(G.ang2, G.dir2, rnd(1.0, 2.0)), Math.min(0.85, hw * 1.15)));
+  } else {
+    pins.push(gate(0, ahead(G.ang, G.dir, first ? rnd(1.6, 2.3) : rnd(CFG.spawnMin, CFG.spawnMax)), hw));
   }
+  if (mix && mix[1] === 'kayan') for (const p of pins) { p.amp = rnd(0.28, 0.45); p.f = rnd(0.3, 0.42); p.ph = rnd(0, TAU); }
+  const tw = mix && mix[1] === 'tuzak' ? 'tuzak' : JTWIN[kind];
+  if (!first && tw && G.eng[tw] && (mix ? true : Math.random() < pm.twin)) addTwin(tw, pins, hw);
   G.pins = pins; G.gateT = 0;
   syncPrimary();
-  if (kind !== 'tek' && !first) introduce(kind, force === kind && !!G.introNew);
-  G.introNew = false;
+  if (kind !== 'tek' && !first) introduce(kind, false);
 };
 
 const shake = s => { if (!RM) G.shake = Math.max(G.shake, s); };
@@ -839,10 +1123,10 @@ const burst = (x, y, n, cols, speed) => {
     G.parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: rnd(0.45, 0.85), r: rnd(2.5, 5.5), c: cols[(Math.random() * cols.length) | 0] });
   }
 };
+/* En fazla iki balon: en yeni halkaya yakın durur, eskisi bir basamak yukarı çıkar. */
 const pop = (txt, kind) => {
-  let slot = 0;
-  for (const p of G.pops) if (p.t < 0.4) slot++;
-  G.pops.push({ txt, kind, t: 0, max: kind === 'hype' || kind === 'roast' ? 1.25 : 0.95, off: Math.min(2, slot) * 36 });
+  G.pops.push({ txt, kind, t: 0, max: kind === 'hype' || kind === 'roast' ? 1.25 : 0.95 });
+  while (G.pops.length > 2) G.pops.shift();
 };
 
 /* ---------- akış ---------- */
@@ -865,6 +1149,7 @@ const relayout = snap => {
     if (rFit < r) { r = rFit; cy = hudB + 8 + 18 + 1.1 * Math.max(56, r) + 10; }
   }
   r = Math.max(56, r);
+  view.hudB = G.mode === 'menu' ? 0 : (hudEl.offsetTop + hudEl.offsetHeight);
   view.tcx = cx; view.tcy = cy; view.tr = r;
   if (snap) { view.cx = cx; view.cy = cy; view.r = r; }
 };
@@ -876,7 +1161,8 @@ const resize = () => {
   relayout(true);
 };
 
-const start = () => {
+const start = fromL => {
+  const L0 = fromL || 1;
   Snd.ui();
   Object.assign(G, {
     mode: 'play', time: LV().startT, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
@@ -884,8 +1170,14 @@ const start = () => {
     revT: 0, beep: 0, scorePulse: 0, parts: [], pops: [], rips: [], nearMsg: '',
     adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false, pt: 0,
     kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, boost: 0, glove: 0, waveSeen: 0, pendingRev: false,
-    introKind: null, introNew: false, hint: null, dir2: -1
+    hint: null, dir2: -1,
+    jt: jStart(L0), L: L0, ph: 'normal', phLeft: jNormal(L0), open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
+    campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: { h: 0, x: 0 }, thDirty: false, sp: [], em: []
   });
+  thWh = thWx = 0; applyTheme(true);
+  applyEvents(true);
+  save.bestL = Math.max(save.bestL, L0);
+  banner(t('bnLevel', { n: L0 }), L0 > 1 ? t('campRun') : '');
   spawnChallenge(true);
   hide(menuEl); hide(overEl); hide(pauseEl); hide(shopEl);
   app.classList.add('playing');
@@ -893,11 +1185,12 @@ const start = () => {
   toolsEl.classList.add('on');
   relayout(false);
   updateTools(); updateHud();
-  Platform.track('run_start', { run: save.runs + 1 });
+  Platform.track('run_start', { run: save.runs + 1, level: L0 });
 };
 
 const goMenu = () => {
   G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0; G.kind = 'tek'; G.hint = null;
+  G.thT = { h: 0, x: 0 }; G.thDirty = true; G.banner = null; G.count = 0;
   hide(overEl); hide(pauseEl); hide(shopEl);
   app.classList.remove('playing');
   hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
@@ -909,28 +1202,22 @@ const goMenu = () => {
 
 /* Dokunuş: hangi ibre hedefindeyse onu vurur. İki halkada ikisi birden hedefteyse hedefine daha yakın olan sayılır. */
 const tap = () => {
-  if (G.mode !== 'play') return;
+  if (G.mode !== 'play' || G.lock > 0) return;
+  /* hedefin üstüne binen tuzaklar (kayan tuzak, diken) hedeften önce sayılır */
+  for (const p of G.pins) {
+    if (p.kind === 'trap' && p.prio && angd(G.ang, pinCenter(p)) <= pinHw(p)) { trap(p); return; }
+  }
   let best = null, bn = 9, bd = 0;
   for (const p of G.pins) {
     if (p.kind !== 'gate' || p.done) continue;
-    const d = angd(p.ring ? G.ang2 : G.ang, pinCenter(p));
-    if (d <= p.hw + CFG.grace && d / p.hw < bn) { best = p; bn = d / p.hw; bd = d; }
+    const h = pinHw(p), d = angd(p.ring ? G.ang2 : G.ang, pinCenter(p));
+    if (d <= h + CFG.grace && d / h < bn) { best = p; bn = d / h; bd = d; }
   }
   if (best) { hit(bd, best); return; }
   for (const p of G.pins) {
-    if (p.kind === 'trap' && angd(G.ang, pinCenter(p)) <= p.hw) { trap(); return; }
+    if (p.kind === 'trap' && !p.prio && angd(G.ang, pinCenter(p)) <= pinHw(p)) { trap(p); return; }
   }
   miss();
-};
-
-const checkUnlock = () => {
-  for (const k of KINDS) {
-    if (k === 'tek' || save.unl[k] || G.n < kindMin(k, null, LV().kind)) continue;
-    save.unl[k] = true; persist();
-    G.introKind = k; G.introNew = true;
-    Snd.fanfare(); Platform.track('unlock', { kind: k, hits: G.n });
-    return;
-  }
 };
 
 const PERF_AT = [3, 6, 10];
@@ -944,7 +1231,7 @@ const cheer = (mult, prevMult, near, perfect) => {
     Snd.combo(mult); Platform.haptic('heavy');
     G.rips.push({ x: view.cx, y: view.cy, t: 0, max: 0.8, r0: view.r * 0.35, r1: view.r * 1.3, c: col });
     burst(view.cx, view.cy, up ? 34 : 20, [col, P.peach, P['peach-soft']], 320);
-    if (c === COMBO.tiers[0] && !save.seen.combo && !G.hint) {
+    if (c === COMBO.tiers[0] && G.comboOn && !save.seen.combo && !G.hint) {
       save.seen.combo = 1; persist();
       G.hint = { lines: [{ txt: t('hint_combo'), bg: 'lilac-soft' }], t: 0, max: 3.2 };
     }
@@ -958,9 +1245,12 @@ const cheer = (mult, prevMult, near, perfect) => {
 const hit = (d, pin) => {
   const wasRelief = G.relief;
   pin.done = true;
-  G.hw = pin.hw;
+  const pm = phaseMod(G.ph, G.L);
+  G.hw = pinHw(pin); G.comboOff = !G.comboOn; G.ptsMul = pm.pts;
   const { perfect, near, pts, mult } = resolveHit(G, d);
-  const prevMult = comboMult(G.combo - 1);
+  G.coinsJ += pm.coinHit;
+  if (pin.br && !pin.br.inv && G.hw >= pin.hw * 0.93) { G.score += pm.pts; pop(t('breathBonus'), 'perfect'); }
+  const prevMult = G.comboOn ? comboMult(G.combo - 1) : 1;
   G.scorePulse = 1; G.missRun = 0;
   G.perf = perfect ? G.perf + 1 : 0;
   if (G.boost > 0) G.boost--;
@@ -984,9 +1274,7 @@ const hit = (d, pin) => {
       G.pendingRev = false;
       G.dir = -G.dir; G.revT = 0.8; pop(t('reverse'), 'rev'); Snd.rev();
     }
-    checkUnlock();
-    const force = G.introKind; G.introKind = null;
-    spawnChallenge(false, force);
+    spawnChallenge(false);
     if (G.relief && !wasRelief) pop(t('breath'), 'rev');
   } else {
     syncPrimary();
@@ -1006,12 +1294,14 @@ const scold = was => {
 };
 
 const miss = () => {
+  const pm = phaseMod(G.ph, G.L);
+  if (pm.pen === 0) { pop(t('miss'), 'miss'); Platform.haptic('light'); return; }   /* cennette ceza yok */
   if (G.glove > 0) {
     G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
     return;
   }
   const was = G.combo;
-  resolveMiss(G, CFG.missCost * LV().miss);
+  resolveMiss(G, CFG.missCost * LV().miss * pm.pen);
   G.perf = 0; G.missRun++;
   shake(0.2); flash('rose', 0.14);
   scold(was);
@@ -1019,16 +1309,19 @@ const miss = () => {
   if (G.time <= 0) die();
 };
 
-const trap = () => {
+const trap = p => {
+  const pm = phaseMod(G.ph, G.L);
+  if (pm.pen === 0) { pop(t('alarm'), 'miss'); Platform.haptic('light'); return; }
   if (G.glove > 0) {
     G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
     return;
   }
   const was = G.combo;
-  resolveMiss(G, CFG.trapCost * LV().trap);
+  resolveMiss(G, (p && p.pen != null ? p.pen : CFG.trapCost) * LV().trap * pm.pen);
   G.perf = 0; G.missRun++;
   shake(0.4); flash('rose', 0.24);
   pop(t('alarm'), 'near'); Snd.alarm(); Platform.haptic('error');
+  if (p && p.narrow) { G.narrow = 3; pop(t('narrow'), 'miss'); }
   if (was >= COMBO.tiers[0]) pop(pickLine('broke'), 'roast');
   if (G.time <= 0) die();
 };
@@ -1065,18 +1358,19 @@ const die = () => {
   const secs = (norm((G.ta - G.ang) * G.dir) - G.hw) / w;
   G.nearMsg = inside ? t('overInside') : (secs > 0 && secs <= 0.6 ? t('overClose', { s: f1(Math.max(0.1, secs)) }) : '');
   shake(0.5); flash('rose', 0.3); Snd.over(); Platform.haptic('error');
-  G.newBest = G.score > bestNow();
+  G.newBest = !G.campRun && G.score > bestNow();
   if (G.newBest) save.bests[save.lvl] = G.score;
+  save.bestL = Math.max(save.bestL, G.L);
   if (!G.runCounted) {
     save.runs++; G.runCounted = true;
     save.low = G.n < 10 ? save.low + 1 : 0;
     if (save.lvl === 'normal') save.high = G.n >= 60 ? save.high + 1 : 0;
   }
-  const total = Math.round((Math.floor(G.raw / CFG.coinDiv) + G.near * CFG.nearCoin) * LV().coin);
+  const total = Math.round((Math.floor(G.raw / CFG.coinDiv) + G.near * CFG.nearCoin) * LV().coin) + Math.floor(G.coinsJ);
   G.gain = total - G.coinsGiven; G.coinsGiven = total; save.coins += G.gain;
   if (!save.tut && G.n >= CFG.tutHits) save.tut = true;
   persist(); refreshStats();
-  Platform.track('run_end', { score: G.score, hits: G.n, near: G.near, combo: G.maxCombo, level: save.lvl, continued: G.continued, kind: G.kind });
+  Platform.track('run_end', { score: G.score, hits: G.n, near: G.near, combo: G.maxCombo, diff: save.lvl, level: G.L, phase: G.ph, camp: G.campRun, continued: G.continued, kind: G.kind });
 };
 
 /* Oyun sonu başlığı: rekor ve uzun oyunda övgü, çok kısa oyunda laf, aksi halde düz "Süre bitti". */
@@ -1104,11 +1398,12 @@ const showOver = () => {
   const d = $('ovDelta');
   d.hidden = G.score === 0;
   if (G.newBest && G.score > 0) { d.textContent = t('newBest'); d.className = 'delta win rise'; }
+  else if (G.campRun) { d.textContent = t('campRun'); d.className = 'delta rise'; d.hidden = false; }
   else { d.textContent = t('toBest', { n: Math.max(1, bestNow() - G.score) }); d.className = 'delta rise'; }
   const nm = $('ovNear');
   if (G.nearMsg) { nm.textContent = G.nearMsg; nm.hidden = false; } else { nm.hidden = true; }
   const coinIcon = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach);width:16px;height:16px"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg>';
-  const chips = [];
+  const chips = ['<span class="chip sm">' + t('overLevel', { n: G.L }) + '</span>'];
   if (G.near > 0) chips.push('<span class="chip sm">' + t('statNear') + ' <b>' + G.near + '</b></span>');
   if (G.maxCombo >= 3) chips.push('<span class="chip sm">' + t('statCombo') + ' <b>' + G.maxCombo + '</b></span>');
   if (G.gain > 0) chips.push('<span class="chip sm">' + coinIcon + '<b>+' + G.gain + '</b></span>');
@@ -1138,8 +1433,9 @@ const doContinue = () => {
   Platform.track('continue', { score: G.score });
 };
 
-const pause = () => { if (G.mode !== 'play'/*NOPAUSE*/) return; G.mode = 'pause'; show(pauseEl); };
-const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'play'; Snd.ui(); };
+const pause = () => { if ((G.mode !== 'play' && G.mode !== 'count')/*NOPAUSE*/) return; G.mode = 'pause'; show(pauseEl); };
+/* Devam edince 3-2-1 geri sayım; sayaçlar (süre, seviye, cennet/cehennem) sayım bitene kadar donuk kalır. */
+const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'count'; G.count = 3; Snd.ui(); };
 
 /* ---------- alet çantası ---------- */
 const pipsHtml = l => '<span class="pips" aria-hidden="true">' + [1, 2, 3].map(i => '<i class="' + (i <= l ? 'on' : '') + '"></i>').join('') + '</span>';
@@ -1193,7 +1489,7 @@ $('shopList').addEventListener('click', e => {
   Platform.track('shop', { id, act: b.getAttribute('data-act') });
 });
 
-let lastT = '', lastFx = '';
+let lastT = '', lastFx = '', lastLvl = '', lastSect = '', lastSectCls = '';
 const updateHud = () => {
   const f = clamp(G.time / CFG.maxTime, 0, 1);
   fillEl.style.width = (f * 100).toFixed(1) + '%';
@@ -1207,32 +1503,77 @@ const updateHud = () => {
   if (G.boost > 0) fx.push(t('fxSteto', { n: G.boost }));
   if (G.glove > 0) fx.push(t('fxShield', { n: G.glove }));
   if (G.slow > 0) fx.push(t('fxSlow', { n: Math.ceil(G.slow) }));
+  if (G.narrow > 0) fx.push(t('fxNarrow', { n: Math.ceil(G.narrow) }));
   const key = fx.join('|');
   if (key !== lastFx) { lastFx = key; fxEl.innerHTML = fx.map(x => '<span class="chip sm">' + x + '</span>').join(''); }
+  const lv = G.L > 10 ? t('lvlEnd', { n: G.L }) : t('lvlChip', { n: G.L });
+  if (lv !== lastLvl) {
+    lastLvl = lv; lvlChipEl.textContent = lv;
+    for (let i = 0; i < pathEl.children.length; i++) pathEl.children[i].className = i + 1 < G.L ? 'on' : (i + 1 === G.L ? 'cur' : '');
+  }
+  const sk = G.ph === 'normal' ? '' : G.ph + Math.ceil(Math.max(0, G.phLeft));
+  if (sk !== lastSect) {
+    lastSect = sk;
+    if (sk) { sectEl.textContent = t(G.ph === 'heaven' ? 'sectHeaven' : 'sectHell', { s: Math.ceil(Math.max(0, G.phLeft)) }); sectEl.className = 'sect on ' + (G.ph === 'heaven' ? 'h' : 'x'); }
+    else sectEl.className = 'sect ' + (lastSectCls || 'h');
+    if (sk) lastSectCls = G.ph === 'heaven' ? 'h' : 'x';
+  }
+};
+
+/* Ortam parçacıkları: cennette yükselen ışık tozları, cehennemde közler. Tema ağırlığı kadar görünür. */
+const envStep = raw => {
+  const w = view.w, h = view.h, k = RM ? 0.5 : 1;
+  if (thWh > 0.08 && G.sp.length < 26 * k && Math.random() < raw * 16 * thWh * k) {
+    G.sp.push({ x: rnd(0, w), y: h + 8, vy: rnd(14, 38), r: rnd(1.4, 3.2), ph: rnd(0, TAU), sw: rnd(8, 22) });
+  }
+  for (const q of G.sp) { q.y -= q.vy * raw; q.x += Math.sin(G.clock * 0.9 + q.ph) * q.sw * raw; }
+  G.sp = thWh < 0.01 ? [] : G.sp.filter(q => q.y > -10);
+  if (thWx > 0.08 && G.em.length < 34 * k && Math.random() < raw * 22 * thWx * k) {
+    G.em.push({ x: rnd(0, w), y: h + 6, vy: rnd(40, 110), r: rnd(1.2, 3), ph: rnd(0, TAU), sw: rnd(10, 30), life: 0, max: rnd(2.2, 4.2) });
+  }
+  for (const e of G.em) { e.life += raw; e.y -= e.vy * raw * (1 - 0.45 * e.life / e.max); e.x += Math.sin(G.clock * 2.4 + e.ph) * e.sw * raw; }
+  G.em = thWx < 0.01 ? [] : G.em.filter(e => e.life < e.max && e.y > -10);
 };
 
 /* ---------- güncelleme ---------- */
+const COUNT_STEP = 0.75;
 const update = raw => {
   G.clock += raw;
   const k = Math.min(1, raw * 9);
   view.cx += (view.tcx - view.cx) * k; view.cy += (view.tcy - view.cy) * k; view.r += (view.tr - view.r) * k;
+  /* Duraklatmada her şey donar: sayaçlar, tema geçişi, parçacıklar. */
+  if (G.mode === 'pause') return;
   if (G.tsT > 0) { G.tsT -= raw; if (G.tsT <= 0) G.tscale = 1; }
   const dt = raw * G.tscale;
 
   if (G.mode === 'menu') {
     G.ang = norm(G.ang + 1.0 * dt);
     G.gateT = Math.min(1, G.gateT + raw * 2);
+  } else if (G.mode === 'count') {
+    const n0 = Math.ceil(G.count);
+    G.count -= raw / COUNT_STEP;
+    G.gateT = Math.min(1, G.gateT + raw * 4);
+    if (G.count <= 0) { G.count = 0; G.mode = 'play'; Snd.tick(true); }
+    else if (Math.ceil(G.count) !== n0) Snd.tick(false);
+    updateHud();
   } else if (G.mode === 'play') {
     const sl = G.slow > 0 ? CFG.contSlowMul : 1;
-    G.pt += dt;
+    G.pt += dt; G.jt += dt;
+    applyEvents(false);
+    const pi = jPhaseAt(G.jt);
+    if (pi.L !== G.L || pi.ph !== G.ph) phaseChange(pi);
+    G.phLeft = pi.left;
+    const pm = phaseMod(G.ph, G.L);
     G.ang = norm(G.ang + G.dir * G.omega * sl * dt);
     if (G.kind === 'iki') G.ang2 = norm(G.ang2 + G.dir2 * G.omega2 * sl * dt);
-    G.time -= dt * drainAt(G.n);
+    G.time -= dt * pm.drain;
     if (G.slow > 0) G.slow -= raw;
+    if (G.narrow > 0) G.narrow = Math.max(0, G.narrow - raw);
+    if (G.lock > 0) G.lock = Math.max(0, G.lock - raw);
     if (G.revT > 0) G.revT -= raw;
     G.gateT = Math.min(1, G.gateT + raw * 4);
     syncPrimary();
-    if (G.time < CFG.nearAt) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
+    if (G.time < CFG.nearAt && pm.drain > 0) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
     if (G.time <= 0) { G.time = 0; die(); }
     updateHud();
   } else if (G.mode === 'dead') {
@@ -1241,6 +1582,15 @@ const update = raw => {
     if (G.deadT <= 0) showOver();
   }
 
+  if (G.banner && (G.mode === 'play' || G.mode === 'count' || G.mode === 'dead')) { G.banner.t += raw; if (G.banner.t > 2.4) G.banner = null; }
+  const kT = 1 - Math.exp(-2.6 * raw);
+  thWh += (G.thT.h - thWh) * kT; thWx += (G.thT.x - thWx) * kT;
+  if (Math.abs(thWh - G.thT.h) < 0.004) thWh = G.thT.h;
+  if (Math.abs(thWx - G.thT.x) < 0.004) thWx = G.thT.x;
+  applyTheme();
+  if (G.thDirty && thWh === G.thT.h && thWx === G.thT.x) { G.thDirty = false; onPalette(); }
+  G.ec += raw;
+  envStep(raw);
   if (G.hint) { G.hint.t += raw; if (G.hint.t > G.hint.max) G.hint = null; }
   G.shake = Math.max(0, G.shake - raw);
   G.flash = Math.max(0, G.flash - raw);
@@ -1279,14 +1629,32 @@ const pill = (c, txt, x, y, bg, fg, size, free) => {
   c.fillStyle = fg; c.textAlign = 'center'; c.textBaseline = 'middle';
   c.fillText(txt, px, y + 1);
 };
+/* Diken: halkanın iki yanına dizilen üçgen dişler. */
+const drawSpikes = (c, cx, cy, Rr, RWr, ce, hw, ext) => {
+  const n = Math.max(3, Math.round(hw * 2 / 0.12)), step = hw * 2 / n, s0 = ce - hw - HALF;
+  const ro = Rr + RWr / 2, ri = Rr - RWr / 2, len = RWr * 0.62 * ext;
+  c.beginPath();
+  for (let i = 0; i < n; i++) {
+    const a = s0 + i * step, m = a + step / 2, e = a + step;
+    c.moveTo(cx + Math.cos(a) * ro, cy + Math.sin(a) * ro);
+    c.lineTo(cx + Math.cos(m) * (ro + len), cy + Math.sin(m) * (ro + len));
+    c.lineTo(cx + Math.cos(e) * ro, cy + Math.sin(e) * ro);
+    c.moveTo(cx + Math.cos(a) * ri, cy + Math.sin(a) * ri);
+    c.lineTo(cx + Math.cos(m) * (ri - len), cy + Math.sin(m) * (ri - len));
+    c.lineTo(cx + Math.cos(e) * ri, cy + Math.sin(e) * ri);
+  }
+  c.fill();
+};
 const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
-  const ce = pinCenter(p), hw = p.hw * (0.35 + 0.65 * gk);
+  const ce = pinCenter(p), hwv = pinHw(p, true), hw = hwv * (0.35 + 0.65 * gk);
   const a0 = ce - hw - HALF, a1 = ce + hw - HALF;
   c.lineCap = 'butt';
   if (p.kind === 'trap') {
-    c.globalAlpha = gk;
+    const live = pinHw(p) > 0;
+    c.globalAlpha = gk * (live ? 1 : 0.4);
     c.lineWidth = RWr + 10; c.strokeStyle = P['rose-soft']; arc(c, cx, cy, Rr, a0, a1);
     c.lineWidth = RWr; c.strokeStyle = P.rose; arc(c, cx, cy, Rr, a0, a1);
+    if (p.sp) { c.fillStyle = P.rose; drawSpikes(c, cx, cy, Rr, RWr, ce, hw, live ? 1 : 0.5); }
     const mx = cx + Math.cos(ce - HALF) * Rr, my = cy + Math.sin(ce - HALF) * Rr, s = RWr * 0.22;
     c.strokeStyle = '#FFFFFF'; c.lineWidth = 3; c.lineCap = 'round';
     c.beginPath(); c.moveTo(mx - s, my - s); c.lineTo(mx + s, my + s); c.moveTo(mx + s, my - s); c.lineTo(mx - s, my + s); c.stroke();
@@ -1309,6 +1677,12 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
   }
   const pc = p.ring ? [P['lilac-soft'], P.lilac, P.btn] : [P['peach-soft'], P.peach, P['peach-deep']];
   c.globalAlpha = gk;
+  if (p.br) {
+    /* nefes alan hedef: en geniş hali dış çizgide görünür, içi nefesle daralıp açılır */
+    c.globalAlpha = 0.5 * gk; c.strokeStyle = pc[1]; c.lineWidth = 3; c.lineCap = 'round';
+    arc(c, cx, cy, Rr + RWr / 2 + 7, ce - p.hw - HALF, ce + p.hw - HALF);
+    c.lineCap = 'butt'; c.globalAlpha = gk;
+  }
   c.lineWidth = RWr + 10; c.strokeStyle = pc[0]; arc(c, cx, cy, Rr, a0, a1);
   c.lineWidth = RWr; c.strokeStyle = pc[1]; arc(c, cx, cy, Rr, a0, a1);
   c.strokeStyle = pc[2]; arc(c, cx, cy, Rr, ce - hw * CFG.perfectFrac - HALF, ce + hw * CFG.perfectFrac - HALF);
@@ -1336,12 +1710,124 @@ const drawPointer = (c, cx, cy, Rr, RWr, ang, dir, col, trailCol) => {
   c.fillStyle = P.surface; c.beginPath(); c.arc(px, py, RWr * 0.17, 0, TAU); c.fill();
 };
 
+
+/* ---------- ortam: cennet ve cehennem arka planı ---------- */
+let cloudSpr = null, crackKey = '', cracks = [];
+const getCloud = () => {
+  if (cloudSpr) return cloudSpr;
+  const cs = document.createElement('canvas'); cs.width = 256; cs.height = 112;
+  const g = cs.getContext('2d');
+  for (const [x, y, r] of [[70, 66, 40], [112, 50, 48], [160, 58, 44], [196, 70, 34], [128, 76, 52]]) {
+    const gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(0.6, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+  }
+  cloudSpr = cs; return cs;
+};
+const buildCracks = () => {
+  crackKey = view.w + 'x' + view.h; cracks = [];
+  let sd = 11; const rr = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 5; i++) {
+    const pts = []; let x = view.w * (0.06 + 0.88 * (i + rr() * 0.7) / 5), y = view.h + 4;
+    const len = view.h * (0.1 + 0.12 * rr());
+    for (let j = 0; j <= 6; j++) { pts.push([x, y]); x += (rr() - 0.5) * 30; y -= len / 6 * (0.6 + 0.8 * rr()); }
+    cracks.push(pts);
+  }
+};
+const drawEnv = c => {
+  const w = view.w, h = view.h, T = G.ec;
+  if (thWh > 0.01) {
+    c.save(); c.globalAlpha = thWh;
+    const g = c.createRadialGradient(view.cx, view.cy, view.r * 0.2, view.cx, view.cy, Math.max(w, h) * 0.75);
+    g.addColorStop(0, 'rgba(255,214,120,.5)'); g.addColorStop(0.55, 'rgba(255,230,160,.16)'); g.addColorStop(1, 'rgba(255,230,160,0)');
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+    const Rm = Math.max(w, h) * 1.1;
+    c.fillStyle = 'rgba(255,226,150,.1)';
+    for (let i = 0; i < 9; i++) {
+      const a = T * 0.05 + i * TAU / 9;
+      c.beginPath(); c.moveTo(view.cx, view.cy); c.arc(view.cx, view.cy, Rm, a - 0.07, a + 0.07); c.closePath(); c.fill();
+    }
+    const cl = getCloud();
+    [[0.16, 1.0, 9, 0], [0.74, 1.35, 6, 0.4], [0.92, 0.8, 12, 0.75]].forEach(([fy, sc, v, off]) => {
+      const cw = 256 * sc, x = ((T * v + off * (w + cw)) % (w + cw)) - cw;
+      c.globalAlpha = thWh * 0.55;
+      c.drawImage(cl, x, h * fy - 56 * sc, cw, 112 * sc);
+    });
+    for (const q of G.sp) {
+      const tw = 0.35 + 0.65 * Math.abs(Math.sin(T * 2 + q.ph)), r = q.r;
+      c.globalAlpha = thWh * tw; c.fillStyle = 'rgba(255,238,170,1)';
+      c.beginPath(); c.moveTo(q.x, q.y - r * 2.2); c.lineTo(q.x + r * 0.55, q.y); c.lineTo(q.x, q.y + r * 2.2); c.lineTo(q.x - r * 0.55, q.y); c.closePath();
+      c.moveTo(q.x - r * 2.2, q.y); c.lineTo(q.x, q.y + r * 0.55); c.lineTo(q.x + r * 2.2, q.y); c.lineTo(q.x, q.y - r * 0.55); c.closePath();
+      c.fill();
+    }
+    c.restore();
+  }
+  if (thWx > 0.01) {
+    c.save(); c.globalAlpha = thWx;
+    const pulse = 0.85 + 0.15 * Math.sin(T * 1.7);
+    const g = c.createLinearGradient(0, h, 0, h * 0.35);
+    g.addColorStop(0, 'rgba(255,80,30,' + (0.5 * pulse).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,80,30,0)');
+    c.fillStyle = g; c.fillRect(0, h * 0.35, w, h * 0.65);
+    const vg = c.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.45, w / 2, h / 2, Math.max(w, h) * 0.8);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.4)');
+    c.fillStyle = vg; c.fillRect(0, 0, w, h);
+    if (crackKey !== view.w + 'x' + view.h) buildCracks();
+    c.lineJoin = 'round'; c.lineCap = 'round';
+    for (const pts of cracks) {
+      c.beginPath(); pts.forEach((q, i) => { if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); });
+      c.globalAlpha = thWx * 0.28 * pulse; c.strokeStyle = 'rgba(255,90,40,1)'; c.lineWidth = 8; c.stroke();
+      c.globalAlpha = thWx * (0.6 + 0.3 * pulse); c.strokeStyle = 'rgba(255,190,110,1)'; c.lineWidth = 2; c.stroke();
+    }
+    for (const e of G.em) {
+      const q = e.life / e.max, fl = 0.6 + 0.4 * Math.sin(T * 14 + e.ph);
+      c.globalAlpha = thWx * (1 - q) * fl; c.fillStyle = q < 0.4 ? 'rgba(255,200,110,1)' : 'rgba(255,110,50,1)';
+      c.beginPath(); c.arc(e.x, e.y, e.r * (1 - 0.5 * q), 0, TAU); c.fill();
+    }
+    c.restore();
+  }
+};
+const bannerAl = b => { const k = b.t / 2.4; return k < 0.1 ? k / 0.1 : (k > 0.78 ? Math.max(0, (1 - k) / 0.22) : 1); };
+const drawBanner = (c, cx, cy, R) => {
+  const b = G.banner, al = bannerAl(b), sc = 0.88 + 0.12 * easeOut(Math.min(1, b.t / 0.28));
+  const bg = b.kind === 'h' ? '#F4B63F' : (b.kind === 'x' ? '#D9503A' : P.btn), fg = b.kind === 'h' ? '#4A3500' : (b.kind === 'x' ? '#FFFFFF' : (P['on-btn'] || '#FFFFFF'));
+  let fs = clamp(Math.round(R * 0.27), 18, 34);
+  c.font = '600 ' + fs + 'px ' + FD;
+  const maxW = Math.min(R * 1.75, view.w - 40);
+  let tw = c.measureText(b.title).width;
+  if (tw > maxW - 36) { fs = Math.max(14, Math.floor(fs * (maxW - 36) / tw)); c.font = '600 ' + fs + 'px ' + FD; tw = c.measureText(b.title).width; }
+  const sfs = 13;
+  c.font = '800 ' + sfs + 'px ' + FB;
+  const sw = b.sub ? c.measureText(b.sub).width : 0;
+  const w = Math.min(maxW, Math.max(tw, sw) + 40), h = b.sub ? fs + sfs + 34 : fs + 26;
+  c.save(); c.globalAlpha = al * 0.97; c.translate(cx, cy); c.scale(sc, sc);
+  c.fillStyle = bg; c.beginPath();
+  if (c.roundRect) c.roundRect(-w / 2, -h / 2, w, h, Math.min(26, h / 2)); else c.rect(-w / 2, -h / 2, w, h);
+  c.fill();
+  c.fillStyle = fg; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.font = '600 ' + fs + 'px ' + FD; c.fillText(b.title, 0, b.sub ? -sfs * 0.75 : 1);
+  if (b.sub) { c.globalAlpha = al * 0.85; c.font = '800 ' + sfs + 'px ' + FB; c.fillText(b.sub, 0, fs * 0.5 + 8); }
+  c.restore();
+};
+const drawCount = (c, cx, cy, R) => {
+  const n = Math.ceil(G.count), f = clamp(n - G.count, 0, 1);
+  c.save();
+  c.globalAlpha = 0.92; c.fillStyle = P.surface; c.beginPath(); c.arc(cx, cy, R * 0.55, 0, TAU); c.fill();
+  c.globalAlpha = 1; c.strokeStyle = P.btn; c.lineWidth = 5; c.lineCap = 'round';
+  c.beginPath(); c.arc(cx, cy, R * 0.55 - 3, -HALF, -HALF + TAU * (1 - f)); c.stroke();
+  const sc = 1.18 - 0.18 * easeOut(Math.min(1, f * 3));
+  c.translate(cx, cy + 2); c.scale(sc, sc);
+  c.fillStyle = P.btn; c.font = '600 ' + Math.round(R * 0.62) + 'px ' + FD; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(String(n), 0, 0);
+  c.restore();
+};
+
 const render = () => {
   const c = ctx, cx = view.cx, cy = view.cy, R = view.r, RW = Math.max(14, R * 0.2);
   const two = G.mode !== 'menu' && G.kind === 'iki';
   const R2 = R * 0.6, RW2 = RW * 0.8;
   c.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
   c.clearRect(0, 0, view.w, view.h);
+  drawEnv(c);
   c.save();
   if (G.shake > 0) { const m = Math.min(9, G.shake * 20); c.translate((Math.random() - 0.5) * m, (Math.random() - 0.5) * m); }
 
@@ -1358,7 +1844,7 @@ const render = () => {
   c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
   c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
   if (two) { c.lineWidth = RW2; c.beginPath(); c.arc(cx, cy, R2, 0, TAU); c.stroke(); }
-  const mult = G.mode === 'play' || G.mode === 'dead' ? comboMult(G.combo) : 1;
+  const mult = (G.mode === 'play' || G.mode === 'dead' || G.mode === 'count') && G.comboOn ? comboMult(G.combo) : 1;
   if (mult >= 2) {
     c.globalAlpha = Math.min(0.4, 0.07 + 0.03 * mult + 0.12 * G.scorePulse); c.fillStyle = tierCol(mult);
     c.beginPath(); c.arc(cx, cy, two ? R2 - RW2 / 2 - 4 : R - RW / 2 - 4, 0, TAU); c.fill();
@@ -1415,6 +1901,8 @@ const render = () => {
   } else {
     const sc = 1 + (0.2 + 0.04 * mult) * G.scorePulse;
     const txt = String(G.score);
+    const cover = G.mode === 'count' ? 1 : (G.banner ? bannerAl(G.banner) : 0);
+    c.globalAlpha = 1 - 0.88 * cover;
     c.save(); c.translate(cx, cy - (two ? 0 : R * 0.04)); c.scale(sc, sc);
     c.fillStyle = P.ink; fitFont(txt, big, R * (two ? 0.95 : 1.5));
     c.fillText(txt, 0, 0);
@@ -1426,6 +1914,9 @@ const render = () => {
       c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
       c.fillText(t('score'), cx, cy + R * 0.36);
     }
+    c.globalAlpha = 1;
+    if (G.mode === 'count' && G.count > 0) drawCount(c, cx, cy, R);
+    else if (G.banner) drawBanner(c, cx, cy, R);
   }
 
   const lineY = cy + r0 + 13 + 36;
@@ -1439,9 +1930,9 @@ const render = () => {
       pill(c, G.n < 2 ? t('tut1') : t('tut2'), cx, lineY, P.surface, P.ink, 14);
     }
   }
-  const topY = cy - (r0 + 13) - 30;
-  for (const p of G.pops) {
-    const k = p.t / p.max, rise = 34 * easeOut(Math.min(1, k * 1.4));
+  const topY = cy - (r0 + 13) - 26, minY = (view.hudB || 0) + 22;
+  G.pops.forEach((p, i) => {
+    const k = p.t / p.max, rise = 20 * easeOut(Math.min(1, k * 1.4));
     const al = k < 0.12 ? k / 0.12 : (k > 0.65 ? (1 - k) / 0.35 : 1);
     const sc = 0.85 + 0.15 * Math.min(1, k / 0.15);
     let bg = P.surface, fg = P.ink;
@@ -1454,10 +1945,10 @@ const render = () => {
     const psz = p.kind === 'near' ? 17 : (p.kind === 'hype' ? 18 : 15);
     c.font = '800 ' + psz + 'px ' + FB;
     const pw = c.measureText(p.txt).width + psz * 1.7;
-    c.save(); c.globalAlpha = al; c.translate(clamp(cx, pw / 2 + 8, view.w - pw / 2 - 8), topY - rise - p.off); c.scale(sc, sc);
+    c.save(); c.globalAlpha = al; c.translate(clamp(cx, pw / 2 + 8, view.w - pw / 2 - 8), Math.max(minY, topY - rise - (G.pops.length - 1 - i) * 36)); c.scale(sc, sc);
     pill(c, p.txt, 0, 0, bg, fg, psz, true);
     c.restore();
-  }
+  });
   c.restore();
 
   if (G.flash > 0) {
@@ -1477,7 +1968,7 @@ app.addEventListener('pointerdown', e => {
   if (overlayOpen()) return;
   if (G.mode === 'play') tap(e.clientX - app.getBoundingClientRect().left);
   else if (G.mode === 'menu') start();
-  else if (G.mode === 'over' && performance.now() - G.overAt > 700) start();
+  else if (G.mode === 'over' && performance.now() - G.overAt > 700) start(G.startL);
   else if (G.mode === 'pause') resume();
 });
 toolsEl.addEventListener('pointerdown', e => {
@@ -1496,7 +1987,7 @@ window.addEventListener('keydown', e => {
   if (overlayOpen()) return;
   if (G.mode === 'play') tap(right ? view.w : (left ? 0 : null));
   else if (G.mode === 'menu') start();
-  else if (G.mode === 'over' && performance.now() - G.overAt > 500) start();
+  else if (G.mode === 'over' && performance.now() - G.overAt > 500) start(G.startL);
   else if (G.mode === 'pause') resume();
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
@@ -1517,7 +2008,8 @@ $('ovTipBtn').addEventListener('click', () => {
   toast(t('lvPicked', { l: t('lv_' + to) }));
 });
 $('playBtn').addEventListener('click', () => { Snd.unlock(); start(); });
-$('againBtn').addEventListener('click', () => { Snd.unlock(); start(); });
+$('againBtn').addEventListener('click', () => { Snd.unlock(); start(G.startL); });
+campEl.addEventListener('click', () => { Snd.unlock(); start(save.camp); });
 $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
 $('resumeBtn').addEventListener('click', resume);
 $('bagBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
@@ -1567,7 +2059,7 @@ if (AppP) {
     AppP.addListener('backButton', () => {
       if (adEl.classList.contains('on')) return;
       if (shopEl.classList.contains('on')) closeShop();
-      else if (G.mode === 'play') pause();
+      else if (G.mode === 'play' || G.mode === 'count') pause();
       else if (G.mode === 'pause') resume();
       else if (G.mode === 'over') goMenu();
       else if (G.mode === 'menu') AppP.exitApp();
