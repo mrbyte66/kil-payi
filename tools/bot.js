@@ -1,57 +1,115 @@
-/* Yolculuk botu: gerçek oyun kodunu (update, tap, spawnChallenge...) hızlandırılmış zamanla oynatır.
+/* Yolculuk botu: gerçek oyun kodunu (update, tap, release, spawnChallenge...) hızlandırılmış zamanla oynatır.
    Kullanım:
      1. DEBUG=1 ./build.sh   (window.__kp test kancası eklenir)
      2. www/ klasörünü bir yerel sunucuyla aç (ör. python3 -m http.server 8780 --directory www)
      3. Tarayıcı konsoluna bu dosyanın içeriğini yapıştır (ya da sayfaya <script src="bot.js"> ekle), sonra:  bulk(['normal'], 40)
    Bot: her hedef için zamanlama hatası ~ N(0, sigmaT) saniye örnekler; ibre hedef merkezine ona göre varınca dokunur.
-   Öncelikli tuzakların (kayan tuzak, diken) üstündeyse trapAvoid olasılığıyla dokunmaz.
-   Beceri düzeyleri: yeni 0,12 sn, orta 0,08 sn, iyi 0,05 sn, usta 0,03 sn (standart sapma).
-   Sonuç: ölüm anındaki yolculuk süresi (medyan, sn), medyan seviye ve "L>=k" oranları (oyunun k. seviyeye ulaşma yüzdesi). */
+   Gelgit hızlanmasını (etaTo), kilitli halkayı, tut-bırak (bas ve bırak), trafik ışığı, bomba, sabır pimi ve hayalet pimi bilir.
+   Tuzakların (kayan tuzak, diken, lanetli altın, alarm, sahte nota, hayalet tuzak) üstündeyse trapAvoid olasılığıyla dokunmaz.
+   Altına yalnızca beceriye bağlı bir olasılıkla uzanır (ince hedef riskli).
+   Beceri düzeyleri: yeni 0,12 sn, orta 0,08 sn, iyi 0,05 sn, usta 0,03 sn (standart sapma). Her oyunda sapma log-normal sallanır
+   (insanın günlük formu) ve her dokunuşta küçük bir dikkat kaybı olasılığı vardır (sapma 3 katına çıkar).
+   Sonuç: ölüm anındaki yolculuk süresi (medyan, sn), medyan seviye, "L>=k" oranları ve ölüm anındaki kilit türü dağılımı. */
 (() => {
   const k = window.__kp, G = k.G;
   const TAU = Math.PI * 2, nrm = a => ((a % TAU) + TAU) % TAU, ad = (a, b) => { const d = nrm(a - b); return d > Math.PI ? TAU - d : d; };
   const gauss = s => { let u = 0; while (!u) u = Math.random(); return s * Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * Math.random()); };
-  window.runBot = (sigmaT, trapAvoid, startL = 1, tmax = 1500, dt = 1 / 60) => {
-    k.start(startL); let t = 0, taps = 0, miss = 0;
+  const sgn = (a, dir) => { let x = nrm(a * dir); if (x > Math.PI) x -= TAU; return x; };
+  /* ibrenin c açısına varma süresi (sn); işaretli: geçtiyse negatif. Gelgit ve girdap hızlanmaları hesaba katılır. */
+  const eta = (c, ring) => {
+    const a = ring ? G.ang2 : G.ang, dir = ring ? G.dir2 : G.dir;
+    const base = (ring ? G.omega2 : G.omega) * (G.slow > 0 ? G.slowMul : 1);
+    const ahead = sgn(c - a, dir);
+    if (!ring && G.kind === 'gelgit' && G.tideC != null && ahead > 0) return k.etaTo(c, dir, 0);
+    return ahead / (base * (ring ? 1 : k.ptrFactor()));
+  };
+  /* tür başına istatistik: tur sayısı, toplam süre, dokunuş, vuruş (zorluk dengesi için) */
+  window.__stats = {};
+  const stat = kd => window.__stats[kd] || (window.__stats[kd] = { ch: 0, dur: 0, taps: 0, hits: 0, pen: 0 });
+  window.runBot = (sigmaT, trapAvoid, startL = 1, tmax = 1500, dt = 1 / 60, opt = {}) => {
+    k.start(startL); let t = 0, taps = 0, miss = 0, curChal = null;
+    sigmaT = sigmaT * Math.exp(gauss(opt.jitter == null ? 0.25 : opt.jitter));
+    const lapse = opt.lapse == null ? 0.01 + sigmaT * 0.15 : opt.lapse, aimE = () => gauss(sigmaT * (Math.random() < lapse ? 3 : 1));
+    const goldP = Math.max(0.15, Math.min(0.85, 0.95 - sigmaT * 6.5)), lightMis = sigmaT * 1.2;
+    const seed = p => { if (p._aim === undefined) { p._aim = aimE(); p._aim2 = aimE() * 1.2; p._armed = false; } };
     while (G.mode === 'play' && t < tmax) {
       k.update(dt); t += dt;
-      const g = G.pins.find(p => p.kind === 'gate' && !p.done && p.ring === 0) || G.pins.find(p => p.kind === 'gate' && !p.done);
-      if (!g) continue;
-      const r2 = !!g.ring, a = r2 ? G.ang2 : G.ang, dir = r2 ? G.dir2 : G.dir, om = (r2 ? G.omega2 : G.omega) * (G.slow > 0 ? 0.7 : 1);
-      if (g._aimT === undefined) g._aimT = gauss(sigmaT);
-      /* Hedefin üstünde öncelikli tuzak varsa insan gibi hedefin açıkta kalan parçasını hedefler (yeterince genişse). */
-      const gc = k.pinCenter(g), gh = k.pinHw(g);
-      let off = 0;
-      for (const p of G.pins) {
-        if (p.kind !== 'trap' || !p.prio || k.pinHw(p) <= 0) continue;
-        const tc = k.pinCenter(p), th = k.pinHw(p), rel = ((tc - gc + Math.PI + 4 * TAU) % TAU) - Math.PI;
-        if (Math.abs(rel) < gh + th) {
-          const left = rel - th - (-gh), right = gh - (rel + th);
-          if (Math.max(left, right) > 0.14) off = left > right ? (-gh + (rel - th)) / 2 : ((rel + th) + gh) / 2; else off = NaN;
+      if (G.chal !== curChal) { if (curChal) { const sx = stat(curChal.kind); sx.ch++; sx.dur += curChal.t; } curChal = G.chal; }
+      if (G.mode !== 'play') break;
+      /* tut-bırak: basılıyken bırakma anını bekle */
+      if (G.holding) {
+        const hp = G.pins.find(p => p.kind === 'hold' && p.st === 'hold');
+        if (hp) {
+          seed(hp);
+          const rel = k.holdRel(hp), om = G.omega * (G.slow > 0 ? G.slowMul : 1) * k.ptrFactor();
+          if ((hp.len - rel) / om <= -hp._aim2) { k.release(); hp._aim = aimE(); hp._aim2 = aimE() * 1.2; hp._armed = false; }
         }
+        continue;
       }
-      let ahead = nrm((gc + (off || 0) - a) * dir); if (ahead > Math.PI) ahead -= TAU;
-      if (ahead > 0.15) g._armed = true;
-      if (g._armed && !Number.isNaN(off) && ahead / om <= -g._aimT) {
-        const inGate = ad(a, gc) <= gh + 0.05;
-        const danger = G.pins.some(p => p.kind === 'trap' && k.pinHw(p) > 0 && ad(G.ang, k.pinCenter(p)) <= k.pinHw(p) + 0.03 && (p.prio || !inGate));
-        if (danger && Math.random() < trapAvoid) continue;
-        const n0 = G.n; k.tap(); taps++; if (G.n === n0) miss++;
-        g._armed = false; g._aimT = gauss(sigmaT);
+      /* hedef seç: en erken varılacak, vurulabilir hedef */
+      let best = null, bestEta = 9e9, bestOff = 0;
+      for (const p of G.pins) {
+        if (p.done) continue;
+        let c, gh;
+        if (p.kind === 'gate') {
+          if (p.locked) continue;
+          if (p.gold) { if (p._try === undefined) p._try = Math.random() < goldP; if (!p._try) continue; }
+          c = k.pinCenter(p); gh = k.pinHw(p);
+        } else if (p.kind === 'lockpin') { if (!p.open) continue; c = p.c0; gh = p.hw; }
+        else if (p.kind === 'hold') { c = p.c0; gh = p.hw; }
+        else continue;
+        seed(p);
+        const ring = p.ring ? 1 : 0;
+        const a = ring ? G.ang2 : G.ang, dir = ring ? G.dir2 : G.dir;
+        /* hedefin üstünde öncelikli tuzak varsa hedefin açıkta kalan parçasını hedefle (yeterince genişse) */
+        let off = 0;
+        if (p.kind === 'gate') for (const q of G.pins) {
+          if (q.kind !== 'trap' || !q.prio || k.pinHw(q) <= 0) continue;
+          const tc = k.pinCenter(q), th = k.pinHw(q), rel = ((tc - c + Math.PI + 4 * TAU) % TAU) - Math.PI;
+          if (Math.abs(rel) < gh + th) {
+            const left = rel - th - (-gh), right = gh - (rel + th);
+            if (Math.max(left, right) > 0.14) off = left > right ? (-gh + (rel - th)) / 2 : ((rel + th) + gh) / 2; else off = NaN;
+          }
+        }
+        if (Number.isNaN(off)) continue;
+        const e = eta(c + off, ring), ahead = sgn(c + off - a, dir);
+        if (ahead > 0.15) p._armed = true;
+        if (!p._armed) continue;
+        if (e < bestEta) { best = p; bestEta = e; bestOff = off; }
       }
+      if (!best) continue;
+      if (bestEta > -best._aim) continue;
+      const ring = best.ring ? 1 : 0, a = ring ? G.ang2 : G.ang;
+      const gc = best.kind === 'hold' ? best.c0 : k.pinCenter(best), gh = best.kind === 'hold' ? best.hw : k.pinHw(best);
+      const inGate = ad(a, gc) <= gh + 0.05;
+      /* trafik ışığı: kırmızıya vurma (yeni oyuncular ara sıra yanılır) */
+      if (best.light && !best.green && Math.random() > lightMis) { continue; }
+      const danger = G.pins.some(p => (p.kind === 'trap' && k.pinHw(p) > 0 && ad(G.ang, k.pinCenter(p)) <= k.pinHw(p) + 0.03 && (p.prio || !inGate)) ||
+        (p.kind === 'lockpin' && !p.open && !p.done && best !== p && ad(G.ang, p.c0) <= p.hw + 0.03 && !inGate));
+      if (danger && Math.random() < trapAvoid) continue;
+      const n0 = G.n, t0 = G.time, kd0 = G.kind;
+      k.tap(); taps++;
+      { const sx = stat(kd0); sx.taps++; if (G.n > n0) sx.hits++; else sx.pen++; }
+      if (best.kind === 'hold') { best._armed = false; best._aim2 = aimE() * 1.2; }
+      else if (G.n === n0 && G.time <= t0) miss++;
+      best._armed = false; best._aim = aimE();
     }
-    return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss };
+    return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss, kind: G.kind, chal: G.chal && G.chal.tw ? G.chal.tw : '' };
   };
   const SKILLS = [['yeni', 0.12, 0.5], ['orta', 0.08, 0.75], ['iyi', 0.05, 0.9], ['usta', 0.03, 0.95]];
-  window.bulk = (levels = ['normal'], n = 40, skills = SKILLS, ups = [2, 3, 4, 5, 6, 8, 10, 12]) => {
+  window.kindStats = () => Object.keys(window.__stats).sort().map(kd => { const x = window.__stats[kd]; return kd + ': ' + x.ch + ' tur, ' + (x.dur / Math.max(1, x.ch)).toFixed(2) + ' sn/tur, vuruş %' + Math.round(100 * x.hits / Math.max(1, x.taps)) + ' (' + x.taps + ' dokunuş)'; });
+  window.bulk = (levels = ['normal'], n = 40, skills = SKILLS, ups = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12]) => {
+    window.__stats = {};
     const out = {};
     for (const lvl of levels) {
       k.setLevel(lvl);
       for (const [name, sg, av] of skills) {
         const rs = []; for (let i = 0; i < n; i++) rs.push(window.runBot(sg, av));
         const js = rs.map(r => r.jt).sort((a, b) => a - b), ls = rs.map(r => r.L).sort((a, b) => a - b);
+        const kinds = {}; rs.forEach(r => { kinds[r.kind] = (kinds[r.kind] || 0) + 1; });
         out[lvl + '/' + name] = 'medyan ' + Math.round(js[n >> 1]) + ' sn, seviye ' + ls[n >> 1] + ' | ' +
-          ups.map(u => 'S' + u + ' %' + Math.round(100 * rs.filter(r => r.L >= u).length / n)).join(' ');
+          ups.map(u => 'S' + u + ' %' + Math.round(100 * rs.filter(r => r.L >= u).length / n)).join(' ') + ' | ölüm: ' +
+          Object.keys(kinds).sort((a, b) => kinds[b] - kinds[a]).map(x => x + ':' + kinds[x]).join(' ');
       }
     }
     k.setLevel('normal');

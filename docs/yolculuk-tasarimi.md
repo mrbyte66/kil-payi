@@ -1,35 +1,38 @@
-# Yolculuk tasarımı (V0.4.1, onaylı 2026-10-17)
+# Yolculuk tasarımı (V0.5.0, onaylı 2026-10-17)
 
 Bu belge oyunun güncel yolculuk tasarımıdır. V0.4.0'daki ilk tasarımdan (cennet bölümü, 15 dakikalık yolculuk) sonra kullanıcı geri bildirimiyle
-değişti; değişiklik nedenleri `CHANGELOG.md` içinde. Hikaye/harita yok.
+iki kez değişti (V0.4.1 tempo, V0.5.0 çeşitlilik); değişiklik nedenleri `CHANGELOG.md` içinde. Kilit fikirlerinin tam listesi (yapılanlar ve
+yapılmayanlar, Kolay/Orta/Zor grupları) `docs/kilit-katalogu.md` içinde. Hikaye/harita yok.
 
 ## Fikir
 
-Oyun hızlanarak değil çeşitlenerek büyür. Bir oyun bir yolculuktur: 10 seviye, ortalama bir oyuncu için yaklaşık 5 dakika. Her yeni **iyi kilit**,
-aynı anda ve aynı zorlukta bir **engel ikiziyle** açılır. Ekranda yalnızca "Seviye N" yazar; toplam seviye sayısı kullanıcıya gösterilmez.
+Oyun hızlanarak değil çeşitlenerek büyür. Bir oyun bir yolculuktur: 10 seviye, ortalama bir oyuncu için yaklaşık 5 buçuk dakika. Her yeni **iyi kilit**
+seviyenin başında gelir, **engel ikizi** seviyenin ortasında; yani yeni bir şey yaklaşık 13 sn'de bir görülür (V0.4.1'de "4. seviyeden sonra hep aynı oyun"
+geri bildirimi bu yüzden). Ekranda yalnızca "Seviye N" yazar; toplam seviye sayısı kullanıcıya gösterilmez.
 10. seviyeden sonra "Sonsuz" mod başlar (10. seviye kuralları, zorluk hızlanır).
 
 ## Seviye yapısı
 
 Her seviye bir **normal bölüm** ve onun sonunda kısa bir **cehennem** bölümünden oluşur (cennet bölümü V0.4.1'de kaldırıldı).
-Cehennem geçilince: +4 sn, coin (2 × (5 + 2 × seviye)), her 2 seviyede bir rastgele joker hediyesi, kamp kaydı.
+Cehennem geçilince: +2 sn, coin (2 × (5 + 2 × seviye)), her 3 seviyede bir rastgele joker hediyesi, kamp kaydı.
 
-| Seviye | Normal | Cehennem | Başlangıç | Yeni kilit (✚ = engel ikizi) |
+| Seviye | Normal | Cehennem | Başlangıç | Yeni kilit (✚ = engel ikizi), olay zamanı normal bölümün kesri |
 |---|---|---|---|---|
-| 1 | 20 sn | 6 sn | 0:00 | Tek pim; çift pim ✚ tuzak pim (6. sn); seri çarpanı (13. sn) |
-| 2 | 22 sn | 6 sn | 0:26 | Kayan pim ✚ kayan tuzak; karışım: çift + kayan (11. sn) |
-| 3 | 22 sn | 7 sn | 0:54 | Nefes pim ✚ diken (kenardan); karışım: nefes + tuzak (11. sn) |
-| 4 | 24 sn | 7 sn | 1:23 | Kasa turu ✚ alarm turu *(yapılmadı)* |
-| 5 | 24 sn | 8 sn | 1:54 | İki halka ✚ kilitli halka *(iki halka var, kilitli halka yok)* |
-| 6 | 24 sn | 8 sn | 2:26 | Altın pim ✚ lanetli altın *(yapılmadı)* |
-| 7 | 26 sn | 8 sn | 2:58 | Hayalet pim ✚ hayalet tuzak *(yapılmadı)* |
-| 8 | 26 sn | 9 sn | 3:32 | Gelgit ibre ✚ girdap *(yapılmadı)* |
-| 9 | 28 sn | 9 sn | 4:07 | Renk pim ✚ yanıltıcı renk, bölgeli *(yapılmadı)* |
-| 10 | 28 sn | 10 sn | 4:44 | Tut-bırak pim ✚ sıcak yay *(yapılmadı)* |
-| Sonsuz | 28 sn | 10 sn | 5:22 | Ritim pim ✚ sahte nota, sarkaç ✚ balyoz, sis ✚ zehirli sis *(yapılmadı)* |
+| 1 | 20 sn | 6 sn | 0:00 | Tek pim; çift pim ✚ tuzak pim (0,30); seri çarpanı (0,65) |
+| 2 | 22 sn | 6 sn | 0:26 | Kayan pim ✚ kayan tuzak (0); karışım: çift + kayan (0,5) |
+| 3 | 22 sn | 7 sn | 0:54 | Nefes pim ✚ diken (0); karışım: nefes + tuzak (0,5) |
+| 4 | 22 sn | 7 sn | 1:23 | Altın pim (0) ✚ lanetli altın (0,42); sabır pimi (0,75) |
+| 5 | 24 sn | 7 sn | 1:52 | Kasa turu (0) ✚ alarm turu (0,45); çürük kilit (0,78, sabır pimine) |
+| 6 | 26 sn | 8 sn | 2:23 | Ritim pim (0) ✚ sahte nota (0,42); trafik ışığı (0,76) |
+| 7 | 28 sn | 8 sn | 2:57 | İki halka (0) ✚ kilitli halka (0,48); ★ güçlenme (0,82) |
+| 8 | 28 sn | 9 sn | 3:33 | Hayalet pim (0) ✚ hayalet tuzak (0,42); bomba pim (0,76) |
+| 9 | 30 sn | 9 sn | 4:10 | Gelgit ibre (0) ✚ girdap (0,48); ★ güçlenme (0,82) |
+| 10 | 32 sn | 10 sn | 4:49 | Tut-bırak pim (0) ✚ sıcak yay (0,45); ★ güçlenme (0,82) |
+| Sonsuz | 32 sn | 10 sn | 5:31 | Görülmüş kilitlerin karışımı (Sarkaç, Sis, Renk vb. sonraki sürümlerde) |
 
-Her seviyede iki olay: yeni kilit seviye başında, ikincisi (★ güçlenme ya da karışım) normal bölümün yarısında. 1. seviyede üç olay var.
-Yapılmamış kilitlerin olayları atlanır (yalnızca yapılmış kilitler, ★ ve karışım çalışır). Zamanlar `JOURNEY`, olaylar `JEV` (TUNE bloğu).
+Sabır pimi, çürük kilit, trafik ışığı ve bomba pim ilk plandaki yedi çifte ek olarak yapıldı (kullanıcı onayıyla); engel ikizi olmadan seviyenin
+sonlarına konuldular. Zamanlar `JOURNEY`, olaylar `JEV` (TUNE bloğu); yapılmamış kilitlerin olayları atlanır (`IMPL_GOOD`/`IMPL_TWIN`).
+Her yeni kilit, kartı çıktıktan 2 sn sonra ve ibreden uzak doğar; ilk hedefi vurulana ya da ıskalanana kadar kart ekranda kalır (en çok 8 sn).
 
 ## Cehennem
 
@@ -41,61 +44,66 @@ Etkiler k ile normal bölümden tam güce doğrusal karışır. Her vuruşta +1 
 
 ## Zorluk ve süre ekonomisi
 
-- Taban yoğunluk `0,02 + 0,015 × (seviye − 1)`, 10. seviyeden sonra seviye başına 0,1 (`ib0`, `ibs`, `ibEnd`). 10 vuruşluk dalga (genlik 0,2) ve "nefes" araları sürer.
-- Vuruş +1,1 sn, ıska −0,7 sn, tuzak −1,2 sn; hedefler daha geniş (hwMax 0,56), ibre daha yavaş (ωMax 3,8).
-- Zorluk seçici: Normal bu ayardır; Rahat biraz daha kolay, Usta eski V0.4.0 sertliğine yakın.
-- **Bot ölçümü** (`tools/bot.js`, Normal, joker kullanmadan, 4. seviyeden sonraki kilitler yokken): sıradan oyuncu (zamanlama sapması 0,08 sn) 10. seviyeye
-  %84-100, iyi (0,05) %100, yeni başlayan (0,12) yaklaşık %50 varıyor. Usta zorlukta sıradan oyuncu %67. Kilitler eklendikçe oranlar düşecek;
-  her fazdan sonra yeniden ölçülür. Hedef: sıradan oyuncunun yaklaşık yarısı 5 dakikada 10. seviyeye varsın.
-- Sonsuz modda zorluk hızlanır; Ritim, Sarkaç ve Sis kilitleri buraya taşındı (henüz yapılmadı).
+- Taban yoğunluk `0,02 + 0,0085 × (seviye − 1)²` (10. seviyede 0,71), 10. seviyeden sonra seviye başına +0,1 (`ib0`, `ibs`, `ibq`, `ibEnd`).
+  10 vuruşluk dalga (genlik 0,2) ve "nefes" araları sürer. Oyuncu mükemmel vurdukça yoğunluk biraz artar, ıskaladıkça azalır (`DIFF.adaptCap` 0,12).
+- Vuruş +0,95 sn (mükemmel +0,08, nefes aralarında +0,2), ıska −0,8 sn, tuzak −1,3 sn; hedefler geniş (hwMax 0,56), ibre yavaş (ωMax 3,8).
+  Bonuslar V0.5.0'da kısıldı: vuruş 1,1 → 0,95, mükemmel 0,15 → 0,08, cehennem sonu +4 → +2 sn, joker hediyesi her 2 → her 3 seviyede.
+  Her kilidin kendi süre/puan değerleri `MECH` tablosunda (altın vuruşu süre vermez, hayalet ×2, sabır ×3, bomba +25 vb.).
+- Zorluk seçici (`LEVEL`): Rahat (hedef ×1,2, ibre ×0,9, vuruş ×1,15, ceza ×0,7, başlangıç 7 sn), Normal, Usta (hedef ×0,9, ibre ×1,1, vuruş ×0,8,
+  ıska ×1,4, tuzak ×1,25, başlangıç 5,5 sn).
+- Sonsuz modda zorluk hızlanır; Sarkaç, Sis ve Renk kilitleri sonraki sürümlere (sonsuz mod havuzuna) bırakıldı.
 
 ## Adil oyun kuralları (bütün kilitlere uygulanır)
 
-1. Vuruş anında ibre ve hedef görünür.
-2. Hiçbir engel hedefi tamamen kapatmaz; oyuncu bir tur boşa beklemek zorunda kalmaz.
-3. Anlık hile yok: renk ve görünürlük değişimleri önceden görülebilir, hedefin dışında olur.
-4. Yeni bir şey ilk görüldüğünde bir kez net anlatılır, sonra ipucu çıkmaz.
+1. Vuruş anında ibre ve hedef görünür (Hayalet pim bunun tek istisnasıdır: hedef önceden görülür, hafızadan vurulur; ibre hep görünür).
+2. Hiçbir engel hedefi tamamen kapatmaz; oyuncu bir tur boşa beklemek zorunda kalmaz (kilitli halkada kilitli iç hedef sayılmaz, dış ibre oynanır).
+3. Anlık hile yok: renk ve görünürlük değişimleri önceden görülebilir (trafik ışığı önce sarı yanıp söner, ibre içerideyken değişmez).
+4. Yeni bir şey ilk görüldüğünde bir kez net anlatılır (büyük kart), sonra ipucu çıkmaz.
+5. Aynı şekil aynı anlama gelir: altın = vur, yeşil çerçeveli soluk altın = dokunma; gül rengi = dokunma, şeftali = vur.
 
 ## Kilit çiftleri (iyi kilit ↔ engel ikizi)
 
-Basamak (★1, ★2, ★3) değerleri slash ile verilmiştir. *(Yapıldı)* işaretliler oyunda var; diğerleri sonraki fazların tasarımıdır.
+Basamak (★1, ★2, ★3) değerleri slash ile verilmiştir. *(Yapıldı)* işaretliler oyunda var; diğerleri `docs/kilit-katalogu.md` içindeki sonraki tasarımlardır.
 
 | İyi kilit | Kural | Engel ikizi | Kural |
 |---|---|---|---|
-| Çift pim *(yapıldı)* | İki hedef, 1 ve 2 numaralı | Tuzak pim *(yapıldı)* | Hedefin yanında gül rengi tuzak, dokunursan −1,2 sn |
+| Çift pim *(yapıldı)* | İki hedef, 1 ve 2 numaralı | Tuzak pim *(yapıldı)* | Hedefin yanında gül rengi tuzak, dokunursan −1,3 sn |
 | Kayan pim *(yapıldı)* | Hedef salınır (genlik 0,45–0,8, 0,32–0,5 Hz) | Kayan tuzak *(yapıldı)* | Hedefin üstünden kayar; hedefin %45'inden dar, hedefin açıkta kalan parçası her zaman vurulabilir; üstündeyken dokunursan seri sıfır, −1 sn |
-| Nefes pim *(yapıldı)* | Hedef genişliği nefes alır; tam açıkken vuruş +1 | Diken *(yapıldı)* | Hedefin kapanan kenarları dikenlidir, ortası her zaman açık; dikenli kenara dokunursan −1,5 sn ve hedefler 3 sn %20 daralır |
-| Kasa turu | Her 25 vuruşta 3 hedef art arda, ibre hızlanır, hedef daralır; açarsan +3 sn ve alet ya da coin | Alarm turu | Kasanın arasına "!" işaretli sahte kilit; dokunursan −2 sn, kasa sıfırlanır |
-| İki halka *(yapıldı)* | Her ibre kendi hedefinde; dokunuş hedefteki ibreyi vurur (iç halka lila, dış halka şeftali) | Kilitli halka | **Kilitliyken iç ibre donar** (hedef kaçmaz), kilit açılınca devam eder; kilitliyken dokunursan −1 sn |
-| Altın pim | Geniş hedefin yanında ince altın hedef; altın ×3 puan, +1 sn, +1 coin; kaçırırsan yalnızca ıska | Lanetli altın | Altına benzeyen kafatasımsı hedef; dokunursan −3 coin, −1 sn |
-| Hayalet pim | Hedef önce görünür, sonra silikleşir (en az %15 görünür kalır, ibre hep görünür); görünmezken vuruş ×2 | Hayalet tuzak | Tuzak da silikleşir; dokunursan −1,5 sn, ekran 2 sn titrer |
-| Gelgit ibre | İbre hızı açıya göre değişir; hızlı bölge dışta koyu bantla görünür | Girdap | İçinden geçen ibre 2,4 sn hızlanır |
-| Renk pim | **Halka iki renk bölgesidir** (şeftali ve lila); ibre bulunduğu bölgenin rengini yumuşakça alır; yalnızca rengi uyan hedefe dokunulur; hedefin içinde renk asla değişmez | Yanıltıcı renk | Yanlış renk bölgesine konan hedef ("≠"); dokunursan −1 sn |
-| Tut-bırak pim | Uzun yay; ibre başa gelince basıp tut, sondaki bölgede bırak | Sıcak yay | Yayın son üçte biri sıcak; tutarken yanarsın, süre erir. **İlk karşılaşmada** yay kızarır, çubuk alev alır, "Sıcak! Bırak" yazar; sonra ipucu yok |
-| Ritim pim (sonsuz) | 3/4/5 küçük hedef art arda, vuruşlarda yükselen nota | Sahte nota | Dizinin arasına gül rengi ×'li nota; dokunursan −1 sn, zincir bozulur |
-| Sarkaç ibre (sonsuz) | İbre dönmez, sağa sola salınır; ortada vuruş ×2 | Balyoz | Hedefin üstünden salınan balyoz; üstteyken dokunursan −2 sn, 1 sn dokunuş kilidi |
-| Sis tüneli (sonsuz) | **İbre hep görünür**; hedef sisin içinde saklı, ibre yaklaşınca (yarım sn kala) sis dağılır | Zehirli sis | Yeşil sis, içinde gizli tuzak; dokunursan 3 sn süre %50 hızlı erir |
+| Nefes pim *(yapıldı)* | Hedef genişliği nefes alır; tam açıkken vuruş +1 | Diken *(yapıldı)* | Hedefin kapanan kenarları dikenlidir, ortası her zaman açık. **Hızlı girer (0,3 sn), bekler (0,8 sn), yavaş çıkar (1,5 sn)**; ★ ile hızlanır. Dikenli kenara dokunursan −1,5 sn ve hedefler 3 sn %20 daralır |
+| Altın pim *(yapıldı, V0.5.0)* | Geniş hedefin yanında ince altın hedef (parıltılı, açık çerçeveli); vurursan ×3 puan, +1 coin, süre vermez; kaçırırsan ceza yok | Lanetli altın *(yapıldı)* | Aynı ince şekil ama soluk, zehir yeşili çerçeveli, damlalı, kafatası işaretli; dokunursan −3 coin, −1 sn, seri sıfır |
+| Sabır pimi *(yapıldı)* | Kilitli pim: ibre her geçtiğinde kilidin üstündeki 3 noktadan biri yanar. Beklerken halkanın başka yerinde yan hedefler çıkar (vurunca süre kazanırsın). Üç nokta yanınca kilit açılır, pim altına döner (×3). Kilitliyken dokunursan sarsılır, noktalar sıfırlanır (−1 sn) | Çürük kilit *(yapıldı)* | Açıldıktan sonra yalnızca bir tur açık kalır; kaçırırsan yeniden kilitlenir |
+| Kasa turu *(yapıldı)* | 3 hedef art arda, ibre hızlanır (×1,18); üçünü açarsan +10 puan, +0,6 sn, +2 coin | Alarm turu *(yapıldı)* | Hedeflerin arasına "!" işaretli sahte kilit; dokunursan −2 sn, tur sıfırlanır |
+| Ritim pim *(yapıldı)* | 3/4/5 küçük hedef art arda, vuruşlarda nota yükselir; zincir tamamlanınca +0,6 sn, +2 puan | Sahte nota *(yapıldı)* | Dizinin arasına gül rengi ×'li nota; dokunursan −1 sn, zincir bozulur |
+| Trafik ışığı *(yapıldı, ikizi yok)* | Yan yana iki hedef: biri yeşil, biri kırmızı. Işıklar her 1,4/1,1/0,8 sn yer değiştirir (önce sarı yanıp söner); ibre içerideyken değişmez. Yeşile vur | Kırmızı hedef | Dokunursan −1 sn |
+| İki halka *(yapıldı)* | Her ibre kendi hedefinde; dokunuş hedefteki ibreyi vurur (iç halka lila, dış halka şeftali) | Kilitli halka *(yapıldı)* | İç halka 2,4 sn tamamen kilitlenir: ibre durur, hedefi sayılmaz, dokunuşlar yalnızca dış ibreye bakar (ceza yok). Bedel: dış ibre %25 hızlanır. Geri sayım görünür; kilit açılınca iç hedef yeni yere gelir |
+| Hayalet pim *(yapıldı)* | Hedef 0,55/0,8/1,1 sn görünür, sonra tamamen kaybolur (yeri değişmez); hafızadan vur, ×2. İbre hep görünür | Hayalet tuzak *(yapıldı)* | Tuzak da kaybolur; yerini unutup dokunursan −1,5 sn, ekran titrer |
+| Bomba pim *(yapıldı, ikizi yok)* | Fitil yanar (3,4/2,9/2,5 sn), çevresindeki halka erir, geri sayım hızlanır. Süre dolmadan vurursan etkisiz (+25 puan) | Patlama | Kaçırırsan patlar: parlama, patlama dalgası, ekran sarsıntısı, halkada krater (−1,5 sn) |
+| Gelgit ibre *(yapıldı)* | İbre hızı halkada değişir; hızlı bölge dışta koyu bantla görünür, ibre oklarla gösterilir | Girdap *(yapıldı)* | İçinden geçen ibre 2,4 sn ×1,7 hızlanır |
+| Tut-bırak pim *(yapıldı)* | Uzun yay (1,4/1,9/2,4 rad); ibre başa gelince basıp tut, sondaki bölgede bırak (×1,5). Erken ya da geç bırakırsan ıska | Sıcak yay *(yapıldı)* | Yayın son %38'i sıcak: tutarken süre 3 kat hızlı erir, doğru bırakırsan ×2. İlk karşılaşmada kart net uyarır |
+| Sarkaç ibre | İbre dönmez, sağa sola salınır; ortada vuruş ×2 | Balyoz | Hedefin üstünden salınan balyoz; üstteyken dokunursan −2 sn *(yapılmadı)* |
+| Sis tüneli | **İbre hep görünür**; hedef sisin içinde saklı, ibre yaklaşınca sis dağılır | Zehirli sis | Yeşil sis, içinde gizli tuzak; dokunursan süre hızlı erir *(yapılmadı)* |
+| Renk pim | Halka iki renk bölgesidir; yalnızca rengi uyan hedefe dokunulur; hedefin içinde renk asla değişmez | Yanıltıcı renk | Yanlış renk bölgesine konan hedef ("≠"); dokunursan −1 sn *(yapılmadı)* |
 
-Tek pim ve Seri çarpanı çekirdek oyundur; çarpan 5/10/20/35. vuruşta ×2/×3/×4/×5.
+Tek pim ve Seri çarpanı çekirdek oyundur; çarpan 5/10/20/35. vuruşta ×2/×3/×4/×5. ★ güçlenme (seviye 7, 9, 10'da): açılmış, ★'lanabilir bir kilidi bir basamak
+güçlendirir (`STAR_KINDS`).
 
-## Ekran ve yardımcılar (V0.4.1)
+## Ekran ve yardımcılar
 
 - **HUD:** süre çubuğu, "Seviye N" ve altında ince ilerleme çizgisi (cehennemde kızıl), cehennem rozeti. Toplam seviye ve noktalı yol yok.
-- **Yeni kilit kartı** (üst kart): HUD'un altında; yeni kilitte simge + ad + kural + uyarı, 6 sn; ★/karışım/seri gibi küçük haberler tek satır, 4 sn.
-  Yeni kilidin ilk hedefi kart çıktıktan 2 sn sonra ve ibreden uzak doğar. **Nesne etiketi:** yeni kilidin ilk 3 karşılaşmasında hedefin ve
-  tuzağın yanında kısa yazı ("Açıkken vur", "Dikene dokunma"). Menüde **Kilit defteri**: görülen kilitlerin açıklamaları.
-- **Jokerler:** halkanın altında, başparmak bölgesinde. İşe yarayacağı an biri parlar, büyür, etiketini gösterir (Kronometre: süre ≤ 2,5 sn;
-  Kalkan: art arda iki hata ya da cehennem başı; Stetoskop: hedef dar ya da cehennem başı; Kum saati: ibre çok hızlı ya da iki ıska).
-  Parlayan jokere dokunmak yeter (+25 puan, "Akıllı hamle!"); parlamayan joker basılı tutulunca (0,45 sn) çalışır, kısa dokunuş oyuna geçer.
-  Etkiler `TOOL` tablosunda (seviyeyle artar): stetoskop hedefleri genişletir, kronometre süre ekler, kalkan ceza ve seri bozulmasını önler,
-  kum saati ibreyi yavaşlatır. Yeni oyuncuda her jokerden 2 var; her 2 seviyede bir hediye. Oyun jokersiz biterse "… vardı, kullanmadan bitti" notu.
-  (Tasarımdaki "yukarı kaydır" kısayolu yapılmadı: kaydırmanın ilk dokunuşu oyunda vuruş sayılırdı.)
+- **Yeni kilit kartı** (üst kart, V0.5.0'da büyüdü): HUD'un altında; yeni kilitte hareketli mini simge + ad (22 punto) + kural (şeftali nokta) + uyarı (gül
+  noktası); ilk hedef vurulana ya da ıskalanana kadar kalır (en çok 8 sn). ★/karışım/seri gibi küçük haberler tek satır, 4 sn.
+  **Nesne işareti:** yeni kilidin ilk karşılaşmalarında hedefin ve tuzağın dışında küçük ✓ (vur) ve ✕ (dokunma) rozeti; halkanın üstüne yazı konmaz
+  (görüşü kapatıyordu). Menüde **Kilit defteri**: görülen kilitlerin açıklamaları (14 giriş).
+- **Jokerler:** halkanın altında, başparmak bölgesinde. İşe yarayacağı an biri parlar, büyür, etiketini gösterir (etiket ekranın dışına taşmaz)
+  (Kronometre: süre ≤ 2,5 sn; Kalkan: art arda iki hata ya da cehennem başı; Stetoskop: hedef dar ya da cehennem başı; Kum saati: ibre çok hızlı ya da iki ıska).
+  Parlayan jokere dokunmak yeter (+25 puan, "Akıllı hamle!"); parlamayan joker basılı tutulunca (0,45 sn) çalışır, kısa dokunuş oyuna geçer
+  (tut-bırak pininde de çalışır). Etkiler `TOOL` tablosunda (seviyeyle artar). Yeni oyuncuda her jokerden 2 var; her 3 seviyede bir hediye.
+  Alet çubuğu oyun alanının altındadır ve oyun dokunuşu almaz (kasıtlı, kazara kullanımı önler).
 - **Can (yedek):** yeşil "+" hedefi; çift seviyelerin normal bölümünün %55'inden sonra, canın yoksa bir sonraki hedef olur. En fazla 1; süre çubuğunun
-  yanında yeşil "+ Can" kapsülü ve çubuğun yeşil çerçevesi. Süre bitince kendiliğinden devreye girer: +3 sn, kısa yavaş ibre. Kalp simgesi
-  kullanılmadı (kullanıcı isteği).
-- **Devam etme:** oyun her 5 sn'de ve çıkarken kaydedilir (`save.run`); uygulama kapansa bile menüde "Devam et" (seviye ve puan yazar), dokununca 3-2-1.
-  "Yeni oyun" kayıt varken önce sorar. Oyun bitince kayıt silinir.
-- **Menü:** "Oyun" sayacı kalktı; en iyi puan, ulaşılan seviye, joker stoğu, zorluk seçici, büyük Devam et/Oyna, Kamp, sürüm adı.
+  yanında yeşil "+ Can" kapsülü. Süre bitince kendiliğinden devreye girer: +3 sn, kısa yavaş ibre.
+- **Devam etme:** oyun her 5 sn'de ve çıkarken kaydedilir (`save.run`); uygulama kapansa bile menüde "Devam et", dokununca 3-2-1.
+  Duraklatma basılı tutulan tut-bırak pinini bırakır (pim yeniden beklemeye döner).
+- **Menü:** en iyi puan, ulaşılan seviye, joker stoğu, zorluk seçici, büyük Devam et/Oyna, Kamp, Kilit defteri, sürüm adı.
 
 ## Kamp, rekor, duraklatma
 
@@ -109,26 +117,35 @@ Tek pim ve Seri çarpanı çekirdek oyundur; çarpan 5/10/20/35. vuruşta ×2/×
 1. **Faz 1 (V0.4.0): TAMAM.** İskelet, tema geçişi, HUD, kamp, duraklatma geri sayımı, Seviye 1-3 kilitleri.
 2. **V0.4.1: TAMAM.** Cennet kalktı, yeni tempo (~5 dk), diken kenara alındı, kayan tuzak daraldı, jokerler, can, devam etme, yeni kilit kartı ve
    etiketleri, kilit defteri, "Seviye N" yazısı, menü.
-3. **Faz 2:** Kasa ✚ Alarm, Kilitli halka (donduran), Altın ✚ Lanetli altın; ★ ve karışımların kalanı.
-4. **Faz 3:** Hayalet, Gelgit ve engel ikizleri.
-5. **Faz 4:** Renk (bölgeli), Tut-bırak ✚ Sıcak yay (ilk karşılaşma uyarısıyla), sonsuz mod kilitleri (Ritim, Sarkaç, Sis, düzeltilmiş), Antrenman modu,
-   yeni tür kutlaması.
-6. **Mağaza hazırlığı (ayrı sürüm):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi, paket adının kesinleşmesi.
+3. **V0.5.0: TAMAM.** Seviye 4-10 kilitleri (altın, sabır, kasa, ritim, trafik, iki halka, hayalet, bomba, gelgit, tut-bırak) ve engel ikizleri
+   (lanetli altın, çürük kilit, alarm, sahte nota, kilitli halka, hayalet tuzak, girdap, sıcak yay); iyi kilit seviye başında, ikiz ortada; yeni kart ve ✓/✕
+   rozetleri; diken yavaş çıkar; bonuslar kısıldı; zorluk botla yeniden ayarlandı; seviyeler 20-32 sn'e uzadı.
+4. **Sıradaki (Faz 4):** `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Işınlanma, Şifre, Makas,
+   Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için; Antrenman modu; yeni tür kutlaması. Kullanıcının oyun sonrası geri bildirimine göre sıra belirlenir.
+5. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
+   paket adının kesinleşmesi.
 
 Sonsuz mod şimdilik yalnızca 10. seviye sonrası otomatik devam ("Yolculuk tamamlandı", +100 coin); yoğunluk ve cehennem gücü her seviyede artar.
 
 ## Bot ile zorluk ölçümü
 
-`tools/bot.js` gerçek oyun kodunu hızlandırılmış zamanla oynatır (kullanımı dosyanın başında). Beceri = dokunuş zamanlama hatasının standart sapması
-(yeni 0,12 sn, orta 0,08, iyi 0,05, usta 0,03). Normal zorluk, joker kullanılmadan, 4. seviyeden sonraki kilitler yokken:
+`tools/bot.js` gerçek oyun kodunu (spawn, update, tap, release) hızlandırılmış zamanla oynatır (kullanımı dosyanın başında; DEBUG=1 derlemesi gerekir).
+Beceri = dokunuş zamanlama hatasının standart sapması (yeni 0,12 sn, orta 0,08, iyi 0,05, usta 0,03); her oyunda sapma log-normal sallanır (günlük form),
+her dokunuşta küçük bir dikkat kaybı olasılığı vardır. Bot gelgit hızını, kilitli halkayı, tut-bırakı, trafik ışığını, bombayı, sabır ve hayalet pimi bilir;
+tuzakların üstündeyse sıklıkla dokunmaz, altına beceriye bağlı olasılıkla uzanır. Joker kullanmaz.
+`window.kindStats()` kilit türü başına tur sayısı, süre ve vuruş oranını verir; `bulk()` seviyeye ulaşma yüzdesini ve ölümlerin kilit dağılımını.
 
-| Beceri | 10. seviyeye ulaşan | Medyan ulaştığı seviye |
-|---|---|---|
-| yeni | ~%50 | — |
-| orta | %84-100 | 16-17 |
-| iyi | %100 | 19 |
-| usta | hepsi | — |
+**V0.5.0 ölçümü** (10. seviyeye ulaşma oranı; n = 24-60 oyun, yaklaşık ±8 puan hata payı):
 
-Rahat daha kolay; Usta'da orta bot %67 ile 10. seviyeye varıyor, yeni bot 8. seviyeye kadar ölüyor. Her faz sonunda yeni kilitlerle yeniden ölçülür.
-Bu sayılar insan oyuncu değil bot sonucudur; gerçek oyuncu geri bildirimi gelince ayarlanır. V0.4.0'daki ölçümler (3. seviyede sıradan bot ölüyordu) bu
-yüzden tempo bu sürümde baştan yeniden ayarlandı.
+| Mod | yeni (0,12) | orta (0,08) | iyi (0,05) | usta (0,03) |
+|---|---|---|---|---|
+| Rahat | %28 | %75 | %97 | ≈%100 (ölçülmedi) |
+| Normal | %4 | %32 | %86 | %92 |
+| Usta | %0 | %0 | %33 | %78 |
+
+Hedef tablosu (`docs/kilit-katalogu.md`): Normal %5 / %35 / %60 / %90, Rahat %40 / %80 / %95 / %100, Usta %0 / %8 / %25 / %60.
+Yeni ve orta oyuncular hedefte; iyi ve usta botlar Normal'de hedefin üstünde (beceri arttıkça ölümler rastgele dikkat kayıplarından gelir, hassasiyetten değil,
+bu yüzden iyi ile usta birbirine yakın). `DIFF.adaptCap` 0,15 ve 0,2 denendi: orta oyuncuyu çok düşürüp (%27, %8) iyi oyuncuyu yeterince düşürmedi (%82),
+0,12'de bırakıldı. En çok öldüren kilitler: tut-bırak, trafik ışığı, ritim ve (yeni oyuncuda) tek pin. Usta mod güçlü oyuncu için asıl zorluk seçeneğidir;
+gerçek oyuncu geri bildirimine göre ayarlanır. Bu sayılar insan değil bot sonucudur: insan yeni kilitlerin kuralını ilk görüşte öğrenmek zorunda olduğu
+için ilk oyunlarda daha çok ölür.

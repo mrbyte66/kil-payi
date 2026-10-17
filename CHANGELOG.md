@@ -3,6 +3,27 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.5.0 — Yeni kilitler ve gerçek zorluk (2026-10-17)
+
+- **Her seviye artık yeni bir oyun:** Seviye 4-10'da her seviyenin başında yeni bir kilit, ortasında onun engeli gelir; yeni bir şey yaklaşık 13 saniyede bir görülür.
+  Seviye 4: **Altın pim** (ince altın hedef, ×3 puan) ✚ **Lanetli altın** (aynı şekil ama soluk, zehir yeşili çerçeveli, kafatası işaretli: dokunma) ve **Sabır pimi**
+  (kilitli pim; ibre üç kez geçince açılır, beklerken yan hedeflere vurursun). Seviye 5: **Kasa turu** ✚ **Alarm turu**, **Çürük kilit**.
+  Seviye 6: **Ritim pim** ✚ **Sahte nota**, **Trafik ışığı** (yeşil hedefe vur, kırmızıya dokunma; ışıklar yer değiştirir). Seviye 7: **İki halka** ✚ **Kilitli halka**
+  (kilitli iç halka donar, dış ibre hızlanır, geri sayım görünür). Seviye 8: **Hayalet pim** ✚ **Hayalet tuzak** (hedef ve tuzak gerçekten kaybolur, hafızadan vurursun),
+  **Bomba pim** (fitil yanar; vurmazsan patlar). Seviye 9: **Gelgit ibre** ✚ **Girdap**. Seviye 10: **Tut-bırak pim** ✚ **Sıcak yay** (bas, tut, sonda bırak).
+- **Seviyeler uzadı:** normal bölüm 20-32 sn; 10. seviyenin sonuna kadar yaklaşık 5 buçuk dakika.
+- **Zorluk yeniden ayarlandı:** bonuslar kısıldı (vuruş +1,1 → +0,95 sn, mükemmel vuruş bonusu yarıya, cehennem sonu +4 → +2 sn, joker hediyesi her 3 seviyede),
+  ıska ve tuzak biraz daha pahalı. Botla ölçüldü: Normal'de yeni başlayanın %4'ü, sıradan oyuncunun %32'si, iyi oyuncunun %86'sı 10. seviyeye varıyor; Usta modunda
+  iyi oyuncunun %33'ü. (Bunlar bot sonucu; gerçek oyuncu geri bildirimine göre ayarlanacak.)
+- **Diken:** hızlı girer (0,3 sn), bekler (0,8 sn), yavaş çıkar (1,5 sn); kenar daha uzun süre dikenli kalır, hedefin ortası yine her zaman açık.
+- **Yeni kilit kartı büyüdü ve düzeldi:** büyük yazı, hareketli mini simge, şeftali nokta (ne yapacağın) ve gül nokta (nelere dokunmayacağın). Yeni kilidin ilk hedefi
+  çözülene kadar ekranda kalır. Halkanın üstündeki yazı etiketleri kalktı (görüşü kapatıyordu); yerine hedefin dışında küçük ✓ (vur) ve ✕ (dokunma) işaretleri geldi.
+- **Kilit defteri** 14 kilidi gösterir (simge, kural, uyarı).
+- **Küçük düzeltmeler:** joker etiketi ekranın dışına taşmıyor; duraklatma basılı tutulan tut-bırak pinini bırakır; İngilizce kart yazıları kısaltıldı (küçük ekranda sığıyor);
+  kamptan başlayınca o seviyenin yeni kilidi kartıyla gelir (önceden sessizce açılıyordu). Seviye süreleri değiştiği için V0.4.1'den kalan yarım oyun "Devam et" ile sürdürülmez; kamp kayıtların aynen duruyor.
+- Bilinen eksikler: Sarkaç, Sis, Renk, Aynalı pim gibi kalan fikirler (`docs/kilit-katalogu.md`) sonsuz mod ve sonraki sürümler için bekliyor. Gerçek telefonda denenmedi
+  (emülatör, tarayıcı ve botla sınandı). Mağaza hazırlığı (ikon, imzalı paket, gizlilik sayfası, gerçek reklam kimliği, paket adı) kullanıcı hesabı açınca yapılacak.
+
 ## V0.4.1 — Rahat oynanan yolculuk (2026-10-17)
 
 - **Tempo:** cennet bölümü kalktı. Seviyeler kısaldı (normal 20-28 sn, cehennem 6-10 sn), zorluk 3 kat daha yavaş artıyor, "Normal" daha kolay;
