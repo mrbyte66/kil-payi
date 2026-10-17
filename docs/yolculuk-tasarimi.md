@@ -1,7 +1,7 @@
-# Yolculuk tasarımı (V0.6.1, onaylı 2026-10-17)
+# Yolculuk tasarımı (V0.7.0, onaylı 2026-10-17)
 
 Bu belge oyunun güncel yolculuk tasarımıdır. V0.4.0'daki ilk tasarımdan (cennet bölümü, 15 dakikalık yolculuk) sonra kullanıcı geri bildirimiyle
-beş kez değişti (V0.4.1 tempo, V0.5.0 çeşitlilik, V0.5.1 cehennem ve düzeltmeler, V0.6.0 Dene ve Cehennem zorluğu, V0.6.1 süreye göre hedef, kademeye göre cehennem, jokerler); değişiklik nedenleri `CHANGELOG.md` içinde. Kilit fikirlerinin tam listesi (yapılanlar ve
+altı kez değişti (V0.4.1 tempo, V0.5.0 çeşitlilik, V0.5.1 cehennem ve düzeltmeler, V0.6.0 Dene ve Cehennem zorluğu, V0.6.1 süreye göre hedef, kademeye göre cehennem, jokerler, V0.7.0 ışınlanma pimi); değişiklik nedenleri `CHANGELOG.md` içinde. Kilit fikirlerinin tam listesi (yapılanlar ve
 yapılmayanlar, Kolay/Orta/Zor grupları) `docs/kilit-katalogu.md` içinde. Hikaye/harita yok.
 
 ## Fikir
@@ -24,21 +24,21 @@ Cehennem geçilince: +2 sn, coin (2 × (5 + 2 × seviye)), her 3 seviyede bir ra
 | 4 | 22 sn | 7 sn | 1:23 | Altın pim (0) ✚ lanetli altın (0,42); sabır pimi (0,75) |
 | 5 | 24 sn | 7 sn | 1:52 | Kasa turu (0) ✚ alarm turu (0,45); çürük kilit (0,78, sabır pimine) |
 | 6 | 26 sn | 8 sn | 2:23 | Ritim pim (0) ✚ sahte nota (0,42); trafik ışığı (0,76) |
-| 7 | 28 sn | 8 sn | 2:57 | İki halka (0) ✚ kilitli halka (0,48); ★ güçlenme (0,82) |
+| 7 | 28 sn | 8 sn | 2:57 | İki halka (0) ✚ kilitli halka (0,48); ışınlanma pimi (0,74, ikizsiz); ★ güçlenme (0,90) |
 | 8 | 28 sn | 9 sn | 3:33 | Hayalet pim (0) ✚ hayalet tuzak (0,42); bomba pim (0,76) |
 | 9 | 30 sn | 9 sn | 4:10 | Gelgit ibre (0) ✚ girdap (0,48); ★ güçlenme (0,82) |
 | 10 | 32 sn | 10 sn | 4:49 | Tut-bırak pim (0) ✚ sıcak yay (0,45); ★ güçlenme (0,82) |
 | Sonsuz | 32 sn | 10 sn | 5:31 | Görülmüş kilitlerin karışımı (Sarkaç, Sis, Renk vb. sonraki sürümlerde) |
 
-Sabır pimi, çürük kilit, trafik ışığı ve bomba pim ilk plandaki yedi çifte ek olarak yapıldı (kullanıcı onayıyla); engel ikizi olmadan seviyenin
+Sabır pimi, çürük kilit, trafik ışığı, bomba pim ve ışınlanma pimi (V0.7.0) ilk plandaki yedi çifte ek olarak yapıldı (kullanıcı onayıyla); trafik, bomba ve ışınlanma engel ikizi olmadan seviyenin
 sonlarına konuldular. Zamanlar `JOURNEY`, olaylar `JEV` (TUNE bloğu); yapılmamış kilitlerin olayları atlanır (`IMPL_GOOD`/`IMPL_TWIN`).
 Her yeni kilit, kartı çıktıktan 2 sn sonra ve ibreden uzak doğar; ilk hedefi vurulana ya da ıskalanana kadar kart ekranda kalır (en çok 8 sn).
 
 ## Cehennem
 
 Süre hızlı erir, ceza ve engel olasılığı artar, hedefler daralır, ibre hızlanır; kızıl-siyah tema, kor ve çatlak efektleri. V0.5.1'de güçlendi: eskiden en güçlü cehennem bile
-normal bölümden yalnızca %4 farklıydı (arkadaşlardan "hiç zor değil"). Gücü `JOURNEY.hellTab[L-1]` ile seviye başına verilir (1 = tam güç): `[0.3, 0.5, 0.7, 0.9, 0.9, 0.8, 0.65, 0.5, 0.42, 0.38]`;
-10. seviyeden sonra `hellEnd` (0,08) kadar artar (en çok 1,5). Güç ilk seviyelerde yumuşak başlar, 4-5. seviyede tepeye çıkar, sonra iner (geç seviyelerde normal bölüm zaten çok yoğundur; çarpanlar onun üstüne biner).
+normal bölümden yalnızca %4 farklıydı (arkadaşlardan "hiç zor değil"). Gücü `JOURNEY.hellTab[L-1]` ile seviye başına verilir (1 = tam güç): `[0.5, 0.65, 0.8, 0.9, 0.9, 0.8, 0.65, 0.5, 0.42, 0.38]`;
+10. seviyeden sonra `hellEnd` (0,08) kadar artar (en çok 2); Cehennem kademesinde `hellScale` ile çarpılır. Güç ilk seviyelerde yumuşak başlar, 4-5. seviyede tepeye çıkar, sonra iner (geç seviyelerde normal bölüm zaten çok yoğundur; çarpanlar onun üstüne biner).
 Tam güç (k = 1) değerleri: hedef ×0,82, ibre ×1,13, süre erimesi ×1,18, ceza ×1,4, zorluk +0,09, engel ikizi olasılığı 0,78 (normalde 0,3). Etkiler k ile normal bölümden tam güce doğrusal karışır.
 Her vuruşta +1 coin; cehennem bitince +2 sn. Adlar (`hellTier`, açılışta çıkan haberde): seviye 1-3 Kolay cehennem, 4-6 Orta cehennem, 7-9 Zor cehennem, 10+ Cehennem.
 
@@ -66,7 +66,7 @@ Her vuruşta +1 coin; cehennem bitince +2 sn. Adlar (`hellTier`, açılışta ç
 
 ## Adil oyun kuralları (bütün kilitlere uygulanır)
 
-1. Vuruş anında ibre ve hedef görünür (Hayalet pim bunun tek istisnasıdır: hedef önceden görülür, hafızadan vurulur; ibre hep görünür).
+1. Vuruş anında ibre ve hedef görünür. İstisnalar: Hayalet pim (hedef önceden görülür, hafızadan vurulur; ibre hep görünür) ve Işınlanma pimi (ibre kapıda 0,15-0,5 sn görünmez, ama hedefe en az yaklaşık yarım saniye kala çıkar ve çıkış kapısı hep görünür).
 2. Hiçbir engel hedefi tamamen kapatmaz; oyuncu bir tur boşa beklemek zorunda kalmaz (kilitli halkada kilitli iç hedef sayılmaz, dış ibre oynanır).
 3. Anlık hile yok: renk ve görünürlük değişimleri önceden görülebilir (trafik ışığı önce sarı yanıp söner, ibre içerideyken değişmez).
 4. Yeni bir şey ilk görüldüğünde bir kez net anlatılır (büyük kart), sonra ipucu çıkmaz.
@@ -87,6 +87,7 @@ Basamak (★1, ★2, ★3) değerleri slash ile verilmiştir. *(Yapıldı)* işa
 | Ritim pim *(yapıldı)* | 3/4/5 küçük hedef art arda, vuruşlarda nota yükselir; zincir tamamlanınca +0,6 sn, +2 puan | Sahte nota *(yapıldı)* | Dizinin arasına gül rengi ×'li nota; dokunursan −1 sn, zincir bozulur |
 | Trafik ışığı *(yapıldı, ikizi yok)* | Yan yana iki hedef: biri yeşil, biri kırmızı. Işıklar her 1,4/1,1/0,8 sn yer değiştirir (önce sarı yanıp söner); ibre içerideyken değişmez. Yeşile vur | Kırmızı hedef | Dokunursan −1 sn |
 | İki halka *(yapıldı)* | Her ibre kendi hedefinde; dokunuş hedefteki ibreyi vurur (iç halka lila, dış halka şeftali) | Kilitli halka *(yapıldı)* | İç halka 2,4 sn tamamen kilitlenir: ibre durur, hedefi sayılmaz, dokunuşlar yalnızca dış ibreye bakar (ceza yok). Bedel: dış ibre %25 hızlanır. Geri sayım görünür; kilit açılınca iç hedef yeni yere gelir |
+| Işınlanma pimi *(yapıldı, V0.7.0, ikizi yok)* | Halkada mavi giriş kapısı (A) ve turuncu çıkış kapısı (B). İbre A'ya girince küçülüp kaybolur, açısı donar; **0,15-0,50 sn** (★: 0,12-0,58 / 0,10-0,66) sonra, **her turda rastgele ve önceden belli olmadan**, B'den çıkar. Hedef (T) B'nin ilerisindedir: çıkıştan hedefe en az 0,52/0,48/0,44 sn (en az 1,1 rad, `isinGapT`/`isinGapMin`). B ile A arası atlanan yaydır (1,1-2,2 rad, `isinSkip`); T ibrenin ilk yoluna (başlangıç ile A arası) düşmez. Tünelde dokunuş ıskadır; süre akar. Vurulana kadar her tur kapı yeniden çalışır | — | Engel ikizi yok (katalogdaki Kara kapı yapılmadı) |
 | Hayalet pim *(yapıldı)* | Hedef 0,55/0,8/1,1 sn görünür, sonra tamamen kaybolur (yeri değişmez); hafızadan vur, ×2. İbre hep görünür | Hayalet tuzak *(yapıldı)* | Tuzak da kaybolur; yerini unutup dokunursan −1,5 sn, ekran titrer |
 | Bomba pim *(yapıldı, ikizi yok)* | Fitil yanar (3,4/2,9/2,5 sn), çevresindeki halka erir, geri sayım hızlanır. Süre dolmadan vurursan etkisiz (+25 puan) | Patlama | Kaçırırsan patlar: parlama, patlama dalgası, ekran sarsıntısı, halkada krater (−1,5 sn) |
 | Gelgit ibre *(yapıldı)* | İbre hızı halkada değişir; hızlı bölge dışta koyu bantla görünür, ibre oklarla gösterilir | Girdap *(yapıldı)* | İçinden geçen ibre 2,4 sn ×1,7 hızlanır |
@@ -96,7 +97,7 @@ Basamak (★1, ★2, ★3) değerleri slash ile verilmiştir. *(Yapıldı)* işa
 | Renk pim | Halka iki renk bölgesidir; yalnızca rengi uyan hedefe dokunulur; hedefin içinde renk asla değişmez | Yanıltıcı renk | Yanlış renk bölgesine konan hedef ("≠"); dokunursan −1 sn *(yapılmadı)* |
 
 Tek pim ve Seri çarpanı çekirdek oyundur; çarpan 5/10/20/35. vuruşta ×2/×3/×4/×5. ★ güçlenme (seviye 7, 9, 10'da): açılmış, ★'lanabilir bir kilidi bir basamak
-güçlendirir (`STAR_KINDS`).
+güçlendirir (`STAR_KINDS`; ışınlanma pimi dahil). Seviye 7'nin ★ olayı %90'a kaydı.
 
 ## Ekran ve yardımcılar
 
@@ -147,11 +148,11 @@ güçlendirir (`STAR_KINDS`).
 5. **V0.6.0: TAMAM.** Kilit defteri yaklaşan kilitleri gösterir ve her satırda **Dene** (kısa canlı deneme) vardır; dördüncü zorluk kademesi **Cehennem**; trafik ışığı değişim aralığı ±%22 rastgele (devri daim kilitlenmesin); bot kırmızı ışıkta takılmıyor.
 6. **V0.6.1: TAMAM.** Hedef uzunluğu süre çubuğunun saniyesine göre (`WIDE_TAB`); cehennem bölümü kademeye göre (`hell`: Rahat/Normal yok, Usta açılıp kapanır, Cehennem baştan sona) ve Cehennem yeniden ayarlandı (pro bot %25);
    dikende nefes oyun ilerledikçe büyür; jokerler tek dokunuş, sıra altta ve halkayla arasında parmak boyu boşluk; kademe değişince yarım kalan oyun uyarısı; botta "pro" becerisi.
-7. **Sıradaki (V0.7.0): Işınlanma pimi** (kullanıcı isteği; tasarım önce görsel olarak gösterilip onaylanacak): ibre portala girer ve görünmez olur; çıkış anı belli değildir (kısa ve rastgele, yaklaşık 0,12-0,55 sn; "hızlı çıksın"),
-   çıkışın ilerisinde tepki verilebilecek bir mesafede (en az yaklaşık 1,0-1,6 rad) hedef durur; tünel sırasında `G.ang` donar. Taslak yeri: Seviye 7'de yaklaşık .72-.74 (yıldız olayı .90'a kayar), ikizsiz başlar.
-   Sonra: `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için; Antrenman modu; yeni tür kutlaması.
+7. **V0.7.0: TAMAM.** Işınlanma pimi (kullanıcı isteği, canlı denemeyle onaylandı; "Hızlı" çıkış 0,15-0,50 sn): `G.tun` (tünel: `t`, `d` rastgele süre, `to` çıkış açısı), `ptrFactor()` tünelde 0 döner (ibre açısı donar), `tickPortal` kapıdan geçişi yakalar (`enterPortal`/`exitPortal`), kapılar `kind: 'portal'` pinleri (`portal: 'in'|'out'`),
+   ibrenin çizimi `ptrScale()` ile küçülüp büyür. `die()` ve `doContinue()` tünel durumunu bilir (ikinci şansta ibre çıkış kapısından başlar). Bot: tünelde ya da önce kapıya varacaksa hedefi bekler (`tools/bot.js`).
+8. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için; Antrenman modu; yeni tür kutlaması.
    Kullanıcının oyun sonrası geri bildirimine göre sıra belirlenir.
-8. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
+9. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
    paket adının kesinleşmesi.
 
 Sonsuz mod şimdilik yalnızca 10. seviye sonrası otomatik devam ("Yolculuk tamamlandı", +100 coin); yoğunluk ve cehennem gücü her seviyede artar.
@@ -198,3 +199,5 @@ pro bot ulaşma %78, bitirme %35. Yeni genişlik tablosuyla aynı eski ayarlar C
 Cehennem'de pro botu en çok öldüren kilitler: nefes (diken) %35, iki halka %17, kasa %15 (n = 60).
 Cehennem ayarı denemeleri (hedef çarpanı, ibre, ceza, süre erimesi, `hellScale` → pro bot bitirme %): ×0,94/1,12/1,3/1,15/0,65 → %60; ×0,92/1,12/1,35/1,18/0,68 → %46; ×0,88/1,12/1,4/1,2/0,72 → %33; ×0,82/1,18/1,5/1,25/0,64 → %24 (seçilen);
 ×0,80/1,18/1,5/1,25/0,62 → %12; `hellScale` tek başına ayarda neredeyse etkisiz (0,68 → 0,85: %46 → %50), asıl kaldıraç hedef genişliğidir.
+
+**V0.7.0 ölçümü** (ışınlanma pimi). Yalnızca ışınlanma pimi açık, süre hep dolu, 7. seviye yoğunluğu, Normal: vuruş yüzdesi pro %100, usta %100, iyi %99, orta %92, yeni %74; tur 1,5-1,7 sn (yeni 2,0 sn). Tam oyunlarda oyun başına yaklaşık 5 ışınlanma turu, iyi botta vuruş %89; ölümlerin %0-5'i ışınlanmadan (Normal iyi 0/40, Normal orta 2/40, Cehennem pro 1/60). Bot çıkışı tepki süresiz görür (yalnızca vuruş tahminine +0,02 sn gürültü eklenir, `opt.isinExtra`); insanda çıkıştan sonra tepki süresi ve 0,5 sn'lik aralığı hatırlama zorluğu bu sayıyı düşürür, gerçek geri bildirime göre ayarlanacak (`MECH.isinGapT`, `isinWait`). Yeni genel ölçümler (n = 30-60): Normal orta bot 10. seviyeye %38, iyi bot (n = 40) %83; Usta iyi bot %30; Cehennem pro bot bitirme %25 (öncekiyle aynı, kilit eklenmesi dengeyi bozmadı). Kilide özel ölçüm: `runBot(sg, av, 7, 60, 1/60, { setup: () => { G.open = ['isin']; G.time = 8; k.spawn(false, 'isin'); }, stop: () => { G.time = 8; return false; } })` sonrası `kindStats()`.
