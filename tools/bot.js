@@ -62,7 +62,7 @@
         let c, gh;
         if (p.kind === 'gate') {
           if (p.locked) continue;
-          if (p.gold) { if (p._try === undefined) p._try = Math.random() < goldP; if (!p._try) continue; }
+          if (p.gold) { if (p.wait || p.gone) continue; if (p._try === undefined) p._try = Math.random() < goldP; if (!p._try) continue; }
           c = k.pinCenter(p); gh = k.pinHw(p);
         } else if (p.kind === 'lockpin') { if (!p.open) continue; c = p.c0; gh = p.hw; }
         else if (p.kind === 'hold') { c = p.c0; gh = p.hw; }

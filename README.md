@@ -18,7 +18,7 @@ Komut satırından APK için: `./tools/release.sh` (`dist/kil-payi-v<sürüm>.ap
 
 - `src/game.html`: oyunun tamamı (HTML, CSS, JS). Tek kaynak bu dosyadır.
 - `build.sh`: `src/game.html` dosyasını tam bir belgeye çevirip `www/index.html` üretir (Capacitor bu klasörü Android projesine kopyalar: `npx cap sync android`).
-  `DEBUG=1 ./build.sh` test kancası ekler (`window.__kp`) ve duraklatmayı kapatır; `DEBUG=2` kancayı ekler ama duraklatma açık kalır
+  `DEBUG=1 ./build.sh` test kancası ekler (`window.__kp`), duraklatmayı ve ilk görüş tanıtımlarını kapatır; `DEBUG=2` kancayı ekler ama duraklatma ve tanıtımlar açık kalır
   (ana ekran, ekran kilidi, geri tuşu denemeleri için). İkisi de yayın sürümüne girmez.
 - `www/`: derlenmiş çıktı (depoda yok; Android projesindeki kopyası `android/app/src/main/assets/public/`).
 - `android/`: Android Studio projesi (Capacitor); `tools/release.sh` APK üretir, `tools/publish.sh` android ve html dallarını yayınlar, `tools/branches/README.html.md` html dalının README'sidir.
@@ -55,6 +55,9 @@ Sonra `http://localhost:8000` adresini aç. Telefon boyutunda denemek için tara
   iki halka ✚ kilitli halka, ışınlanma pimi (V0.7.0: mavi kapıdan girer, turuncudan rastgele bir an sonra çıkar), hayalet ✚ hayalet tuzak, bomba pim, gelgit ✚ girdap, tut-bırak ✚ sıcak yay. Sayılar `MECH` tablosunda; tür tabloları `JKIND`,
   `JTWIN`, `IMPL_GOOD`/`IMPL_TWIN` (yeni tür eklerken hepsine ve `BOOK` kilit defterine eklenir). Kalan fikirler `docs/kilit-katalogu.md` içinde.
   Tut-bırak pininde dokunuş iki olaydır: basış (`tap`) ve bırakış (`release`).
+  **İlk görüşte tanıtım (V0.8.0):** yeni kilit ya da engel ilk kez geldiğinde oyun durur, üstteki kart uzar ve içinde küçük bir animasyon kilidi gösterir (`INTRO`, `G.mode = 'intro'`); dokununca geçilir, yalnızca ilk görüşte çıkar (`save.intro`).
+  Yeni kilit eklerken `INTRO` sahnesi ve `STR`'de `ic_<tür>` satırı da gerekir.
+  **Cehennem çemberi (V0.8.0):** yalnızca Cehennem kademesinde çember nefes alır, bütün çember ibrenin tersine döner ve içinde sarmal döner (`HX`, `hellFx`); yalnızca görüntüdür, seviyeyle güçlenir.
 - **Jokerler ve can:** alet çubuğu ekranın en altındadır; işe yarayacağı an ilgili joker parlar (`adviceFor`, yalnızca ipucu), jokere tek dokunuş yeter (V0.6.1; basılı tutma kalktı). Halka ile joker sırası arasında parmak boyu boş alan bırakılır (`relayout`), oyun dokunuşları oraya gider.
   Her 3 seviyede bir joker hediye edilir. En fazla 1 yedek **can** taşınır (yeşil "+" hedefi, süre bitince +3 sn).
 - **Dene (kilit defteri):** defterden bir kilidin kısa canlı denemesi (`startPractice`, `G.practice`); süre, ceza, puan ve kayıt yok, ayrıntı `docs/yolculuk-tasarimi.md`. Yeni kilit eklerken `PRAC_TWIN` (denemede gelecek engel ikizi) ve gerekirse `PRAC_NEED` tablosuna bak.

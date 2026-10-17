@@ -14,6 +14,7 @@ VER=$(sed -n 's/.*versionName "\(.*\)".*/\1/p' android/app/build.gradle | head -
 GAME_VER=$(sed -n "s/.*const VERSION = 'V\\(.*\\)';.*/\\1/p" src/game.html | head -1)
 [ "$GAME_VER" = "$VER" ] || { echo "HATA: src/game.html içindeki VERSION (V$GAME_VER) ile build.gradle versionName ($VER) aynı olmalı"; exit 1; }
 
+node tools/check-strings.mjs
 ./build.sh
 # Test yardımcıları (bot.js, kp-*.js, index-en.html vb.) www/ içinde unutulmuş olabilir; yayına yalnızca index.html ve fonts/ girer.
 find www -mindepth 1 -maxdepth 1 ! -name index.html ! -name fonts -exec rm -rf {} +
