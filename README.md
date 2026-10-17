@@ -32,11 +32,14 @@ Sonra `http://localhost:8000` adresini aç. Telefon boyutunda denemek için tara
 
 ### Kilit türleri ve aletler
 
-- **Yolculuk:** oyun 10 seviyedir (yaklaşık 15 dk). Her seviyede 3 kilit olayı vardır (iyi kilit ✚ engel ikizi, ★ güçlenme, karışım); ardından
-  süre donan, cezasız, puan ×2 **cennet** ve süre hızlı eriyen, cezası ağır **cehennem** bölümü gelir (ikisi de 10 + seviye sn), sonra sonraki seviye.
-  Tema yumuşak geçişle altın-krem ya da kızıl-siyaha döner. Bir seviyeyi bitirince **kamp** açılır (menüde "Kamp · Seviye N"). Duraklatma her şeyi dondurur,
-  devam edince 3-2-1 sayılır. Zamanlar ve olaylar `JOURNEY`/`JEVENTS` (TUNE bloğu); ayrıntı `docs/yolculuk-tasarimi.md`. Şimdilik Seviye 1-3'ün kilitleri
-  yapıldı (çift ✚ tuzak, kayan ✚ kayan tuzak, nefes ✚ diken); kalanı fazlar halinde eklenecek.
+- **Yolculuk:** oyun 10 seviyedir (yaklaşık 5 dk, sonra sonsuz mod). Her seviye bir normal bölüm ve kısa bir **cehennem** bölümüdür (süre hızlı erir,
+  ceza ağırdır, hedefler dar; gücü seviyeyle artar). İki olay vardır: seviye başında iyi kilit ✚ engel ikizi, ortada ★ güçlenme ya da karışım.
+  Tema yumuşak geçişle kızıl-siyaha döner. Ekranda yalnızca "Seviye N" yazar; yeni kilit üst kartla ve hedefin yanındaki etiketle anlatılır, **Kilit defteri**
+  menüden açılır. Bir seviyeyi bitirince **kamp** açılır (menüde "Kamp · Seviye N"). Duraklatma her şeyi dondurur, devam edince 3-2-1 sayılır; oyun uygulamadan
+  çıkınca kaydedilir ve menüde "Devam et" çıkar (`save.run`). Zamanlar ve olaylar `JOURNEY`/`JEV` (TUNE bloğu); ayrıntı `docs/yolculuk-tasarimi.md`.
+  Şimdilik Seviye 1-3'ün kilitleri yapıldı (çift ✚ tuzak, kayan ✚ kayan tuzak, nefes ✚ diken); kalanı fazlar halinde eklenecek.
+- **Jokerler ve can:** alet çubuğu halkanın altındadır; işe yarayacağı an ilgili joker parlar (`adviceFor`), dokunmak yeter. Parlamayan joker basılı tutulunca çalışır.
+  Her 2 seviyede bir joker hediye edilir. En fazla 1 yedek **can** taşınır (yeşil "+" hedefi, süre bitince +3 sn).
 - **Eski türler (`KIND`):** vuruş sayısına bağlı eski açılış modeli yalnızca `tools/sim.mjs` tarafından kullanılır; oyunda yolculuk (`JKIND`, `JEVENTS`) geçerlidir.
 - **Aletler (`TOOL`):** stetoskop (hedefi genişletir), kronometre (+süre), kalkan (ıskayı bağışlar), kum saati (ibreyi yavaşlatır). Stok ve seviye cihazda saklanır; coin ile alınır ve yükseltilir, ödüllü reklam coin verir.
 - **Seri (kombo, `COMBO`):** ardışık vuruşlar puan çarpanı kazandırır (5, 10, 20 ve 35. vuruşta ×2, ×3, ×4, ×5). Iska seriyi sıfırlar, kalkan korur. Çarpan yalnızca puanı etkiler; coin ham puandan hesaplanır, ekonomi değişmez.

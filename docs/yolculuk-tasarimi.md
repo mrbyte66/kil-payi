@@ -1,124 +1,134 @@
-# Yolculuk tasarımı (onaylı, 2026-10-16)
+# Yolculuk tasarımı (V0.4.1, onaylı 2026-10-17)
 
-Kullanıcı bu tasarımı ve aşağıdaki süreleri onayladı. Süreler "şimdilik kesin" kabul edildi; yolculuk için süre ekonomisi
-simülasyonu bilerek ertelendi (ilk oyun testlerinden sonra gerçek oyuncu verisiyle ele alınacak). Hikaye/harita yok.
+Bu belge oyunun güncel yolculuk tasarımıdır. V0.4.0'daki ilk tasarımdan (cennet bölümü, 15 dakikalık yolculuk) sonra kullanıcı geri bildirimiyle
+değişti; değişiklik nedenleri `CHANGELOG.md` içinde. Hikaye/harita yok.
 
 ## Fikir
 
-Oyun hızlanarak değil çeşitlenerek büyür. Bir oyun bir yolculuktur: 10 seviye, aralıksız oynayan biri için yaklaşık 15 dakika.
-Her yeni **iyi kilit**, aynı anda ve aynı zorlukta bir **engel ikiziyle** açılır. Engeller "can yakar": süre, seri, coin,
-ibre hızı, dokunuş kilidi, zehir gibi farklı biçimlerde ceza verir.
+Oyun hızlanarak değil çeşitlenerek büyür. Bir oyun bir yolculuktur: 10 seviye, ortalama bir oyuncu için yaklaşık 5 dakika. Her yeni **iyi kilit**,
+aynı anda ve aynı zorlukta bir **engel ikiziyle** açılır. Ekranda yalnızca "Seviye N" yazar; toplam seviye sayısı kullanıcıya gösterilmez.
+10. seviyeden sonra "Sonsuz" mod başlar (10. seviye kuralları, zorluk hızlanır).
 
 ## Seviye yapısı
 
-- Her seviyede 3 **kilit olayı** var. Bir çift (iyi kilit + engel ikizi) tek olay sayılır. Diğer olaylar: `★` (eski bir kilidin
-  bir basamak güçlenmesi) ve `Karışım` (bilinen iki kilidin aynı meydan okumada gelmesi).
-- Üçüncü olaydan sonra **Cennet** (10 + seviye sn), sonra **Cehennem** (aynı süre), sonra sonraki seviye.
-- Ekranda hep `Seviye N/10` yazar (süre çubuğunun altında) ve 10 noktalı yol görünür. Cennet/cehennemde yanında
-  `Cennet · 13 sn` / `Cehennem · 13 sn` rozeti çıkar.
-- Seviye 10 bitince "Yolculuk tamamlandı" ekranı ve ödül, sonra isteğe bağlı sonsuz mod (seviye 10 kuralları, her dakika bir basamak zorlaşır).
+Her seviye bir **normal bölüm** ve onun sonunda kısa bir **cehennem** bölümünden oluşur (cennet bölümü V0.4.1'de kaldırıldı).
+Cehennem geçilince: +4 sn, coin (2 × (5 + 2 × seviye)), her 2 seviyede bir rastgele joker hediyesi, kamp kaydı.
 
-## Zaman çizelgesi (m:ss, yolculuğun başından; toplam 15:00)
+| Seviye | Normal | Cehennem | Başlangıç | Yeni kilit (✚ = engel ikizi) |
+|---|---|---|---|---|
+| 1 | 20 sn | 6 sn | 0:00 | Tek pim; çift pim ✚ tuzak pim (6. sn); seri çarpanı (13. sn) |
+| 2 | 22 sn | 6 sn | 0:26 | Kayan pim ✚ kayan tuzak; karışım: çift + kayan (11. sn) |
+| 3 | 22 sn | 7 sn | 0:54 | Nefes pim ✚ diken (kenardan); karışım: nefes + tuzak (11. sn) |
+| 4 | 24 sn | 7 sn | 1:23 | Kasa turu ✚ alarm turu *(yapılmadı)* |
+| 5 | 24 sn | 8 sn | 1:54 | İki halka ✚ kilitli halka *(iki halka var, kilitli halka yok)* |
+| 6 | 24 sn | 8 sn | 2:26 | Altın pim ✚ lanetli altın *(yapılmadı)* |
+| 7 | 26 sn | 8 sn | 2:58 | Hayalet pim ✚ hayalet tuzak *(yapılmadı)* |
+| 8 | 26 sn | 9 sn | 3:32 | Gelgit ibre ✚ girdap *(yapılmadı)* |
+| 9 | 28 sn | 9 sn | 4:07 | Renk pim ✚ yanıltıcı renk, bölgeli *(yapılmadı)* |
+| 10 | 28 sn | 10 sn | 4:44 | Tut-bırak pim ✚ sıcak yay *(yapılmadı)* |
+| Sonsuz | 28 sn | 10 sn | 5:22 | Ritim pim ✚ sahte nota, sarkaç ✚ balyoz, sis ✚ zehirli sis *(yapılmadı)* |
 
-Normal bölüm uzunlukları (sn): 45, 52, 56, 58, 60, 60, 62, 62, 65, 70. Cennet ve cehennem: 10 + seviye sn (11 … 20).
-Olay zamanları: 1. olay seviye başında, 2. olay normal bölümün %40'ında, 3. olay %75'inde.
+Her seviyede iki olay: yeni kilit seviye başında, ikincisi (★ güçlenme ya da karışım) normal bölümün yarısında. 1. seviyede üç olay var.
+Yapılmamış kilitlerin olayları atlanır (yalnızca yapılmış kilitler, ★ ve karışım çalışır). Zamanlar `JOURNEY`, olaylar `JEV` (TUNE bloğu).
 
-| Seviye | Başlangıç | Yeni kilitler (3 olay) | Puan türü | Ceza türü | Cennet + cehennem |
-|---|---|---|---|---|---|
-| 1 Isınma | 0:00 | Tek pim (0:00) · Çift pim ✚ Tuzak pim (0:18) · Seri çarpanı (0:34) | Düz puan, mükemmel ×2, kıl payı ×3 | Iska −1 sn, tuzak −1,5 sn | 11 + 11 sn, 0:45 |
-| 2 Kayma | 1:07 | Kayan pim ✚ Kayan tuzak (1:07) · ★ (1:28) · Karışım: çift + kayan (1:46) | Seri çarpanı ×2'den ×5'e | Iska ve kayan tuzak seriyi sıfırlar | 12 + 12 sn, 1:59 |
-| 3 Nefes | 2:23 | Nefes pim ✚ Diken (2:23) · ★ (2:45) · Karışım: nefes + tuzak (3:05) | Nefes bonusu (tam açıkken +1) | Diken: −1,5 sn, hedef 3 sn daralır | 13 + 13 sn, 3:19 |
-| 4 Kilit odası | 3:45 | Kasa turu ✚ Alarm turu (3:45) · Ritim pim ✚ Sahte nota (4:08) · ★ (4:29) | Kasa ödülü, nota puanı | Alarm: −2 sn, kasa sıfırlanır. Sahte nota: −1 sn, zincir bozulur | 14 + 14 sn, 4:43 |
-| 5 Çifte halka | 5:11 | İki halka ✚ Kilitli halka (5:11) · ★ (5:35) · Karışım: iki halka + tuzak (5:56) | Halka puanı (iki halka art arda +2) | Kilitli halka: −1 sn, halka 4 sn kilitli | 15 + 15 sn, 6:11 |
-| 6 Altın çağı | 6:41 | Altın pim ✚ Lanetli altın (6:41) · ★ (7:05) · Karışım: altın + nefes (7:26) | Altın puanı: ×3, +1 sn, +1 coin | Lanetli altın: −3 coin, −1 sn | 16 + 16 sn, 7:41 |
-| 7 Hafıza | 8:13 | Hayalet pim ✚ Hayalet tuzak (8:13) · ★ (8:38) · Karışım: hayalet + kayan (8:59) | Hafıza puanı (görünmeden vuruş ×2) | −1,5 sn, ekran 2 sn titrer | 17 + 17 sn, 9:15 |
-| 8 Hız | 9:49 | Gelgit ibre ✚ Girdap (9:49) · Sarkaç ibre ✚ Balyoz (10:14) · ★ (10:35) | Hız puanı (hızlı bölgede, sarkaç ortasında ×2) | Girdap: ibre 3 sn hızlanır. Balyoz: −2 sn, 1 sn dokunuş kilidi | 18 + 18 sn, 10:51 |
-| 9 Gölge | 11:27 | Renk pim ✚ Yanıltıcı renk (11:27) · Sis tüneli ✚ Zehirli sis (11:53) · ★ (12:16) | Renk zinciri (+1, +2, +3…), sis içinde ×2 | Yanıltıcı renk: −1 sn, 2 sn ters renk. Zehirli sis: 3 sn süre %50 hızlı erir | 19 + 19 sn, 12:32 |
-| 10 Final | 13:10 | Tut-bırak pim ✚ Sıcak yay (13:10) · Efsane karışımı: tüm türler (13:38) · Final (14:02) | Tut puanı (tuttukça +1, doğru bırakma ×2), tüm puanlar ×1,5 | Sıcak yay: tutarken yanık, süre erir. Tüm cezalar bir arada | 20 + 20 sn, 14:20 |
+## Cehennem
 
-Cehennem, cennetin hemen arkasından gelir (cennet başlangıç saatine cennet süresini ekle).
+Süre biraz hızlı erir, ceza ve engel olasılığı artar, hedefler daralır, ibre hızlanır; kızıl-siyah tema, kor ve çatlak efektleri.
+Gücü seviyeyle artar: `hellK(L) = hell0 + hellStep × (min(L, 8) − 1) + hellEnd × max(0, L − 10)`; `hell0` 0,1, `hellStep` 0,04, `hellEnd` 0,08.
+Yani 1. seviyede %10, 8.-10. seviyede %38, sonsuz modda her seviyede +%8 (18. seviyede tam güç).
+Tam güç (k = 1) değerleri: süre ×1,05, ceza ×1,3, hedef ×0,9, ibre ×1,1, zorluk +0,1, engel ikizi olasılığı 0,5 (normalde 0,3).
+Etkiler k ile normal bölümden tam güce doğrusal karışır. Her vuruşta +1 coin.
 
-## Cennet ve cehennem
+## Zorluk ve süre ekonomisi
 
-- **Cennet** (10 + seviye sn): süre donar, ıska cezasız (seri de bozulmaz), puan ×2, her 2 vuruşta +1 coin, hedefler %30 geniş,
-  ibre %15 yavaş, engel yok. O seviyenin iyi kilidi bol çıkar. Bitince +3 sn ve ödül: 5 + 2×seviye coin; 3., 6., 9. seviyede bir alet.
-- **Cehennem** (aynı süre): süre 1,25 kat hızlı erir, ıska ve tuzak cezası ×2, hedefler %20 dar, ibre %20 hızlı, engel ikizleri bol
-  (olasılık 0,75; normalde 0,3). Her vuruşta +1 coin. Sağ çıkarsan +3 sn ve 2 × (5 + 2×seviye) coin, sonra sonraki seviye.
-  Orada ölürsen oyun biter, ama ulaşılan seviye kaydedilir.
-- **Cehennemin gücü seviyeyle artar** (bot testinden sonra eklendi, ilk sürümde 1. seviyedeki cehennem herkesi eliyordu): 1. seviyede
-  yukarıdaki etkilerin %40'ı, her seviyede +%12, 6. seviyeden itibaren tam güç. Başlıkta gerçek ceza çarpanı yazar ("Ceza ×1,4").
-  Ayar: `JOURNEY.hell0` ve `JOURNEY.hellStep` (TUNE bloğu).
-- Zorluk seviyeye bağlı: taban yoğunluk `0,05 + 0,07 × (seviye − 1)` (+ 10 vuruşluk dalga ve "nefes" araları). Cennet −0,25, cehennem +0,15 kayar.
-- Uzun oyunda süreyi hızlandıran "yorgunluk" yolculukta yoktur.
+- Taban yoğunluk `0,02 + 0,015 × (seviye − 1)`, 10. seviyeden sonra seviye başına 0,1 (`ib0`, `ibs`, `ibEnd`). 10 vuruşluk dalga (genlik 0,2) ve "nefes" araları sürer.
+- Vuruş +1,1 sn, ıska −0,7 sn, tuzak −1,2 sn; hedefler daha geniş (hwMax 0,56), ibre daha yavaş (ωMax 3,8).
+- Zorluk seçici: Normal bu ayardır; Rahat biraz daha kolay, Usta eski V0.4.0 sertliğine yakın.
+- **Bot ölçümü** (`tools/bot.js`, Normal, joker kullanmadan, 4. seviyeden sonraki kilitler yokken): sıradan oyuncu (zamanlama sapması 0,08 sn) 10. seviyeye
+  %84-100, iyi (0,05) %100, yeni başlayan (0,12) yaklaşık %50 varıyor. Usta zorlukta sıradan oyuncu %67. Kilitler eklendikçe oranlar düşecek;
+  her fazdan sonra yeniden ölçülür. Hedef: sıradan oyuncunun yaklaşık yarısı 5 dakikada 10. seviyeye varsın.
+- Sonsuz modda zorluk hızlanır; Ritim, Sarkaç ve Sis kilitleri buraya taşındı (henüz yapılmadı).
 
-## Tema ve görünüm
+## Adil oyun kuralları (bütün kilitlere uygulanır)
 
-- Normal: lila + şeftali (sistem açık/koyu temasını izler).
-- Cennet: altın-krem arka plan, bulutlar, kıvılcımlar, altın hedefler. Cehennem: kızıl-siyah, kor, çatlaklar, kızıl hedefler.
-- Geçiş yaklaşık 1 saniyede, koyu moda geçer gibi yumuşak (renkler üstel yumuşatma ile karışır; `k = 1 − e^(−2,6·dt)`).
-- Bölüm başında büyük başlık 2 sn: "Cennet bölümü", "Cehennem bölümü", "Seviye N".
-- Cennet'te rozet: "Puan ×2 · ceza yok". Cehennem'de: "Ceza ×2 · süre hızlı erir".
+1. Vuruş anında ibre ve hedef görünür.
+2. Hiçbir engel hedefi tamamen kapatmaz; oyuncu bir tur boşa beklemek zorunda kalmaz.
+3. Anlık hile yok: renk ve görünürlük değişimleri önceden görülebilir, hedefin dışında olur.
+4. Yeni bir şey ilk görüldüğünde bir kez net anlatılır, sonra ipucu çıkmaz.
 
-## Kilit çiftleri (iyi ↔ engel ikizi) ve kuralları
+## Kilit çiftleri (iyi kilit ↔ engel ikizi)
 
-Basamak (★1, ★2, ★3) değerleri slash ile verilmiştir.
+Basamak (★1, ★2, ★3) değerleri slash ile verilmiştir. *(Yapıldı)* işaretliler oyunda var; diğerleri sonraki fazların tasarımıdır.
 
 | İyi kilit | Kural | Engel ikizi | Kural |
 |---|---|---|---|
-| Çift pim | İki hedef, 1 ve 2 numaralı, aralarında 0,5–1,0 rad boşluk | Tuzak pim | Hedefin yanında gül rengi tuzak, dokunursan −1,5 sn |
-| Kayan pim | Hedef salınır (genlik 0,45–0,8, 0,32–0,5 Hz) | Kayan tuzak | Tuzak hedefin üstünden kayar (genlik 0,95, 0,33 Hz); üst üsteyken dokunursan seri sıfır, −1 sn |
-| Nefes pim | Hedef yarı genişliği tam genişlik ile (1 − g) arasında nefes alır; g = 0,3/0,5/0,62, periyot 1,7/1,2/0,9 sn; yalnızca o anki genişlikte vuruş sayılır | Diken | Hedefin üstünde dikenli tuzak, genişliği 0,1–0,46 arası 1,4 sn'de nefes alır; açıkken (>0,3) dokunursan −1,5 sn ve hedefler 3 sn %20 daralır |
-| Kasa turu | Her 25 vuruşta 3 hedef art arda (1,5 rad aralık, her vuruşta ibre ×1,12, hedef −%18); yarı genişlik 0,36/0,28/0,2; açarsan +3 sn ve alet ya da coin | Alarm turu | Kasanın arasına "!" işaretli sahte kilit; dokunursan −2 sn, kasa sıfırlanır |
-| Ritim pim | 3/4/5 küçük hedef (yarı genişlik 0,26/0,2/0,16) 1,15 rad aralıkla; vuruşlarda yükselen nota; hepsi tutarsa +0,6 sn | Sahte nota | Dizinin arasına gül rengi ×'li nota; dokunursan −1 sn, zincir bozulur |
-| İki halka | Her ibre kendi hedefinde; dokunuş hedefteki ibreyi vurur; iç halka lila, dış halka şeftali | Kilitli halka | İç halka 2,2 sn'de bir kilitlenir (kilit simgesi, gül tonu); kilitliyken dokunursan −1 sn |
-| Altın pim | Geniş normal hedefin yanında ince altın hedef (yarı genişlik 0,24/0,17/0,12); altın ×3 puan, +1 sn, +1 coin; kaçırırsan ibre bir tur döner | Lanetli altın | Altına benzeyen koyu, kafatasımsı işaretli hedef; dokunursan −3 coin, −1 sn |
-| Hayalet pim | Hedef 1,2/0,9/0,55 sn görünür, sonra %35/%12/%0 görünürlüğe silikleşir | Hayalet tuzak | Tuzak da silikleşir; dokunursan −1,5 sn, ekran 2 sn titrer |
-| Gelgit ibre | İbre hızı açıya göre değişir: ω(a) = ω0(1 + v·sin a), v = 0,25/0,5/0,72; dışarıda koyu bant hızlı bölgeyi gösterir | Girdap | Halkada girdap bölgesi; içinden geçen ibre 2,4 sn ×1,9 hızlanır |
-| Sarkaç ibre | İbre dönmez, sağa sola salınır (yarım aralık 0,8/1,1/1,5 rad, 0,42/0,52/0,66 Hz); hedefler salınımın içinde; ortada vuruş ×2 | Balyoz | Hedefin üstünden salınan gül rengi balyoz (genlik 1,0 rad, 0,45 Hz); üstteyken dokunursan −2 sn, 1 sn dokunuş kilidi |
-| Renk pim | İbre rengi (şeftali daire / lila elmas) 2,0/1,4/0,95 sn'de bir değişir; yalnızca rengi uyan hedefe dokunulur; şekil renk körlüğü için | Yanıltıcı renk | Renk hedefe varmadan hemen önce değişir (hile); dokunursan −1 sn ve 2 sn ters renk |
-| Sis tüneli | Halkanın 0,9/1,7/2,4 rad'ı sisli; ibre içinde görünmez, hedef sisin içinde | Zehirli sis | Yeşil sis, içinde gizli tuzak; dokunursan 3 sn süre %50 hızlı erir |
-| Tut-bırak pim | Uzun yay (1,2/1,8/2,5 rad); ibre başa gelince basıp tut, sondaki bölgede (0,34/0,24/0,16 rad) bırak | Sıcak yay | Yayın son üçte biri sıcak (gül); orada basılı tutarsan yanarsın, süre erir |
+| Çift pim *(yapıldı)* | İki hedef, 1 ve 2 numaralı | Tuzak pim *(yapıldı)* | Hedefin yanında gül rengi tuzak, dokunursan −1,2 sn |
+| Kayan pim *(yapıldı)* | Hedef salınır (genlik 0,45–0,8, 0,32–0,5 Hz) | Kayan tuzak *(yapıldı)* | Hedefin üstünden kayar; hedefin %45'inden dar, hedefin açıkta kalan parçası her zaman vurulabilir; üstündeyken dokunursan seri sıfır, −1 sn |
+| Nefes pim *(yapıldı)* | Hedef genişliği nefes alır; tam açıkken vuruş +1 | Diken *(yapıldı)* | Hedefin kapanan kenarları dikenlidir, ortası her zaman açık; dikenli kenara dokunursan −1,5 sn ve hedefler 3 sn %20 daralır |
+| Kasa turu | Her 25 vuruşta 3 hedef art arda, ibre hızlanır, hedef daralır; açarsan +3 sn ve alet ya da coin | Alarm turu | Kasanın arasına "!" işaretli sahte kilit; dokunursan −2 sn, kasa sıfırlanır |
+| İki halka *(yapıldı)* | Her ibre kendi hedefinde; dokunuş hedefteki ibreyi vurur (iç halka lila, dış halka şeftali) | Kilitli halka | **Kilitliyken iç ibre donar** (hedef kaçmaz), kilit açılınca devam eder; kilitliyken dokunursan −1 sn |
+| Altın pim | Geniş hedefin yanında ince altın hedef; altın ×3 puan, +1 sn, +1 coin; kaçırırsan yalnızca ıska | Lanetli altın | Altına benzeyen kafatasımsı hedef; dokunursan −3 coin, −1 sn |
+| Hayalet pim | Hedef önce görünür, sonra silikleşir (en az %15 görünür kalır, ibre hep görünür); görünmezken vuruş ×2 | Hayalet tuzak | Tuzak da silikleşir; dokunursan −1,5 sn, ekran 2 sn titrer |
+| Gelgit ibre | İbre hızı açıya göre değişir; hızlı bölge dışta koyu bantla görünür | Girdap | İçinden geçen ibre 2,4 sn hızlanır |
+| Renk pim | **Halka iki renk bölgesidir** (şeftali ve lila); ibre bulunduğu bölgenin rengini yumuşakça alır; yalnızca rengi uyan hedefe dokunulur; hedefin içinde renk asla değişmez | Yanıltıcı renk | Yanlış renk bölgesine konan hedef ("≠"); dokunursan −1 sn |
+| Tut-bırak pim | Uzun yay; ibre başa gelince basıp tut, sondaki bölgede bırak | Sıcak yay | Yayın son üçte biri sıcak; tutarken yanarsın, süre erir. **İlk karşılaşmada** yay kızarır, çubuk alev alır, "Sıcak! Bırak" yazar; sonra ipucu yok |
+| Ritim pim (sonsuz) | 3/4/5 küçük hedef art arda, vuruşlarda yükselen nota | Sahte nota | Dizinin arasına gül rengi ×'li nota; dokunursan −1 sn, zincir bozulur |
+| Sarkaç ibre (sonsuz) | İbre dönmez, sağa sola salınır; ortada vuruş ×2 | Balyoz | Hedefin üstünden salınan balyoz; üstteyken dokunursan −2 sn, 1 sn dokunuş kilidi |
+| Sis tüneli (sonsuz) | **İbre hep görünür**; hedef sisin içinde saklı, ibre yaklaşınca (yarım sn kala) sis dağılır | Zehirli sis | Yeşil sis, içinde gizli tuzak; dokunursan 3 sn süre %50 hızlı erir |
 
-Tek pim ve Seri çarpanı (combo) çekirdek oyundur; çarpan 5/10/20/35. vuruşta ×2/×3/×4/×5.
+Tek pim ve Seri çarpanı çekirdek oyundur; çarpan 5/10/20/35. vuruşta ×2/×3/×4/×5.
+
+## Ekran ve yardımcılar (V0.4.1)
+
+- **HUD:** süre çubuğu, "Seviye N" ve altında ince ilerleme çizgisi (cehennemde kızıl), cehennem rozeti. Toplam seviye ve noktalı yol yok.
+- **Yeni kilit kartı** (üst kart): HUD'un altında; yeni kilitte simge + ad + kural + uyarı, 6 sn; ★/karışım/seri gibi küçük haberler tek satır, 4 sn.
+  Yeni kilidin ilk hedefi kart çıktıktan 2 sn sonra ve ibreden uzak doğar. **Nesne etiketi:** yeni kilidin ilk 3 karşılaşmasında hedefin ve
+  tuzağın yanında kısa yazı ("Açıkken vur", "Dikene dokunma"). Menüde **Kilit defteri**: görülen kilitlerin açıklamaları.
+- **Jokerler:** halkanın altında, başparmak bölgesinde. İşe yarayacağı an biri parlar, büyür, etiketini gösterir (Kronometre: süre ≤ 2,5 sn;
+  Kalkan: art arda iki hata ya da cehennem başı; Stetoskop: hedef dar ya da cehennem başı; Kum saati: ibre çok hızlı ya da iki ıska).
+  Parlayan jokere dokunmak yeter (+25 puan, "Akıllı hamle!"); parlamayan joker basılı tutulunca (0,45 sn) çalışır, kısa dokunuş oyuna geçer.
+  Etkiler `TOOL` tablosunda (seviyeyle artar): stetoskop hedefleri genişletir, kronometre süre ekler, kalkan ceza ve seri bozulmasını önler,
+  kum saati ibreyi yavaşlatır. Yeni oyuncuda her jokerden 2 var; her 2 seviyede bir hediye. Oyun jokersiz biterse "… vardı, kullanmadan bitti" notu.
+  (Tasarımdaki "yukarı kaydır" kısayolu yapılmadı: kaydırmanın ilk dokunuşu oyunda vuruş sayılırdı.)
+- **Can (yedek):** yeşil "+" hedefi; çift seviyelerin normal bölümünün %55'inden sonra, canın yoksa bir sonraki hedef olur. En fazla 1; süre çubuğunun
+  yanında yeşil "+ Can" kapsülü ve çubuğun yeşil çerçevesi. Süre bitince kendiliğinden devreye girer: +3 sn, kısa yavaş ibre. Kalp simgesi
+  kullanılmadı (kullanıcı isteği).
+- **Devam etme:** oyun her 5 sn'de ve çıkarken kaydedilir (`save.run`); uygulama kapansa bile menüde "Devam et" (seviye ve puan yazar), dokununca 3-2-1.
+  "Yeni oyun" kayıt varken önce sorar. Oyun bitince kayıt silinir.
+- **Menü:** "Oyun" sayacı kalktı; en iyi puan, ulaşılan seviye, joker stoğu, zorluk seçici, büyük Devam et/Oyna, Kamp, sürüm adı.
 
 ## Kamp, rekor, duraklatma
 
-- **Kamp:** Bir seviyeyi (cehennemi dahil) bitirince o seviyenin sonu kayıt noktası olur. Sonraki oyunda menüde "Kamp · Seviye N" ile oradan
-  başlanabilir. Kamp oyunları puan rekorunu etkilemez; en iyi seviye ayrı tutulur.
-- **Rekor:** Puan rekoru (zorluk seviyesi başına) yalnızca 1. seviyeden başlayan oyunlarla güncellenir. "En iyi seviye" her oyunda güncellenir.
-- **Duraklatma:** Ana ekran tuşu, ekran kilidi/kapanması, geri tuşu ve uygulamadan çıkış oyunu duraklatır (zaten çalışır).
-  Seviye sayacı, cennet/cehennem geri sayımı, tema geçişi ve ses de duracak; "Devam et"ten sonra 3-2-1 geri sayım.
-- Zorluk seçici (Rahat/Normal/Usta) sayıları değiştirir; yolculuk süreleri sabittir. ("Usta'da hızlı açılış" fikri bu yüzden kaldırıldı.)
+- **Kamp:** Bir seviyeyi (cehennemi dahil) bitirince o seviyenin sonu kayıt noktası olur; menüde "Kamp · Seviye N". Kamp oyunları puan rekorunu etkilemez.
+- **Rekor:** Puan rekoru (zorluk başına) yalnızca 1. seviyeden başlayan oyunlarla güncellenir; "en iyi seviye" her oyunda.
+- **Duraklatma:** Ana ekran, ekran kilidi, geri tuşu ve uygulamadan çıkış oyunu duraklatır ve kaydeder; sayaçlar, tema geçişi donar; "Devam et"ten sonra 3-2-1.
+  Duraklatma ekranında "Menü" düğmesi kaydı bırakıp menüye döner.
 
 ## Yapım sırası ve durum
 
-1. **Faz 1 (iskelet): TAMAM (0.3.0).** Seviye/cennet/cehennem akışı (`jPhaseAt`), kilit olayları (`JEVENTS`, `fireEvent`), tema geçişi
-   (`THEME_H`/`THEME_X`, `applyTheme`), HUD (Seviye N/10, 10 noktalı yol, bölüm rozeti), bölüm başlığı, kamp, duraklatmada her şeyin donması ve
-   "Devam et"ten sonra 3-2-1. Kilitler: Çift ✚ Tuzak, Kayan ✚ Kayan tuzak, Nefes ✚ Diken (hedefle ters fazda nefes alan dikenler),
-   Seri çarpanı, ★ (en az güçlenmiş kilit güçlenir), Karışım (S2: çift + kayan, S3: nefes + tuzak, S5: iki halka + tuzak), Nefes bonusu (tam açıkken +1),
-   İki halka (S5, kilitli halka olmadan). Henüz yapılmamış kilitlerin olayları atlanır.
-2. **Faz 2:** Kasa ✚ Alarm, Ritim ✚ Sahte nota, Kilitli halka, Altın ✚ Lanetli altın; ★ ve Karışım olaylarının kalanı.
-3. **Faz 3:** Hayalet, Gelgit, Sarkaç ve engel ikizleri.
-4. **Faz 4:** Renk, Sis, Tut-bırak ve engel ikizleri; final ve sonsuz mod; Antrenman modu; yeni tür kutlaması.
+1. **Faz 1 (V0.4.0): TAMAM.** İskelet, tema geçişi, HUD, kamp, duraklatma geri sayımı, Seviye 1-3 kilitleri.
+2. **V0.4.1: TAMAM.** Cennet kalktı, yeni tempo (~5 dk), diken kenara alındı, kayan tuzak daraldı, jokerler, can, devam etme, yeni kilit kartı ve
+   etiketleri, kilit defteri, "Seviye N" yazısı, menü.
+3. **Faz 2:** Kasa ✚ Alarm, Kilitli halka (donduran), Altın ✚ Lanetli altın; ★ ve karışımların kalanı.
+4. **Faz 3:** Hayalet, Gelgit ve engel ikizleri.
+5. **Faz 4:** Renk (bölgeli), Tut-bırak ✚ Sıcak yay (ilk karşılaşma uyarısıyla), sonsuz mod kilitleri (Ritim, Sarkaç, Sis, düzeltilmiş), Antrenman modu,
+   yeni tür kutlaması.
+6. **Mağaza hazırlığı (ayrı sürüm):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi, paket adının kesinleşmesi.
 
-Sonsuz mod şimdilik yalnızca 10. seviye sonrası otomatik devam ("Yolculuk tamamlandı", +100 coin); bölüm uzunlukları 10. seviyeninkiyle aynı,
-yoğunluk her seviyede biraz artar.
+Sonsuz mod şimdilik yalnızca 10. seviye sonrası otomatik devam ("Yolculuk tamamlandı", +100 coin); yoğunluk ve cehennem gücü her seviyede artar.
 
-## Bot ile zorluk ölçümü (Faz 1 sonrası)
+## Bot ile zorluk ölçümü
 
 `tools/bot.js` gerçek oyun kodunu hızlandırılmış zamanla oynatır (kullanımı dosyanın başında). Beceri = dokunuş zamanlama hatasının standart sapması
-(yeni 0,12 sn, orta 0,08, iyi 0,05, usta 0,03). Her hücre 40 oyun, Normal zorluk, cehennem gücü rampasıyla:
+(yeni 0,12 sn, orta 0,08, iyi 0,05, usta 0,03). Normal zorluk, joker kullanılmadan, 4. seviyeden sonraki kilitler yokken:
 
-| Beceri | Ölüm anı (medyan) | S2'ye ulaşan | S3 | S4 | S5 | S6 |
-|---|---|---|---|---|---|---|
-| yeni | 40 sn | 7/40 | 0 | 0 | 0 | 0 |
-| orta | 140 sn | 33/40 | 12 | 0 | 0 | 0 |
-| iyi | 217 sn | 40/40 | 39 | 12 | 1 | 0 |
-| usta | 221 sn | 40/40 | 38 | 14 | 6 | 3 |
+| Beceri | 10. seviyeye ulaşan | Medyan ulaştığı seviye |
+|---|---|---|
+| yeni | ~%50 | — |
+| orta | %84-100 | 16-17 |
+| iyi | %100 | 19 |
+| usta | hepsi | — |
 
-Rahat'ta orta bot 194 sn, usta bot 346 sn medyan (S6'ya 11/40); Usta'da orta bot 63 sn, usta bot 197 sn. Yani yolculuğun tamamı (15 dk) şimdilik
-yalnızca çok iyi oyuncular ve kamp kayıt noktalarıyla ulaşılabilir; bu bilinçli bir "zor" tercih değil, gerçek oyuncu verisiyle ayarlanacak konu.
-Botun bulduğu iki hata düzeltildi: tuzak ikizi çift pimin ikinci hedefinin üstüne düşüyordu; hell ilk sürümde 1. seviyede bile tam güçteydi.
-
-Açık konu: yolculuk süre ekonomisinin (başlangıç süresi, cennet/cehennem etkileri, zorluk eğrisi) gerçek oyuncu geri bildirimiyle ayarı.
-Kullanıcı süre simülasyonu adımını bilerek atladı; süreler (normal bölüm uzunlukları, cennet/cehennem 10 + seviye sn) değişmedi.
+Rahat daha kolay; Usta'da orta bot %67 ile 10. seviyeye varıyor, yeni bot 8. seviyeye kadar ölüyor. Her faz sonunda yeni kilitlerle yeniden ölçülür.
+Bu sayılar insan oyuncu değil bot sonucudur; gerçek oyuncu geri bildirimi gelince ayarlanır. V0.4.0'daki ölçümler (3. seviyede sıradan bot ölüyordu) bu
+yüzden tempo bu sürümde baştan yeniden ayarlandı.
