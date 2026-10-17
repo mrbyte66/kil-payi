@@ -21,20 +21,22 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 
 ## Oyun sistemleri
 
-- Oyunda geçerli olan kilit modeli yolculuktur: `JKIND` (iyi kilitler), `JTWIN` (engel ikizleri), `JEVENTS` (hangi seviyede ne açılır), `MIXES` (karışımlar); spawn `spawnChallenge`, vuruş `tap`/`hit`/`trap`, tür açılışı `fireEvent`. Yeni tür eklerken `IMPL_GOOD`/`IMPL_TWIN` tablolarına da ekle (yapılmamış türlerin olayı atlanır). `KIND` tablosu eski modeldir, yalnızca `tools/sim.mjs` kullanır.
-- Yolculuk zorluğunu `tools/bot.js` ile ölç (DEBUG=1 derlemesinde); kilit eklediğin her fazdan sonra çalıştır, tuzakların hedeflerin üstüne düşmediğinden emin ol.
+- Oyunda geçerli olan kilit modeli yolculuktur: `JKIND` (iyi kilitler), `JTWIN` (engel ikizleri), `JEV` → `JEVENTS` (hangi seviyede ne açılır), `MECH` (kilitlerin sayıları), `MIXES` (karışımlar); spawn `spawnChallenge` (+ `addTwin`), vuruş `tap`/`release`/`hit`/`trap` (tut-bırak pininde dokunuş basış ve bırakış olarak iki olaydır), tur durumu `G.chal` ve `updateChal`, tür açılışı `fireEvent`. Yeni tür eklerken `IMPL_GOOD`/`IMPL_TWIN` ve `BOOK` (kilit defteri) tablolarına, `STR`'de `k_`/`rule_`/`warn_` satırlarına (TR ve EN), `drawPin` ve `drawLockIcon` çizimlerine de ekle (yapılmamış türlerin olayı atlanır). `KIND` tablosu eski modeldir, yalnızca `tools/sim.mjs` kullanır.
+- Yolculuk zorluğunu `tools/bot.js` ile ölç (DEBUG=1 derlemesinde; `www/` içine kopyalayıp sayfaya yükle, ya da konsola yapıştır): `bulk(['normal'], 40, [['orta', 0.08, 0.75]])`, her beceri ayrı çağrıda (uzun çağrı tarayıcı aracında hata verir); `kindStats()` kilit başına vuruş oranını gösterir. Kilit ya da ayar değiştirdiğin her seferde çalıştır, tuzakların hedeflerin üstüne düşmediğinden emin ol. Hedef tablosu ve son ölçüm `docs/yolculuk-tasarimi.md` sonunda. Bot insan değildir: insan yeni kuralı ilk görüşte öğrenmek zorunda kaldığı için daha çok ölür. Tarayıcı panelinde sayfa önbellekte kalır: yeniden derleyince adrese `?v=N` ekle. `www/` içine koyduğun geçici test dosyalarını `tools/release.sh` siler.
 - Aletler `TOOL` tablosunda; stok ve seviye `save.tools`. Alet çubuğu oyun alanının altında ve oyun dokunuşu almaz (kasıtlı, kazara kullanımı önler).
 - Seviyeler (`LEVEL`: rahat, normal, usta) ve seri çarpanı (`comboMult`) TUNE bloğunda, sim ile paylaşılır. Seviye çarpanlarını değiştirince `node tools/sim.mjs 2000 seviye` çalıştır; hedef: Rahat'ta bir beceri düzeyi, Normal'in bir alt düzeyi gibi oynasın.
 - Her seviyenin rekoru ayrı (`save.bests`); `save.best` kaldırıldı, eski kayıt Normal'e taşınır.
 - Övgü ve laf satırları `LINES` içinde (TR ve EN). Yeni satır eklerken iki dili de doldur; ton hafif şakacı kalsın, aşağılayıcı olmasın. Kullanıcı özellikle "Senin yapacağın iş değil" tarzı laf istedi.
 - İki halkada dokunuş ekranın neresinde olursa olsun hedefteki ibreyi vurur (sol/sağ kuralı kaldırıldı); iç halka lila, dış halka şeftali boyanır. Çift pimde iki hedef arası da açıldı. Nedeni: arkadaşlardan "iki tane olan böyle olmamalı" geri bildirimi geldi; kullanıcı bunun iki halka olduğunu doğruladı (çift pimdeki açma önlem olarak yapıldı, şikâyet konusu değildi). Ayrıntıyı (sol/sağ kuralı mı, iki ibreyi aynı anda izlemek mi) arkadaşlar söylemedi; yeni sürümden sonra tekrar sor.
-- **Yolculuk (onaylı tasarım, V0.4.1):** `docs/yolculuk-tasarimi.md`. 10 seviye (~5 dk), her seviyede iyi kilit ✚ engel ikizi, ardından kısa cehennem
+- **Yolculuk (onaylı tasarım, V0.5.0):** `docs/yolculuk-tasarimi.md` ve kilit fikirleri `docs/kilit-katalogu.md`. 10 seviye (~5,5 dk), seviye başında iyi kilit, ortasında engel ikizi, ardından kısa cehennem
   bölümü (cennet kaldırıldı), kontrastlı temalar ve yumuşak geçiş. Ekranda yalnızca "Seviye N" yazar, toplam gösterilmez. Süreler bot ölçümüyle ayarlandı
   (`JOURNEY.normal/hell`, cehennem gücü `hellK`; ölçüm belgede). Kullanıcı kalp simgesini sevmedi: can yeşil "+ Can" kapsülüdür. Jokerler parlayarak
   ipucu verir (`adviceFor`), oyun `save.run` ile kaldığı yerden devam eder. Yeni özellik eklerken önce o belgeyi oku, bitince belgedeki "Yapım sırası ve
-  durum" bölümünü güncelle. V0.4.1 tamam; sıradaki Faz 2 (Kasa, Kilitli halka, Altın). İkon/imzalı paket/gizlilik sayfası/gerçek reklam kimliği ayrı sürümde.
-- Sis, renk ve sıcak yay kilitleri yapılırken tasarım kuralları belgede ("Adil oyun kuralları"): ibre hep görünür, renk hedefin içinde değişmez
-  (halka iki bölgeli), sıcak yayda ilk karşılaşmada net uyarı. `DEBUG=2 ./build.sh` kancayı ekler ama duraklatmayı kapatmaz (yaşam döngüsü testi için).
+  durum" bölümünü güncelle. V0.5.0 tamam (Seviye 4-10 kilitleri); sıradaki: katalogdaki kalan fikirler (Sarkaç, Renk, Sis...) sonsuz mod için, kullanıcının oyun sonrası geri bildirimine göre. İkon/imzalı paket/gizlilik sayfası/gerçek reklam kimliği ayrı sürümde (kullanıcı Play hesabı açınca haber verecek).
+- Sis ve renk kilitleri yapılırken tasarım kuralları belgede ("Adil oyun kuralları"): ibre hep görünür, renk hedefin içinde değişmez
+  (halka iki bölgeli). `DEBUG=2 ./build.sh` kancayı ekler ama duraklatmayı kapatmaz (yaşam döngüsü testi için; `DEBUG=1`'de `pause()` hiçbir şey yapmaz).
+- Kullanıcı geri bildirimi (V0.4.1 sonrası): yeni kilit görünüşleri tutarlı olmalı (aynı şekil aynı anlam), etiket yazıları halkanın üstüne konmaz, bonuslar az,
+  zorluk gerçekten artmalı. Yeni kilidi önce görsel olarak çizip göster, onaylanınca kodla.
 - Hikaye/harita yok; kullanıcı gereksiz buldu. Eklenmesi önerilmesin.
 
 ## Ortam notları (bu makine)

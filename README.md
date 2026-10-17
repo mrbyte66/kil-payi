@@ -10,6 +10,7 @@ Refleks oyunu. Kadran üzerinde dönen ibreyi şeftali bölgedeyken yakala; sür
   (ana ekran, ekran kilidi, geri tuşu denemeleri için). İkisi de yayın sürümüne girmez.
 - `www/`: derlenmiş çıktı.
 - `docs/yolculuk-tasarimi.md`: onaylı yolculuk tasarımı, süreler, kilit çiftleri, yapım durumu ve bot ölçümleri.
+- `docs/kilit-katalogu.md`: kilit fikirlerinin tam listesi (Kolay/Orta/Zor), V0.5.0'da yapılanlar ve bekleyenler.
 - `tools/`: `sim.mjs` (eski vuruş sayısına bağlı zorluk simülatörü), `bot.js` (yolculuğu gerçek kodla oynatan bot).
 
 ## Çalıştırma
@@ -32,14 +33,17 @@ Sonra `http://localhost:8000` adresini aç. Telefon boyutunda denemek için tara
 
 ### Kilit türleri ve aletler
 
-- **Yolculuk:** oyun 10 seviyedir (yaklaşık 5 dk, sonra sonsuz mod). Her seviye bir normal bölüm ve kısa bir **cehennem** bölümüdür (süre hızlı erir,
-  ceza ağırdır, hedefler dar; gücü seviyeyle artar). İki olay vardır: seviye başında iyi kilit ✚ engel ikizi, ortada ★ güçlenme ya da karışım.
+- **Yolculuk:** oyun 10 seviyedir (yaklaşık 5 buçuk dk, sonra sonsuz mod). Her seviye bir normal bölüm ve kısa bir **cehennem** bölümüdür (süre hızlı erir,
+  ceza ağırdır, hedefler dar; gücü seviyeyle artar). Seviye 4-10'da seviyenin başında yeni bir iyi kilit, ortasında onun engel ikizi gelir (`JEV`).
   Tema yumuşak geçişle kızıl-siyaha döner. Ekranda yalnızca "Seviye N" yazar; yeni kilit üst kartla ve hedefin yanındaki etiketle anlatılır, **Kilit defteri**
   menüden açılır. Bir seviyeyi bitirince **kamp** açılır (menüde "Kamp · Seviye N"). Duraklatma her şeyi dondurur, devam edince 3-2-1 sayılır; oyun uygulamadan
   çıkınca kaydedilir ve menüde "Devam et" çıkar (`save.run`). Zamanlar ve olaylar `JOURNEY`/`JEV` (TUNE bloğu); ayrıntı `docs/yolculuk-tasarimi.md`.
-  Şimdilik Seviye 1-3'ün kilitleri yapıldı (çift ✚ tuzak, kayan ✚ kayan tuzak, nefes ✚ diken); kalanı fazlar halinde eklenecek.
+  Kilitler: çift ✚ tuzak, kayan ✚ kayan tuzak, nefes ✚ diken, altın ✚ lanetli altın, sabır pimi ✚ çürük kilit, kasa ✚ alarm, ritim ✚ sahte nota, trafik ışığı,
+  iki halka ✚ kilitli halka, hayalet ✚ hayalet tuzak, bomba pim, gelgit ✚ girdap, tut-bırak ✚ sıcak yay. Sayılar `MECH` tablosunda; tür tabloları `JKIND`,
+  `JTWIN`, `IMPL_GOOD`/`IMPL_TWIN` (yeni tür eklerken hepsine ve `BOOK` kilit defterine eklenir). Kalan fikirler `docs/kilit-katalogu.md` içinde.
+  Tut-bırak pininde dokunuş iki olaydır: basış (`tap`) ve bırakış (`release`).
 - **Jokerler ve can:** alet çubuğu halkanın altındadır; işe yarayacağı an ilgili joker parlar (`adviceFor`), dokunmak yeter. Parlamayan joker basılı tutulunca çalışır.
-  Her 2 seviyede bir joker hediye edilir. En fazla 1 yedek **can** taşınır (yeşil "+" hedefi, süre bitince +3 sn).
+  Her 3 seviyede bir joker hediye edilir. En fazla 1 yedek **can** taşınır (yeşil "+" hedefi, süre bitince +3 sn).
 - **Eski türler (`KIND`):** vuruş sayısına bağlı eski açılış modeli yalnızca `tools/sim.mjs` tarafından kullanılır; oyunda yolculuk (`JKIND`, `JEVENTS`) geçerlidir.
 - **Aletler (`TOOL`):** stetoskop (hedefi genişletir), kronometre (+süre), kalkan (ıskayı bağışlar), kum saati (ibreyi yavaşlatır). Stok ve seviye cihazda saklanır; coin ile alınır ve yükseltilir, ödüllü reklam coin verir.
 - **Seri (kombo, `COMBO`):** ardışık vuruşlar puan çarpanı kazandırır (5, 10, 20 ve 35. vuruşta ×2, ×3, ×4, ×5). Iska seriyi sıfırlar, kalkan korur. Çarpan yalnızca puanı etkiler; coin ham puandan hesaplanır, ekonomi değişmez.
@@ -59,8 +63,10 @@ node tools/sim.mjs curve         # zorluk eğrisi verisi (JSON)
 DIFF_OVERRIDE='{"rise":0.7}' node tools/sim.mjs 2500 yeni   # parametre denemesi
 ```
 
-Yolculuk için ayrı bir bot var: `DEBUG=1 ./build.sh` ile derlenen sayfada `tools/bot.js` içeriğini konsola yapıştırıp `bulk(['normal'], 40)` çalıştır;
-bot gerçek oyun kodunu hızlandırılmış zamanla oynar ve beceri düzeyine göre kaç saniyede, hangi seviyede öldüğünü verir (sonuçlar `docs/yolculuk-tasarimi.md` içinde).
+Yolculuk için ayrı bir bot var: `DEBUG=1 ./build.sh` ile derlenen sayfada (`python3 -m http.server --directory www`, `tools/bot.js` dosyasını `www/` içine kopyalayıp sayfaya
+`<script src="bot.js">` ekle ya da içeriğini konsola yapıştır) `bulk(['normal'], 40)` çalıştır; bot gerçek oyun kodunu hızlandırılmış zamanla oynar ve beceri düzeyine göre
+kaç saniyede, hangi seviyede, hangi kilitte öldüğünü ve seviyeye ulaşma yüzdelerini verir (`kindStats()` kilit başına tur ve vuruş oranını gösterir;
+sonuçlar `docs/yolculuk-tasarimi.md` içinde). Uzun koşuları beceri başına ayrı çalıştır (bir çağrı çok uzarsa tarayıcı aracı hata verir).
 
 Simülasyon, gerçek oyunla aynı `TUNE` bloğunu okur. Oyuncular zamanlama sapması (sigma) ve dikkat kaybı olasılığıyla modellenir;
 gerçek oyuncu verisi geldiğinde bu değerler yeniden kalibre edilmelidir.
