@@ -24,16 +24,24 @@
     return ahead / (base * (ring ? 1 : k.ptrFactor()));
   };
   /* tür başına istatistik: tur sayısı, toplam süre, dokunuş, vuruş (zorluk dengesi için) */
-  window.__stats = {};
+  window.__stats = {}; window.__hell = {};
+  const hstat = L => window.__hell[L] || (window.__hell[L] = { enter: 0, pass: 0 });
   const stat = kd => window.__stats[kd] || (window.__stats[kd] = { ch: 0, dur: 0, taps: 0, hits: 0, pen: 0 });
   window.runBot = (sigmaT, trapAvoid, startL = 1, tmax = 1500, dt = 1 / 60, opt = {}) => {
-    k.start(startL); let t = 0, taps = 0, miss = 0, curChal = null;
+    k.start(startL); if (opt.setup) opt.setup();
+    let t = 0, taps = 0, miss = 0, curChal = null, prevPh = G.ph, prevL = G.L;
     sigmaT = sigmaT * Math.exp(gauss(opt.jitter == null ? 0.25 : opt.jitter));
     const lapse = opt.lapse == null ? 0.01 + sigmaT * 0.15 : opt.lapse, aimE = () => gauss(sigmaT * (Math.random() < lapse ? 3 : 1));
     const goldP = Math.max(0.15, Math.min(0.85, 0.95 - sigmaT * 6.5)), lightMis = sigmaT * 1.2;
     const seed = p => { if (p._aim === undefined) { p._aim = aimE(); p._aim2 = aimE() * 1.2; p._armed = false; } };
     while (G.mode === 'play' && t < tmax) {
       k.update(dt); t += dt;
+      if (opt.stop && opt.stop()) break;
+      if (G.ph !== prevPh || G.L !== prevL) {
+        if (G.ph === 'hell') hstat(G.L).enter++;
+        else if (prevPh === 'hell') hstat(prevL).pass++;
+        prevPh = G.ph; prevL = G.L;
+      }
       if (G.chal !== curChal) { if (curChal) { const sx = stat(curChal.kind); sx.ch++; sx.dur += curChal.t; } curChal = G.chal; }
       if (G.mode !== 'play') break;
       /* tut-bırak: basılıyken bırakma anını bekle */
@@ -94,12 +102,30 @@
       else if (G.n === n0 && G.time <= t0) miss++;
       best._armed = false; best._aim = aimE();
     }
-    return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss, kind: G.kind, chal: G.chal && G.chal.tw ? G.chal.tw : '' };
+    return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss, kind: G.kind, chal: G.chal && G.chal.tw ? G.chal.tw : '', alive: G.mode === 'play', time: G.time };
   };
   const SKILLS = [['yeni', 0.12, 0.5], ['orta', 0.08, 0.75], ['iyi', 0.05, 0.9], ['usta', 0.03, 0.95]];
   window.kindStats = () => Object.keys(window.__stats).sort().map(kd => { const x = window.__stats[kd]; return kd + ': ' + x.ch + ' tur, ' + (x.dur / Math.max(1, x.ch)).toFixed(2) + ' sn/tur, vuruş %' + Math.round(100 * x.hits / Math.max(1, x.taps)) + ' (' + x.taps + ' dokunuş)'; });
+  /* cehennem bölümlerinde hayatta kalma: seviye başına girenlerin yüzde kaçı çıktı (bulk sonrası) */
+  window.hellStats = () => Object.keys(window.__hell).map(Number).sort((a, b) => a - b).filter(L => L <= 12).map(L => { const h = window.__hell[L]; return 'S' + L + ' %' + Math.round(100 * h.pass / Math.max(1, h.enter)) + ' (' + h.enter + ')'; }).join('  ');
+  /* Tek bir cehennem bölümünü ölç: o seviyenin cehennemine t0 saniye süreyle girilir; hayatta kalan yüzdesi ve kalan süre. */
+  window.hellTest = (L, sg, av, n = 100, t0 = 6) => {
+    let ok = 0, left = 0;
+    for (let i = 0; i < n; i++) {
+      const r = window.runBot(sg, av, L, 60, 1 / 60, {
+        setup: () => {
+          G.jt = k.jStart(L) + k.JOURNEY.normal[Math.min(L, 10) - 1] + 0.01; G.evi = 0; G.open = []; G.eng = {}; G.stars = {}; G.mixes = []; G.comboOn = true; k.applyEvents(true);
+          k.update(1 / 60); G.time = t0; k.spawn(false);
+        },
+        stop: () => G.mode === 'play' && G.ph === 'normal' && G.L > L
+      });
+      if (r.alive) { ok++; left += r.time; }
+    }
+    return 'S' + L + ' %' + Math.round(100 * ok / n) + (ok ? ' (kalan ' + (left / ok).toFixed(1) + ' sn)' : '');
+  };
+  window.hellLine = (sg, av, n = 100, t0 = 6, Ls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) => Ls.map(L => window.hellTest(L, sg, av, n, t0)).join('  ');
   window.bulk = (levels = ['normal'], n = 40, skills = SKILLS, ups = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12]) => {
-    window.__stats = {};
+    window.__stats = {}; window.__hell = {};
     const out = {};
     for (const lvl of levels) {
       k.setLevel(lvl);
@@ -109,7 +135,8 @@
         const kinds = {}; rs.forEach(r => { kinds[r.kind] = (kinds[r.kind] || 0) + 1; });
         out[lvl + '/' + name] = 'medyan ' + Math.round(js[n >> 1]) + ' sn, seviye ' + ls[n >> 1] + ' | ' +
           ups.map(u => 'S' + u + ' %' + Math.round(100 * rs.filter(r => r.L >= u).length / n)).join(' ') + ' | ölüm: ' +
-          Object.keys(kinds).sort((a, b) => kinds[b] - kinds[a]).map(x => x + ':' + kinds[x]).join(' ');
+          Object.keys(kinds).sort((a, b) => kinds[b] - kinds[a]).map(x => x + ':' + kinds[x]).join(' ') +
+          ' | cehennemde ölen %' + Math.round(100 * rs.filter(r => r.ph === 'hell').length / n) + ' | cehennemi geçme: ' + window.hellStats();
       }
     }
     k.setLevel('normal');

@@ -33,6 +33,9 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
   (`JOURNEY.normal/hell`, cehennem gücü `hellK`; ölçüm belgede). Kullanıcı kalp simgesini sevmedi: can yeşil "+ Can" kapsülüdür. Jokerler parlayarak
   ipucu verir (`adviceFor`), oyun `save.run` ile kaldığı yerden devam eder. Yeni özellik eklerken önce o belgeyi oku, bitince belgedeki "Yapım sırası ve
   durum" bölümünü güncelle. V0.5.0 tamam (Seviye 4-10 kilitleri); sıradaki: katalogdaki kalan fikirler (Sarkaç, Renk, Sis...) sonsuz mod için, kullanıcının oyun sonrası geri bildirimine göre. İkon/imzalı paket/gizlilik sayfası/gerçek reklam kimliği ayrı sürümde (kullanıcı Play hesabı açınca haber verecek).
+- Cehennem gücü `JOURNEY.hellTab` (seviye başına tablo, 1 = tam güç) ve `phase.hell` tam güç değerleriyle ayarlanır; her değişiklikten sonra `hellLine(0.08, 0.75)` ile seviye seviye geçme oranına bak (hedef: orta oyuncu ilk seviyelerde ~%95+, 9-10'da ~%40-60;
+  yeni başlayan %60-85). Çarpanlar normal bölümün üstüne bindiği için geç seviyelerde güç aşağı inmeli. Süreye göre hedef uzunluğu `WIDE`/`wideAt` (TUNE bloğunda). Joker sırası: basılı tutarak çalışır, kısa dokunuş oyuna geçer; yeni dokunuş yolları `tapNear` mantığını bozmamalı.
+- Kullanıcıdan onay bekleyen tasarımlar (V0.5.1 sonrası gösterildi): kilit defterinde açılmamış kilitleri gösterme + her satırda "Dene" (kısa canlı deneme), dördüncü zorluk "Cehennem". Onay gelmeden kodlama.
 - Sis ve renk kilitleri yapılırken tasarım kuralları belgede ("Adil oyun kuralları"): ibre hep görünür, renk hedefin içinde değişmez
   (halka iki bölgeli). `DEBUG=2 ./build.sh` kancayı ekler ama duraklatmayı kapatmaz (yaşam döngüsü testi için; `DEBUG=1`'de `pause()` hiçbir şey yapmaz).
 - Kullanıcı geri bildirimi (V0.4.1 sonrası): yeni kilit görünüşleri tutarlı olmalı (aynı şekil aynı anlam), etiket yazıları halkanın üstüne konmaz, bonuslar az,
