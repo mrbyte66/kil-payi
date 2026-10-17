@@ -91,10 +91,10 @@
       const gc = best.kind === 'hold' ? best.c0 : k.pinCenter(best), gh = best.kind === 'hold' ? best.hw : k.pinHw(best);
       const inGate = ad(a, gc) <= gh + 0.05;
       /* trafik ışığı: kırmızıya vurma (yeni oyuncular ara sıra yanılır) */
-      if (best.light && !best.green && Math.random() > lightMis) { continue; }
+      if (best.light && !best.green && Math.random() > lightMis) { best._armed = false; best._aim = aimE(); continue; }
       const danger = G.pins.some(p => (p.kind === 'trap' && k.pinHw(p) > 0 && ad(G.ang, k.pinCenter(p)) <= k.pinHw(p) + 0.03 && (p.prio || !inGate)) ||
         (p.kind === 'lockpin' && !p.open && !p.done && best !== p && ad(G.ang, p.c0) <= p.hw + 0.03 && !inGate));
-      if (danger && Math.random() < trapAvoid) continue;
+      if (danger && Math.random() < trapAvoid) { best._armed = false; best._aim = aimE(); continue; }
       const n0 = G.n, t0 = G.time, kd0 = G.kind;
       k.tap(); taps++;
       { const sx = stat(kd0); sx.taps++; if (G.n > n0) sx.hits++; else sx.pen++; }

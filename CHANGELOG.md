@@ -3,6 +3,20 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.6.0 — Dene ve Cehennem zorluğu (2026-10-17)
+
+- **Kilit defteri baştan yazıldı.** Artık 14 kilidin hepsi görünür: açtıkların tam açıklamalarıyla, açmadıkların adı ve açılacağı seviyeyle (sıradaki kesikli çerçeveli "Sıradaki · Seviye 4"). Başlıkta "3 / 14 açıldı" yazar.
+- **Dene.** Defterde her satırda **Dene** düğmesi var, açılmamış kilitlerde de. Dokununca o kilidin kısa canlı denemesi başlar: yavaş ibre, geniş hedef, süre ve ceza yok, puan ve kayıt yok.
+  Engelinden de çıkar (ikinci turdan sonra). Ceza nesnesine dokunmadan 3 turu bitirirsen "Öğrendin" yazar (sabır pimi 1 tur). Üstte "Dene" rozeti, üç nokta ve "Bitir"; kural kartı hep açık kalır;
+  ortada doğru turlar sayılır. Uygulamadan çıkarsan ya da geri tuşuna basarsan deneme kapanır, deftere dönersin. Denerken oyun kaydın ve rekorların değişmez.
+- **Dördüncü zorluk: Cehennem.** Rahat, Normal, Usta, **Cehennem**. Baştan sona cehennem teması (kırmızı-siyah, kor ve çatlaklar); hedefler %28 dar, ibre %22 hızlı, süre %35 çabuk erir (taslakta %50'ydi, çok sert çıktı), hata cezası %80 ağır,
+  engel ikizleri kilitle birlikte açılır ve çok sık gelir, coin ×2. Ayrı rekoru ve kırmızı rozeti var (oyun içinde seviye rozeti kırmızı, sonuç ekranında "Cehennem · Seviye N"). Menüde seçince altında tek satırlık açıklaması çıkar
+  (küçük ekranda gizlenir). Usta modunda iki uzun oyundan sonra "Usta kolay mı? Cehennem modu" önerisi çıkar; Cehennem'de üç kısa oyundan sonra Usta önerisi.
+  Botla ölçüldü: en iyi oyuncunun (usta bot) %37'si 10. seviyeyi bitiriyor, iyi oyuncunun %0'ı.
+- **Trafik ışığı:** ışık değişim aralığı biraz rastgele (±%22); eskiden belli hız ve aralıkta ibre hep kırmızıya denk gelip tur uzayabiliyordu.
+- Dört kademe 320 piksel genişlikte de sığar; yeni defter satırları dar ekranda sıkılaşır.
+- Bekleyen: kalan kilit fikirleri (Sarkaç, Renk, Sis...) sonsuz mod için, mağaza hazırlığı (kullanıcı hesabı açınca).
+
 ## V0.5.1 — Cehennem zorlaştı, düzeltmeler (2026-10-17)
 
 - **Cehennem artık gerçekten zor.** Eskiden en güçlü cehennem bile normal bölümden yalnızca %4 farklıydı. Şimdi cehennem bölümünde ibre %13'e kadar hızlı, hedefler %18'e kadar dar,
