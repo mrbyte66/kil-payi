@@ -43,7 +43,7 @@ Sonra `http://localhost:8000` adresini aç. Telefon boyutunda denemek için tara
   `JTWIN`, `IMPL_GOOD`/`IMPL_TWIN` (yeni tür eklerken hepsine ve `BOOK` kilit defterine eklenir). Kalan fikirler `docs/kilit-katalogu.md` içinde.
   Tut-bırak pininde dokunuş iki olaydır: basış (`tap`) ve bırakış (`release`).
 - **Jokerler ve can:** alet çubuğu halkanın altındadır; işe yarayacağı an ilgili joker parlar (`adviceFor`), dokunmak yeter. Parlamayan joker basılı tutulunca çalışır.
-  Her 3 seviyede bir joker hediye edilir. En fazla 1 yedek **can** taşınır (yeşil "+" hedefi, süre bitince +3 sn).
+  Her 3 seviyede bir joker hediye edilir. Jokeri kullanmak için basılı tutulur; kısa dokunuş oyuna geçer (`tapNear`). En fazla 1 yedek **can** taşınır (yeşil "+" hedefi, süre bitince +3 sn).
 - **Eski türler (`KIND`):** vuruş sayısına bağlı eski açılış modeli yalnızca `tools/sim.mjs` tarafından kullanılır; oyunda yolculuk (`JKIND`, `JEVENTS`) geçerlidir.
 - **Aletler (`TOOL`):** stetoskop (hedefi genişletir), kronometre (+süre), kalkan (ıskayı bağışlar), kum saati (ibreyi yavaşlatır). Stok ve seviye cihazda saklanır; coin ile alınır ve yükseltilir, ödüllü reklam coin verir.
 - **Seri (kombo, `COMBO`):** ardışık vuruşlar puan çarpanı kazandırır (5, 10, 20 ve 35. vuruşta ×2, ×3, ×4, ×5). Iska seriyi sıfırlar, kalkan korur. Çarpan yalnızca puanı etkiler; coin ham puandan hesaplanır, ekonomi değişmez.
@@ -65,7 +65,7 @@ DIFF_OVERRIDE='{"rise":0.7}' node tools/sim.mjs 2500 yeni   # parametre denemesi
 
 Yolculuk için ayrı bir bot var: `DEBUG=1 ./build.sh` ile derlenen sayfada (`python3 -m http.server --directory www`, `tools/bot.js` dosyasını `www/` içine kopyalayıp sayfaya
 `<script src="bot.js">` ekle ya da içeriğini konsola yapıştır) `bulk(['normal'], 40)` çalıştır; bot gerçek oyun kodunu hızlandırılmış zamanla oynar ve beceri düzeyine göre
-kaç saniyede, hangi seviyede, hangi kilitte öldüğünü ve seviyeye ulaşma yüzdelerini verir (`kindStats()` kilit başına tur ve vuruş oranını gösterir;
+kaç saniyede, hangi seviyede, hangi kilitte öldüğünü ve seviyeye ulaşma yüzdelerini verir (`kindStats()` kilit başına tur ve vuruş oranını gösterir, `hellLine(0.08, 0.75)` yalnızca cehennem bölümlerini seviye seviye ölçer;
 sonuçlar `docs/yolculuk-tasarimi.md` içinde). Uzun koşuları beceri başına ayrı çalıştır (bir çağrı çok uzarsa tarayıcı aracı hata verir).
 
 Simülasyon, gerçek oyunla aynı `TUNE` bloğunu okur. Oyuncular zamanlama sapması (sigma) ve dikkat kaybı olasılığıyla modellenir;

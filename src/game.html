@@ -141,7 +141,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .tool.adv{width:70px;height:70px;background:#F4B63F;color:#3F2A00;box-shadow:0 0 0 5px rgba(244,182,63,.3),var(--shadow-s);animation:advpulse .9s ease-in-out infinite}
 .tool.adv .badge{background:#3F2A00;color:#F4B63F}
 @keyframes advpulse{50%{box-shadow:0 0 0 12px rgba(244,182,63,.08),var(--shadow-s);transform:scale(1.05)}}
-.tool.holding::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--btn);animation:holdring .45s linear forwards}
+.tool.holding::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--btn);animation:holdring var(--hold,.45s) linear forwards}
 @keyframes holdring{from{transform:scale(.75);opacity:.2}to{transform:scale(1);opacity:1}}
 .advlbl{position:absolute;top:-36px;transform:translateX(-50%);padding:6px 13px;border-radius:999px;background:#F4B63F;color:#3F2A00;font:800 13px/1 var(--font-body);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
 .advlbl.on{opacity:1}
@@ -467,14 +467,17 @@ const JOURNEY = {
   normal: [20, 22, 22, 22, 24, 26, 28, 28, 30, 32],
   hell:   [6, 6, 7, 7, 7, 8, 8, 9, 9, 10],
   ib0: 0.02, ibs: 0, ibq: 0.0085, ibEnd: 0.1, giftEvery: 3,
-  /* Cehennemin gücü seviyeyle artar: 1. seviyede hell0 kadar, her seviyede hellStep artar, 8. seviyede durur; 10. seviyeden sonra (sonsuz mod) yeniden artar. */
-  hell0: 0.1, hellStep: 0.04, hellEnd: 0.08,
+  /* Cehennemin gücü (V0.5.1'de güçlendi): seviye başına bir değer (1 = aşağıdaki tam güç). Ayarlar normal bölümün üstüne biner; geç seviyelerde
+     normal bölüm zaten çok yoğun olduğu için güç oradan geriye iner. 10. seviyeden sonra (sonsuz mod) hellEnd kadar artar (en çok 1,5).
+     Adlar: seviye 1-3 kolay, 4-6 orta, 7-9 zor, 10+ cehennem. */
+  hellTab: [0.3, 0.5, 0.7, 0.9, 0.9, 0.8, 0.65, 0.5, 0.42, 0.38], hellEnd: 0.08,
   phase: {
     normal: { hwM: 1,   omM: 1,   drain: 1,    pen: 1,   dI: 0,   twin: 0.3, pts: 1, coinHit: 0 },
-    hell:   { hwM: 0.9, omM: 1.1, drain: 1.05, pen: 1.3, dI: 0.1, twin: 0.5, pts: 1, coinHit: 1, bonusT: 2 }
+    hell:   { hwM: 0.82, omM: 1.13, drain: 1.18, pen: 1.4, dI: 0.09, twin: 0.78, pts: 1, coinHit: 1, bonusT: 2 }
   }
 };
-const hellK = L => Math.min(1, JOURNEY.hell0 + JOURNEY.hellStep * (Math.min(L, 8) - 1) + JOURNEY.hellEnd * Math.max(0, L - 10));
+const hellK = L => Math.min(1.5, JOURNEY.hellTab[Math.min(L, 10) - 1] + JOURNEY.hellEnd * Math.max(0, L - 10));
+const hellTier = L => (L <= 3 ? 0 : L <= 6 ? 1 : L <= 9 ? 2 : 3);
 const phaseMod = (ph, L) => {
   const b = JOURNEY.phase[ph] || JOURNEY.phase.normal;
   if (ph !== 'hell') return b;
@@ -536,7 +539,8 @@ const MECH = {
   holdLen: [1.4, 1.9, 2.4], holdPts: 1.5, hotFrom: 0.62, hotDrain: 3, hotPts: 2, holdGrace: 0.06,
   sabirNeed: 3, sabirPts: 3, sabirPen: 1.0, sabirCoin: 1, sabirMax: 22,
   lightPer: [1.4, 1.1, 0.8], lightWarn: 0.3, lightPen: 1.0,
-  bombFuse: [3.4, 2.9, 2.5], bombPen: 1.5, bombPts: 25, bombCrater: 3
+  bombFuse: [3.4, 2.9, 2.5], bombPen: 1.5, bombPts: 25, bombCrater: 3,
+  thornRef: 2.4, thornMin: 0.5, thornMax: 1.15, thornLead: [-0.1, 0.3]
 };
 const pickJ = (open, relief, last, r, ph) => {
   if (relief || !open.length) return 'tek';
@@ -557,6 +561,12 @@ const planJourney = (L, ph, n, adapt, mercy) => {
     hw: DIFF.hwMax - (DIFF.hwMax - DIFF.hwMin) * I,
     relief: ph === 'normal' && wp > DIFF.rise + 1e-9
   };
+};
+/* Süreye göre hedef uzunluğu (V0.5.1): süre doluyken hedefler biraz dar (ilk üç seviyede yavaş yavaş), süre azalınca (tam yanacakken) uzar. */
+const WIDE = { full: 0.9, empty: 1.3 };
+const wideAt = (tm, L) => {
+  const f = Math.min(1, Math.max(0, tm / CFG.maxTime)), full = 1 - (1 - WIDE.full) * Math.min(1, Math.max(0, ((L || 10) - 1) / 3));
+  return WIDE.empty + (full - WIDE.empty) * f;
 };
 /*TUNE-END*/
 
@@ -599,7 +609,7 @@ const STR = {
     warn_cift: 'Pembe tuzağa dokunma', warn_kayan: 'Pembe kayan tuzağa dokunma', warn_nefes: 'Dikenli kenara dokunma',
     lbl_open: 'Açıkken vur', lbl_slide: 'Zamanla', lbl_avoid: 'Dokunma', lbl_thorn: 'Dikene dokunma',
     lifeTag: 'Can', lifeGot: 'Can +1', lifeSaved: 'Can kurtardı: +3 sn',
-    smartMove: 'Akıllı hamle! +25', advNow: 'Şimdi kullan',
+    smartMove: 'Akıllı hamle! +25', advNow: 'Basılı tut',
     ts_steto: '{n} sn geniş', ts_kron: '+{n} sn', ts_kalkan: '{n} hata cezasız', ts_kum: '{n} sn yavaş',
     resumeSub: 'Seviye {n} · {p} puan', newGame: 'Yeni oyun', newSure: 'Kayıt silinsin mi? Dokun', toMenu: 'Menü',
     bookT: 'Kilit defteri', bkOpen: 'açık', bkNew: 'yeni', bkLockAt: 'Seviye {n}\'de açılır',
@@ -608,6 +618,7 @@ const STR = {
     tipEasy: 'Zor mu geldi?', tipEasyBtn: 'Rahat mod', tipHard: 'Çok kolay mı?', tipHardBtn: 'Usta mod',
     lvlChip: 'Seviye {n}', sectHell: 'Cehennem · {s} sn',
     bnHell: 'Cehennem bölümü', bnHellSub: 'Ceza ×{p} · süre hızlı erir', bnLevel: 'Seviye {n}',
+    hellT0: 'Kolay cehennem', hellT1: 'Orta cehennem', hellT2: 'Zor cehennem', hellT3: 'Cehennem',
     rwHell: 'Seviye bitti +{n} coin', rwTool: 'Hediye: {t}',
     camp: 'Kamp · Seviye {n}', campRun: 'Kamp oyunu', overLevel: 'Seviye {n}',
     k_tuzak: 'Tuzak pim', k_kayanT: 'Kayan tuzak', k_nefes: 'Nefes pim', k_diken: 'Diken',
@@ -663,7 +674,7 @@ const STR = {
     warn_cift: 'Stay off the rose trap', warn_kayan: 'Stay off the sliding trap', warn_nefes: 'Stay off the thorny edge',
     lbl_open: 'Hit while open', lbl_slide: 'Time it', lbl_avoid: 'Avoid', lbl_thorn: 'Avoid thorns',
     lifeTag: 'Life', lifeGot: 'Life +1', lifeSaved: 'Life saved you: +3 s',
-    smartMove: 'Smart move! +25', advNow: 'Use now',
+    smartMove: 'Smart move! +25', advNow: 'Hold to use',
     ts_steto: '{n} s wider', ts_kron: '+{n} s', ts_kalkan: '{n} free mistakes', ts_kum: '{n} s slower',
     resumeSub: 'Level {n} · {p} pts', newGame: 'New game', newSure: 'Delete the save? Tap again', toMenu: 'Menu',
     bookT: 'Lock book', bkOpen: 'open', bkNew: 'new', bkLockAt: 'Unlocks at level {n}',
@@ -672,6 +683,7 @@ const STR = {
     tipEasy: 'Too hard?', tipEasyBtn: 'Easy mode', tipHard: 'Too easy?', tipHardBtn: 'Master mode',
     lvlChip: 'Level {n}', sectHell: 'Hell · {s} s',
     bnHell: 'Hell round', bnHellSub: 'Penalties ×{p} · time melts faster', bnLevel: 'Level {n}',
+    hellT0: 'Easy hell', hellT1: 'Medium hell', hellT2: 'Hard hell', hellT3: 'Full hell',
     rwHell: 'Level done +{n} coins', rwTool: 'Gift: {t}',
     camp: 'Camp · Level {n}', campRun: 'Camp run', overLevel: 'Level {n}',
     k_tuzak: 'Trap pin', k_kayanT: 'Sliding trap', k_nefes: 'Breathing pin', k_diken: 'Thorns',
@@ -763,7 +775,7 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.5.0';
+const VERSION = 'V0.5.1';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
   bests: { rahat: 0, normal: 0, usta: 0 },
@@ -832,7 +844,9 @@ const TH_X = {}, BASE = {};
 TH_KEYS.forEach(k => { TH_X[k] = parseCol(THEME_X[k]); });
 let thWx = 0, thLast = -1;
 const applyTheme = force => {
-  if (!force && Math.abs(thWx - thLast) < 0.002) return;
+  /* geçiş sürerken en çok ~%1,5'lik adımlarla güncelle (her güncelleme tüm sayfanın stilini yeniden hesaplatır); bitiş değeri her zaman uygulanır */
+  const d = Math.abs(thWx - thLast);
+  if (!force && (d < 0.002 || (thWx !== G.thT && d < 0.015))) return;
   thLast = thWx;
   const root = document.documentElement, off = thWx < 0.002;
   TH_KEYS.forEach(k => {
@@ -1213,13 +1227,13 @@ const phaseChange = pi => {
   G.L = pi.L; G.ph = pi.ph; G.lvStart = pi.start; G.ptsMul = phaseMod(pi.ph, pi.L).pts;
   if (pi.ph === 'hell') {
     G.thT = 1; G.hellAge = 0;
-    banner(t('bnHell'), t('bnHellSub', { p: fx(phaseMod('hell', pi.L).pen) }), 'x'); Snd.hell(); Platform.haptic('heavy');
+    banner(t('hellT' + hellTier(pi.L)), t('bnHellSub', { p: fx(phaseMod('hell', pi.L).pen) }), 'x'); Snd.hell(); Platform.haptic('heavy');
   } else {
     if (prev === 'hell') { rewardHell(prevL); levelUp(); }
     G.thT = 0;
   }
   G.thDirty = true;
-  spawnChallenge(false);
+  /* Çalışan tur bozulmaz: yeni bölümün ayarları bir sonraki turdan başlar (ibre hedefe varmak üzereyken hedef ortadan kalkmasın). */
 };
 
 /* Küçük yardımcılar: işaretli açı farkı, ibrenin gidiş yönünde uzaklık, tamamlanması gereken hedefler. */
@@ -1265,8 +1279,11 @@ const addTwin = (tw, pins, hw) => {
     pins.push({ kind: 'trap', tw, ring: 0, c0: g0.c0, amp: 0.95, f: 0.33, ph: rnd(0, TAU), hw: Math.min(0.28, 0.45 * g0.hw), prio: true, pen: 1.0, done: false });
   } else if (tw === 'diken') {
     if (!g0) return '';
-    const st = G.stars.nefes | 0;
-    g0.thorn = true; g0.thw = { att: 0.3 - 0.03 * st, hold: 0.8 - 0.1 * st, rel: 1.5 - 0.2 * st, o: rnd(0, 2.6) };
+    const st = G.stars.nefes | 0, sp = clamp(MECH.thornRef / G.omega, MECH.thornMin, MECH.thornMax);
+    const att = (0.3 - 0.03 * st) * sp, hold = (0.8 - 0.1 * st) * sp, rel = (1.5 - 0.2 * st) * sp, P = att + hold + rel;
+    /* ibre hızlandıkça diken de hızlanır; diken, ibre hedefe girerken tam kapanmış olacak biçimde zamanlanır (ortası yine hep açık) */
+    const om = G.omega * (G.slow > 0 ? G.slowMul : 1), tIn = Math.max(0, (aheadOf(g0.c0) - g0.hw) / om), lead = rnd(MECH.thornLead[0], MECH.thornLead[1]);
+    g0.thorn = true; g0.thw = { att, hold, rel, o: (((att + lead - G.pt - tIn) % P) + P) % P };
   } else if (tw === 'lanetli') {
     const gold = pins.find(p => p.gold), m = pins.find(p => p.kind === 'gate' && !p.bonus);
     if (!gold || !m) return '';
@@ -1357,7 +1374,7 @@ const spawnChallenge = (first, force) => {
   G.kind = kind; G.lastKind = kind; G.gainMul = km.gain * lv.gain;
   G.I = plan.I; G.relief = plan.relief;
   G.omega = plan.omega * km.omMul * lv.om * pm.omM;
-  let hw = Math.min(0.8, plan.hw * km.hwMul * lv.hw * pm.hwM);
+  let hw = Math.min(0.8, plan.hw * km.hwMul * lv.hw * pm.hwM * wideAt(G.time, G.L));
   if (can) hw = Math.min(0.8, hw * 1.15);
   const star = G.stars[kind] | 0, sIx = Math.min(2, star);
   G.chal = { kind, t: 0, star, tw: '' };
@@ -1383,13 +1400,10 @@ const spawnChallenge = (first, force) => {
     pins.push(gate(0, ahead(G.ang, G.dir, dist(1.0, 2.2)), hw));
     pins.push(gate(1, ahead(G.ang2, G.dir2, rnd(1.0, 2.0)), Math.min(0.85, hw * 1.15)));
   } else if (kind === 'altin') {
-    const m = gate(0, ahead(G.ang, G.dir, dist(1.2, 2.2)), hw);
-    pins.push(m);
-    const gh = MECH.goldHw;
-    for (let tries = 0; tries < 12; tries++) {
-      const side = Math.random() < 0.5 ? 1 : -1, c = norm(m.c0 + side * (hw + gh + rnd(0.3, 0.9))), d = aheadOf(c);
-      if (d >= 0.6 && d <= 4.6) { pins.push(Object.assign(gate(0, c, gh), { bonus: true, gold: true })); break; }
-    }
+    /* altın ibrenin önünde, ana hedef ondan sonra gelir: ana hedefi vurunca tur biter ama altın hiç yarım kalmaz */
+    const gh = MECH.goldHw, ga = ahead(G.ang, G.dir, dist(1.0, 1.7));
+    pins.push(gate(0, ahead(ga, G.dir, gh + hw + rnd(0.34, 0.7)), hw));
+    pins.push(Object.assign(gate(0, ga, gh), { bonus: true, gold: true }));
   } else if (kind === 'kasa') {
     const hk = hw * 0.85, step = 2 * hk + rnd(0.55, 0.85), a = ahead(G.ang, G.dir, dist(1.0, 1.8));
     for (let i = 0; i < 3; i++) pins.push(Object.assign(gate(0, ahead(a, G.dir, i * step), hk), { kasa: true }));
@@ -1479,10 +1493,10 @@ const relayout = snap => {
     const top = hudB + 6 + cardH, bottom = h - 14;
     view.cardB = top;
     r = Math.min(w * 0.33, h * 0.2);
-    const rFit = (bottom - top - dockH - 12 - 46) / 2.2;
+    const rFit = (bottom - top - dockH - 12 - 58) / 2.2;
     if (rFit < r) r = rFit;
     r = Math.max(56, r);
-    const blockH = 2.2 * r + 46;
+    const blockH = 2.2 * r + 58;
     cy = Math.max(top + blockH / 2, h * 0.44);
     view.dockTop = Math.min(cy + blockH / 2 + 8, h - 10 - dockH);
     toolsEl.style.top = view.dockTop + 'px';
@@ -2224,7 +2238,7 @@ const update = raw => {
   }
 
   const live = G.mode === 'play' || G.mode === 'count' || G.mode === 'dead';
-  if (G.banner && live) { G.banner.t += raw; if (G.banner.t > 2.4) G.banner = null; }
+  if (G.banner && live) { G.banner.t += raw; if (G.banner.t > 2.0) G.banner = null; }
   if (G.card && (G.mode === 'play' || G.mode === 'count')) { G.card.t += raw; if (G.card.t > G.card.max) G.card = null; }
   if (G.lab && G.mode === 'play') { G.lab.t += raw; if (G.lab.t > G.lab.max) G.lab = null; }
   const kT = 1 - Math.exp(-2.6 * raw);
@@ -2580,26 +2594,19 @@ const drawEnv = c => {
     c.restore();
   }
 };
-const bannerAl = b => { const k = b.t / 2.4; return k < 0.1 ? k / 0.1 : (k > 0.78 ? Math.max(0, (1 - k) / 0.22) : 1); };
-const drawBanner = (c, cx, cy, R) => {
-  const b = G.banner, al = bannerAl(b), sc = 0.88 + 0.12 * easeOut(Math.min(1, b.t / 0.28));
-  const bg = b.kind === 'x' ? '#D9503A' : P.btn, fg = b.kind === 'x' ? '#FFFFFF' : (P['on-btn'] || '#FFFFFF');
-  let fs = clamp(Math.round(R * 0.27), 18, 34);
-  c.font = '600 ' + fs + 'px ' + FD;
-  const maxW = Math.min(R * 1.75, view.w - 40);
-  let tw = c.measureText(b.title).width;
-  if (tw > maxW - 36) { fs = Math.max(14, Math.floor(fs * (maxW - 36) / tw)); c.font = '600 ' + fs + 'px ' + FD; tw = c.measureText(b.title).width; }
-  const sfs = 13;
-  c.font = '800 ' + sfs + 'px ' + FB;
-  const sw = b.sub ? c.measureText(b.sub).width : 0;
-  const w = Math.min(maxW, Math.max(tw, sw) + 40), h = b.sub ? fs + sfs + 34 : fs + 26;
-  c.save(); c.globalAlpha = al * 0.97; c.translate(cx, cy); c.scale(sc, sc);
-  c.fillStyle = bg; c.beginPath();
-  if (c.roundRect) c.roundRect(-w / 2, -h / 2, w, h, Math.min(26, h / 2)); else c.rect(-w / 2, -h / 2, w, h);
-  c.fill();
+const bannerAl = b => { const k = b.t / 2.0; return k < 0.1 ? k / 0.1 : (k > 0.78 ? Math.max(0, (1 - k) / 0.22) : 1); };
+/* Bölüm ve cehennem haberi (V0.5.1): halkanın üstüne değil, kart bandına çizilir; kart ya da ilk dokunuş ipucu varken yer yoktur, HUD'daki rozet yeter. */
+const drawBanner = c => {
+  const b = G.banner;
+  if (G.card || (G.mode === 'play' && !save.tut && G.n < CFG.tutHits)) return;
+  const al = bannerAl(b), w = Math.min(view.w - 28, 392), x = (view.w - w) / 2, y = (view.hudB || 0) + 8;
+  const hell = b.kind === 'x', bg = hell ? '#D9503A' : P.btn, fg = hell ? '#FFFFFF' : (P['on-btn'] || '#FFFFFF');
+  const h = b.sub ? 60 : 46, slide = -14 * (1 - easeOut(Math.min(1, b.t / 0.28)));
+  c.save(); c.globalAlpha = al * 0.97; c.translate(0, slide);
+  rrect(c, x, y, w, h, Math.min(24, h / 2)); c.fillStyle = bg; c.fill();
   c.fillStyle = fg; c.textAlign = 'center'; c.textBaseline = 'middle';
-  c.font = '600 ' + fs + 'px ' + FD; c.fillText(b.title, 0, b.sub ? -sfs * 0.75 : 1);
-  if (b.sub) { c.globalAlpha = al * 0.85; c.font = '800 ' + sfs + 'px ' + FB; c.fillText(b.sub, 0, fs * 0.5 + 8); }
+  fitPx(c, b.title, 600, 21, FD, w - 32, 14); c.fillText(b.title, view.w / 2, y + (b.sub ? 22 : h / 2 + 1));
+  if (b.sub) { c.globalAlpha = al * 0.88; fitPx(c, b.sub, 800, 13, FB, w - 32, 10); c.fillText(b.sub, view.w / 2, y + 44); }
   c.restore();
 };
 const drawCount = (c, cx, cy, R) => {
@@ -2881,7 +2888,7 @@ const render = () => {
   } else {
     const sc = 1 + (0.2 + 0.04 * mult) * G.scorePulse;
     const txt = String(G.score);
-    const cover = G.mode === 'count' ? 1 : (G.banner ? bannerAl(G.banner) : 0);
+    const cover = G.mode === 'count' ? 1 : 0;
     c.globalAlpha = 1 - 0.88 * cover;
     c.save(); c.translate(cx, cy - (two ? 0 : R * 0.04)); c.scale(sc, sc);
     c.fillStyle = P.ink; fitFont(txt, big, R * (two ? 0.95 : 1.5));
@@ -2897,7 +2904,7 @@ const render = () => {
     c.globalAlpha = 1;
     if (two && G.lockLeft > 0 && G.mode === 'play') drawLockTimer(c, cx, cy, R);
     if (G.mode === 'count' && G.count > 0) drawCount(c, cx, cy, R);
-    else if (G.banner) drawBanner(c, cx, cy, R);
+    else if (G.banner) drawBanner(c);
   }
 
   drawCard(c);
@@ -2916,7 +2923,8 @@ const render = () => {
     const psz = p.kind === 'near' ? 17 : (p.kind === 'hype' ? 18 : 15);
     c.font = '800 ' + psz + 'px ' + FB;
     const pw = c.measureText(p.txt).width + psz * 1.7;
-    c.save(); c.globalAlpha = al; c.translate(clamp(cx, pw / 2 + 8, view.w - pw / 2 - 8), slot ? cy + R * 0.58 : cy - R * 0.5 - 6 * easeOut(Math.min(1, k * 1.4))); c.scale(sc, sc);
+    c.save(); c.globalAlpha = al; const rise = 6 * easeOut(Math.min(1, k * 1.4)), py = two ? (slot ? Math.min(view.h - 40, cy + R + RW / 2 + 19) : Math.max((view.hudB || 0) + 20, cy - R - RW / 2 - 19 - rise)) : (slot ? cy + R * 0.58 : cy - R * 0.5 - rise);
+    c.translate(clamp(cx, pw / 2 + 8, view.w - pw / 2 - 8), py); c.scale(sc, sc);
     pill(c, p.txt, 0, 0, bg, fg, psz, true);
     c.restore();
   });
@@ -2947,17 +2955,30 @@ app.addEventListener('pointerdown', e => {
   else if (G.mode === 'over' && performance.now() - G.overAt > 700) start(G.startL);
   else if (G.mode === 'pause') resume();
 });
-/* Joker düğmeleri: parlayan joker dokununca çalışır. Parlamayan jokeri kullanmak için basılı tutulur;
-   kısa dokunuş oyuna geçer, böylece joker sırası vuruşları çalmaz. */
+/* Dokunuş oyunda bir şeye denk gelir mi (hedef, tuzak, tut-bırak başı)? Joker sırasına gelen dokunuşlar için. */
+const tapNear = () => {
+  const m = CFG.grace + 0.14;
+  for (const p of G.pins) {
+    if (p.done || p.locked) continue;
+    if (p.kind === 'hold') { if (Math.abs(holdRel(p)) <= p.hw + m) return true; }
+    else if (p.kind === 'gate' || p.kind === 'trap' || p.kind === 'lockpin') {
+      if (angd(p.ring ? G.ang2 : G.ang, pinCenter(p)) <= Math.max(pinHw(p), p.hw || 0) + m) return true;
+    }
+  }
+  return false;
+};
+/* Joker düğmeleri (V0.5.1): jokeri kullanmak için basılı tutulur (parlayan joker 0,28 sn, diğerleri 0,48 sn); kısa dokunuş her zaman oyuna geçer.
+   İbre bir hedefin üstündeyse dokunuş hemen oyuna gider, vuruş gecikmez; böylece ekrana vururken jokerler yanlışlıkla harcanmaz. */
 toolsEl.addEventListener('pointerdown', e => {
   const b = e.target.closest && e.target.closest('button.tool');
   if (!b) return;
   e.preventDefault(); Snd.unlock();
-  const id = b.getAttribute('data-tool');
-  if (b.classList.contains('adv')) { useTool(id); return; }
-  b.classList.add('holding');
+  if (G.mode !== 'play') return;
+  if (tapNear()) { tap(); return; }
+  const id = b.getAttribute('data-tool'), need = b.classList.contains('adv') ? 280 : 480;
+  b.style.setProperty('--hold', need + 'ms'); b.classList.add('holding');
   let done = false;
-  const timer = setTimeout(() => { done = true; b.classList.remove('holding'); useTool(id); }, 450);
+  const timer = setTimeout(() => { done = true; b.classList.remove('holding'); useTool(id); }, need);
   const up = () => {
     clearTimeout(timer); b.classList.remove('holding');
     window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);

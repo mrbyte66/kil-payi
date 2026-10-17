@@ -3,6 +3,22 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.5.1 — Cehennem zorlaştı, düzeltmeler (2026-10-17)
+
+- **Cehennem artık gerçekten zor.** Eskiden en güçlü cehennem bile normal bölümden yalnızca %4 farklıydı. Şimdi cehennem bölümünde ibre %13'e kadar hızlı, hedefler %18'e kadar dar,
+  süre %18'e kadar çabuk erir, hata cezası %40'a kadar ağır ve engel ikizleri daha sık gelir. Cehennemin adı seviyeyle büyür: seviye 1-3 **Kolay cehennem**, 4-6 **Orta cehennem**,
+  7-9 **Zor cehennem**, 10 ve sonrası **Cehennem**. Güç ilk seviyelerde yumuşak başlar (yeni oyuncu ilk cehennemde boğulmasın), 4-5. seviyede en yüksek olur, sonra normal bölüm zaten çok yoğun olduğu için biraz iner.
+  Botla ölçüldü: yeni başlayan bir oyuncunun 3.-6. seviyelerdeki cehennemi geçme şansı yaklaşık %95'ten %85-45 arasına indi; sıradan oyuncuda 6.-8. seviyelerde %80-90, 9. ve 10. seviyede %63 ve %38.
+- **Süre azalınca hedef uzar.** İlk sürümlerdeki denge geri geldi: süre çubuğu doluyken hedefler biraz dar, süre azaldıkça (tam yanacakken) %30'a kadar uzar; yani kıl payı kurtulma şansın var.
+  İlk üç seviyede dar kısım yavaş yavaş devreye girer.
+- **Diken ibreye uyuyor.** İbre hızlandıkça diken de hızlı girip hızlı çıkıyor ve ibre hedefe girerken dikenler kapanmış oluyor (hedefin ortası yine hep açık). Artık dikenden önce vuruvermek yok.
+- **Altın yarım kalmıyor.** Altın hedef hep ana hedeften önce gelir; ana hedefi vurunca altın ortadan kalkamaz.
+- **Bölüm geçişi düzeldi.** Bölüm ya da cehennem başlayınca ibre hedefe varmak üzereyken hedef artık ortadan kaybolmuyor (yeni bölüm bir sonraki turdan başlar). Tema geçişi daha az güncelleme yapıyor (telefonda takılma azalır).
+- **Yazılar halkadan çıktı.** "Seviye N" ve "Cehennem" haberi halkanın üstünde, kart yerinde çıkıyor (yeni kilit kartı varken HUD rozeti yetiyor). İki halkada puan balonları halkaların dışında. Joker etiketi halkaya binmiyor.
+- **Jokerler yanlışlıkla harcanmıyor.** Jokeri kullanmak için basılı tutulur (parlayan 0,3 sn, diğerleri 0,5 sn; halka dolar). Kısa dokunuş her zaman oyuna gider; ibre bir hedefin üstündeyken joker sırasına dokunsan da vuruş gecikmez.
+  Tut-bırak pininde parmağın joker sırasındayken de basış ve bırakış çalışır.
+- Bekleyen tasarımlar (onay istendi): kilit defterinde açılmamış kilitleri de gösterme ve kilit başına kısa canlı deneme ("Dene"); dört kademeli zorluk (Rahat, Normal, Usta, Cehennem).
+
 ## V0.5.0 — Yeni kilitler ve gerçek zorluk (2026-10-17)
 
 - **Her seviye artık yeni bir oyun:** Seviye 4-10'da her seviyenin başında yeni bir kilit, ortasında onun engeli gelir; yeni bir şey yaklaşık 13 saniyede bir görülür.
