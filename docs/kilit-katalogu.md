@@ -3,7 +3,7 @@
 Kaynak: V0.4.1 geri bildirimi (2026-10-17). Kullanıcı özeti: oyun 4. seviyeden sonra "hep aynı oyun", hiç ölmüyor, yeni kilitleri göremedi;
 etiket yazıları görüşü kapatıyor; diken hedefe sızıyor ama çok çabuk çekiliyor; bonuslar fazla. İstek: 10 yeni kilit/engel fikri daha, eski ve yeni
 önerilerin hepsi Kolay/Orta/Zor gruplarında; V0.5.0'da ele alınacak; zorluk/süre buna göre yeniden ayarlanacak. Play Store işi: kullanıcı hesabı alınca haber verecek.
-Durum (V0.5.0): aşağıdaki "V0.5.0'da yapılanlar" tablosundaki 14 kilit ve 11 engel/ikiz oyunda; geri kalan fikirler (Aynalı pim, Zırhlı pim, Işınlanma, Sarkaç, Renk, Sis, Şifre, Makas, Ani pim, Zil) sonsuz mod havuzu ve sonraki sürümler için bekliyor.
+Durum (V0.5.0): aşağıdaki "V0.5.0'da yapılanlar" tablosundaki 14 kilit ve 11 engel/ikiz oyunda; geri kalan fikirler (Aynalı pim, Zırhlı pim, Sarkaç, Renk, Sis, Şifre, Makas, Ani pim, Zil; Işınlanma pimi V0.7.0'da yapıldı, yalnızca Kara kapı ikizi bekliyor) sonsuz mod havuzu ve sonraki sürümler için bekliyor.
 Görsel kaynak: konuşmadaki animasyonlu katalog (bu dosya aynı içeriğin yazılı kaydıdır). İkinci tur (2026-10-17): kullanıcı lanetli altın, sabır pimi, kilitli halka, hayalet pim, trafik ışığı ve bomba pim için düzeltme istedi; yeniden çizildi, bu tabloda "v2" yazanlar güncel hali. Diken düzeltmesi onaylandı.
 
 ## Kolay (tek yeni fikir, hata bağışlayıcı)
@@ -25,7 +25,7 @@ Görsel kaynak: konuşmadaki animasyonlu katalog (bu dosya aynı içeriğin yaz�
 | O4 | Trafik ışığı pimi | yeni (v2) | Yan yana iki hedef: biri yeşil, biri kırmızı; ışıklar her 1,4 sn yer değiştirir (önce sarı yanıp söner). Yeşile vur, kırmızıya dokunma (−1 sn). İbre içerideyken ışık değişmez. ★ arttıkça ritim hızlanır (1,4 → 1,1 → 0,8 sn). |
 | O5 | Zırhlı pim ✚ Cam tuzak | yeni | İri hedef üç vuruşta kırılır, ibre biraz hızlanır. Cam tuzak gridir, dokunursan −1 sn. |
 | O6 | Bomba pim | yeni (v2) | Fitil yanar, bombanın çevresindeki halka eriyip kırmızıya döner, geri sayım hızlanır. Süre dolmadan vurursan etkisiz (+25). Kaçırırsan patlar: parlama, patlama dalgası, ekran sarsıntısı, halkada çatlak (−1,5 sn). ★ arttıkça fitil kısalır, sonra ikinci bomba gelir. |
-| O7 | Işınlanma kapıları ✚ Kara kapı | yeni | Mavi kapıya giren ibre turuncudan çıkar. Kara kapı ibreyi biraz geri atar. |
+| O7 | Işınlanma pimi *(yapıldı, V0.7.0)* ✚ Kara kapı *(yapılmadı)* | yeni | Mavi kapıya giren ibre görünmez olur, 0,15-0,50 sn sonra (her turda rastgele) turuncu kapıdan çıkar; hedef çıkıştan yaklaşık yarım saniye ilerisindedir. Kara kapı ibreyi biraz geri atar. |
 
 ## Zor (iki şeyi birden izle ya da yeni dokunuş)
 

@@ -3,6 +3,19 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.7.0 — Işınlanma pimi (2026-10-17)
+
+- **Yeni kilit: Işınlanma pimi** (Seviye 7'nin sonuna doğru gelir, Kilit defterinde ve **Dene**'de de var). Halkada iki kapı olur: **mavi kapı** ibreyi içeri alır, **turuncu kapı** dışarı verir.
+  İbre mavi kapıya girince küçülüp kaybolur; **ne zaman çıkacağı belli olmaz**: 0,15 ile 0,50 saniye arasında (her turda farklı), turuncu kapıdan çıkar. Hedef turuncu kapının ilerisindedir
+  (çıkıştan yaklaşık yarım saniye sonra), yani çıktığını görüp vurabilirsin. Kapının içindeyken dokunursan ıska sayılır. İbre kapıdayken süre akmaya devam eder.
+  Kullanıcı isteğiyle yapıldı ("ışına girip ne zaman çıkacağı belli olmasın, her an çıkabilir, hızlı çıksın"); önce canlı bir deneme gösterilip onaylandı, çıkış hızı "Hızlı" seçildi.
+- ★ güçlenme bu kilide de uygulanabilir: bekleme aralığı 0,12-0,58 sn, sonra 0,10-0,66 sn'ye genişler, hedef çıkışa biraz yaklaşır.
+- Kilit defteri artık 15 kilit gösterir. Seviye 7'nin ★ güçlenmesi seviyenin %82'sinden %90'ına kaydı (ışınlanma pimine yer açmak için).
+- Botla ölçüldü: ışınlanma pimini zayıf bot bile %74, iyi bot %99 vuruyor (bot çıkışı hiç şaşırmadan görür, insan için daha zor olabilir); bir tur yaklaşık 1,6 sn sürer, bu yüzden süre kazancı ×1,2.
+  Diğer kademelerin zorluğu değişmedi (Normal orta bot %38, iyi bot %83; Usta iyi bot %30; Cehennem pro bot %25 bitiriyor).
+- **GitHub'da iki ayrı dal:** `android` = Android projesi (oyunun paketlenmiş hali dahil; Android Studio'da `android` klasörünü açarsın), `html` = yalnızca HTML oyunu. İkisi de her sürümde güncellenir, `main`'e birleştirilmez (`main` ilk sürüm olarak kaldı). `tools/publish.sh` ikisini birden gönderir.
+- Bekleyen: Işınlanma'nın engel ikizi **Kara kapı** (ibreyi geri atan kapı) yapılmadı; sonsuz mod için Sarkaç, Renk, Sis fikirleri duruyor.
+
 ## V0.6.1 — Süreye göre hedef, mod geçişi, sağlam jokerler (2026-10-17)
 
 - **Hedefin uzunluğu süre çubuğunun her saniyesinde farklı.** Süre doluyken (8. saniye) hedefler en dar (×0,8: zor), sonra saniye saniye uzar: 7. sn ×0,87, 6. sn ×0,94, 5. sn ×1,02, 4. sn ×1,12, 3. sn ×1,25, 2. sn ×1,42, 1. sn ×1,62, süre bitmek üzereyken ×1,8 (en kolay).

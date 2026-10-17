@@ -5,6 +5,7 @@
      3. Tarayıcı konsoluna bu dosyanın içeriğini yapıştır (ya da sayfaya <script src="bot.js"> ekle), sonra:  bulk(['normal'], 40)
    Bot: her hedef için zamanlama hatası ~ N(0, sigmaT) saniye örnekler; ibre hedef merkezine ona göre varınca dokunur.
    Gelgit hızlanmasını (etaTo), kilitli halkayı, tut-bırak (bas ve bırak), trafik ışığı, bomba, sabır pimi ve hayalet pimi bilir.
+   Işınlanma pininde ibre tünelde ya da önce kapıya varacaksa bekler; çıkışı gördükten sonra hedefe dokunur (süre tahminine ek 0,02 sn gürültü: çıkış anı bir uyarandır).
    Tuzakların (kayan tuzak, diken, lanetli altın, alarm, sahte nota, hayalet tuzak) üstündeyse trapAvoid olasılığıyla dokunmaz.
    Altına yalnızca beceriye bağlı bir olasılıkla uzanır (ince hedef riskli).
    Beceri düzeyleri: yeni 0,12 sn, orta 0,08 sn, iyi 0,05 sn, usta 0,03 sn, pro 0,02 sn (standart sapma; pro = "refleksi çok iyi"). Her oyunda sapma log-normal sallanır
@@ -31,7 +32,7 @@
     k.start(startL); if (opt.setup) opt.setup();
     let t = 0, taps = 0, miss = 0, curChal = null, prevPh = G.ph, prevL = G.L;
     sigmaT = sigmaT * Math.exp(gauss(opt.jitter == null ? 0.25 : opt.jitter));
-    const lapse = opt.lapse == null ? 0.01 + sigmaT * 0.15 : opt.lapse, aimE = () => gauss(sigmaT * (Math.random() < lapse ? 3 : 1));
+    const lapse = opt.lapse == null ? 0.01 + sigmaT * 0.15 : opt.lapse, aimE = () => gauss(sigmaT * (Math.random() < lapse ? 3 : 1)) + (G.kind === 'isin' ? gauss(opt.isinExtra == null ? 0.02 : opt.isinExtra) : 0);
     const goldP = Math.max(0.15, Math.min(0.85, 0.95 - sigmaT * 6.5)), lightMis = sigmaT * 1.2;
     const seed = p => { if (p._aim === undefined) { p._aim = aimE(); p._aim2 = aimE() * 1.2; p._armed = false; } };
     while (G.mode === 'play' && t < tmax) {
@@ -66,6 +67,12 @@
         } else if (p.kind === 'lockpin') { if (!p.open) continue; c = p.c0; gh = p.hw; }
         else if (p.kind === 'hold') { c = p.c0; gh = p.hw; }
         else continue;
+        /* ışınlanma pini: ibre tünelde ya da önce kapıya varacaksa hedefi bekle (çıkışı görünce hedefe giden yol serbest) */
+        if (G.kind === 'isin' && p.kind === 'gate') {
+          if (G.tun) continue;
+          const pin = G.pins.find(q => q.kind === 'portal' && q.portal === 'in'), at = sgn(c - G.ang, G.dir);
+          if (at > 0 && pin && nrm((pin.c0 - G.ang) * G.dir) < at) continue;
+        }
         seed(p);
         const ring = p.ring ? 1 : 0;
         const a = ring ? G.ang2 : G.ang, dir = ring ? G.dir2 : G.dir;

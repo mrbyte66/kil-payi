@@ -92,10 +92,10 @@ lint/tmp/
 # Cordova plugins for Capacitor
 capacitor-cordova-android-plugins
 
-# Copied web assets
-app/src/main/assets/public
-
-# Generated Config files
-app/src/main/assets/capacitor.config.json
-app/src/main/assets/capacitor.plugins.json
-app/src/main/res/xml/config.xml
+# Kıl payı: paketlenmiş oyun dosyaları ve Capacitor ayarları Android projesinin parçasıdır, depoya girer
+# (android dalında projenin tam hali görünsün diye; `npx cap sync android` bunları yeniden üretir).
+# Capacitor'un varsayılanı bunları yok sayar:
+# app/src/main/assets/public
+# app/src/main/assets/capacitor.config.json
+# app/src/main/assets/capacitor.plugins.json
+# app/src/main/res/xml/config.xml

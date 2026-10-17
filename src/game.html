@@ -560,7 +560,7 @@ const JEV = [
   [4, 0, { good: 'altin' }], [4, 0.42, { twin: 'lanetli' }], [4, 0.75, { good: 'sabir' }],
   [5, 0, { good: 'kasa' }], [5, 0.45, { twin: 'alarm' }], [5, 0.78, { twin: 'curuk' }],
   [6, 0, { good: 'ritim' }], [6, 0.42, { twin: 'sahtenota' }], [6, 0.76, { good: 'trafik' }],
-  [7, 0, { good: 'iki' }], [7, 0.48, { twin: 'kilitli' }], [7, 0.82, { star: 1 }],
+  [7, 0, { good: 'iki' }], [7, 0.48, { twin: 'kilitli' }], [7, 0.74, { good: 'isin' }], [7, 0.9, { star: 1 }],
   [8, 0, { good: 'hayalet' }], [8, 0.42, { twin: 'hayaletT' }], [8, 0.76, { good: 'bomba' }],
   [9, 0, { good: 'gelgit' }], [9, 0.48, { twin: 'girdap' }], [9, 0.82, { star: 1 }],
   [10, 0, { good: 'tutbirak' }], [10, 0.45, { twin: 'sicak' }], [10, 0.82, { star: 1 }]
@@ -573,6 +573,7 @@ const JKIND = {
   kayan:    { w: 0.5,  hwMul: 1.2,  omMul: 0.92, gain: 1.0 },
   nefes:    { w: 0.5,  hwMul: 1.1,  omMul: 1.0,  gain: 1.0 },
   iki:      { w: 0.4,  hwMul: 1.25, omMul: 0.82, gain: 0.65 },
+  isin:     { w: 0.4,  hwMul: 1.05, omMul: 0.9,  gain: 1.2 },
   altin:    { w: 0.5,  hwMul: 1.05, omMul: 1.0,  gain: 1.0 },
   sabir:    { w: 0.22, hwMul: 1.0,  omMul: 0.95, gain: 1.0 },
   kasa:     { w: 0.4,  hwMul: 0.9,  omMul: 1.18, gain: 0.8 },
@@ -596,7 +597,9 @@ const MECH = {
   sabirNeed: 3, sabirPts: 3, sabirPen: 1.0, sabirCoin: 1, sabirMax: 22,
   lightPer: [1.4, 1.1, 0.8], lightWarn: 0.3, lightPen: 1.0,
   bombFuse: [3.4, 2.9, 2.5], bombPen: 1.5, bombPts: 25, bombCrater: 3,
-  thornRef: 2.4, thornMin: 0.5, thornMax: 1.15, thornLead: [-0.1, 0.3]
+  thornRef: 2.4, thornMin: 0.5, thornMax: 1.15, thornLead: [-0.1, 0.3],
+  /* Işınlanma pimi: ibre kapıda kalır (sn, ★ ile genişler), çıkıştan hedefe en az süre (sn) ve yay (rad), atlanan yay (rad), kapı boyutu, kaybolma ve çıkış animasyonu (sn) */
+  isinWait: [[0.15, 0.5], [0.12, 0.58], [0.1, 0.66]], isinGapT: [0.52, 0.48, 0.44], isinGapMin: 1.1, isinSkip: [1.1, 2.2], isinPortalHw: 0.17, isinFade: 0.1, isinPop: 0.14
 };
 const pickJ = (open, relief, last, r, ph) => {
   if (relief || !open.length) return 'tek';
@@ -707,6 +710,7 @@ const STR = {
     k_sahtenota: 'Sahte nota', rule_sahtenota: 'Notaları sırayla vur', warn_sahtenota: 'Gül renkli ×\'e dokunma',
     k_trafik: 'Trafik ışığı', rule_trafik: 'Yeşil hedefe vur', warn_trafik: 'Kırmızıya dokunma',
     warn_iki: 'Kilitli halka çıkabilir',
+    k_isin: 'Işınlanma pimi', rule_isin: 'Mavi kapıya girer, turuncudan çıkar', warn_isin: 'Çıkış anı rastgele',
     k_kilitli: 'Kilitli halka', rule_kilitli: 'Kilitliyken yalnızca dış ibre sayılır', warn_kilitli: 'Dış ibre hızlanır; geri sayımı izle',
     k_hayalet: 'Hayalet pim', rule_hayalet: 'Hedef kaybolur: hafızandan vur (×2)', warn_hayalet: 'Hayalet tuzak da çıkar',
     k_hayaletT: 'Hayalet tuzak', rule_hayaletT: 'Tuzak da kaybolur', warn_hayaletT: 'Yerini unutma: −1,5 sn',
@@ -776,6 +780,7 @@ const STR = {
     k_sahtenota: 'Fake note', rule_sahtenota: 'Hit the notes in order', warn_sahtenota: 'Avoid the rose ×',
     k_trafik: 'Traffic light', rule_trafik: 'Hit the green target', warn_trafik: 'Avoid the red one',
     warn_iki: 'A locked ring may appear',
+    k_isin: 'Teleport pin', rule_isin: 'Enters the blue gate, exits the orange one', warn_isin: 'The exit time is random',
     k_kilitli: 'Locked ring', rule_kilitli: 'Locked: only the outer pointer counts', warn_kilitli: 'Outer pointer speeds up while locked',
     k_hayalet: 'Ghost pin', rule_hayalet: 'Target vanishes: hit from memory (×2)', warn_hayalet: 'A ghost trap may appear',
     k_hayaletT: 'Ghost trap', rule_hayaletT: 'The trap vanishes too', warn_hayaletT: "Don't forget where it is: −1.5 s",
@@ -846,7 +851,7 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.6.1';
+const VERSION = 'V0.7.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -982,6 +987,8 @@ const Snd = {
   warn() { this.tone(1180, 0.05, 'sine', 0.05); },
   ui() { this.tone(660, 0.08, 'triangle', 0.12); },
   rev() { this.tone(520, 0.12, 'triangle', 0.1, 780); },
+  portalIn() { this.tone(760, 0.16, 'sine', 0.1, 240); },
+  portalOut() { this.tone(260, 0.12, 'sine', 0.1, 900); this.tone(1320, 0.14, 'triangle', 0.07, null, 0.07); },
   fanfare() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.22, 'triangle', 0.14, null, i * 0.08)); },
   tool() { this.tone(500, 0.1, 'triangle', 0.14, 900); this.tone(900, 0.14, 'sine', 0.1, null, 0.08); },
   life() { [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.18, 'triangle', 0.13, null, i * 0.06)); },
@@ -1132,7 +1139,7 @@ const updateTools = () => {
   });
 };
 /* Kilit defteri: oyunda görülen kilitler, açıklamalarıyla acelesiz okunur. */
-const BOOK = [{ k: 'tek', lv: 1 }, { k: 'cift', lv: 1 }, { k: 'kayan', lv: 2 }, { k: 'nefes', lv: 3 }, { k: 'altin', lv: 4 }, { k: 'sabir', lv: 4 }, { k: 'kasa', lv: 5 }, { k: 'ritim', lv: 6 }, { k: 'trafik', lv: 6 }, { k: 'iki', lv: 7 }, { k: 'hayalet', lv: 8 }, { k: 'bomba', lv: 8 }, { k: 'gelgit', lv: 9 }, { k: 'tutbirak', lv: 10 }];
+const BOOK = [{ k: 'tek', lv: 1 }, { k: 'cift', lv: 1 }, { k: 'kayan', lv: 2 }, { k: 'nefes', lv: 3 }, { k: 'altin', lv: 4 }, { k: 'sabir', lv: 4 }, { k: 'kasa', lv: 5 }, { k: 'ritim', lv: 6 }, { k: 'trafik', lv: 6 }, { k: 'iki', lv: 7 }, { k: 'isin', lv: 7 }, { k: 'hayalet', lv: 8 }, { k: 'bomba', lv: 8 }, { k: 'gelgit', lv: 9 }, { k: 'tutbirak', lv: 10 }];
 const bookNew = () => BOOK.some(e => (save.seen[e.k] | 0) > 0 && !save.book[e.k]);
 const bookIcon = (c, kind) => {
   /* defter simgeleri canvas ile çizilir, küçük bir tuvale basılıp resme çevrilir */
@@ -1201,7 +1208,7 @@ const G = {
   campRun: false, startL: 1, banner: null, count: 0, thT: 0, thDirty: false, ec: 0, em: [],
   life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
   pendingNew: '', pendingTw: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0,
-  chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null
+  chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0
 };
 const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100, hudB: 0, dockTop: 0, cardB: 0 };
 
@@ -1236,12 +1243,12 @@ const syncPrimary = () => {
 const ahead = (ang, dir, d) => norm(ang + dir * d);
 
 /* ---------- yolculuk: kilit olayları, cehennem, seviye atlama ---------- */
-const IMPL_GOOD = { tek: 1, cift: 1, kayan: 1, nefes: 1, iki: 1, altin: 1, sabir: 1, kasa: 1, ritim: 1, trafik: 1, hayalet: 1, bomba: 1, gelgit: 1, tutbirak: 1 };
+const IMPL_GOOD = { tek: 1, cift: 1, kayan: 1, nefes: 1, iki: 1, isin: 1, altin: 1, sabir: 1, kasa: 1, ritim: 1, trafik: 1, hayalet: 1, bomba: 1, gelgit: 1, tutbirak: 1 };
 const IMPL_TWIN = { tuzak: 1, kayanT: 1, diken: 1, lanetli: 1, alarm: 1, sahtenota: 1, kilitli: 1, hayaletT: 1, girdap: 1, sicak: 1, curuk: 1 };
-const STAR_KINDS = { cift: 1, kayan: 1, nefes: 1, ritim: 1, hayalet: 1, trafik: 1, bomba: 1, tutbirak: 1, gelgit: 1 };
+const STAR_KINDS = { cift: 1, kayan: 1, nefes: 1, ritim: 1, hayalet: 1, trafik: 1, bomba: 1, tutbirak: 1, gelgit: 1, isin: 1 };
 /* Engel ikizinin iyi kilidi; kilit defteri sırası ve ilk açıldığı seviye. */
 const GOOD_OF = { tuzak: 'cift', kayanT: 'kayan', diken: 'nefes', lanetli: 'altin', alarm: 'kasa', sahtenota: 'ritim', kilitli: 'iki', hayaletT: 'hayalet', girdap: 'gelgit', sicak: 'tutbirak', curuk: 'sabir' };
-const WARN_ON_GOOD = { sabir: 1, trafik: 1, bomba: 1 };
+const WARN_ON_GOOD = { sabir: 1, trafik: 1, bomba: 1, isin: 1 };
 /* Karışım olayları: seviye -> [ana kilit, katılan]. Yapılmamış kilitler için olay atlanır. */
 const MIXES = { 2: ['cift', 'kayan'], 3: ['nefes', 'tuzak'] };
 const banner = (title, sub, kind) => { G.banner = { title, sub: sub || '', kind: kind || '', t: 0 }; };
@@ -1420,7 +1427,7 @@ const makeLabels = (kind, pins, seenKind, seenTw) => {
   const lab = { pins, t: 0, max: 5, ok: null, no: null, noDa: 0 };
   const g = pins.find(p => p.kind === 'gate' && !p.bonus);
   if (seenKind <= 3) {
-    if (kind === 'nefes' || kind === 'kayan') lab.ok = g;
+    if (kind === 'nefes' || kind === 'kayan' || kind === 'isin') lab.ok = g;
     else if (kind === 'altin') lab.ok = pins.find(p => p.gold) || null;
     else if (kind === 'tutbirak') lab.ok = pins.find(p => p.kind === 'hold') || null;
     else if (kind === 'sabir') { lab.ok = pins.find(p => p.side) || null; lab.no = pins.find(p => p.kind === 'lockpin') || null; }
@@ -1463,7 +1470,7 @@ const spawnChallenge = (first, force) => {
   if (can) hw = Math.min(0.8, hw * 1.15);
   const star = G.stars[kind] | 0, sIx = Math.min(2, star);
   G.chal = { kind, t: 0, star, tw: '' };
-  G.holding = false; G.lockLeft = 0;
+  G.holding = false; G.lockLeft = 0; G.tun = null; G.emerge = 0;
   const far = (G.firstOfKind || PR) ? [2.0, 2.6] : null;
   const dist = (lo, hi) => far ? rnd(far[0], far[1]) : rnd(lo, hi);
   const gate = mkGate;
@@ -1505,6 +1512,19 @@ const spawnChallenge = (first, force) => {
   } else if (kind === 'gelgit') {
     if (G.tideC == null) G.tideC = rnd(0, TAU);
     pins.push(gate(0, ahead(G.ang, G.dir, dist(1.2, 2.4)), hw));
+  } else if (kind === 'isin') {
+    /* İbre mavi kapıya (A) girer, turuncu kapıdan (B) çıkar; hedef (T) çıkışın ilerisindedir ve çıkışı görüp tepki verilebilecek kadar uzaktadır.
+       Hedef, ibrenin ilk yoluna (başlangıç ile A arası) düşmez: o yayı ibre hep ışınlanmadan önce geçer. */
+    const om = G.omega * (G.slow > 0 ? G.slowMul : 1), room = TAU - 0.55;
+    let gap = Math.max(MECH.isinGapMin, om * MECH.isinGapT[sIx]) + rnd(0, 0.3), skip = rnd(MECH.isinSkip[0], MECH.isinSkip[1]), a = dist(1.3, 2.0);
+    if (a + skip + gap > room) {
+      skip = Math.max(0.9, room - a - gap);
+      if (a + skip + gap > room) { a = Math.max(1.0, room - skip - gap); if (a + skip + gap > room) gap = room - a - skip; }
+    }
+    const pa = ahead(G.ang, G.dir, a), pb = ahead(pa, G.dir, skip);
+    pins.push(gate(0, ahead(pb, G.dir, gap), hw));
+    pins.push({ kind: 'portal', portal: 'in', ring: 0, c0: pa, amp: 0, f: 0, ph: 0, hw: MECH.isinPortalHw, done: false, wait: MECH.isinWait[sIx], prev: null });
+    pins.push({ kind: 'portal', portal: 'out', ring: 0, c0: pb, amp: 0, f: 0, ph: 0, hw: MECH.isinPortalHw, done: false });
   } else if (kind === 'tutbirak') {
     const len = MECH.holdLen[sIx], s0 = ahead(G.ang, G.dir, dist(1.2, 2.0));
     pins.push({ kind: 'hold', ring: 0, c0: s0, amp: 0, f: 0, ph: 0, hw: Math.max(0.16, hw * 0.8), rw: Math.max(0.14, hw * 0.6), len, dirH: G.dir, st: 'wait', done: false, hot: false });
@@ -1616,7 +1636,7 @@ const runState = L0 => ({
     campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: 0, thDirty: false, em: [],
     life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
     pendingNew: '', pendingTw: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0,
-    chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null
+    chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0
 });
 
 const start = (fromL, snap) => {
@@ -1790,6 +1810,35 @@ const tickLight = dt => {
   ch.warn = ch.left < MECH.lightWarn;
 };
 const p0Tone = p => p.green ? 880 : 440;
+/* Işınlanma pimi: ibre mavi kapıya girince görünmez olur ve açısı donar; rastgele bir süre sonra turuncu kapıdan çıkar. */
+const outPortal = () => G.pins.find(q => q.kind === 'portal' && q.portal === 'out');
+const enterPortal = p => {
+  const out = outPortal();
+  if (!out) return;
+  const w = p.wait || MECH.isinWait[0];
+  G.ang = p.c0; G.tun = { t: 0, d: rnd(w[0], w[1]), to: out.c0 };
+  const q = pinXY(p); fxRing(q.x, q.y, P.lilac, 70, 0.45); burst(q.x, q.y, 10, [P.lilac, P['lilac-soft'], '#FFFFFF'], 150);
+  Snd.portalIn(); Platform.haptic('light');
+};
+const exitPortal = () => {
+  const out = outPortal();
+  G.ang = G.tun.to; G.tun = null; G.emerge = MECH.isinPop;
+  if (out) { const q = pinXY(out); fxRing(q.x, q.y, P.peach, 80, 0.5); burst(q.x, q.y, 14, [P.peach, P['peach-soft'], '#FFFFFF'], 190); }
+  Snd.portalOut(); Platform.haptic('light');
+};
+const tickPortal = (p, dt) => {
+  if (G.emerge > 0) G.emerge = Math.max(0, G.emerge - dt);
+  if (G.tun) {
+    G.tun.t += dt;
+    if (G.tun.t >= G.tun.d) { exitPortal(); p.prev = null; }
+    return;
+  }
+  const rel = sdiff(G.ang, p.c0) * G.dir;
+  if (p.prev != null && p.prev < 0 && rel >= 0 && Math.abs(rel) < 0.7) { enterPortal(p); p.prev = null; return; }
+  p.prev = rel;
+};
+/* İbrenin çizim ölçeği: kapıya girerken küçülür, çıkarken büyür. */
+const ptrScale = () => G.tun ? clamp(1 - G.tun.t / MECH.isinFade, 0, 1) : (G.emerge > 0 ? 1 - G.emerge / MECH.isinPop : 1);
 const blast = p => {
   G.chal.fail = true;
   p.done = true; p.bomb.st = 'boom';
@@ -1828,6 +1877,7 @@ const updateChal = dt => {
     } else if (p.kind === 'lockpin') tickLockpin(p, dt);
     else if (p.kind === 'hold') tickHold(p, dt);
     else if (p.bomb && !p.done) { p.bomb.fuse -= dt; if (p.bomb.fuse <= 0 && G.mode === 'play') blast(p); }
+    else if (p.kind === 'portal' && p.portal === 'in') tickPortal(p, dt);
   }
   if (ch.light) tickLight(dt);
   if (G.mode === 'play' && G.needCheck) { G.needCheck = false; if (G.pins.every(q => !isReq(q))) advance(false); }
@@ -1838,6 +1888,7 @@ const tideF = a => {
   return MECH.tideBase + v * s * s * (3 - 2 * s);
 };
 const ptrFactor = () => {
+  if (G.tun) return 0;
   let f = 1;
   if (G.kind === 'gelgit' && G.tideC != null) f *= tideF(G.ang);
   if (G.vort > 0) f *= MECH.vortexMul;
@@ -2120,8 +2171,10 @@ const die = () => {
   G.mode = 'dead'; G.deadT = 0.6;
   toolsEl.classList.remove('on');
   const w = G.omega * (G.slow > 0 ? CFG.contSlowMul : 1);
-  const inside = angd(G.ang, G.ta) <= G.hw;
-  const secs = (norm((G.ta - G.ang) * G.dir) - G.hw) / w;
+  /* ışınlanma pininde ibre kapıya varmadan ya da kapıdayken "hedefe şu kadar kala" demek yanıltır */
+  const viaGate = G.kind === 'isin' && (!!G.tun || G.pins.some(p => p.kind === 'portal' && p.portal === 'in' && aheadOf(p.c0) < aheadOf(G.ta)));
+  const inside = !viaGate && angd(G.ang, G.ta) <= G.hw;
+  const secs = viaGate ? 0 : (norm((G.ta - G.ang) * G.dir) - G.hw) / w;
   G.nearMsg = inside ? t('overInside') : (secs > 0 && secs <= 0.6 ? t('overClose', { s: f1(Math.max(0.1, secs)) }) : '');
   shake(0.5); flash('rose', 0.3); Snd.over(); Platform.haptic('error');
   save.run = null; G.adv = null;
@@ -2198,7 +2251,11 @@ const doContinue = () => {
   G.mode = 'play'; G.continued = true; G.time = CFG.contTime; G.slow = CFG.contSlow; G.slowMul = CFG.contSlowMul;
   G.combo = 0; G.tscale = 1; G.tsT = 0; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
   const g0 = primaryPin();
-  if (g0) G.ang = norm((g0.kind === 'hold' ? g0.c0 : pinCenter(g0)) - G.dir * 1.3);
+  if (G.kind === 'isin') {
+    /* ışınlanma pininde ibre çıkış kapısından başlar: hedefe giden yol hep serbest */
+    G.tun = null; G.emerge = 0; G.pins.forEach(p => { if (p.kind === 'portal') p.prev = null; });
+    const po = outPortal(); if (po) G.ang = po.c0;
+  } else if (g0) G.ang = norm((g0.kind === 'hold' ? g0.c0 : pinCenter(g0)) - G.dir * 1.3);
   const g1 = G.pins.find(p => p.kind === 'gate' && !p.done && p.ring === 1);
   if (g1) G.ang2 = norm(pinCenter(g1) - G.dir2 * 1.3);
   G.gateT = 0;
@@ -2598,7 +2655,23 @@ const drawVortex = (c, cx, cy, Rr, RWr, p, gk) => {
   c.globalAlpha = gk * 0.18; c.fillStyle = P.lilac; c.beginPath(); c.arc(q[0], q[1], RWr * 1.0, 0, TAU); c.fill();
   c.globalAlpha = 1; c.lineCap = 'butt';
 };
+/* Işınlanma kapıları: mavi kapı ibreyi içeri alır, turuncu kapı dışarı verir; dönen kesikli halka ve iç kıvrımlar. */
+const drawPortal = (c, cx, cy, Rr, RWr, p, gk) => {
+  const q = ptXY(cx, cy, p.c0, Rr), isIn = p.portal === 'in', col = isIn ? P.lilac : P['peach-deep'], soft = isIn ? P['lilac-soft'] : P['peach-soft'], dr = isIn ? -1 : 1;
+  const r = RWr * 0.95 * (0.5 + 0.5 * gk), act = isIn ? (G.tun ? 1 : 0) : (G.emerge > 0 ? G.emerge / MECH.isinPop : 0);
+  c.save(); c.translate(q[0], q[1]); c.lineCap = 'round';
+  c.globalAlpha = gk * (0.35 + 0.25 * act); c.fillStyle = soft; c.beginPath(); c.arc(0, 0, r * 1.18, 0, TAU); c.fill();
+  c.globalAlpha = gk; c.strokeStyle = col;
+  c.save(); c.rotate(G.clock * 1.8 * dr); c.setLineDash([r * 0.46, r * 0.3]); c.lineWidth = 3; c.beginPath(); c.arc(0, 0, r * 1.12, 0, TAU); c.stroke(); c.restore();
+  c.setLineDash([]);
+  c.save(); c.rotate(-G.clock * 3.2 * dr); c.lineWidth = 3.4;
+  for (let i = 0; i < 2; i++) { c.beginPath(); c.arc(0, 0, r * 0.55, i * Math.PI + 0.3, i * Math.PI + 2.3); c.stroke(); }
+  c.restore();
+  c.fillStyle = col; c.beginPath(); c.arc(0, 0, r * (0.14 + 0.08 * act), 0, TAU); c.fill();
+  c.restore(); c.globalAlpha = 1; c.lineCap = 'butt';
+};
 const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
+  if (p.kind === 'portal') { drawPortal(c, cx, cy, Rr, RWr, p, gk); return; }
   if (p.kind === 'vortex') { drawVortex(c, cx, cy, Rr, RWr, p, gk); return; }
   if (p.kind === 'hold') { drawHold(c, cx, cy, Rr, RWr, p, gk); return; }
   if (p.kind === 'lockpin') { drawLockpin(c, cx, cy, Rr, RWr, p, gk); return; }
@@ -2693,7 +2766,8 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
   }
   c.globalAlpha = 1;
 };
-const drawPointer = (c, cx, cy, Rr, RWr, ang, dir, col, trailCol) => {
+const drawPointer = (c, cx, cy, Rr, RWr, ang, dir, col, trailCol, sc) => {
+  if (sc == null) sc = 1;
   const a = ang - HALF;
   c.lineCap = 'butt'; c.lineWidth = RWr * 0.5; c.strokeStyle = trailCol;
   for (let i = 0; i < 10; i++) {
@@ -2705,8 +2779,8 @@ const drawPointer = (c, cx, cy, Rr, RWr, ang, dir, col, trailCol) => {
   const px = cx + Math.cos(a) * Rr, py = cy + Math.sin(a) * Rr;
   c.lineCap = 'round'; c.lineWidth = 3; c.strokeStyle = col;
   c.beginPath(); c.moveTo(cx + Math.cos(a) * Rr * 0.62, cy + Math.sin(a) * Rr * 0.62); c.lineTo(px, py); c.stroke();
-  c.fillStyle = col; c.beginPath(); c.arc(px, py, RWr * 0.5 + 2, 0, TAU); c.fill();
-  c.fillStyle = P.surface; c.beginPath(); c.arc(px, py, RWr * 0.17, 0, TAU); c.fill();
+  c.fillStyle = col; c.beginPath(); c.arc(px, py, (RWr * 0.5 + 2) * sc, 0, TAU); c.fill();
+  c.fillStyle = P.surface; c.beginPath(); c.arc(px, py, RWr * 0.17 * sc, 0, TAU); c.fill();
 };
 
 
@@ -2815,6 +2889,16 @@ const drawLockIcon = (c, kind, x, y, s, anim) => {
   else if (kind === 'hayalet') { c.globalAlpha *= 0.55; c.setLineDash([3, 3]); ring(-0.7, 0.7, w, P.peach); c.setLineDash([]); c.globalAlpha /= 0.55; }
   else if (kind === 'hayaletT') { c.globalAlpha *= 0.55; c.setLineDash([3, 3]); ring(-0.6, 0.6, w, P.rose); c.setLineDash([]); c.globalAlpha /= 0.55; }
   else if (kind === 'bomba') { ring(-1.3, -0.75, w, P.peach); c.fillStyle = '#0E0C20'; c.beginPath(); c.arc(s * 0.2, -s * 0.18, s * 0.26, 0, TAU); c.fill(); c.lineWidth = 1.4; c.strokeStyle = P['ink-3']; c.stroke(); c.beginPath(); c.moveTo(s * 0.32, -s * 0.4); c.quadraticCurveTo(s * 0.42, -s * 0.58, s * 0.55, -s * 0.52); c.lineWidth = 2; c.strokeStyle = '#C9B98A'; c.stroke(); spark4(c, s * 0.55, -s * 0.52, s * 0.12, GOLD_L, 1); }
+  else if (kind === 'isin') {
+    ring(0.55, 1.35, w, P.peach);
+    const dot = (a, col) => {
+      const px = Math.sin(a) * r0, py = -Math.cos(a) * r0;
+      c.beginPath(); c.arc(px, py, w * 0.8, 0, TAU); c.fillStyle = mixHex(col, P.bg, 0.65); c.fill();
+      c.lineWidth = Math.max(1.8, s * 0.07); c.strokeStyle = col; c.setLineDash([s * 0.12, s * 0.09]); c.stroke(); c.setLineDash([]);
+      c.beginPath(); c.arc(px, py, w * 0.3, 0, TAU); c.fillStyle = col; c.fill();
+    };
+    dot(-1.15, P.lilac); dot(-0.05, P['peach-deep']);
+  }
   else if (kind === 'gelgit') { ring(-1.0, 1.0, w, mixHex(P.track, P.lilac, 0.5)); ring(-0.4, 0.4, w, P.lilac); ring(-0.2, 0.2, w * 0.5, P.peach); }
   else if (kind === 'girdap') { for (let i = 0; i < 3; i++) { c.beginPath(); c.arc(0, -s * 0.05, s * (0.14 + 0.13 * i), 0.6 * i, 0.6 * i + 4.2); c.lineWidth = 2.4; c.strokeStyle = P.lilac; c.stroke(); } }
   else if (kind === 'tutbirak') { ring(-1.2, 1.2, w * 0.9, P.peach); ring(0.95, 1.25, w, P['peach-deep']); c.beginPath(); c.arc(r0 * Math.sin(-1.2), -r0 * Math.cos(-1.2), w * 0.45, 0, TAU); c.fillStyle = P.surface; c.fill(); }
@@ -3017,7 +3101,8 @@ const render = () => {
   }
 
   const trail = mult >= 2 ? tierCol(mult) : P.lilac;
-  drawPointer(c, cx, cy, R, RW, G.ang, G.dir, P.ink, trail);
+  const psc = ptrScale();
+  if (psc > 0.03) { c.globalAlpha = psc; drawPointer(c, cx, cy, R, RW, G.ang, G.dir, P.ink, trail, psc); c.globalAlpha = 1; }
   if (two) { if (G.lockLeft > 0) c.globalAlpha = 0.4; drawPointer(c, cx, cy, R2, RW2, G.ang2, G.dir2, P.btn, trail); c.globalAlpha = 1; }
   if (G.mode === 'play') drawBoost(c, cx, cy, R, RW);
   if (G.holding && G.mode === 'play') {

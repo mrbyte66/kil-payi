@@ -10,7 +10,8 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 - `src/fonts/`: Fredoka ve Nunito (OFL). `node tools/fetch-fonts.mjs` ile indirilir, `www/` sürümü bunları yerelden okur.
 - `tools/sim.mjs`: zorluk simülatörü. `src/game.html` içindeki `TUNE-START`/`TUNE-END` bloğunu okur.
 - `CHANGELOG.md`: sürüm notları (Türkçe, kullanıcı gözüyle). `tools/release.sh`: sürüm APK'sını `dist/kil-payi-v<sürüm>.apk` adıyla üretir.
-- `android/`: Capacitor 8.5.3 Android projesi. `capacitor.config.ts` içinde geçici appId `com.mrbyte66.kilpayi` (yayından önce kullanıcıyla kesinleştir).
+- `android/`: Capacitor 8.5.3 Android projesi. `capacitor.config.ts` içinde geçici appId `com.mrbyte66.kilpayi` (yayından önce kullanıcıyla kesinleştir). Paketlenmiş oyun (`app/src/main/assets/public/`), `capacitor.config.json`, `capacitor.plugins.json` ve `res/xml/config.xml` depoya girer (kullanıcı "gerçek Android projesini görmek istiyorum" dedi); `release.sh` bunları yeniler, commit'e dahil et.
+- **Dallar (V0.7.0, kullanıcı kararı):** `android` = çalışma dalı ve tam Android projesi (eski adı `android-capacitor`); `html` = yalnızca HTML oyunu, `tools/publish.sh` android'den üretir, elle düzenleme; `main` = ilk sürüm, dokunulmaz. `android` ve `html` `main`'e birleştirilmez, hep ayrı gider. `tools/branches/README.html.md` html dalının README'sidir (README.md'yi değiştirince buna da yansıt).
 
 ## Kararlar
 
@@ -32,11 +33,12 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
   bölümü (cennet kaldırıldı), kontrastlı temalar ve yumuşak geçiş. Ekranda yalnızca "Seviye N" yazar, toplam gösterilmez. Süreler bot ölçümüyle ayarlandı
   (`JOURNEY.normal/hell`, cehennem gücü `hellK`; ölçüm belgede). Kullanıcı kalp simgesini sevmedi: can yeşil "+ Can" kapsülüdür. Jokerler parlayarak
   ipucu verir (`adviceFor`), oyun `save.run` ile kaldığı yerden devam eder. Yeni özellik eklerken önce o belgeyi oku, bitince belgedeki "Yapım sırası ve
-  durum" bölümünü güncelle. V0.5.0 tamam (Seviye 4-10 kilitleri); sıradaki: **Işınlanma pimi** (kullanıcı V0.6.0 sonrası istedi: ibre kapıya girer, çıkış anı rastgele ve "hızlı çıksın"; önce görsel tasarım gösterilip onaylanacak, bkz. yolculuk belgesi "Yapım sırası"), sonra katalogdaki kalan fikirler (Sarkaç, Renk, Sis...) sonsuz mod için, kullanıcının oyun sonrası geri bildirimine göre. İkon/imzalı paket/gizlilik sayfası/gerçek reklam kimliği ayrı sürümde (kullanıcı Play hesabı açınca haber verecek).
+  durum" bölümünü güncelle. V0.5.0 tamam (Seviye 4-10 kilitleri); V0.7.0 tamam (Işınlanma pimi: Seviye 7'nin %74'ünde, ikizsiz, 15 kilit); sıradaki: Kara kapı (ışınlanma ikizi) ve katalogdaki kalan fikirler (Sarkaç, Renk, Sis...) sonsuz mod için, kullanıcının oyun sonrası geri bildirimine göre. İkon/imzalı paket/gizlilik sayfası/gerçek reklam kimliği ayrı sürümde (kullanıcı Play hesabı açınca haber verecek).
 - Cehennem gücü `JOURNEY.hellTab` (seviye başına tablo, 1 = tam güç) ve `phase.hell` tam güç değerleriyle ayarlanır; her değişiklikten sonra `hellLine(0.08, 0.75)` ile seviye seviye geçme oranına bak (hedef: orta oyuncu ilk seviyelerde ~%95+, 9-10'da ~%40-60;
   yeni başlayan %60-85). Çarpanlar normal bölümün üstüne bindiği için geç seviyelerde güç aşağı inmeli. Süreye göre hedef uzunluğu `WIDE_TAB`/`wideAt` (TUNE bloğunda; süre çubuğunun her saniyesi için ayrı çarpan, 8. sn ×0,8 ... 1. sn ×1,62, bitmek üzereyken ×1,8; kullanıcı isteği). Genişlik tablosunu ya da tier çarpanlarını değiştirince tüm kademeleri yeniden ölç: tablo süresi azalan oyuncuya çok cömert, hep aynı ayarla ölçmek yanıltır.
 - Kademe değişimi (V0.6.1): `save.run.lvl` yarım kalan oyunun kademesidir, açılışta kademe seçici ona eşitlenir. Yarım kalan oyun varken başka kademe seçilirse `#swap` onay penceresi çıkar (`runPending` kaybolacak coini hesaplar); "Sil ve geç" `save.run`'ı siler. Kullanıcı resume'u sevdi, yalnızca modlar arası karışmasın istedi.
 - Dikende (`nefes` kilidinin diken ikizi) kapanma payı `p.br.a` seviyeyle büyür (`0,22 + 0,4 × yoğunluk + 0,05 × ★`, en çok 0,62); 0,72'ye çıkarınca nefes en büyük katil oldu ve Cehennem aşılmaz hâle geldi; 0,62 sınırında da Cehennem'de pro botun ölümlerinin %35'i nefesten (ayarı daha da büyütme).
+- Işınlanma pimi (V0.7.0): ibre kapıya (`portal: 'in'`) girince `G.tun` doğar, `ptrFactor()` 0 döner (ibre açısı donar, çizilmez), süre dolunca `G.ang` çıkış kapısının açısına atlar. İbre açısına bakan yeni kod (`die`, `doContinue`, ipuçları, bot) `G.tun` durumunu bilmeli; hedef ibrenin ilk yoluna (başlangıç ile giriş kapısı arası) ve giriş kapısının önüne düşmemeli. Çıkıştan hedefe en az ~0,5 sn bırak (tepki payı).
 - Dene modu (V0.6.0, kilit defterinden): `G.practice` doluyken yolculuk, süre, kayıt ve rekor devre dışıdır (`update`, `lethal`, `persistRun`, `noteSeen` korumaları); yeni kilit eklerken `PRAC_TWIN`/`PRAC_NEED` tablolarına bak ve `tools/bot.js` ile `runBot(..., { setup: () => startPractice(tür) })` her kilidin denemesini bitirebiliyor mu kontrol et.
 - Sis ve renk kilitleri yapılırken tasarım kuralları belgede ("Adil oyun kuralları"): ibre hep görünür, renk hedefin içinde değişmez
   (halka iki bölgeli). `DEBUG=2 ./build.sh` kancayı ekler ama duraklatmayı kapatmaz (yaşam döngüsü testi için; `DEBUG=1`'de `pause()` hiçbir şey yapmaz).
@@ -56,11 +58,11 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 - Sürüm adları `V0.x.y`. Kullanıcı sürümleri bu adlarla anar ("V0.4.0'daki şu seviyeyi koru"), bu yüzden APK'yı hep sürüm adıyla ver: `dist/kil-payi-v0.x.y.apk`.
   Sürüm adı `android/app/build.gradle` içindeki `versionName`; her sürümde `versionCode` da bir artar. Eski sürümlerin APK'larını silme (`dist/` git'te yok).
 - Her sürümde sırayla: `CHANGELOG.md`'yi güncelle, `./tools/release.sh` ile APK üret, commit'le, `git tag -a v0.x.y -m "..."`,
-  `git push origin android-capacitor --tags` (kullanıcı her sürümde push'lamamı istedi), sonra APK'yı Wi-Fi/QR ve SendUserFile ile ver.
+  `./tools/publish.sh` (android dalını etiketlerle, html dalını android'den üretip push'lar; kullanıcı her sürümde ikisinin de push'lanmasını istedi), sonra APK'yı Wi-Fi/QR ve SendUserFile ile ver.
 - Büyük değişiklikte önce görsel tasarım göster, kullanıcı onaylayınca kodla.
 
 ## Çalışma kuralları
 
 - Oyun mantığını değiştirince `node tools/sim.mjs 2500` ile zorluk dengesini kontrol et.
 - Arayüz değişikliklerinde açık ve koyu tema, telefon genişliği ve mevcut tasarım dili (lila + şeftali, yuvarlak formlar) korunmalı.
-- Dal: Android çalışması `android-capacitor` dalında; `main` dokunulmamış.
+- Dal: çalışma `android` dalında (commit'ler burada); `html` dalı `./tools/publish.sh` ile üretilir; `main` dokunulmamış. Eski uzak dal `android-capacitor` artık güncellenmez.
