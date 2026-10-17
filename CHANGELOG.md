@@ -3,6 +3,27 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.8.0 — İlk görüşte tanıtım, Cehennem çemberi, altın sırası (2026-10-17)
+
+- **Yeni kilit ya da engel ilk kez geldiğinde oyun birkaç saniye durur, küçük bir animasyon onu tanıtır** (öğreticiyi aramana gerek kalmaz). Üstteki yeni-kilit kartı uzar, içinde kilit baştan sona oynanır
+  (ibre geçer, parmak dokunur, ödül çıkar) ve ne yapılacağı adım adım yazılır; halka aşağı kayıp küçülür, oyun alanı hafifçe silinir, joker sırası soluk kalır. Oyunun üstüne pencere açılmaz.
+  Dokununca geçilir (ilk 1,2 saniyedeki dokunuş yok sayılır, tempoda vuran parmak kazara atlatmasın), yoksa 4-5,5 saniye sonra kendiliğinden kapanır ve "Kaldığın yerden devam" yazısıyla oyun sürer. **Yalnızca ilk görüşte çıkar**
+  (daha önce karşılaştığın kilitler için çıkmaz); iyi kilit ile engel ikizi birlikte gelirse art arda gösterilir (önce kilit, sonra engel). 25 türün hepsinin (14 kilit, 11 engel) kendi animasyonu var ve gerçek oyun çizimleriyle yapıldı.
+  Uygulama arka plana giderse yarım kalan tanıtım devamında baştan başlar; Android geri tuşu tanıtımları geçer. Kilit defteri ve **Dene** aynen duruyor. Türkçe ve İngilizce.
+  Kullanıcı isteğiyle yapıldı: "oyunun üstüne yeni pencere açmak istemiyorum" dediği için dört tasarım gösterildi, "üst kart büyür" seçildi.
+- **Cehennem'de çember nefes alıyor, ters dönüyor, gözü yoruyor** (yalnızca Cehennem kademesinde; Usta'nın cehennem bölümlerinde yok). Çember yavaşça küçülüp geri açılır (**nefes**), bütün çember (çentikler, hedefler, ibre) **ibrenin tersine döner**,
+  içinde üç kollu bir **sarmal** döner. Seviye ilerledikçe güçlenir: nefes 1. seviyede %3 küçülür, 10. seviyede %25'e çıkar ve 3,4 sn'den 1,6 sn'ye hızlanır; çember 1. seviyede saniyede 3°, 10. seviyede 18° döner.
+  Yalnızca görüntü oynar: ibre ile hedef arasındaki açı ve dokunuş mantığı değişmez (botla ölçüldü: Cehennem sayıları aynı çıktı). Çember hiçbir zaman ayarlanan boyutundan büyümez, bu yüzden kartın altına girmez;
+  rakamlar (çift pimin 1-2'si) dönmez, hep dik kalır. "Hareketi azalt" ayarı açık cihazlarda efekt kapalıdır. Cehennem'i seçmeyen oyuncu hiçbir fark görmez.
+  Kullanıcı isteğiyle yapıldı; nefes açık, ters dönüş "bütün çember", sarmal açık, yalnızca Cehennem modu olarak seçildi.
+- **Altın pim ana hedeften sonra açılır.** Altın önce soluk ve kilitlidir (üstünde küçük kilit); sıradaki ana hedefi vurunca **parlayarak açılır**. Açıldıktan sonra ilk dokunuş altına aittir: dokunup tutturamazsan normal ıska cezası ve altın kaybolur;
+  hiç dokunmadan ibre altını geçerse ceza yok, altın yalnızca kaybolur. Lanetli altın (engel ikizi) buna göre yeniden yerleşti: gerçek altının önünde ya da ardında, her zaman ana hedeften sonra.
+- **Hedefin boyu süre çubuğuna göre belirgin değişiyor.** "8 saniyelik çubuğun 8. saniyesinde hedef zor, 7. saniyesinde daha kolay…" isteği V0.6.1'de yapılmıştı ama hissedilmiyordu: iyi oynayan oyuncuda çubuk hep 7,5-8 sn'de durduğu için eski tabloda
+  (×0,80 ile ×0,87) fark yalnızca %8'di. Şimdi çubuk doluyken hedef ×0,62, 7 sn'de ×0,80, 6 sn'de ×0,94 (aşağısı aynı: 5 sn ×1,02, 4 sn ×1,12, 3 sn ×1,25, 2 sn ×1,42, 1 sn ×1,62, bitmek üzereyken ×1,8);
+  yani bir ıskadan sonra çıkan hedef gözle görülür biçimde büyür. Orta kısmı da sertleştirmek Usta ve Cehennem'i fazla zorlaştırdığı için yalnızca üst iki saniye değiştirildi.
+- Botla ölçüldü (10. seviyeye ulaşma; n = 18-70, hata payı ±10 puan): Normal yeni %3, orta %50, iyi %84; Usta usta bot %78; Cehennem pro bot %37 ulaşıyor, %27 bitiriyor. V0.7.0 ölçümüyle (Normal orta %38, iyi %83; Cehennem pro bitirme %25) hata payı içinde aynı:
+  bu sürümdeki değişiklikler zorluğu bozmadı. İlk görüş tanıtımı botları durdurmasın diye `DEBUG=1` derlemesinde kapalıdır (`DEBUG=2`'de açık).
+
 ## V0.7.0 — Işınlanma pimi (2026-10-17)
 
 - **Yeni kilit: Işınlanma pimi** (Seviye 7'nin sonuna doğru gelir, Kilit defterinde ve **Dene**'de de var). Halkada iki kapı olur: **mavi kapı** ibreyi içeri alır, **turuncu kapı** dışarı verir.

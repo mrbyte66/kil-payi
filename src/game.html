@@ -134,6 +134,8 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
 .tools{position:absolute;left:0;right:0;top:0;bottom:auto;padding:0 16px;display:flex;justify-content:center;align-items:flex-end;gap:16px;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-slow) var(--ease)}
 .tools.on{opacity:1;transform:none}
+.tools.on.dim{opacity:.3}
+.tools.dim .tool{pointer-events:none}
 .tool{appearance:none;border:0;position:relative;width:60px;height:60px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-s);display:grid;place-items:center;cursor:pointer;pointer-events:auto;touch-action:none;transition:transform var(--dur-fast) var(--ease),opacity var(--dur-fast),width var(--dur-fast) var(--ease),height var(--dur-fast) var(--ease)}
 .tools:not(.on) .tool{pointer-events:none}
 .tool:active{transform:scale(.94)}
@@ -587,7 +589,7 @@ const JKIND = {
 const JTWIN = { tek: 'tuzak', cift: 'tuzak', kayan: 'kayanT', nefes: 'diken', iki: 'kilitli', altin: 'lanetli', kasa: 'alarm', ritim: 'sahtenota', hayalet: 'hayaletT', gelgit: 'girdap', tutbirak: 'sicak', sabir: 'curuk' };
 /* Yeni kilitlerin sayıları: tek yerde, bot ve sim ile ayarlanır. */
 const MECH = {
-  goldHw: 0.17, goldCoin: 1, cursedCoins: 3, cursedPen: 1.0,
+  goldHw: 0.17, goldGap: [0.7, 1.1], goldCoin: 1, cursedCoins: 3, cursedPen: 1.0,
   kasaBonusT: 0.6, kasaPts: 10, kasaCoin: 2, alarmPen: 2,
   ritimN: [3, 4, 5], ritimBonusT: 0.6, ritimPts: 2, notePen: 1.0,
   lockT: 2.4, lockMul: 1.25,
@@ -625,13 +627,16 @@ const planJourney = (L, ph, n, adapt, mercy) => {
 const PRAC = { omega: 2.2, hw: 0.46, need: 3 };
 const PRAC_NEED = { sabir: 1 };
 const PRAC_TWIN = { cift: 'tuzak', kayan: 'kayanT', nefes: 'diken', altin: 'lanetli', kasa: 'alarm', ritim: 'sahtenota', iki: 'kilitli', hayalet: 'hayaletT', gelgit: 'girdap', tutbirak: 'sicak' };
-/* Süreye göre hedef uzunluğu: süre çubuğunun her saniyesinde başka uzunlukta hedef çıkar (V0.6.1). Anahtar noktalar saniye başına, aralarında doğrusal.
-   8 sn en dar (zor), 1 sn en uzun (en kolay). Dar tarafı ilk üç seviyede yavaş yavaş devreye girer. */
-const WIDE_TAB = [1.8, 1.62, 1.42, 1.25, 1.12, 1.02, 0.94, 0.87, 0.8];
+/* Süreye göre hedef uzunluğu: süre çubuğunun her saniyesinde başka uzunlukta hedef çıkar; anahtar noktalar saniye başına (0 sn ... 8 sn), aralarında doğrusal.
+   8 sn (çubuk dolu) en dar, 1 sn en geniş. V0.8.0: çubuk iyi oynayan oyuncuda hep 7,5-8 sn'de durur (her vuruş çubuğu doldurur), bu yüzden fark en çok 6-8 sn arasında olmalı:
+   bir ıskadan sonra (çubuk ~7 sn) sıradaki hedef belirgin büyür (×0,62 -> ×0,80), iki ıskadan sonra daha da (×0,94). V0.6.1'de 8 sn ×0,80, 7 sn ×0,87 idi, fark hissedilmiyordu.
+   Alt tarafı (4 sn ve altı) eskisiyle aynı: kurtarma cömertliği değişmesin (denge bot ölçümüyle korundu).
+   Daraltma (×1'in altı) ilk üç seviyede yavaş yavaş tam güce çıkar (1. seviyede %60). */
+const WIDE_TAB = [1.8, 1.62, 1.42, 1.25, 1.12, 1.02, 0.94, 0.80, 0.62];
 const wideAt = (tm, L) => {
   const x = Math.min(WIDE_TAB.length - 1, Math.max(0, tm / CFG.maxTime * (WIDE_TAB.length - 1))), i = Math.min(WIDE_TAB.length - 2, Math.floor(x)), f = x - i;
   let v = WIDE_TAB[i] * (1 - f) + WIDE_TAB[i + 1] * f;
-  if (v < 1) v = 1 - (1 - v) * Math.min(1, Math.max(0, ((L || 10) - 1) / 3));
+  if (v < 1) v = 1 - (1 - v) * (0.6 + 0.4 * Math.min(1, Math.max(0, ((L || 10) - 1) / 3)));
   return v;
 };
 /*TUNE-END*/
@@ -673,6 +678,8 @@ const STR = {
     hint_combo: 'Arka arkaya vur, puan çarpanı artsın',
     k_tek: 'Tek pim', rule_tek: 'Şeftali bölgedeyken dokun', rule_cift: 'İki hedefi de vur', rule_kayan: 'Hedef kayar, zamanla', rule_nefes: 'Nefes alır, açıkken vur', rule_iki: 'Her ibre kendi hedefinde',
     warn_cift: 'Pembe tuzağa dokunma', warn_kayan: 'Pembe kayan tuzağa dokunma', warn_nefes: 'Dikenli kenara dokunma',
+    rule_tuzak: 'Yine şeftali hedefe vur', warn_tuzak: 'Pembe tuzağa dokunma', rule_kayanT: 'Tuzak hedefin üstünde gezer', warn_kayanT: 'Pembe kayan tuzağa dokunma',
+    rule_diken: 'Hedefin kenarı dikenle kapanır', warn_diken: 'Dikenli kenara dokunma',
     lbl_open: 'Açıkken vur', lbl_slide: 'Zamanla', lbl_avoid: 'Dokunma', lbl_thorn: 'Dikene dokunma',
     lifeTag: 'Can', lifeGot: 'Can +1', lifeSaved: 'Can kurtardı: +3 sn',
     smartMove: 'Akıllı hamle! +25', advNow: 'Dokun',
@@ -700,7 +707,8 @@ const STR = {
     d_steto: '{n} sn boyunca hedefler %40 geniş', d_kron: 'Süreye +{n} sn', d_kalkan: 'Sonraki {n} hata cezasız, seri bozulmaz', d_kum: 'İbre {n} sn %35 yavaşlar',
     toolEmpty: 'Stokta yok. Alet çantasından alabilirsin.', shopAd: 'Reklam izle, +{n} coin', gotCoins: '+{n} coin',
     fxSteto: 'Geniş {n} sn', fxShield: 'Kalkan {n}', fxSlow: 'Yavaş {n} sn', fxNarrow: 'Dar {n} sn',
-    k_altin: 'Altın pim', rule_altin: 'İnce altın hedefe vur: ×3 puan', warn_altin: 'Lanetli altına dokunma',
+    popGoldOpen: 'Altın açıldı!',
+    k_altin: 'Altın pim', rule_altin: 'Önce hedefi vur, altın açılır: ×3 puan', warn_altin: 'Lanetli altına dokunma',
     k_lanetli: 'Lanetli altın', rule_lanetli: 'Gerçek altın parıltılıdır', warn_lanetli: 'Yeşil çerçeveliye dokunma',
     k_sabir: 'Sabır pimi', rule_sabir: 'Üç geçişte açılır: altına döner, ×3', warn_sabir: 'Kilitliyken dokunma; yan hedeflere vur',
     k_curuk: 'Çürük kilit', rule_curuk: 'Açılınca yalnızca bir tur açık kalır', warn_curuk: 'Kaçırırsan yeniden kilitlenir',
@@ -723,7 +731,21 @@ const STR = {
     popGhost: 'Hayalet ×2', popLockHit: 'Kilit sarsıldı', popUnlock: 'Kilit açıldı!', popRingLock: 'İç halka kilitlendi', popRingFree: 'İç halka açıldı',
     popDefuse: 'Etkisiz! +{n}', popBoom: 'Patladı!', popVortex: 'Girdap!', popBurn: 'Yanıyorsun', popHold: 'Tut', popEarly: 'Erken bıraktın', popLate: 'Geç bıraktın',
     popHoldOk: 'Tam bırakış', popFire: 'Ateşten geçtin ×2', popRed: 'Kırmızı!', popAlarmReset: 'Alarm! Tur sıfırlandı', popSide: 'Yan hedef', hintHold: 'Basılı tut',
-    fxVortex: 'Girdap {n} sn', fxLock: 'Kilit {n}', curukRelock: 'Yeniden kilitlendi'
+    fxVortex: 'Girdap {n} sn', fxLock: 'Kilit {n}', curukRelock: 'Yeniden kilitlendi',
+    introTag: 'YENİ KİLİT', introTagTw: 'YENİ ENGEL', introHint: 'geçmek için dokun', introResume: 'Kaldığın yerden devam',
+    ic_cift: 'İbre iki hedeften geçer|Her birine ayrı dokun', ic_kayan: 'Hedef sağa sola kayar|İbre içindeyken dokun', ic_nefes: 'Hedef daralıp genişler|Açıkken dokun',
+    ic_altin: 'Önce hedefi vur|Altın açılır|Altına dokun: ×3', ic_sabir: 'Her geçişte bir nokta yanar|Kilit açıldı!|Şimdi vur: ×3',
+    ic_kasa: 'Üç hedef art arda|Üçünü de aç: ödül', ic_ritim: 'Küçük hedefler art arda|Hepsini tutturursan ödül',
+    ic_trafik: 'Işıklar sürekli değişir|Şimdi yeşil olana vur', ic_iki: 'İki ibre, iki halka|Her ibre kendi hedefinde',
+    ic_isin: 'Mavi kapıya girer|Ne zaman çıkacağı belli değil|Çıkınca hedefe vur', ic_hayalet: 'Hedef birden kaybolur|Yerini hatırla: ×2',
+    ic_bomba: 'Fitil yanıyor|Süre dolmadan vur: +{n}', ic_gelgit: 'Koyu bant ibreyi hızlandırır|Hızına göre zamanla',
+    ic_tutbirak: 'Başta bas ve tut|Basılı tutmaya devam et|Sonda bırak',
+    ic_tuzak: 'Pembe tuzağa dokunma|Şeftali hedefe vur', ic_kayanT: 'Tuzak hedefin üstünde gezer|Açıkta kalan yere dokun',
+    ic_diken: 'Kenarlar dikenle kapanır|Diken çekilince dokun', ic_lanetli: 'Gerçek altın parıldar|Yeşil çerçeveli olan lanetli',
+    ic_alarm: 'Hedeflerin arasında alarm var|"!" işaretliye dokunma', ic_curuk: 'Kilit açıldı ama yalnızca bir tur|Kaçırırsan yeniden kilitlenir',
+    ic_sahtenota: 'Notaların arasında sahte var|Pembe ×\'e dokunma', ic_kilitli: 'İç halka kilitli, dış ibre hızlı|Dış hedefi vur|Kilit açıldı: şimdi iç halka',
+    ic_hayaletT: 'Tuzak da kaybolur|Yerini unutma', ic_girdap: 'Girdaptan geçen ibre hızlanır|Hızlı gelen ibreyi yakala',
+    ic_sicak: 'Yayın sonu kızıl: sıcak|Tutarken yanarsın, süre erir|Yine de sonda bırak: ×2'
   },
   en: {
     title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs', bestLvl: 'Level',
@@ -743,6 +765,8 @@ const STR = {
     hint_combo: 'Hit again and again to raise your multiplier',
     k_tek: 'Single pin', rule_tek: 'Tap while the pointer is in the peach zone', rule_cift: 'Hit both targets', rule_kayan: 'The target slides, time it', rule_nefes: 'It breathes, hit it while open', rule_iki: 'Each pointer in its own target',
     warn_cift: 'Stay off the rose trap', warn_kayan: 'Stay off the sliding trap', warn_nefes: 'Stay off the thorny edge',
+    rule_tuzak: 'Hit the peach target as before', warn_tuzak: 'Stay off the rose trap', rule_kayanT: 'The trap slides over the target', warn_kayanT: 'Stay off the sliding trap',
+    rule_diken: 'The target edges close with thorns', warn_diken: 'Stay off the thorny edge',
     lbl_open: 'Hit while open', lbl_slide: 'Time it', lbl_avoid: 'Avoid', lbl_thorn: 'Avoid thorns',
     lifeTag: 'Life', lifeGot: 'Life +1', lifeSaved: 'Life saved you: +3 s',
     smartMove: 'Smart move! +25', advNow: 'Tap',
@@ -770,7 +794,8 @@ const STR = {
     d_steto: 'Targets 40% wider for {n} s', d_kron: '+{n} s on the clock', d_kalkan: 'Next {n} mistakes are free, streak stays', d_kum: 'Pointer 35% slower for {n} s',
     toolEmpty: 'Out of stock. Get more in the toolbag.', shopAd: 'Watch ad, +{n} coins', gotCoins: '+{n} coins',
     fxSteto: 'Wide {n} s', fxShield: 'Shield {n}', fxSlow: 'Slow {n} s', fxNarrow: 'Narrow {n} s',
-    k_altin: 'Gold pin', rule_altin: 'Hit the thin gold target: ×3 points', warn_altin: 'Stay off the cursed gold',
+    popGoldOpen: 'Gold unlocked!',
+    k_altin: 'Gold pin', rule_altin: 'Hit the target first, then the gold opens: ×3', warn_altin: 'Stay off the cursed gold',
     k_lanetli: 'Cursed gold', rule_lanetli: 'Real gold is sparkly', warn_lanetli: 'Avoid the green-framed one',
     k_sabir: 'Patience pin', rule_sabir: 'Opens after 3 passes: turns gold, ×3', warn_sabir: "Locked? Hit the side targets instead",
     k_curuk: 'Rotten lock', rule_curuk: 'Stays open for one lap only', warn_curuk: 'Miss it and it locks again',
@@ -793,7 +818,21 @@ const STR = {
     popGhost: 'Ghost ×2', popLockHit: 'Lock rattled', popUnlock: 'Unlocked!', popRingLock: 'Inner ring locked', popRingFree: 'Inner ring free',
     popDefuse: 'Defused! +{n}', popBoom: 'Boom!', popVortex: 'Whirlpool!', popBurn: "You're burning", popHold: 'Hold', popEarly: 'Released too early', popLate: 'Released too late',
     popHoldOk: 'Clean release', popFire: 'Through the fire ×2', popRed: 'Red!', popAlarmReset: 'Alarm! Round reset', popSide: 'Side target', hintHold: 'Press and hold',
-    fxVortex: 'Whirlpool {n} s', fxLock: 'Lock {n}', curukRelock: 'Locked again'
+    fxVortex: 'Whirlpool {n} s', fxLock: 'Lock {n}', curukRelock: 'Locked again',
+    introTag: 'NEW LOCK', introTagTw: 'NEW OBSTACLE', introHint: 'tap to skip', introResume: 'Back to the game',
+    ic_cift: 'The pointer crosses two targets|Tap each one separately', ic_kayan: 'The target slides side to side|Tap while the pointer is inside', ic_nefes: 'The target shrinks and grows|Tap while it is open',
+    ic_altin: 'Hit the target first|The gold unlocks|Tap the gold: ×3', ic_sabir: 'Each pass lights a dot|Unlocked!|Now hit it: ×3',
+    ic_kasa: 'Three targets in a row|Open all three: reward', ic_ritim: 'Small targets in a row|Hit them all for a reward',
+    ic_trafik: 'The lights keep changing|Hit the green one now', ic_iki: 'Two pointers, two rings|Each in its own target',
+    ic_isin: 'It enters the blue gate|Nobody knows when it exits|Hit the target after it exits', ic_hayalet: 'The target suddenly vanishes|Remember where it was: ×2',
+    ic_bomba: 'The fuse is burning|Hit it before time runs out: +{n}', ic_gelgit: 'The dark band speeds it up|Time it by its speed',
+    ic_tutbirak: 'Press and hold at the start|Keep holding|Release at the end',
+    ic_tuzak: "Don't touch the rose trap|Hit the peach target", ic_kayanT: 'The trap slides over the target|Tap the part left open',
+    ic_diken: 'Thorns close the edges|Tap when the thorns pull back', ic_lanetli: 'Real gold sparkles|The green-framed one is cursed',
+    ic_alarm: 'An alarm hides between the targets|Avoid the "!" target', ic_curuk: 'Unlocked, but for one lap only|Miss it and it locks again',
+    ic_sahtenota: 'A fake note hides among the notes|Avoid the rose ×', ic_kilitli: 'Inner ring locked, outer pointer fast|Hit the outer target|Unlocked: the inner ring now',
+    ic_hayaletT: 'The trap vanishes too|Remember where it is', ic_girdap: 'A pointer crossing it speeds up|Catch the fast pointer',
+    ic_sicak: 'The arc end is red: hot|You burn while holding: time melts|Release at the end anyway: ×2'
   }
 };
 const t = (k, v) => {
@@ -851,12 +890,12 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.7.0';
+const VERSION = 'V0.8.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
   tools: { steto: { n: 2, l: 1 }, kron: { n: 2, l: 1 }, kalkan: { n: 2, l: 1 }, kum: { n: 2, l: 1 } },
-  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, v: 2
+  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, intro: {}, v: 2
 };
 try {
   const raw = localStorage.getItem('kilpayi.v1');
@@ -870,6 +909,8 @@ try {
   save.v = 2;
 } catch (e) {}
 if (!save.book || typeof save.book !== 'object') save.book = {};
+if (!save.intro || typeof save.intro !== 'object') save.intro = {};
+if (!save.seen || typeof save.seen !== 'object') save.seen = {};
 /* Kayıtlı oyun sürümü: 2 = V0.5.0 (yeni seviye süreleri ve olay listesi); eski sürümün yarım oyunu devam ettirilmez. */
 if (!save.run || typeof save.run !== 'object' || save.run.v !== 2) save.run = null;
 if (!save.bests || typeof save.bests !== 'object') save.bests = {};
@@ -1208,9 +1249,15 @@ const G = {
   campRun: false, startL: 1, banner: null, count: 0, thT: 0, thDirty: false, ec: 0, em: [],
   life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
   pendingNew: '', pendingTw: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0,
-  chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0
+  chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0,
+  intro: null, introQ: [], introK: 0, introLast: null
 };
-const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100, hudB: 0, dockTop: 0, cardB: 0 };
+const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100, hudB: 0, dockTop: 0, cardB: 0, ik: 0 };
+/* Tanıtım kartının boyu (px): normal kart 98 / 60, tanıtım sırasında uzar */
+const CARD_H = { small: 60, normal: 98 }, INTRO_H = { small: 118, normal: 150 };
+/* Cehennem çemberinin görüntü hali (V0.8.0): s etki gücü (yumuşak giriş-çıkış), a nefes genliği, ph nefes evresi, b yarıçap çarpanı, r bütün çemberin dönüşü,
+   v dönüş hızı, tr çentiklerin ek dönüşü, sp sarmalın dönüşü. Yalnızca görüntü: açılar ve dokunuş mantığı değişmez. */
+const HX = { s: 0, a: 0, ph: 0, b: 1, r: 0, v: 0, tr: 0, sp: 0 };
 
 const pinCenter = p => p.kind === 'hold' ? norm(p.c0 + p.dirH * p.len) : (p.amp ? norm(p.c0 + p.amp * Math.sin(TAU * p.f * G.pt + p.ph)) : p.c0);
 /* O anki yarı genişlik: nefes alan hedef ve dikenler nefes alır (diken: hızlı girer, yavaş çıkar), diken yedikten sonra hedefler kısa süre daralır. */
@@ -1262,15 +1309,16 @@ const fireEvent = (e, silent) => {
   let card = null;
   if (e.good) {
     const tw0 = e.twin || (LV().twins && JTWIN[e.good]) || '', tw = tw0 && IMPL_TWIN[tw0] ? tw0 : '';
-    let isNew = false;
-    if (IMPL_GOOD[e.good] && G.open.indexOf(e.good) < 0) { G.open.push(e.good); isNew = true; }
-    if (tw && !G.eng[tw]) { G.eng[tw] = true; isNew = true; }
+    let isNew = false, newG = false, newT = false;
+    if (IMPL_GOOD[e.good] && G.open.indexOf(e.good) < 0) { G.open.push(e.good); isNew = true; newG = true; }
+    if (tw && !G.eng[tw]) { G.eng[tw] = true; isNew = true; newT = true; }
     if (isNew && e.good !== 'tek') { card = bigCard(e.good, tw); if (!silent) { G.pendingNew = e.good; G.pendingTw = ''; G.pendingT = 0; } }
+    if (!silent) { if (newG) queueIntro(e.good); if (newT) queueIntro(tw); }
   } else if (e.twin) {
     const tw = e.twin, g = GOOD_OF[tw];
     if (IMPL_TWIN[tw] && !G.eng[tw] && G.open.indexOf(g) >= 0) {
       G.eng[tw] = true; card = twinCard(tw);
-      if (!silent) { G.pendingNew = g; G.pendingTw = tw; G.pendingT = 0; }
+      if (!silent) { G.pendingNew = g; G.pendingTw = tw; G.pendingT = 0; queueIntro(tw); }
     }
   } else if (e.combo) {
     G.comboOn = true; card = lineCard(t('evCombo'), 'combo');
@@ -1376,12 +1424,12 @@ const addTwin = (tw, pins, hw) => {
   } else if (tw === 'lanetli') {
     const gold = pins.find(p => p.gold), m = pins.find(p => p.kind === 'gate' && !p.bonus);
     if (!gold || !m) return '';
-    const gh = MECH.goldHw, gs = sdiff(gold.c0, m.c0) >= 0 ? 1 : -1;
+    const gh = MECH.goldHw, after = aheadOf(m.c0) + m.hw + gh + 0.3, first = Math.random() < 0.5 ? -1 : 1;
     let c = -1;
-    for (let tries = 0; tries < 14 && c < 0; tries++) {
-      const cand = tries < 8 ? norm(m.c0 - gs * (m.hw + gh + rnd(0.3, 0.9))) : norm(m.c0 + gs * (gold.hw + m.hw + gh + rnd(0.9, 1.6) + gh));
+    for (let tries = 0; tries < 12 && c < 0; tries++) {
+      const side = (tries & 1) ? -first : first, cand = norm(gold.c0 + side * G.dir * (2 * gh + rnd(0.5, 0.9)));
       const d = aheadOf(cand);
-      if (d >= 0.6 && d <= 4.8 && angd(cand, gold.c0) > 2 * gh + 0.3 && angd(cand, m.c0) > m.hw + gh + 0.2) c = cand;
+      if (d >= after && d <= 5.4 && angd(cand, gold.c0) > 2 * gh + 0.3) c = cand;
     }
     if (c < 0) return '';
     pins.push({ kind: 'trap', tw, ring: 0, c0: c, amp: 0, f: 0, ph: 0, hw: gh, done: false, cursed: true, pen: MECH.cursedPen });
@@ -1428,7 +1476,7 @@ const makeLabels = (kind, pins, seenKind, seenTw) => {
   const g = pins.find(p => p.kind === 'gate' && !p.bonus);
   if (seenKind <= 3) {
     if (kind === 'nefes' || kind === 'kayan' || kind === 'isin') lab.ok = g;
-    else if (kind === 'altin') lab.ok = pins.find(p => p.gold) || null;
+    else if (kind === 'altin') lab.ok = g;
     else if (kind === 'tutbirak') lab.ok = pins.find(p => p.kind === 'hold') || null;
     else if (kind === 'sabir') { lab.ok = pins.find(p => p.side) || null; lab.no = pins.find(p => p.kind === 'lockpin') || null; }
   }
@@ -1492,10 +1540,10 @@ const spawnChallenge = (first, force) => {
     pins.push(gate(0, ahead(G.ang, G.dir, dist(1.0, 2.2)), hw));
     pins.push(gate(1, ahead(G.ang2, G.dir2, rnd(1.0, 2.0)), Math.min(0.85, hw * 1.15)));
   } else if (kind === 'altin') {
-    /* altın ibrenin önünde, ana hedef ondan sonra gelir: ana hedefi vurunca tur biter ama altın hiç yarım kalmaz */
-    const gh = MECH.goldHw, ga = ahead(G.ang, G.dir, dist(1.0, 1.7));
-    pins.push(gate(0, ahead(ga, G.dir, gh + hw + rnd(0.34, 0.7)), hw));
-    pins.push(Object.assign(gate(0, ga, gh), { bonus: true, gold: true }));
+    /* V0.8.0: önce sıradaki hedef, altın ondan sonra gelir ve hedef vurulana kadar kapalıdır (soluk, kilitli); açılınca ilk dokunuş altına aittir, ıskalanırsa altın kaybolur */
+    const gh = MECH.goldHw, ma = ahead(G.ang, G.dir, dist(1.0, 1.7));
+    pins.push(gate(0, ma, hw));
+    pins.push(Object.assign(gate(0, ahead(ma, G.dir, hw + gh + rnd(MECH.goldGap[0], MECH.goldGap[1])), gh), { bonus: true, gold: true, wait: true }));
   } else if (kind === 'kasa') {
     const hk = hw * 0.85, step = 2 * hk + rnd(0.55, 0.85), a = ahead(G.ang, G.dir, dist(1.0, 1.8));
     for (let i = 0; i < 3; i++) pins.push(Object.assign(gate(0, ahead(a, G.dir, i * step), hk), { kasa: true }));
@@ -1556,6 +1604,7 @@ const spawnChallenge = (first, force) => {
   G.pins = pins; G.gateT = 0; G.lab = null;
   syncPrimary();
   if (!first && !can) {
+    if (!PR) { queueIntro(kind); if (G.chal.tw) queueIntro(G.chal.tw); }
     const sk = PR ? 1 : (kind !== 'tek' ? noteSeen(kind) : 99), st = PR ? 1 : (G.chal.tw ? noteSeen(G.chal.tw) : 99);
     G.lab = makeLabels(kind, pins, sk, st);
   }
@@ -1563,9 +1612,9 @@ const spawnChallenge = (first, force) => {
 
 const shake = s => { if (!RM) G.shake = Math.max(G.shake, s); };
 const flash = (kind, s) => { if (!RM) { G.flashKind = kind; G.flash = s; } };
-const ringR = ring => ring ? view.r * 0.6 : view.r;
+const ringR = ring => (ring ? view.r * 0.6 : view.r) * HX.b;
 const pinXY = p => {
-  const a = pinCenter(p) - HALF, r = ringR(p.ring);
+  const a = pinCenter(p) - HALF + HX.r, r = ringR(p.ring);
   return { x: view.cx + Math.cos(a) * r, y: view.cy + Math.sin(a) * r };
 };
 const burst = (x, y, n, cols, speed) => {
@@ -1594,7 +1643,8 @@ const relayout = snap => {
   } else {
     /* yukarıdan aşağı: HUD, yeni kilit kartının yeri, halka, halkanın altında joker sırası */
     const hudB = (hudEl.offsetTop + hudEl.offsetHeight) || 140;
-    const short = h < 700, cardH = short ? 62 : 102, prac = !!G.practice;
+    const short = h < 700, prac = !!G.practice;
+    const cardH = (short ? 62 : 102) + (short ? INTRO_H.small - CARD_H.small : INTRO_H.normal - CARD_H.normal) * easeOut(clamp(G.introK, 0, 1));
     /* Joker sırası ekranın altında; halka ile arasında parmak boyunda (yaklaşık 1,5 cm) boş alan kalır, oyun dokunuşları jokerlere değmesin (V0.6.1). */
     const dockH = prac ? 0 : (short ? 68 : 80), lblH = prac ? 0 : 34, gapMin = short ? 54 : 70, bottomPad = short ? 14 : 24;
     const top = hudB + 6 + cardH, dockTop = prac ? h : h - bottomPad - dockH;
@@ -1608,6 +1658,7 @@ const relayout = snap => {
   }
   r = Math.max(56, r);
   view.hudB = G.mode === 'menu' ? 0 : (hudEl.offsetTop + hudEl.offsetHeight);
+  view.ik = G.introK;
   view.tcx = cx; view.tcy = cy; view.tr = r;
   if (snap) { view.cx = cx; view.cy = cy; view.r = r; }
 };
@@ -1622,7 +1673,7 @@ const resize = () => {
 /* Oyun kaydı: uygulamadan çıkınca (kapansa bile) kaldığı yerden devam edebilmek için. */
 const RUN_KEYS = ['jt', 'L', 'ph', 'time', 'score', 'n', 'combo', 'maxCombo', 'near', 'raw', 'perf', 'missRun', 'adapt', 'mercy', 'open', 'eng', 'stars', 'mixes', 'comboOn', 'evi', 'glove', 'boostT', 'slow', 'slowMul', 'narrow', 'coinsJ', 'life', 'lifeLevel', 'campRun', 'startL', 'coinsGiven', 'continued', 'runCounted', 'waveSeen', 'dir'];
 const snapRun = () => { const o = { v: 2, lvl: save.lvl }; RUN_KEYS.forEach(k => { o[k] = G[k]; }); return JSON.parse(JSON.stringify(o)); };
-const persistRun = () => { if (!G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause')) { save.run = snapRun(); persist(); } };
+const persistRun = () => { if (!G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause' || G.mode === 'intro')) { save.run = snapRun(); persist(); } };
 
 /* Yeni oyunun başlangıç durumu; Dene modu da aynısından yola çıkar. */
 const runState = L0 => ({
@@ -1636,7 +1687,8 @@ const runState = L0 => ({
     campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: 0, thDirty: false, em: [],
     life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
     pendingNew: '', pendingTw: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0,
-    chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0
+    chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0,
+    intro: null, introQ: [], introK: 0, introLast: null
 });
 
 const start = (fromL, snap) => {
@@ -1734,6 +1786,22 @@ const endPractice = toBook => {
 /* ---------- yeni kilitlerin işleyişi: kilit, tut-bırak, ışık, bomba, girdap ---------- */
 const primaryPin = () => G.pins.find(p => isReq(p) && p.ring === 0) || G.pins.find(p => !p.done && p.kind === 'gate' && p.ring === 0) || null;
 const holdRel = p => sdiff(G.ang, p.c0) * p.dirH;
+/* Altın pim: ana hedef vurulana kadar kapalı (wait); açıkken ilk dokunuş altına aittir, ıskalanırsa ya da ibre geçerse kaybolur (gone). */
+const goldPending = q => !!q.gold && !q.done && !q.gone;
+const goneGold = g => { if (!g.gone) { g.gone = true; g.goneAt = G.clock; G.needCheck = true; } };
+const loseGold = () => { const g = G.pins.find(q => goldPending(q) && !q.wait); if (g) goneGold(g); };
+const openGold = g => {
+  g.wait = false; g.enT = 0; g.seen = false;
+  const q = pinXY(g); fxRing(q.x, q.y, GOLD, 70, 0.5); burst(q.x, q.y, 10, [GOLD, GOLD_L, '#FFFFFF'], 150);
+  pop(t('popGoldOpen'), 'hype'); Snd.adv(); Platform.haptic('light');
+};
+const tickGold = (p, dt) => {
+  if (p.wait || p.gone || p.done) return;
+  p.enT = (p.enT || 0) + dt;
+  const rel = sdiff(G.ang, p.c0) * G.dir;
+  if (rel < -p.hw * 1.2) p.seen = true;
+  if ((p.seen && rel > p.hw + CFG.grace + 0.05) || p.enT > 3) goneGold(p);
+};
 const advance = wasRelief => {
   if (G.practice) { practiceStep(); return; }
   if (G.pendingRev) {
@@ -1878,9 +1946,10 @@ const updateChal = dt => {
     else if (p.kind === 'hold') tickHold(p, dt);
     else if (p.bomb && !p.done) { p.bomb.fuse -= dt; if (p.bomb.fuse <= 0 && G.mode === 'play') blast(p); }
     else if (p.kind === 'portal' && p.portal === 'in') tickPortal(p, dt);
+    else if (p.gold) tickGold(p, dt);
   }
   if (ch.light) tickLight(dt);
-  if (G.mode === 'play' && G.needCheck) { G.needCheck = false; if (G.pins.every(q => !isReq(q))) advance(false); }
+  if (G.mode === 'play' && G.needCheck) { G.needCheck = false; if (G.pins.every(q => !isReq(q) && !goldPending(q))) advance(false); }
 };
 /* İbre hızı: gelgit bandı, girdap ve kilitli halka çarpanları. */
 const tideF = a => {
@@ -1929,7 +1998,7 @@ const tap = () => {
   }
   let best = null, bn = 9, bd = 0;
   for (const p of G.pins) {
-    if (p.kind !== 'gate' || p.done || p.locked) continue;
+    if (p.kind !== 'gate' || p.done || p.locked || p.wait || p.gone) continue;
     const h = pinHw(p), d = angd(p.ring ? G.ang2 : G.ang, pinCenter(p));
     if (d <= h + CFG.grace && d / h < bn) { best = p; bn = d / h; bd = d; }
   }
@@ -2039,7 +2108,9 @@ const hit = (d, pin) => {
     if (sg) G.pins.push(sg);
     G.gateT = Math.max(G.gateT, 0.9);
   }
-  if (G.pins.every(q => !isReq(q))) {
+  const gw = !pin.gold && G.pins.find(q => q.gold && q.wait && !q.done);
+  if (gw) openGold(gw);
+  if (G.pins.every(q => !isReq(q) && !goldPending(q))) {
     if (G.chal.kasa && G.pins.filter(q => q.kasa).every(q => q.done)) kasaReward();
     if (G.chal.ritim && !G.chal.broken && G.pins.filter(q => q.note).every(q => q.done)) ritimReward();
     advance(wasRelief);
@@ -2085,6 +2156,7 @@ const revive = () => {
 const lethal = () => { if (G.practice) { G.time = CFG.maxTime; return; } if (G.life) revive(); else die(); };
 
 const miss = () => {
+  loseGold();
   if (G.practice) { pop(t('pracMiss'), 'miss'); Snd.ui(); return; }
   const pm = phaseMod(G.ph, G.L);
   if (G.glove > 0) {
@@ -2101,6 +2173,7 @@ const miss = () => {
 };
 
 const trap = p => {
+  loseGold();
   G.chal.fail = true;
   const pm = phaseMod(G.ph, G.L);
   if (G.glove > 0) {
@@ -2267,8 +2340,9 @@ const doContinue = () => {
 };
 
 const pause = () => {
-  if ((G.mode !== 'play' && G.mode !== 'count')/*NOPAUSE*/) return;
+  if ((G.mode !== 'play' && G.mode !== 'count' && G.mode !== 'intro')/*NOPAUSE*/) return;
   if (G.practice) { endPractice(true); return; }
+  abortIntro();
   G.mode = 'pause'; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
   persistRun(); show(pauseEl);
 };
@@ -2390,12 +2464,39 @@ const envStep = raw => {
 
 /* ---------- güncelleme ---------- */
 const COUNT_STEP = 0.75;
+/* Cehennem kademesinde (yalnızca) çember nefes alır, bütün çember ibrenin tersine döner, içinde sarmal döner; seviye arttıkça güçlenir.
+   Nefes yalnızca küçülüp geri açılır (ayarlanan boyutu aşmaz, kartın altına girmez). Kapanırken çember en yakın tam tura oturur, normal görünüme sıçramaz. */
+const hellFx = raw => {
+  if (G.mode === 'intro') return;
+  const on = !RM && LV().hell === 'always' && !G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'dead');
+  const lv = clamp(G.L, 1, 10) - 1, k = Math.min(1, raw * 3);
+  HX.s += ((on ? 1 : 0) - HX.s) * Math.min(1, raw * 2.5);
+  if (on || HX.s > 0.003) {
+    HX.a += (0.015 + 0.012 * lv - HX.a) * k;
+    HX.ph += TAU * raw / (3.4 - 0.2 * lv);
+    HX.b = 1 - 2 * HX.a * (0.5 - 0.5 * Math.sin(HX.ph)) * HX.s;
+    HX.v += ((on ? -G.dir * (0.05 + 0.03 * lv) : 0) - HX.v) * k;
+    HX.r += HX.v * raw;
+    HX.tr += (on ? -G.dir * (0.25 + 0.06 * lv) : 0) * raw;
+    HX.sp += (on ? -G.dir * (0.4 + 0.1 * lv) : 0) * raw;
+  } else HX.b = 1;
+  if (!on) {
+    const kk = Math.min(1, raw * 5), q = TAU / 12;
+    HX.r += (Math.round(HX.r / TAU) * TAU - HX.r) * kk; HX.tr += (Math.round(HX.tr / q) * q - HX.tr) * kk;
+    if (HX.s <= 0.003 && Math.abs(HX.r - Math.round(HX.r / TAU) * TAU) < 0.002 && Math.abs(HX.tr - Math.round(HX.tr / q) * q) < 0.002) { HX.r = 0; HX.tr = 0; HX.v = 0; }
+  }
+};
 const update = raw => {
   G.clock += raw;
   const k = Math.min(1, raw * 9);
   view.cx += (view.tcx - view.cx) * k; view.cy += (view.tcy - view.cy) * k; view.r += (view.tr - view.r) * k;
+  /* tanıtım kartı uzar ve geri kısalır; halka buna göre kayar (V0.8.0) */
+  G.introK = clamp(G.introK + (G.mode === 'intro' && G.intro && !G.intro.closing ? raw / 0.45 : -raw / 0.35), 0, 1);
+  if (view.ik !== G.introK) relayout(false);
   /* Duraklatmada her şey donar: sayaçlar, tema geçişi, parçacıklar. */
   if (G.mode === 'pause') return;
+  if (G.mode === 'play' && G.introQ.length && !G.holding && !G.practice) startIntro();
+  hellFx(raw);
   if (G.tsT > 0) { G.tsT -= raw; if (G.tsT <= 0) G.tscale = 1; }
   const dt = raw * G.tscale;
 
@@ -2442,13 +2543,19 @@ const update = raw => {
       if (G.time <= 0) { G.time = 0; lethal(); }
     }
     updateHud(); updateDock();
+  } else if (G.mode === 'intro') {
+    /* tanıtım: oyun donuk (süre, ibre, hedefler); kart uzar, animasyon döner, dokunuşla ya da kendiliğinden kapanır, sonra kısa bir "devam" payı */
+    const it = G.intro;
+    if (!it) G.mode = 'play';
+    else if (it.closing) { it.closing += raw; if (it.closing >= 0.7) { G.intro = null; G.mode = 'play'; } }
+    else { it.t += raw; if (it.t >= it.auto) closeIntro(false); }
   } else if (G.mode === 'dead') {
     G.deadT -= raw;
     updateHud(); updateDock();
     if (G.deadT <= 0) showOver();
   }
 
-  const live = G.mode === 'play' || G.mode === 'count' || G.mode === 'dead';
+  const live = G.mode === 'play' || G.mode === 'count' || G.mode === 'dead' || G.mode === 'intro';
   if (G.banner && live) { G.banner.t += raw; if (G.banner.t > 2.0) G.banner = null; }
   if (G.card && (G.mode === 'play' || G.mode === 'count')) { G.card.t += raw; if (G.card.t > G.card.max) G.card = null; }
   if (G.lab && G.mode === 'play') { G.lab.t += raw; if (G.lab.t > G.lab.max) G.lab = null; }
@@ -2549,8 +2656,20 @@ const drawPadlock = (c, x, y, s, col, open) => {
 const ptXY = (cx, cy, a, r) => [cx + Math.sin(a) * r, cy - Math.cos(a) * r];
 const lightCol = p => (G.chal.light && G.chal.light.warn) ? ['#F4D03F', '#C9A227'] : (p.green ? [P.life, mixHex(P.life, '#000000', 0.25)] : [P.rose, mixHex(P.rose, '#000000', 0.2)]);
 
-const drawGoldPin = (c, cx, cy, Rr, RWr, ce, hw, gk) => {
+const drawGoldPin = (c, cx, cy, Rr, RWr, ce, hw, gk, pin) => {
   const tw = 0.5 + 0.5 * Math.sin(G.clock * 5);
+  if (pin && pin.gone) gk *= Math.max(0, 1 - (G.clock - (pin.goneAt || 0)) / 0.3);
+  if (gk <= 0.01) return;
+  if (pin && pin.wait) {
+    /* kapalı altın: soluk, kesikli çerçeveli, üstünde küçük kilit; ana hedef vurulunca parlayarak açılır */
+    c.globalAlpha = gk * 0.34; c.lineCap = 'butt'; c.lineWidth = RWr; c.strokeStyle = GOLD; arc(c, cx, cy, Rr, ce - hw - HALF, ce + hw - HALF);
+    c.globalAlpha = gk * 0.7; c.setLineDash([5, 5]); frameArc(c, cx, cy, Rr, RWr, ce, hw, GOLD_L, 2); c.setLineDash([]);
+    const q = ptXY(cx, cy, ce, Rr); drawPadlock(c, q[0], q[1] + 1, RWr * 0.3, GOLD_L, false);
+    c.globalAlpha = 1;
+    return;
+  }
+  const sh = pin && pin.enT != null ? Math.max(0, 1 - pin.enT / 0.5) : 0;
+  if (sh > 0) { c.globalAlpha = gk * sh * 0.5; c.lineCap = 'butt'; c.lineWidth = RWr + 16; c.strokeStyle = '#FFF3C4'; arc(c, cx, cy, Rr, ce - hw - HALF, ce + hw - HALF); }
   c.globalAlpha = gk; c.lineCap = 'butt';
   c.lineWidth = RWr; c.strokeStyle = GOLD; arc(c, cx, cy, Rr, ce - hw - HALF, ce + hw - HALF);
   c.strokeStyle = GOLD_L; arc(c, cx, cy, Rr, ce - hw * 0.45 - HALF, ce + hw * 0.45 - HALF);
@@ -2670,6 +2789,7 @@ const drawPortal = (c, cx, cy, Rr, RWr, p, gk) => {
   c.fillStyle = col; c.beginPath(); c.arc(0, 0, r * (0.14 + 0.08 * act), 0, TAU); c.fill();
   c.restore(); c.globalAlpha = 1; c.lineCap = 'butt';
 };
+let drawRot = 0;
 const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
   if (p.kind === 'portal') { drawPortal(c, cx, cy, Rr, RWr, p, gk); return; }
   if (p.kind === 'vortex') { drawVortex(c, cx, cy, Rr, RWr, p, gk); return; }
@@ -2713,7 +2833,7 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
     c.globalAlpha = 1;
     return;
   }
-  if (p.gold) { drawGoldPin(c, cx, cy, Rr, RWr, ce, hw, gk); return; }
+  if (p.gold) { drawGoldPin(c, cx, cy, Rr, RWr, ce, hw, gk, p); return; }
   if (p.can) {
     /* can hedefi: yeşil, ortasında beyaz "+"; nabız gibi atan halesi dikkat çeker */
     const pu = 0.5 + 0.5 * Math.sin(G.clock * 6);
@@ -2762,7 +2882,7 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
     const mx = cx + Math.cos(ce - HALF) * (Rr - RWr * 1.15), my = cy + Math.sin(ce - HALF) * (Rr - RWr * 1.15);
     c.fillStyle = P.surface; c.beginPath(); c.arc(mx, my, RWr * 0.42, 0, TAU); c.fill();
     c.fillStyle = P.ink; c.font = '800 ' + Math.round(RWr * 0.55) + 'px ' + FB; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.fillText(String(idx + 1), mx, my + 1);
+    c.save(); c.translate(mx, my + 1); c.rotate(-drawRot); c.fillText(String(idx + 1), 0, 0); c.restore();
   }
   c.globalAlpha = 1;
 };
@@ -2826,7 +2946,7 @@ const bannerAl = b => { const k = b.t / 2.0; return k < 0.1 ? k / 0.1 : (k > 0.7
 /* Bölüm ve cehennem haberi (V0.5.1): halkanın üstüne değil, kart bandına çizilir; kart ya da ilk dokunuş ipucu varken yer yoktur, HUD'daki rozet yeter. */
 const drawBanner = c => {
   const b = G.banner;
-  if (G.card || (G.mode === 'play' && !save.tut && G.n < CFG.tutHits)) return;
+  if (G.card || G.mode === 'intro' || (G.mode === 'play' && !save.tut && G.n < CFG.tutHits)) return;
   const al = bannerAl(b), w = Math.min(view.w - 28, 392), x = (view.w - w) / 2, y = (view.hudB || 0) + 8;
   const hell = b.kind === 'x', bg = hell ? '#D9503A' : P.btn, fg = hell ? '#FFFFFF' : (P['on-btn'] || '#FFFFFF');
   const h = b.sub ? 60 : 46, slide = -14 * (1 - easeOut(Math.min(1, b.t / 0.28)));
@@ -2922,30 +3042,38 @@ const fitPx = (c, txt, wt, size, face, maxW, minSize) => {
 /* Yeni kilit kartı: HUD'un hemen altında, büyük yazı, hareketli küçük gösterim ve renkli noktalar (şeftali: vur, gül: dokunma).
    Yeni kilidin ilk hedefi vurulana ya da ıskalanana kadar kalır. Dokunuşları engellemez. */
 const drawCard = c => {
-  if (G.mode !== 'play' && G.mode !== 'count') return;
+  const ik = clamp(G.introK, 0, 1), inIntro = ik > 0.001;
+  if (G.mode !== 'play' && G.mode !== 'count' && G.mode !== 'intro' && !inIntro) return;
   let cd = G.card, persist = false;
   if (!cd && G.mode === 'play' && !save.tut && G.n < CFG.tutHits) { cd = { type: 'line', title: G.n < 2 ? t('tut1') : t('tut2'), t: 99, max: 999 }; persist = true; }
-  if (!cd) return;
+  if (inIntro && cd && cd.type !== 'big') cd = null;
+  if (!cd && !inIntro) return;
   const w = Math.min(view.w - 28, 392), x = (view.w - w) / 2, y = (view.hudB || 0) + 8;
-  const al = persist ? 1 : Math.min(1, cd.t / 0.25, (cd.max - cd.t) / 0.4);
-  const slide = persist ? 0 : -18 * (1 - easeOut(Math.min(1, cd.t / 0.3)));
+  const steady = persist || inIntro;
+  const al = steady ? 1 : Math.min(1, cd.t / 0.25, (cd.max - cd.t) / 0.4);
+  const slide = steady ? 0 : -18 * (1 - easeOut(Math.min(1, cd.t / 0.3)));
   c.save(); c.globalAlpha = clamp(al, 0, 1); c.translate(0, slide);
   c.textAlign = 'left'; c.textBaseline = 'middle';
-  if (cd.type === 'big') {
-    const small = view.h < 700, h = small ? 60 : 98, ts = small ? 42 : 62;
-    rrect(c, x, y, w, h, 20); c.fillStyle = P.surface; c.fill(); c.lineWidth = 1.5; c.strokeStyle = P.lilac; c.globalAlpha *= 0.55; c.stroke(); c.globalAlpha = clamp(al, 0, 1);
-    rrect(c, x + 10, y + (h - ts) / 2, ts, ts, 14); c.fillStyle = P['lilac-soft']; c.fill();
-    drawLockIcon(c, cd.icon, x + 10 + ts / 2, y + h / 2, ts * 0.46, true);
-    const tx0 = x + 10 + ts + 14, mw = w - (tx0 - x) - 12, dot = (yy, col) => { c.fillStyle = col; c.beginPath(); c.arc(tx0 + 5, yy, small ? 3.4 : 4.4, 0, TAU); c.fill(); };
-    const tSz = small ? 16 : 22, lSz = small ? 12.5 : 16.5, off = small ? 15 : 20;
-    if (cd.warn) {
-      fitPx(c, cd.title, 600, tSz, FD, mw, 13); c.fillStyle = P.ink; c.fillText(cd.title, tx0, y + (small ? 15 : 24));
-      dot(y + (small ? 33 : 55), P.peach); fitPx(c, cd.rule, 800, lSz, FB, mw - 16, 10); c.fillStyle = P.ink; c.fillText(cd.rule, tx0 + 16, y + (small ? 33 : 55) + 1);
-      dot(y + (small ? 48 : 78), P.rose); fitPx(c, cd.warn, 800, lSz, FB, mw - 16, 10); c.fillStyle = P.rose; c.fillText(cd.warn, tx0 + 16, y + (small ? 48 : 78) + 1);
-    } else {
-      fitPx(c, cd.title, 600, tSz, FD, mw, 13); c.fillStyle = P.ink; c.fillText(cd.title, tx0, y + h * 0.36);
-      dot(y + h * 0.69, P.peach); fitPx(c, cd.rule, 800, lSz, FB, mw - 16, 10); c.fillStyle = P.ink; c.fillText(cd.rule, tx0 + 16, y + h * 0.69 + 1);
+  if (inIntro || cd.type === 'big') {
+    /* h: normal kartın boyu, hf: tanıtımda uzamış boy, H: o anki boy */
+    const small = view.h < 700, h = small ? CARD_H.small : CARD_H.normal, hf = small ? INTRO_H.small : INTRO_H.normal, H = h + (hf - h) * easeOut(ik), ts = small ? 42 : 62;
+    rrect(c, x, y, w, H, 20); c.fillStyle = P.surface; c.fill(); c.lineWidth = 1.5; c.strokeStyle = P.lilac; c.globalAlpha *= 0.55; c.stroke(); c.globalAlpha = clamp(al, 0, 1);
+    if (cd) {
+      c.globalAlpha = clamp(al, 0, 1) * (1 - clamp((ik - 0.45) / 0.4, 0, 1));
+      rrect(c, x + 10, y + (h - ts) / 2, ts, ts, 14); c.fillStyle = P['lilac-soft']; c.fill();
+      drawLockIcon(c, cd.icon, x + 10 + ts / 2, y + h / 2, ts * 0.46, true);
+      const tx0 = x + 10 + ts + 14, mw = w - (tx0 - x) - 12, dot = (yy, col) => { c.fillStyle = col; c.beginPath(); c.arc(tx0 + 5, yy, small ? 3.4 : 4.4, 0, TAU); c.fill(); };
+      const tSz = small ? 16 : 22, lSz = small ? 12.5 : 16.5, off = small ? 15 : 20;
+      if (cd.warn) {
+        fitPx(c, cd.title, 600, tSz, FD, mw, 13); c.fillStyle = P.ink; c.fillText(cd.title, tx0, y + (small ? 15 : 24));
+        dot(y + (small ? 33 : 55), P.peach); fitPx(c, cd.rule, 800, lSz, FB, mw - 16, 10); c.fillStyle = P.ink; c.fillText(cd.rule, tx0 + 16, y + (small ? 33 : 55) + 1);
+        dot(y + (small ? 48 : 78), P.rose); fitPx(c, cd.warn, 800, lSz, FB, mw - 16, 10); c.fillStyle = P.rose; c.fillText(cd.warn, tx0 + 16, y + (small ? 48 : 78) + 1);
+      } else {
+        fitPx(c, cd.title, 600, tSz, FD, mw, 13); c.fillStyle = P.ink; c.fillText(cd.title, tx0, y + h * 0.36);
+        dot(y + h * 0.69, P.peach); fitPx(c, cd.rule, 800, lSz, FB, mw - 16, 10); c.fillStyle = P.ink; c.fillText(cd.rule, tx0 + 16, y + h * 0.69 + 1);
+      }
     }
+    if (inIntro) drawIntroBody(c, x, y, w, H, hf, ik);
   } else {
     const z = fitPx(c, cd.title, 800, 15, FB, w - 44, 11), tw = c.measureText(cd.title).width, pw = Math.min(w, tw + 40), ph = 38;
     const px = (view.w - pw) / 2;
@@ -2954,6 +3082,360 @@ const drawCard = c => {
   }
   c.restore();
 };
+/* ---------- İlk görüşte tanıtım (V0.8.0) ----------
+   Yeni bir kilit ya da engel ilk kez geldiğinde oyun durur (süre akmaz), üstteki yeni-kilit kartı uzar ve içinde küçük bir animasyon kilidi baştan sona gösterir.
+   Dokunuşla geçilir (ilk 1,2 sn yok sayılır: tempoda vuran parmak kazara atlatmasın), yoksa 4-5,5 sn sonra kendiliğinden kapanır; halka kısa bir süre daha donuk kalır.
+   Yalnızca ilk görüşte çıkar: save.intro (gösterildi) ve save.seen (eski oyunlarda zaten karşılaşılmış); Dene modunda çıkmaz.
+   Sahneler gerçek çizim kodunu (drawPin, drawPointer) sahte pinlerle çalıştırır; açılar oyundaki gibidir (0 = üst, saat yönü).
+   Yeni kilit eklerken buraya da bir sahne ve STR'ye ic_<kilit> satırı ekle (sahnesi olmayan kilidin tanıtımı atlanır). */
+const IR = 70, IRW = 15, IR2 = 42, IRW2 = 12;
+const tAt = (a0, w, a) => { const d = w >= 0 ? a - a0 : a0 - a; return (((d % TAU) + TAU) % TAU) / Math.abs(w); };
+const gpin = (c0, hw, o) => Object.assign({ kind: 'gate', ring: 0, c0, amp: 0, f: 0, ph: 0, hw, done: false }, o || {});
+const tpin = (c0, hw, o) => Object.assign({ kind: 'trap', ring: 0, c0, amp: 0, f: 0, ph: 0, hw, done: false }, o || {});
+const ISIN_D = [0.35, 0.55, 0.22, 0.45];
+const introCapT = (sc, n) => typeof sc.capT === 'function' ? sc.capT(n) : sc.capT;
+/* sahne araç takımı: sanal halka (yarıçap 70) üzerinde çizer; kart bunu küçültür */
+const introKit = (c, tt) => ({
+  c, tt,
+  ring(inner) { c.lineCap = 'butt'; c.lineWidth = inner ? IRW2 : IRW; c.strokeStyle = P.track; c.beginPath(); c.arc(0, 0, inner ? IR2 : IR, 0, TAU); c.stroke(); },
+  pin(p, idx, num) { drawPin(c, 0, 0, p.ring ? IR2 : IR, p.ring ? IRW2 : IRW, p, 1, idx | 0, !!num); },
+  ptr(a, sc, inner, dir) {
+    if (sc != null && sc <= 0.03) return;
+    drawPointer(c, 0, 0, inner ? IR2 : IR, inner ? IRW2 : IRW, a, dir || 1, inner ? P.btn : P.ink, P.lilac, sc == null ? 1 : sc);
+  },
+  touch(a, at, inner) {
+    const k = (tt - at) / 0.45;
+    if (k < -0.25 || k > 1) return;
+    const q = ptXY(0, 0, a, IR + IRW * 2);
+    c.globalAlpha = (k < 0 ? 1 + k / 0.25 : 1) * 0.92; c.fillStyle = P.ink; c.beginPath(); c.arc(q[0], q[1], 10, 0, TAU); c.fill();
+    c.fillStyle = P.surface; c.beginPath(); c.arc(q[0], q[1], 4, 0, TAU); c.fill();
+    if (k >= 0) { const p0 = ptXY(0, 0, a, inner ? IR2 : IR); c.globalAlpha = 1 - k; c.strokeStyle = P.peach; c.lineWidth = 3; c.beginPath(); c.arc(p0[0], p0[1], 8 + 34 * k, 0, TAU); c.stroke(); }
+    c.globalAlpha = 1;
+  },
+  held(a, on) {
+    if (!on) return;
+    const q = ptXY(0, 0, a, IR + IRW * 2), pu = 0.5 + 0.5 * Math.sin(G.clock * 8);
+    c.globalAlpha = 0.92; c.fillStyle = P.ink; c.beginPath(); c.arc(q[0], q[1], 10, 0, TAU); c.fill();
+    c.fillStyle = P.surface; c.beginPath(); c.arc(q[0], q[1], 4, 0, TAU); c.fill();
+    c.globalAlpha = 0.5 + 0.3 * pu; c.strokeStyle = P.btn; c.lineWidth = 3; c.beginPath(); c.arc(q[0], q[1], 15 + 2 * pu, 0, TAU); c.stroke(); c.globalAlpha = 1;
+  },
+  /* ✓ (vur) ve ✕ (dokunma) işaretleri: oyundaki drawLabels ile aynı çizim; t1 verilirse o andan sonra söner */
+  badge(a, ok, t0, inner, t1) {
+    const al = clamp((tt - t0) / 0.2, 0, 1) * (t1 != null && tt > t1 ? clamp(1 - (tt - t1) / 0.2, 0, 1) : 1);
+    if (al <= 0) return;
+    const q = ptXY(0, 0, a, inner ? IR2 - IRW2 * 1.5 : IR - IRW * 1.7);
+    c.globalAlpha = al; c.fillStyle = ok ? P.peach : P.rose; c.beginPath(); c.arc(q[0], q[1], 10, 0, TAU); c.fill();
+    c.strokeStyle = ok ? '#3A1D00' : '#FFFFFF'; c.lineWidth = 2.6; c.lineCap = 'round'; c.beginPath();
+    if (ok) { c.moveTo(q[0] - 4.5, q[1] + 0.5); c.lineTo(q[0] - 1.2, q[1] + 3.6); c.lineTo(q[0] + 5, q[1] - 3.6); }
+    else { c.moveTo(q[0] - 3.6, q[1] - 3.6); c.lineTo(q[0] + 3.6, q[1] + 3.6); c.moveTo(q[0] + 3.6, q[1] - 3.6); c.lineTo(q[0] - 3.6, q[1] + 3.6); }
+    c.stroke(); c.lineCap = 'butt'; c.globalAlpha = 1;
+  },
+  /* halkanın ortasında beliren ödül yazısı */
+  txt(str, size, col, t0) {
+    const k = clamp((tt - t0) / 0.25, 0, 1);
+    if (k <= 0) return;
+    const s = 0.7 + 0.3 * easeOut(k);
+    c.save(); c.translate(0, -2); c.scale(s, s); c.globalAlpha = k;
+    c.font = '600 ' + size + 'px ' + FD; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = col; c.fillText(str, 0, 0); c.restore();
+  },
+  /* ortada küçük süre çubuğu (sıcak yay: süre erir) */
+  bar(frac, hot) {
+    rrect(c, -30, -4, 60, 8, 4); c.fillStyle = P.track; c.fill();
+    if (frac > 0.02) { rrect(c, -30, -4, 60 * frac, 8, 4); c.fillStyle = hot ? P.rose : P.btn; c.fill(); }
+  }
+});
+/* kilitli halkanın geri sayım kapsülü: oyundaki drawLockTimer ile aynı biçim, sahne için büyütülmüş ve ortada */
+const introLockPill = (c, n) => {
+  const z = 16, txt = String(n);
+  c.font = '800 ' + z + 'px ' + FB;
+  const w = c.measureText(txt).width + z * 2.8, h = z * 2.1;
+  rrect(c, -w / 2, -h / 2, w, h, h / 2); c.fillStyle = P.rose; c.fill();
+  drawPadlock(c, -w / 2 + z * 1.2, -z * 0.15, z * 0.5, '#FFFFFF', false);
+  c.fillStyle = '#FFFFFF'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(txt, z * 0.55, 1);
+};
+/* geçici oyun durumu: sahneler gerçek çizimleri kullanır, bitince eski değerler geri konur */
+const withIntroState = (tt, fn) => {
+  const s = { pt: G.pt, narrow: G.narrow, boostT: G.boostT, tun: G.tun, emerge: G.emerge, ang: G.ang, chal: G.chal, holding: G.holding, vort: G.vort, dir: G.dir, lockLeft: G.lockLeft };
+  G.pt = tt; G.narrow = 0; G.boostT = 0; G.tun = null; G.emerge = 0; G.holding = false; G.vort = 0; G.dir = 1; G.lockLeft = 0; G.chal = { kind: 'tek', t: 0 };
+  try { fn(); } finally { Object.assign(G, s); }
+};
+const INTRO = {
+  cift: { dur: 2.8, capT: [0, 0.3], draw(K, tt) {
+    const w = 2.4, a0 = -1.9, A = -0.75, B = 0.55, tA = tAt(a0, w, A), tB = tAt(a0, w, B);
+    K.ring(); K.pin(gpin(A, 0.32, { done: tt > tA }), 0, true); K.pin(gpin(B, 0.32, { done: tt > tB }), 1, true);
+    K.ptr(a0 + w * tt); K.touch(A, tA); K.touch(B, tB);
+  } },
+  kayan: { dur: 3.2, capT: [0, 0.9], draw(K, tt) {
+    const w = 2.2, a0 = -1.9, c0 = 0.5, amp = 0.55, f = 0.38, ctr = t => c0 + amp * Math.sin(TAU * f * t);
+    let tS = 1.4;
+    for (let t = 0.3; t < 2.6; t += 0.005) if (a0 + w * t >= ctr(t)) { tS = t; break; }
+    K.ring(); K.pin(tt > tS ? gpin(ctr(tS), 0.34, { done: true }) : gpin(c0, 0.34, { amp, f }), 0);
+    K.ptr(a0 + w * tt); K.touch(ctr(tS), tS); K.badge(ctr(tS), true, tS);
+  } },
+  nefes: { dur: 3.2, capT: [0, 1.0], draw(K, tt) {
+    const w = 2.0, c0 = 0.2, Pb = 1.6, tS = Pb, a0 = c0 - w * tS;
+    K.ring(); K.pin(gpin(c0, 0.42, { br: { a: 0.55, P: Pb, ph: 0 }, done: tt > tS }), 0);
+    K.ptr(a0 + w * tt); K.touch(c0, tS); K.badge(c0, true, tS);
+  } },
+  altin: { dur: 3.6, capT: [0, 0.8, 1.15], draw(K, tt) {
+    const w = 1.9, a0 = -1.6, M = -0.2, Gx = 1.1, tm = tAt(a0, w, M), tg = tAt(a0, w, Gx), op = tm + 0.05;
+    K.ring(); K.pin(gpin(M, 0.4, { done: tt > tm }), 0);
+    K.pin(gpin(Gx, MECH.goldHw, { bonus: true, gold: true, wait: tt <= op, enT: Math.max(0, tt - op), done: tt > tg }), 1);
+    K.ptr(a0 + w * tt); K.touch(M, tm); K.touch(Gx, tg); K.badge(M, true, tm); K.badge(Gx, true, tg); K.txt('×3', 24, GOLD, tg + 0.1);
+  } },
+  sabir: { dur: 4.6, capT: [0, 2.6, 3.2], draw(K, tt) {
+    const w = 6.0, a0 = -3.0, L = 0, t1 = tAt(a0, w, L), lap = TAU / w, tTap = t1 + 3 * lap;
+    let passes = 0; for (let k = 0; k < 3; k++) if (tt >= t1 + k * lap) passes++;
+    K.ring(); K.pin({ kind: 'lockpin', ring: 0, c0: L, amp: 0, f: 0, ph: 0, hw: 0.34, done: tt > tTap, passes, open: passes >= 3, openT: 0, prev: null, rattle: 0 }, 0);
+    K.ptr(a0 + w * tt); K.touch(L, tTap); K.badge(L, true, tTap); K.txt('×3', 24, GOLD, tTap + 0.1);
+  } },
+  kasa: { dur: 3.0, capT: [0, 1.1], draw(K, tt) {
+    const w = 2.3, a0 = -1.9, xs = [-0.95, 0, 0.95], ts = xs.map(x => tAt(a0, w, x));
+    K.ring(); xs.forEach((x, i) => K.pin(gpin(x, 0.17, { kasa: true, done: tt > ts[i] }), i));
+    K.ptr(a0 + w * tt); xs.forEach((x, i) => { K.touch(x, ts[i]); K.badge(x, true, ts[i]); });
+    K.txt('+' + MECH.kasaPts, 24, GOLD, ts[2] + 0.15);
+  } },
+  ritim: { dur: 3.2, capT: [0, 1.6], draw(K, tt) {
+    const w = 2.3, a0 = -2.1, xs = [-1.2, -0.4, 0.4, 1.2], ts = xs.map(x => tAt(a0, w, x));
+    K.ring(); xs.forEach((x, i) => K.pin(gpin(x, 0.14, { note: true, done: tt > ts[i] }), i));
+    K.ptr(a0 + w * tt); xs.forEach((x, i) => { K.touch(x, ts[i]); K.badge(x, true, ts[i]); });
+    K.txt('+' + MECH.ritimPts * xs.length, 24, P['peach-deep'], ts[3] + 0.15);
+  } },
+  trafik: { dur: 3.6, capT: [0, 0.6], draw(K, tt) {
+    const w = 2.0, a0 = -2.1, Lx = -0.55, Rx = 0.45, sw = 0.55, tl = tAt(a0, w, Lx), tr = tAt(a0, w, Rx), lg = tt < sw, dn = tt > tr;
+    G.chal = { kind: 'trafik', t: 0, light: { warn: tt > sw - 0.3 && tt < sw && Math.floor(tt * 14) % 2 === 0 } };
+    K.ring(); K.pin(gpin(Lx, 0.28, { light: true, green: lg, done: dn }), 0); K.pin(gpin(Rx, 0.28, { light: true, green: !lg, done: dn }), 1);
+    K.ptr(a0 + w * tt); K.badge(Lx, false, tl - 0.05, false, tr); K.touch(Rx, tr); K.badge(Rx, true, tr);
+  } },
+  iki: { dur: 3.4, capT: [0, 0.9], draw(K, tt) {
+    const w1 = 2.2, a1 = -2.0, T1 = 0.5, w2 = -1.8, a2 = 2.0, T2 = -0.9, t1 = tAt(a1, w1, T1), t2 = tAt(a2, w2, T2);
+    K.ring(); K.ring(true); K.pin(gpin(T1, 0.34, { done: tt > t1 }), 0); K.pin(gpin(T2, 0.4, { ring: 1, done: tt > t2 }), 1);
+    K.ptr(a1 + w1 * tt); K.ptr(a2 + w2 * tt, 1, true, -1);
+    K.touch(T1, t1); K.touch(T2, t2, true); K.badge(T1, true, t1); K.badge(T2, true, t2, true);
+  } },
+  isin: { dur: 4.0, capT: n => [0, 0.42, 0.42 + ISIN_D[n % 4]], draw(K, tt, n) {
+    const w = 2.6, A = -2.3, B = 0, Tg = 1.3, a0 = -3.4, d = ISIN_D[n % 4], tA = tAt(a0, w, A), tB = tA + d, tT = tB + (Tg - B) / w;
+    let a = a0 + w * tt, sc = 1;
+    if (tt >= tB) { a = B + w * (tt - tB); sc = Math.min(1, (tt - tB) / MECH.isinPop); G.emerge = Math.max(0, MECH.isinPop - (tt - tB)); }
+    else if (tt >= tA) { a = A; sc = Math.max(0, 1 - (tt - tA) / MECH.isinFade); G.tun = { t: tt - tA, d }; }
+    const pt = (kind, x) => ({ kind: 'portal', portal: kind, ring: 0, c0: x, amp: 0, f: 0, ph: 0, hw: MECH.isinPortalHw, done: false });
+    K.ring(); K.pin(gpin(Tg, 0.36, { done: tt > tT }), 0); K.pin(pt('in', A), 1); K.pin(pt('out', B), 2);
+    K.ptr(a, sc);
+    if (tt > tA && tt < tB) { const q = ptXY(0, 0, A, IR - IRW * 2.3); K.c.fillStyle = P.btn; K.c.font = '800 20px ' + FB; K.c.textAlign = 'center'; K.c.textBaseline = 'middle'; K.c.fillText('?', q[0], q[1]); }
+    K.touch(Tg, tT); K.badge(Tg, true, tT);
+  } },
+  hayalet: { dur: 3.4, capT: [0, 0.95], draw(K, tt) {
+    const w = 1.7, a0 = -1.5, c0 = 0.9, tS = tAt(a0, w, c0);
+    K.ring(); K.pin(gpin(c0, 0.36, { ghost: { vis: 0.9 }, age: tt, done: tt > tS }), 0);
+    K.ptr(a0 + w * tt); K.touch(c0, tS); K.badge(c0, true, tS); K.txt('×' + MECH.ghostPts, 24, P['peach-deep'], tS + 0.1);
+  } },
+  bomba: { dur: 3.4, capT: [0, 0.9], draw(K, tt) {
+    const w = 2.0, a0 = -1.7, Bx = 0.6, tS = tAt(a0, w, Bx), mx = 2.8, def = tt > tS;
+    K.ring(); K.pin(gpin(Bx, 0.3, { bomb: { fuse: def ? 0 : Math.max(0.3, mx - tt), max: mx, st: def ? 'def' : 'arm' }, done: def }), 0);
+    K.ptr(a0 + w * tt); K.touch(Bx, tS); K.txt('+' + MECH.bombPts, 24, P.life, tS + 0.15);
+  } },
+  gelgit: { dur: 3.4, capT: [0, 0.85], draw(K, tt) {
+    const c = K.c, base = 1.3, mid = 0.7, bw = 0.95, T = 2.6, spd = th => base * (0.88 + 1.1 * sm(clamp(1 - angd(th, mid) / bw, 0, 1)));
+    let th = -1.2, a = null, tS = -1;
+    for (let t = 0; t < 3.4; t += 0.01) { if (a === null && t >= tt) a = th; if (tS < 0 && th >= T) tS = t; if (a !== null && tS >= 0) break; th += spd(th) * 0.01; }
+    if (a === null) a = th;
+    K.ring(); c.lineCap = 'butt';
+    [[1, 0.18], [0.66, 0.2], [0.33, 0.24]].forEach(([k, al]) => { c.globalAlpha = al; c.lineWidth = IRW + 6; c.strokeStyle = P.lilac; arc(c, 0, 0, IR, mid - bw * k - HALF, mid + bw * k - HALF); });
+    c.globalAlpha = 0.75; for (let i = -1; i <= 1; i++) chevron(c, 0, 0, mid + i * 0.36, IR, IRW * 0.26, P['ink-2']);
+    c.globalAlpha = 1;
+    K.pin(gpin(T, 0.34, { done: a >= T }), 0); K.ptr(a); K.touch(T, tS); K.badge(T, true, tS);
+  } },
+  tutbirak: { dur: 3.4, capT: [0, 0.5, 1.15], draw(K, tt) {
+    const w = 2.4, a0 = -2.4, s0 = -1.2, len = 1.9, e = s0 + len, tP = tAt(a0, w, s0), tR = tAt(a0, w, e), hold = tt > tP && tt < tR;
+    G.ang = a0 + w * tt;
+    K.ring(); K.pin({ kind: 'hold', ring: 0, c0: s0, amp: 0, f: 0, ph: 0, hw: 0.2, rw: 0.17, len, dirH: 1, st: hold ? 'hold' : 'wait', done: tt >= tR, hot: false }, 0);
+    K.ptr(G.ang); K.touch(s0, tP); K.held(s0, hold); K.touch(e, tR); K.badge(e, true, tR); K.txt('×' + fx(MECH.holdPts), 22, P['peach-deep'], tR + 0.1);
+  } },
+  tuzak: { dur: 3.0, capT: [0, 0.85], draw(K, tt) {
+    const w = 2.0, a0 = -1.5, Tr = -0.25, Tg = 0.8, tT = tAt(a0, w, Tg);
+    K.ring(); K.pin(tpin(Tr, 0.17), 0); K.pin(gpin(Tg, 0.34, { done: tt > tT }), 1);
+    K.ptr(a0 + w * tt); K.touch(Tg, tT); K.badge(Tg, true, tT);
+  } },
+  kayanT: { dur: 3.4, capT: [0, 0.8], draw(K, tt) {
+    const w = 1.9, a0 = -1.5, c0 = 0.4, amp = 0.55, f = 0.4, ph = -4.084, tS = tAt(a0, w, c0);
+    K.ring(); K.pin(gpin(c0, 0.42, { done: tt > tS }), 0); K.pin(tpin(c0, 0.13, { amp, f, ph, prio: true }), 1);
+    K.ptr(a0 + w * tt); K.touch(c0, tS); K.badge(c0, true, tS);
+  } },
+  diken: { dur: 3.4, capT: [0, 1.7], draw(K, tt) {
+    const w = 1.6, c0 = 0.3, tS = 2.45, a0 = c0 - w * tS;
+    K.ring(); K.pin(gpin(c0, 0.42, { thorn: true, thw: { att: 0.3, hold: 0.8, rel: 1.5, o: 0 }, br: { a: 0.5, P: 2.6, ph: 0 }, done: tt > tS }), 0);
+    K.ptr(a0 + w * tt); K.touch(c0, tS); K.badge(c0, true, tS);
+  } },
+  lanetli: { dur: 3.2, capT: [0, 1.0], draw(K, tt) {
+    const w = 1.8, a0 = -1.2, Gx = 0.1, Cx = 1.35, tg = tAt(a0, w, Gx);
+    K.ring(); K.pin(gpin(Gx, MECH.goldHw, { bonus: true, gold: true, enT: tt, done: tt > tg }), 0); K.pin(tpin(Cx, MECH.goldHw, { cursed: true }), 1);
+    K.ptr(a0 + w * tt); K.touch(Gx, tg); K.badge(Gx, true, tg); K.txt('×3', 24, GOLD, tg + 0.1);
+  } },
+  alarm: { dur: 3.4, capT: [0, 0.9], draw(K, tt) {
+    const w = 2.3, a0 = -1.9, xs = [-0.95, 0, 0.95], ts = xs.map(x => tAt(a0, w, x));
+    K.ring(); xs.forEach((x, i) => K.pin(gpin(x, 0.17, { kasa: true, done: tt > ts[i] }), i)); K.pin(tpin(-0.475, 0.11, { alarm: true }), 3);
+    K.ptr(a0 + w * tt); xs.forEach((x, i) => { K.touch(x, ts[i]); K.badge(x, true, ts[i]); });
+  } },
+  curuk: { dur: 3.6, capT: [0, 1.0], draw(K, tt) {
+    const w = 2.0, a0 = -1.4, L = 0.3, hw = 0.34, tRe = tAt(a0, w, L + hw + 0.05), locked = tt > tRe;
+    K.ring();
+    K.pin({ kind: 'lockpin', ring: 0, c0: L, amp: 0, f: 0, ph: 0, hw, done: false, passes: locked ? 0 : 3, open: !locked, openT: 0, prev: null, rattle: locked && tt < tRe + 0.4 ? 0.4 - (tt - tRe) : 0 }, 0);
+    K.ptr(a0 + w * tt); K.badge(L, false, tRe);
+  } },
+  sahtenota: { dur: 3.4, capT: [0, 1.0], draw(K, tt) {
+    const w = 2.3, a0 = -2.1, xs = [-1.2, -0.45, 0.5, 1.2], ts = xs.map(x => tAt(a0, w, x));
+    K.ring(); xs.forEach((x, i) => K.pin(gpin(x, 0.14, { note: true, done: tt > ts[i] }), i)); K.pin(tpin(0.025, 0.11, { fake: true }), 4);
+    K.ptr(a0 + w * tt); xs.forEach((x, i) => { K.touch(x, ts[i]); K.badge(x, true, ts[i]); });
+  } },
+  kilitli: { dur: 4.4, capT: [0, 0.45, 2.45], draw(K, tt) {
+    const c = K.c, wO = 2.7, aO = -1.8, TO = 0.6, tO = tAt(aO, wO, TO), tu = MECH.lockT, aI = 2.2, wI = -1.8, T2 = 0.8, tI = tu + tAt(aI, wI, T2), lock = tt < tu;
+    const aOut = aO + wO * tt, aIn = lock ? aI : aI + wI * (tt - tu);
+    K.ring(); K.ring(true);
+    if (lock) {
+      c.save(); c.globalAlpha = 0.3; c.strokeStyle = P['ink-3']; c.lineWidth = 1.4; c.lineCap = 'butt';
+      for (let i = 0; i < 46; i++) { const a = i / 46 * TAU - HALF, a2 = a + 0.1; c.beginPath(); c.moveTo(Math.cos(a) * (IR2 - IRW2 / 2), Math.sin(a) * (IR2 - IRW2 / 2)); c.lineTo(Math.cos(a2) * (IR2 + IRW2 / 2), Math.sin(a2) * (IR2 + IRW2 / 2)); c.stroke(); }
+      c.restore();
+    }
+    K.pin(gpin(TO, 0.34, { done: tt > tO }), 0); K.pin(gpin(lock ? -1.0 : T2, 0.4, { ring: 1, locked: lock, done: tt > tI }), 1);
+    K.ptr(aOut);
+    if (lock) { c.globalAlpha = 0.85; chevron(c, 0, 0, aOut - 0.16, IR, IRW * 0.3, P.rose); c.globalAlpha = 0.5; chevron(c, 0, 0, aOut - 0.32, IR, IRW * 0.3, P.rose); c.globalAlpha = 1; }
+    c.globalAlpha = lock ? 0.4 : 1; K.ptr(aIn, 1, true, -1); c.globalAlpha = 1;
+    K.touch(TO, tO); K.badge(TO, true, tO); K.touch(T2, tI, true); K.badge(T2, true, tI, true);
+    if (lock) introLockPill(c, Math.ceil(tu - tt));
+  } },
+  hayaletT: { dur: 3.4, capT: [0, 0.9], draw(K, tt) {
+    const w = 1.7, a0 = -1.6, Cx = -0.2, Tg = 1.3, tc = tAt(a0, w, Cx), tT = tAt(a0, w, Tg);
+    K.ring(); K.pin(tpin(Cx, 0.17, { ghost: { vis: 0.7 }, spook: true, age: tt }), 0); K.pin(gpin(Tg, 0.34, { done: tt > tT }), 1);
+    K.ptr(a0 + w * tt); K.badge(Cx, false, tc - 0.1, false, tc + 0.7); K.touch(Tg, tT); K.badge(Tg, true, tT);
+  } },
+  girdap: { dur: 3.4, capT: [0, 1.0], draw(K, tt) {
+    const c = K.c, w = 1.6, a0 = -1.6, Vx = -0.3, Tg = 2.3, tv = tAt(a0, w, Vx), boost = MECH.vortexMul, tgt = tv + (Tg - Vx) / (w * boost);
+    const a = tt < tv ? a0 + w * tt : Vx + w * boost * (tt - tv);
+    K.ring(); K.pin({ kind: 'vortex', ring: 0, c0: Vx, amp: 0, f: 0, ph: 0, hw: MECH.vortexHw, done: false }, 0); K.pin(gpin(Tg, 0.32, { done: tt > tgt }), 1);
+    K.ptr(a);
+    if (tt > tv && tt < tgt) { c.globalAlpha = 0.85; chevron(c, 0, 0, a - 0.16, IR, IRW * 0.3, P.lilac); c.globalAlpha = 0.5; chevron(c, 0, 0, a - 0.32, IR, IRW * 0.3, P.lilac); c.globalAlpha = 1; }
+    K.touch(Tg, tgt); K.badge(Tg, true, tgt);
+  } },
+  sicak: { dur: 4.0, capT: [0, 1.0, 1.35], draw(K, tt) {
+    const w = 2.2, a0 = -2.3, s0 = -1.2, len = 1.9, e = s0 + len, tP = tAt(a0, w, s0), tR = tAt(a0, w, e), tHot = tAt(a0, w, s0 + len * MECH.hotFrom), hold = tt > tP && tt < tR;
+    G.ang = a0 + w * tt;
+    K.ring(); K.pin({ kind: 'hold', ring: 0, c0: s0, amp: 0, f: 0, ph: 0, hw: 0.2, rw: 0.17, len, dirH: 1, st: hold ? 'hold' : 'wait', done: tt >= tR, hot: true }, 0);
+    K.ptr(G.ang); K.touch(s0, tP); K.held(s0, hold); K.touch(e, tR); K.badge(e, true, tR);
+    if (tt < tR + 0.05) K.bar(tt < tHot ? 1 : 1 - 0.45 * clamp((tt - tHot) / (tR - tHot), 0, 1), tt >= tHot);
+    else K.txt('×' + MECH.hotPts, 24, '#E8456E', tR + 0.1);
+  } }
+};
+/* bir sahneyi verilen merkez ve yarı boyutta çiz (kart ve test kancası için) */
+let introErr = false;
+const drawIntroScene = (c, kind, x, y, half, tt, n) => {
+  const sc = INTRO[kind];
+  if (!sc) return;
+  const k = half / (IR + IRW * 1.9);
+  c.save(); c.translate(x, y); c.scale(k, k);
+  try { withIntroState(tt, () => sc.draw(introKit(c, tt), tt, n | 0)); }
+  catch (e) { if (!introErr) { introErr = true; try { console.error('[kp] tanıtım sahnesi', kind, e && e.stack ? e.stack : e); } catch (x2) {} } }
+  c.restore();
+};
+const introWanted = kind => /*NOINTRO*/ !G.practice && !!INTRO[kind] && !(save.intro && save.intro[kind]) && !((save.seen[kind] | 0) > 0);
+const queueIntro = kind => { if (introWanted(kind) && G.introQ.indexOf(kind) < 0) G.introQ.push(kind); };
+const dockDim = on => { if (toolsEl) toolsEl.classList.toggle('dim', on); };
+const startIntro = () => {
+  const kind = G.introQ.shift(), sc = INTRO[kind];
+  if (!sc) return;
+  const tw = !!GOOD_OF[kind], cd = tw ? twinCard(kind) : bigCard(kind, '');
+  G.intro = { kind, t: 0, closing: 0, auto: clamp(sc.dur + 0.9, 4, 5.5), title: cd.title, rule: cd.rule, warn: cd.warn, tag: t(tw ? 'introTagTw' : 'introTag'), caps: t('ic_' + kind, { n: MECH.bombPts }).split('|') };
+  G.introLast = G.intro;
+  /* kart ve hedefler tam görünür dursun (yeni açılmış olabilir) */
+  if (G.card) G.card.t = Math.max(G.card.t, 0.3);
+  G.gateT = Math.max(G.gateT, 0.3);
+  G.holding = false;
+  G.mode = 'intro'; dockDim(true);
+  Platform.haptic('light'); Platform.track('intro', { kind });
+};
+/* Tanıtımı kapat (dokunuş, süre dolması ya da geri tuşu): görüldü diye işaretlenir; sırada başka varsa kart uzun kalır ve sıradaki başlar. */
+const closeIntro = all => {
+  const it = G.intro;
+  if (G.mode !== 'intro' || !it || it.closing) return;
+  save.intro[it.kind] = 1; persist();
+  Snd.ui();
+  if (all) G.introQ.length = 0;
+  if (G.introQ.length) { startIntro(); return; }
+  it.closing = 0.0001; dockDim(false);
+};
+const skipIntro = () => { if (G.mode === 'intro' && G.intro && !G.intro.closing && G.intro.t > 1.2) closeIntro(false); };
+/* Uygulama arka plana giderse tanıtım yarım kalır: görüldü sayılmaz, geri dönünce yeniden başlar. */
+const abortIntro = () => {
+  if (G.mode !== 'intro') return;
+  if (G.intro && !G.intro.closing) G.introQ.unshift(G.intro.kind);
+  G.intro = null; G.mode = 'play'; G.introK = 0; dockDim(false);
+};
+const introNow = kind => { G.introQ.push(kind); if (G.mode === 'play') startIntro(); };
+/* Yazıyı en çok maxLines satıra böl; sığmazsa puntoyu küçült (en az minSize). */
+const fitWrap = (c, txt, wt, size, face, maxW, maxLines, minSize) => {
+  for (let z = size; ; z -= 0.5) {
+    c.font = wt + ' ' + z + 'px ' + face;
+    const words = String(txt).split(' '), lines = []; let cur = '';
+    for (const wd of words) {
+      const tr = cur ? cur + ' ' + wd : wd;
+      if (!cur || c.measureText(tr).width <= maxW) cur = tr; else { lines.push(cur); cur = wd; }
+    }
+    if (cur) lines.push(cur);
+    if ((lines.length <= maxLines && lines.every(l => c.measureText(l).width <= maxW + 0.5)) || z <= minSize) return { lines, z };
+  }
+};
+/* Uzayan kartın içi: solda küçük animasyon, sağda etiket, ad, anlık açıklama, kural ve uyarı; altta ilerleme çizgisi. */
+const drawIntroBody = (c, x, y, w, H, hf, ik) => {
+  const it = G.intro || G.introLast, sc = it && INTRO[it.kind];
+  if (!sc) return;
+  const ca = clamp((ik - 0.5) / 0.4, 0, 1);
+  if (ca <= 0.01) return;
+  const small = view.h < 700, live = !!G.intro && !G.intro.closing, n = Math.floor(it.t / sc.dur), tt = it.t % sc.dur;
+  c.save(); rrect(c, x, y, w, H, 20); c.clip(); c.globalAlpha = ca;
+  const ms = hf - 20, half = ms / 2;
+  drawIntroScene(c, it.kind, x + 10 + half, y + hf / 2 + 1, half, tt, n);
+  c.globalAlpha = ca;
+  const tx = x + ms + 22, mw = x + w - 12 - tx;
+  c.textAlign = 'left'; c.textBaseline = 'middle';
+  let ty = y + (small ? 12 : 16);
+  c.font = '800 ' + (small ? 9.5 : 10.5) + 'px ' + FB; c.fillStyle = P.btn; c.fillText(it.tag, tx, ty);
+  if (live) {
+    const hint = t('introHint');
+    if (c.measureText(it.tag).width + c.measureText(hint).width + 14 < mw) { c.fillStyle = P['ink-3']; c.textAlign = 'right'; c.fillText(hint, x + w - 12, ty); c.textAlign = 'left'; }
+  }
+  ty += small ? 17 : 22;
+  fitPx(c, it.title, 600, small ? 17 : 21, FD, mw, 13); c.fillStyle = P.ink; c.fillText(it.title, tx, ty);
+  ty += small ? 15 : 22;
+  /* anlık açıklama: iki satırlık yer ayrılır, alttaki satırlar oynamaz */
+  const ct = introCapT(sc, n), cz = small ? 12 : 13.5;
+  let cap = ''; for (let i = 0; i < ct.length; i++) if (tt >= ct[i]) cap = it.caps[i] || cap;
+  const cl = fitWrap(c, cap, 800, cz, FB, mw, 2, 10);
+  c.fillStyle = P.btn; cl.lines.forEach((ln, i) => c.fillText(ln, tx, ty + i * cz * 1.2));
+  const by = ty + 2 * cz * 1.2 + (small ? 3 : 4), bottom = y + hf - (small ? 9 : 12);
+  let rl = null, wl = null, sz = small ? 11.5 : 12.5;
+  for (; ; sz -= 0.5) {
+    rl = fitWrap(c, it.rule, 800, sz, FB, mw - 14, 2, sz); wl = it.warn ? fitWrap(c, it.warn, 800, sz, FB, mw - 14, 2, sz) : { lines: [] };
+    if (sz <= 9 || (rl.lines.length + wl.lines.length) * sz * 1.2 + (it.warn ? 5 : 0) <= bottom - by + sz * 0.6) break;
+  }
+  const lh = sz * 1.2, dot = (yy, col) => { c.fillStyle = col; c.beginPath(); c.arc(tx + 4, yy, small ? 3 : 3.6, 0, TAU); c.fill(); };
+  c.font = '800 ' + sz + 'px ' + FB; c.fillStyle = P.ink;
+  dot(by, P.peach); rl.lines.forEach((ln, i) => c.fillText(ln, tx + 14, by + i * lh));
+  if (it.warn) {
+    const wy = by + rl.lines.length * lh + 5;
+    dot(wy, P.rose); c.fillStyle = P.rose; wl.lines.forEach((ln, i) => c.fillText(ln, tx + 14, wy + i * lh));
+  }
+  if (live) { c.fillStyle = P.btn; c.globalAlpha = ca * 0.9; c.fillRect(x + 14, y + hf - 6, (w - 28) * clamp(it.t / it.auto, 0, 1), 3); }
+  c.restore();
+};
+/* Tanıtım kapanırken halkanın üstünde kısa bir "devam" kapsülü. */
+const drawIntroPill = c => {
+  const it = G.intro;
+  if (!it || !it.closing) return;
+  const k = it.closing / 0.7, al = k < 0.15 ? k / 0.15 : (k > 0.7 ? Math.max(0, (1 - k) / 0.3) : 1);
+  c.save(); c.globalAlpha = al * 0.95;
+  pill(c, t('introResume'), view.cx, view.cy + view.r * 0.66, P.ink, P.bg, 13);
+  c.restore();
+};
+
 /* Nesne işaretleri: halkanın dışında küçük ✓ (vur) ve ✕ (dokunma); hedefin üstüne yazı konmaz. Yer yoksa halkanın iç kenarına yaslanır. */
 const drawLabels = (c, cx, cy, R, RW) => {
   const lb = G.lab;
@@ -2961,7 +3443,7 @@ const drawLabels = (c, cx, cy, R, RW) => {
   const al = clamp(Math.min(lb.t / 0.3, (lb.max - lb.t) / 0.5), 0, 1);
   if (al <= 0) return;
   const put = (p, ok, da) => {
-    const a = pinCenter(p) + (da || 0) - HALF, col = ok ? P.peach : P.rose;
+    const a = pinCenter(p) + (da || 0) - HALF + HX.r, col = ok ? P.peach : P.rose;
     let r1 = R + RW / 2 + 26, x = cx + Math.cos(a) * r1, y = cy + Math.sin(a) * r1;
     const inside = y < (view.cardB || 0) + 14;
     if (inside) { r1 = R - RW / 2 - 18; x = cx + Math.cos(a) * r1; y = cy + Math.sin(a) * r1; }
@@ -3044,15 +3526,15 @@ const drawFxs = (c) => {
       c.globalAlpha = sa * 0.55; c.strokeStyle = '#FF8A4F'; c.lineWidth = 4; c.beginPath(); c.arc(f.x, f.y, Math.max(0, (k - 0.12) * 320), 0, TAU); c.stroke();
       c.globalAlpha = 1;
     } else if (f.type === 'reveal') {
-      const k = f.t / f.max, R = view.r, RW = Math.max(14, R * 0.2);
+      const k = f.t / f.max, R = view.r * HX.b, RW = Math.max(14, R * 0.2);
       c.globalAlpha = (1 - k) * 0.9; c.lineWidth = RW; c.strokeStyle = P.rose; c.lineCap = 'butt';
-      arc(c, view.cx, view.cy, R, f.a - 0.3 - HALF, f.a + 0.3 - HALF); c.globalAlpha = 1;
+      arc(c, view.cx, view.cy, R, f.a + HX.r - 0.3 - HALF, f.a + HX.r + 0.3 - HALF); c.globalAlpha = 1;
     }
   }
 };
 
 const render = () => {
-  const c = ctx, cx = view.cx, cy = view.cy, R = view.r, RW = Math.max(14, R * 0.2);
+  const c = ctx, cx = view.cx, cy = view.cy, R = view.r * HX.b, RW = Math.max(14, R * 0.2);
   const two = G.mode !== 'menu' && G.kind === 'iki';
   const R2 = R * 0.6, RW2 = RW * 0.8;
   c.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
@@ -3061,11 +3543,14 @@ const render = () => {
   c.save();
   if (G.shake > 0) { const m = Math.min(9, G.shake * 20); c.translate((Math.random() - 0.5) * m, (Math.random() - 0.5) * m); }
 
+  /* Cehennem: bütün çember (çentikler, hedefler, ibre) birlikte döner; etiket ve parçacıklar dönmeyen katmanda kalır */
+  const hx = HX.s > 0.003 || HX.r !== 0;
+  if (hx) { c.save(); c.translate(cx, cy); c.rotate(HX.r); c.translate(-cx, -cy); drawRot = HX.r; }
   const r0 = R + RW / 2 + 10;
   const iv = G.mode === 'menu' ? 0 : G.Ivis;
   c.lineCap = 'round'; c.strokeStyle = mixHex(P.tick, P.rose, 0.8 * iv);
   for (let i = 0; i < 60; i++) {
-    const a = i / 60 * TAU - HALF, long = i % 5 === 0, r1 = r0 + (long ? 13 + 5 * iv : 7 + 3 * iv), ca = Math.cos(a), sa = Math.sin(a);
+    const a = i / 60 * TAU - HALF + HX.tr, long = i % 5 === 0, r1 = r0 + (long ? 13 + 5 * iv : 7 + 3 * iv), ca = Math.cos(a), sa = Math.sin(a);
     c.globalAlpha = long ? 0.95 : 0.55 + 0.3 * iv; c.lineWidth = (long ? 2.6 : 1.6) + 0.6 * iv;
     c.beginPath(); c.moveTo(cx + ca * r0, cy + sa * r0); c.lineTo(cx + ca * r1, cy + sa * r1); c.stroke();
   }
@@ -3074,8 +3559,19 @@ const render = () => {
   c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
   c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
   if (two) { c.lineWidth = RW2; c.beginPath(); c.arc(cx, cy, R2, 0, TAU); c.stroke(); }
+  if (HX.s > 0.003) {
+    /* hipnoz sarmalı: halkanın içinde üç kol, kendi hızıyla ters döner */
+    const lim = two ? 0.46 : 0.62;
+    c.save(); c.translate(cx, cy); c.rotate(HX.sp); c.lineCap = 'round'; c.lineWidth = Math.max(2, R * 0.024); c.strokeStyle = mixHex(P.track, P.rose, 0.5); c.globalAlpha = 0.6 * HX.s;
+    for (let a = 0; a < 3; a++) {
+      c.beginPath();
+      for (let n = 0; n <= 48; n++) { const f = n / 48, ang = a * TAU / 3 + f * 3.4, rr = R * (0.16 + (lim - 0.16) * f), x = Math.cos(ang) * rr, y = Math.sin(ang) * rr; if (n) c.lineTo(x, y); else c.moveTo(x, y); }
+      c.stroke();
+    }
+    c.restore(); c.globalAlpha = 1;
+  }
   drawTrackFx(c, cx, cy, R, RW, R2, RW2, two);
-  const mult = (G.mode === 'play' || G.mode === 'dead' || G.mode === 'count') && G.comboOn ? comboMult(G.combo) : 1;
+  const mult = (G.mode === 'play' || G.mode === 'dead' || G.mode === 'count' || G.mode === 'intro') && G.comboOn ? comboMult(G.combo) : 1;
   if (mult >= 2) {
     c.globalAlpha = Math.min(0.4, 0.07 + 0.03 * mult + 0.12 * G.scorePulse); c.fillStyle = tierCol(mult);
     c.beginPath(); c.arc(cx, cy, two ? R2 - RW2 / 2 - 4 : R - RW / 2 - 4, 0, TAU); c.fill();
@@ -3109,6 +3605,7 @@ const render = () => {
     const q = ptXY(cx, cy, G.ang, R), pu = 0.5 + 0.5 * Math.sin(G.clock * 14);
     c.globalAlpha = 0.5 + 0.3 * pu; c.strokeStyle = P.btn; c.lineWidth = 3; c.beginPath(); c.arc(q[0], q[1], RW * 0.5 + 6 + 2 * pu, 0, TAU); c.stroke(); c.globalAlpha = 1;
   }
+  if (hx) { c.restore(); drawRot = 0; }
   drawLabels(c, cx, cy, R, RW);
   drawFxs(c);
 
@@ -3156,12 +3653,15 @@ const render = () => {
       c.fillText(t('score'), cx, cy + R * 0.36);
     }
     c.globalAlpha = 1;
-    if (two && G.lockLeft > 0 && G.mode === 'play') drawLockTimer(c, cx, cy, R);
+    if (two && G.lockLeft > 0 && (G.mode === 'play' || G.mode === 'intro')) drawLockTimer(c, cx, cy, R);
     if (G.mode === 'count' && G.count > 0) drawCount(c, cx, cy, R);
     else if (G.banner) drawBanner(c);
   }
 
+  /* tanıtım sırasında oyun alanı hafifçe silinir; yalnızca kart net kalır */
+  if (G.introK > 0.001) { c.globalAlpha = 0.55 * easeOut(clamp(G.introK, 0, 1)); c.fillStyle = P.bg; c.fillRect(-20, -20, view.w + 40, view.h + 40); c.globalAlpha = 1; }
   drawCard(c);
+  drawIntroPill(c);
   /* puan balonları halkanın iç bölgesinde, ibre halkasının üstüne binmez: en yeni skorun üstünde, eskisi altında */
   G.pops.forEach((p, i) => {
     const k = p.t / p.max, slot = G.pops.length - 1 - i;
@@ -3208,6 +3708,7 @@ app.addEventListener('pointerdown', e => {
   else if (G.mode === 'menu') { if (!save.run) start(); }
   else if (G.mode === 'over' && performance.now() - G.overAt > 700) start(G.startL);
   else if (G.mode === 'pause') resume();
+  else if (G.mode === 'intro') skipIntro();
 });
 /* Joker düğmeleri: dokununca çalışır (V0.6.1). Yanlışlıkla basılmasın diye sıra ekranın altındadır ve halkayla arasında parmak boyunda boş alan vardır;
    o boşluğa dokunuşlar oyuna gider. */
@@ -3230,6 +3731,7 @@ window.addEventListener('keydown', e => {
   else if (G.mode === 'menu') { if (save.run) resumeSaved(); else start(); }
   else if (G.mode === 'over' && performance.now() - G.overAt > 500) start(G.startL);
   else if (G.mode === 'pause') resume();
+  else if (G.mode === 'intro') skipIntro();
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 window.addEventListener('pagehide', () => persistRun());
@@ -3349,6 +3851,7 @@ if (AppP) {
       if (G.practice) endPractice(true);
       else if (bookEl.classList.contains('on')) closeBook();
       else if (shopEl.classList.contains('on')) closeShop();
+      else if (G.mode === 'intro') closeIntro(true);
       else if (G.mode === 'play' || G.mode === 'count') pause();
       else if (G.mode === 'pause') resume();
       else if (G.mode === 'over') goMenu();
