@@ -3,18 +3,27 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
-## V0.4.1 (hazırlanıyor)
+## V0.4.1 — Rahat oynanan yolculuk (2026-10-17)
 
-Tasarımı kullanıcıyla netleştiriliyor; onaylanınca kodlanacak. Kapsam:
-
-- Cennet bölümü kalkıyor (ödülleri cehennemin sonuna taşınıyor).
-- Jokerler oyun sırasında rahat kullanılacak: başparmağa yakın yer, durumu gösteren parlama, seviye hediyesi.
-- Uygulamadan çıkınca (kapansa bile) oyun kaldığı yerden devam edecek; menüde "Devam et".
-- Ekranda "Seviye 3" yazacak (toplam seviye sayısı gösterilmeyecek); yeni kilit yazıları okunur olacak.
-- Seviye 3'teki diken engeli adil olacak (hedefi tamamen kapatıp pas geçirmeyecek); sis, renk ve sıcak yay mantık hataları düzelecek.
-- Seviyeler kısalacak, zorluk daha yavaş artacak; hedef: orta düzey bir oyuncu yaklaşık 5 dakikada 10. seviyeye varabilsin.
-- En fazla 1 tane toplanabilen "can" (kalp).
-- Menü güzelleşecek; "Oyun" sayacı kalkacak.
+- **Tempo:** cennet bölümü kalktı. Seviyeler kısaldı (normal 20-28 sn, cehennem 6-10 sn), zorluk 3 kat daha yavaş artıyor, "Normal" daha kolay;
+  hedef: sıradan bir oyuncu yaklaşık 5 dakikada 10. seviyeye varabilsin. Seviye bitince +4 sn, coin, her 2 seviyede bir joker hediyesi.
+  "Usta" eski V0.4.0 sertliğine yakın.
+- **Jokerler artık kullanışlı:** halkanın hemen altında, başparmağın bulunduğu yerde. İşe yarayacağı an ilgili joker parlayıp büyür ve ne işe
+  yarayacağını yazar; dokununca çalışır, doğru zamanda kullanırsan +25 puan ("Akıllı hamle!"). Parlamayan joker basılı tutulunca çalışır.
+  Yeni oyuncu her jokerden 2 ile başlar. Joker kullanmadan biten oyunda sonda küçük bir hatırlatma çıkar.
+- **Can:** en fazla 1 tane toplanan yeşil "+" hedefi; süre çubuğunun yanında yeşil "+ Can" rozeti ve yeşil çerçeve. Süre bitince kendiliğinden
+  +3 sn verip oyunu sürdürür. (Kalp simgesi kullanılmadı.)
+- **Kaldığın yerden devam:** uygulamadan çıksan ya da uygulama kapansa bile oyun kaydedilir; menüde "Devam et" çıkar, 3-2-1 sayıp devam eder.
+  "Yeni oyun" kayıt varken önce sorar.
+- **Ekran:** yalnızca "Seviye N" yazar (toplam yok), altında ince ilerleme çizgisi. Yeni kilit için üst kart (simge, ad, kural, uyarı) ve ilk üç
+  karşılaşmada hedefin yanında kısa etiket ("Açıkken vur", "Dikene dokunma"). Yeni kilidin ilk hedefi kart çıktıktan 2 sn sonra, ibreden uzak doğar.
+- **Menü:** güzelleşti; "Oyun" sayacı kalktı; **Kilit defteri** eklendi (gördüğün kilitlerin açıklamaları); büyük Devam et / Oyna düğmesi.
+- **Düzeltmeler:** Seviye 3'teki diken artık kenardan kapanır, hedefin ortası her zaman açıktır (pas geçmek zorunda kalmazsın); kayan tuzak hedeften
+  dar ve hedefin açıkta kalan parçası her zaman vurulabilir; duraklatma ekranına "Menü" düğmesi eklendi.
+- **Tasarım kuralları (sonraki sürümler için):** sis, renk ve sıcak yay kilitlerindeki mantık hataları (görmeden atış, hedefe girmeden değişen renk,
+  sıcak yayın ilk karşılaşmada anlaşılmaması) tasarımda düzeltildi; bu kilitler henüz oyunda olmadığı için kodu yok. Ritim, Sarkaç ve Sis sonsuz moda taşındı.
+- Bilinen eksikler: Seviye 4 ve sonrasının yeni kilitleri (Kasa, Altın, Hayalet, Gelgit, Renk, Tut-bırak) henüz yok; o seviyelerde yalnızca ★ güçlenme
+  ve bilinen kilitlerin karışımı çıkar. İkon, imzalı paket, gizlilik sayfası ve gerçek reklam kimliği ayrı bir sürümde yapılacak.
 
 ## V0.4.0 — Yolculuk (2026-10-16)
 

@@ -28,9 +28,13 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
 - Her seviyenin rekoru ayrı (`save.bests`); `save.best` kaldırıldı, eski kayıt Normal'e taşınır.
 - Övgü ve laf satırları `LINES` içinde (TR ve EN). Yeni satır eklerken iki dili de doldur; ton hafif şakacı kalsın, aşağılayıcı olmasın. Kullanıcı özellikle "Senin yapacağın iş değil" tarzı laf istedi.
 - İki halkada dokunuş ekranın neresinde olursa olsun hedefteki ibreyi vurur (sol/sağ kuralı kaldırıldı); iç halka lila, dış halka şeftali boyanır. Çift pimde iki hedef arası da açıldı. Nedeni: arkadaşlardan "iki tane olan böyle olmamalı" geri bildirimi geldi; kullanıcı bunun iki halka olduğunu doğruladı (çift pimdeki açma önlem olarak yapıldı, şikâyet konusu değildi). Ayrıntıyı (sol/sağ kuralı mı, iki ibreyi aynı anda izlemek mi) arkadaşlar söylemedi; yeni sürümden sonra tekrar sor.
-- **Yolculuk (onaylı tasarım):** `docs/yolculuk-tasarimi.md`. 10 seviye, her seviyede iyi kilit ✚ engel ikizi, ardından cennet ve cehennem
-  bölümü (10 + seviye sn), kontrastlı temalar ve yumuşak geçiş. Süreler kullanıcı tarafından "şimdilik kesin" kabul edildi; yolculuk süre
-  ekonomisi simülasyonu bilerek ertelendi (cehennemin gücü seviyeyle artar: `JOURNEY.hell0/hellStep`, bot ölçümü belgede). Yeni özellik eklerken önce o belgeyi oku, bitince belgedeki "Yapım sırası ve durum" bölümünü güncelle. Faz 1 (iskelet + Seviye 1-3) tamam, sıradaki Faz 2.
+- **Yolculuk (onaylı tasarım, V0.4.1):** `docs/yolculuk-tasarimi.md`. 10 seviye (~5 dk), her seviyede iyi kilit ✚ engel ikizi, ardından kısa cehennem
+  bölümü (cennet kaldırıldı), kontrastlı temalar ve yumuşak geçiş. Ekranda yalnızca "Seviye N" yazar, toplam gösterilmez. Süreler bot ölçümüyle ayarlandı
+  (`JOURNEY.normal/hell`, cehennem gücü `hellK`; ölçüm belgede). Kullanıcı kalp simgesini sevmedi: can yeşil "+ Can" kapsülüdür. Jokerler parlayarak
+  ipucu verir (`adviceFor`), oyun `save.run` ile kaldığı yerden devam eder. Yeni özellik eklerken önce o belgeyi oku, bitince belgedeki "Yapım sırası ve
+  durum" bölümünü güncelle. V0.4.1 tamam; sıradaki Faz 2 (Kasa, Kilitli halka, Altın). İkon/imzalı paket/gizlilik sayfası/gerçek reklam kimliği ayrı sürümde.
+- Sis, renk ve sıcak yay kilitleri yapılırken tasarım kuralları belgede ("Adil oyun kuralları"): ibre hep görünür, renk hedefin içinde değişmez
+  (halka iki bölgeli), sıcak yayda ilk karşılaşmada net uyarı. `DEBUG=2 ./build.sh` kancayı ekler ama duraklatmayı kapatmaz (yaşam döngüsü testi için).
 - Hikaye/harita yok; kullanıcı gereksiz buldu. Eklenmesi önerilmesin.
 
 ## Ortam notları (bu makine)

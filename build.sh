@@ -14,7 +14,7 @@ FONTS_LOCAL='<link rel="stylesheet" href="fonts/fonts.css">'
   printf '%s\n' "$HEAD"
   if [ "${DEBUG:-0}" != "0" ]; then
     if [ "$DEBUG" = "2" ]; then NOPAUSE='s#/\*NOPAUSE\*/##'; else NOPAUSE='s#/\*NOPAUSE\*/# || true#'; fi
-    sed -e 's#/\*DEBUG\*/#window.__kp={G:G,CFG:CFG,save:save,view:view,tap:tap,start:start,die:die,hit:hit,miss:miss,showOver:showOver,spawn:spawnChallenge,useTool:useTool,pinCenter:pinCenter,KIND:KIND,LEVEL:LEVEL,comboMult:comboMult,LV:LV,bestNow:bestNow,setLevel:setLevel,scold:scold,cheer:cheer,pickLine:pickLine,tierCol:tierCol,trap:trap,pinHw:pinHw,JOURNEY:JOURNEY,JEVENTS:JEVENTS,jPhaseAt:jPhaseAt,jStart:jStart,fireEvent:fireEvent,applyEvents:applyEvents,resume:resume,pause:pause,th:function(){return[thWh,thWx]},jump:function(x){G.jt=x},update:update,render:render,phaseMod:phaseMod,hellK:hellK};#' \
+    sed -e 's#/\*DEBUG\*/#window.__kp={G:G,CFG:CFG,save:save,view:view,tap:tap,start:start,die:die,hit:hit,miss:miss,showOver:showOver,spawn:spawnChallenge,useTool:useTool,pinCenter:pinCenter,KIND:KIND,LEVEL:LEVEL,comboMult:comboMult,LV:LV,bestNow:bestNow,setLevel:setLevel,scold:scold,cheer:cheer,pickLine:pickLine,tierCol:tierCol,trap:trap,pinHw:pinHw,JOURNEY:JOURNEY,JEVENTS:JEVENTS,jPhaseAt:jPhaseAt,jStart:jStart,fireEvent:fireEvent,applyEvents:applyEvents,resume:resume,pause:pause,th:function(){return[thWx]},jump:function(x){G.jt=x},update:update,render:render,phaseMod:phaseMod,hellK:hellK,resumeSaved:resumeSaved,persistRun:persistRun,adviceFor:adviceFor,updateAdvice:updateAdvice,lethal:lethal,grantLife:grantLife,jLen:jLen,TOOL:TOOL,DIFF:DIFF,openBook:openBook};#' \
         -e "$NOPAUSE" \
         -e '/<!--FONTS-START-->/,/<!--FONTS-END-->/c\
 '"$FONTS_LOCAL" src/game.html

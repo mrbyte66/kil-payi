@@ -14,7 +14,7 @@
   --ink:#29233F;--ink-2:#615A7C;--ink-3:#8F87AB;
   --lilac:#8E7CF2;--lilac-soft:#DCD5FB;--btn:#6D58E0;--on-btn:#FFFFFF;
   --peach:#FFA473;--peach-deep:#FF7D43;--peach-soft:#FFD9C5;
-  --rose:#FF5C84;--rose-soft:#FFD2DC;
+  --rose:#FF5C84;--rose-soft:#FFD2DC;--life:#27B27A;
   --blob-1:#E2DBFB;--blob-2:#EBDDF9;
   --glass:rgba(255,255,255,.64);--glass-edge:rgba(255,255,255,.85);--scrim:rgba(41,35,63,.18);
   --shadow-s:0 1px 2px rgba(41,35,63,.06),0 6px 16px rgba(41,35,63,.08);
@@ -31,7 +31,7 @@
   --ink:#F4F1FF;--ink-2:#BBB4DC;--ink-3:#8780AE;
   --lilac:#AA9CFF;--lilac-soft:#3B327A;--btn:#BBAEFF;--on-btn:#1B1644;
   --peach:#FFB088;--peach-deep:#FF9560;--peach-soft:#6B4148;
-  --rose:#FF7C9E;--rose-soft:#5C2D49;
+  --rose:#FF7C9E;--rose-soft:#5C2D49;--life:#3BD99B;
   --blob-1:#2B2463;--blob-2:#382A6C;
   --glass:rgba(38,32,77,.62);--glass-edge:rgba(255,255,255,.16);--scrim:rgba(7,5,22,.5);
   --shadow-s:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.28);
@@ -42,7 +42,7 @@
   --ink:#F4F1FF;--ink-2:#BBB4DC;--ink-3:#8780AE;
   --lilac:#AA9CFF;--lilac-soft:#3B327A;--btn:#BBAEFF;--on-btn:#1B1644;
   --peach:#FFB088;--peach-deep:#FF9560;--peach-soft:#6B4148;
-  --rose:#FF7C9E;--rose-soft:#5C2D49;
+  --rose:#FF7C9E;--rose-soft:#5C2D49;--life:#3BD99B;
   --blob-1:#2B2463;--blob-2:#382A6C;
   --glass:rgba(38,32,77,.62);--glass-edge:rgba(255,255,255,.16);--scrim:rgba(7,5,22,.5);
   --shadow-s:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.28);
@@ -81,16 +81,20 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .notch{position:absolute;top:7px;bottom:7px;width:3px;margin-left:-1px;border-radius:2px;background:var(--rose)}
 .tleft{min-width:52px;text-align:right;font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);font-variant-numeric:tabular-nums;color:var(--ink)}
 .hud-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.hud-row2{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px}
-.path{display:flex;gap:5px;align-items:center;justify-content:center;flex:1;min-width:0}
-.path i{width:6px;height:6px;border-radius:50%;background:var(--track);flex:none;transition:background var(--dur-base) var(--ease),transform var(--dur-base) var(--ease)}
-.path i.on{background:var(--ink-3)}
-.path i.cur{background:var(--btn);transform:scale(1.6)}
+.hud-row2{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-height:24px}
+.lvl{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.lprog{display:block;width:100%;height:3px;border-radius:2px;background:var(--track);overflow:hidden}
+.lprog b{display:block;height:100%;width:0;border-radius:2px;background:var(--lilac)}
+.lprog.x b{background:#D9503A}
 .sect{display:inline-flex;align-items:center;min-height:24px;padding:0 10px;border-radius:var(--r-pill);font-weight:800;font-size:var(--fs-12);white-space:nowrap;opacity:0;transform:translateY(-4px);transition:opacity var(--dur-base) var(--ease),transform var(--dur-base) var(--ease)}
 .sect.on{opacity:1;transform:none}
-.sect.h{background:#F4B63F;color:#4A3500}
 .sect.x{background:#D9503A;color:#fff}
-@media (max-width:380px){.path{display:none}}
+.gauge.hasLife{box-shadow:0 0 0 2.5px var(--life)}
+.life{display:none;align-items:center;gap:3px;height:24px;padding:0 9px 0 6px;border-radius:12px;background:var(--life);color:#fff;font:800 12px/1 var(--font-body);flex:none}
+.life svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
+.life.on{display:inline-flex}
+.life.pop{animation:lifepop .6s var(--ease)}
+@keyframes lifepop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
 .zone{font-weight:800;font-size:var(--fs-12);color:var(--ink-2);transition:color var(--dur-fast);white-space:nowrap}
 .zone.hot{color:var(--rose)}
 .fx{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1;min-width:0}
@@ -128,15 +132,46 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 @keyframes breathe{50%{transform:scale(1.04)}}
 .breathe{animation:breathe 2.4s ease-in-out infinite}
 
-.tools{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 18px;display:flex;justify-content:center;gap:16px;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-slow) var(--ease)}
-.tools.on{opacity:1;transform:none;pointer-events:auto}
-.tool{appearance:none;border:0;position:relative;width:58px;height:58px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-s);display:grid;place-items:center;cursor:pointer;transition:transform var(--dur-fast) var(--ease),opacity var(--dur-fast)}
-.tool:active{transform:scale(.92)}
+.tools{position:absolute;left:0;right:0;top:0;bottom:auto;padding:0 16px;display:flex;justify-content:center;align-items:flex-end;gap:16px;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-slow) var(--ease)}
+.tools.on{opacity:1;transform:none}
+.tool{appearance:none;border:0;position:relative;width:52px;height:52px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-s);display:grid;place-items:center;cursor:pointer;pointer-events:auto;touch-action:none;transition:transform var(--dur-fast) var(--ease),opacity var(--dur-fast),width var(--dur-fast) var(--ease),height var(--dur-fast) var(--ease)}
+.tools:not(.on) .tool{pointer-events:none}
+.tool:active{transform:scale(.94)}
 .tool.empty{opacity:.55}
-.tool svg{width:28px;height:28px;display:block}
+.tool.adv{width:70px;height:70px;background:#F4B63F;color:#3F2A00;box-shadow:0 0 0 5px rgba(244,182,63,.3),var(--shadow-s);animation:advpulse .9s ease-in-out infinite}
+.tool.adv .badge{background:#3F2A00;color:#F4B63F}
+@keyframes advpulse{50%{box-shadow:0 0 0 12px rgba(244,182,63,.08),var(--shadow-s);transform:scale(1.05)}}
+.tool.holding::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--btn);animation:holdring .45s linear forwards}
+@keyframes holdring{from{transform:scale(.75);opacity:.2}to{transform:scale(1);opacity:1}}
+.advlbl{position:absolute;top:-36px;transform:translateX(-50%);padding:6px 13px;border-radius:999px;background:#F4B63F;color:#3F2A00;font:800 13px/1 var(--font-body);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+.advlbl.on{opacity:1}
+.tool svg{width:26px;height:26px;display:block}
 .tool .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .tool .badge{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--btn);color:var(--on-btn);font:800 12px/22px var(--font-body);text-align:center;font-variant-numeric:tabular-nums}
 .tool.empty .badge{background:var(--track);color:var(--ink-2)}
+.mjk{display:flex;gap:10px}
+.mj{position:relative;width:40px;height:40px;border-radius:50%;background:var(--surface);color:var(--ink-2);box-shadow:var(--shadow-s);display:grid;place-items:center}
+.mj svg{width:22px;height:22px}
+.mj .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.mj em{position:absolute;top:-4px;right:-4px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--btn);color:var(--on-btn);font:800 11px/19px var(--font-body);font-style:normal;text-align:center}
+.mj.zero em{background:var(--track);color:var(--ink-2)}
+.btn.big small{display:block;font:800 var(--fs-12)/1 var(--font-body);opacity:.85}
+.btn.big.two{flex-direction:column;gap:4px;min-height:70px}
+.btn.warn{color:var(--rose)}
+.ver{font-weight:800;font-size:var(--fs-12);color:var(--ink-3);opacity:.85;margin-top:-4px}
+.icon-btn{position:relative}
+.icon-btn.dot::after{content:"";position:absolute;top:8px;right:8px;width:10px;height:10px;border-radius:50%;background:var(--rose);box-shadow:0 0 0 2px var(--surface)}
+.brow{display:grid;grid-template-columns:44px 1fr auto;gap:2px 12px;align-items:center;padding:10px 12px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);text-align:left}
+.brow .bt{grid-row:1/3;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--lilac-soft)}
+.brow .bt img{display:block}
+.brow b{font-family:var(--font-display);font-weight:600;font-size:var(--fs-16)}
+.brow small{grid-column:2;color:var(--ink-2);font-weight:700;font-size:var(--fs-12);line-height:1.3}
+.brow small i{display:block;font-style:normal;color:var(--rose)}
+.brow .st{grid-column:3;grid-row:1/3;font-weight:800;font-size:var(--fs-12);color:var(--life)}
+.brow.lk{opacity:.55}
+.brow.lk .st{color:var(--ink-3)}
+.brow.nw{outline:2px solid var(--btn);outline-offset:-2px}
+.brow.nw .st{color:var(--btn)}
 
 .scr.dim{background:var(--scrim);justify-content:center}
 .card{width:min(100%,380px);padding:26px 20px 20px;border-radius:var(--r-l);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
@@ -203,6 +238,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
   <div class="hud" id="hud" aria-hidden="true">
     <div class="gauge-row">
       <div class="gauge"><div class="fill" id="fill"></div><span class="notch" id="notch"></span></div>
+      <span class="life" id="life" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="lifeTag">Can</span></span>
       <span class="tleft" id="tleft">6,0</span>
     </div>
     <div class="hud-row">
@@ -211,13 +247,13 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
       <span class="chip sm" id="hudBest"></span>
     </div>
     <div class="hud-row2">
-      <span class="chip sm" id="lvlChip"></span>
-      <span class="path" id="path" aria-hidden="true"></span>
-      <span class="sect" id="sect"></span>
+      <div class="lvl"><span class="chip sm" id="lvlChip"></span><i class="lprog"><b id="lprog"></b></i></div>
+      <span class="sect x" id="sect"></span>
     </div>
   </div>
 
   <div class="tools" id="tools" role="group" aria-label="Aletler">
+    <div class="advlbl" id="advLbl"></div>
     <button class="tool" data-tool="steto" type="button" style="color:var(--btn)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M6 3v5a5 5 0 0 0 10 0V3M11 13v2.5a4 4 0 0 0 8 0V14"/><circle class="s" cx="19" cy="12" r="2"/></svg><b class="badge">0</b></button>
     <button class="tool" data-tool="kron" type="button" style="color:var(--peach-deep)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="s" cx="12" cy="13.5" r="7"/><path class="s" d="M12 13.5V10M10 3h4M12 3v3.5"/></svg><b class="badge">0</b></button>
     <button class="tool" data-tool="kalkan" type="button" style="color:var(--rose)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3z"/></svg><b class="badge">0</b></button>
@@ -230,6 +266,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
         <span class="chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><b id="coinN">0</b></span>
         <span class="tb-right">
           <button class="icon-btn" id="bagBtn" type="button" aria-label="Alet çantası"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg></button>
+          <button class="icon-btn" id="bookBtn" type="button" aria-label="Kilit defteri"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5zM5 17a3 3 0 0 1 3-3h10"/></svg></button>
           <button class="icon-btn" id="sndBtn" type="button" aria-label="Ses"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M4 9.5v5h3.6L12.5 19V5L7.6 9.5H4z"/><path class="s" id="sndWaves" d="M16 9a4.2 4.2 0 0 1 0 6M18.6 6.4a8 8 0 0 1 0 11.2"/></svg></button>
         </span>
       </div>
@@ -240,16 +277,18 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     <footer class="menu-foot" id="menuFoot">
       <div class="stat-row rise" style="--i:3">
         <span class="chip"><span data-i18n="best">En iyi</span><b id="menuBest">0</b></span>
-        <span class="chip"><span data-i18n="runs">Oyun</span><b id="menuRuns">0</b></span>
         <span class="chip" id="menuLvlChip" hidden><span data-i18n="bestLvl">Seviye</span><b id="menuBestL">0</b></span>
       </div>
+      <div class="mjk rise" style="--i:3" id="menuJk" role="group" aria-label="Aletler"></div>
       <div class="seg rise" style="--i:4" id="lvlSeg" role="radiogroup" aria-label="Zorluk">
         <button type="button" role="radio" data-lvl="rahat" aria-checked="false" data-i18n="lv_rahat">Rahat</button>
         <button type="button" role="radio" data-lvl="normal" aria-checked="true" data-i18n="lv_normal">Normal</button>
         <button type="button" role="radio" data-lvl="usta" aria-checked="false" data-i18n="lv_usta">Usta</button>
       </div>
-      <button class="btn primary big breathe rise" style="--i:5" id="playBtn" type="button" data-i18n="play">Oyna</button>
+      <button class="btn primary big breathe rise" style="--i:5" id="playBtn" type="button"><span id="playT">Oyna</span><small id="playSub" hidden></small></button>
+      <button class="btn quiet rise" style="--i:6" id="newBtn" type="button" hidden></button>
       <button class="btn quiet rise" style="--i:6" id="campBtn" type="button" hidden></button>
+      <div class="ver rise" style="--i:7" id="ver"></div>
     </footer>
   </section>
 
@@ -259,6 +298,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
       <div class="big-score rise" style="--i:1" id="ovScore">0</div>
       <p class="delta rise" style="--i:2" id="ovDelta"></p>
       <p class="near-msg rise" style="--i:3" id="ovNear" hidden></p>
+      <p class="near-msg rise" style="--i:3;background:var(--lilac-soft)" id="ovJoker" hidden></p>
       <div class="tip rise" style="--i:3" id="ovTip" hidden><span id="ovTipT"></span><button class="btn" id="ovTipBtn" type="button"></button></div>
       <div class="stat-row rise" style="--i:4" id="ovStats"></div>
       <div class="cont rise" style="--i:5" id="cont">
@@ -280,6 +320,15 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     <div class="card glass">
       <p class="eyebrow rise" style="--i:0" data-i18n="paused">Duraklatıldı</p>
       <button class="btn primary big rise" style="--i:1" id="resumeBtn" type="button" data-i18n="resume">Devam et</button>
+      <button class="btn quiet rise" style="--i:2" id="pauseMenuBtn" type="button" data-i18n="toMenu">Menü</button>
+    </div>
+  </section>
+
+  <section class="scr dim" id="book" aria-label="Kilit defteri" aria-hidden="true">
+    <div class="card glass shop">
+      <div class="shop-head"><h2 data-i18n="bookT">Kilit defteri</h2></div>
+      <div class="shop-list" id="bookList"></div>
+      <button class="btn quiet" id="bookClose" type="button" data-i18n="close">Kapat</button>
     </div>
   </section>
 
@@ -325,9 +374,9 @@ const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)'
 /*TUNE-START*/
 const CFG = {
   maxTime: 8, startTime: 6,
-  hitGain: 0.85, perfectBonus: 0.15, reliefGain: 0.25, nearGain: 1.5, nearAt: 1.0, missCost: 1.0, trapCost: 1.5,
+  hitGain: 1.1, perfectBonus: 0.15, reliefGain: 0.25, nearGain: 1.5, nearAt: 1.0, missCost: 0.7, trapCost: 1.2,
   perfectFrac: 0.32, grace: 0.05,
-  spawnMin: 1.0, spawnMax: 2.6,
+  spawnMin: 1.0, spawnMax: 2.2,
   contTime: 4, contCoins: 25, contSlow: 3, contSlowMul: 0.7,
   coinDiv: 4, nearCoin: 2, adSeconds: 3, tutHits: 5, adCoins: 20
 };
@@ -336,8 +385,8 @@ const CFG = {
 const DIFF = {
   period: 10, rise: 0.6,
   trendMax: 0.72, trendTau: 75,
-  ampMax: 0.35, ampStart: 0.3, ampTau: 20,
-  omegaMin: 2.2, omegaMax: 4.2, hwMax: 0.5, hwMin: 0.15,
+  ampMax: 0.2, ampStart: 0.3, ampTau: 20,
+  omegaMin: 2.2, omegaMax: 3.8, hwMax: 0.56, hwMin: 0.15,
   adaptUp: 0.01, adaptDown: 0.03, adaptCap: 0.12,
   mercyHit: 0.6, mercyDecay: 0.7, mercyDrop: 0.25,
   fatigueFrom: 100, fatigueRate: 0.004, fatigueCap: 0.6
@@ -356,9 +405,9 @@ const KIND = {
    kind = kilit eşiği çarpanı, startT = başlangıç süresi, coin = coin kazancı çarpanı. */
 const LEVELS = ['rahat', 'normal', 'usta'];
 const LEVEL = {
-  rahat:  { hw: 1.2,  om: 0.88, gain: 1.15, miss: 0.7, trap: 0.7,  kind: 1.4, startT: 7,   coin: 0.7 },
+  rahat:  { hw: 1.15, om: 0.9,  gain: 1.1,  miss: 0.75, trap: 0.75, kind: 1.4, startT: 7,   coin: 0.7 },
   normal: { hw: 1,    om: 1,    gain: 1,    miss: 1,   trap: 1,    kind: 1,   startT: 6,   coin: 1 },
-  usta:   { hw: 0.88, om: 1.1,  gain: 0.92, miss: 1.2, trap: 1.35, kind: 0.6, startT: 5.5, coin: 1.4 }
+  usta:   { hw: 0.9,  om: 1.1,  gain: 0.8,  miss: 1.4,  trap: 1.25, kind: 0.6, startT: 5.5, coin: 1.4 }
 };
 /* Seri (kombo): ardışık vuruşlar puan çarpanı kazandırır, ıska seriyi sıfırlar. tiers: çarpanın arttığı seri sayıları. */
 const COMBO = { tiers: [5, 10, 20, 35] };
@@ -413,65 +462,64 @@ const resolveMiss = (S, cost) => {
   S.adapt = Math.max(-DIFF.adaptCap, S.adapt - DIFF.adaptDown);
   S.mercy = Math.min(1, S.mercy + DIFF.mercyHit);
 };
-/* Yolculuk: 10 seviye; her seviye normal bölüm, cennet (10 + seviye sn), cehennem (aynı süre). Süreler docs/yolculuk-tasarimi.md ile aynı. */
+/* Yolculuk: 10 seviye; her seviye bir normal bölüm ve bir cehennem. Süreler docs/yolculuk-tasarimi.md ile aynı. */
 const JOURNEY = {
-  normal: [45, 52, 56, 58, 60, 60, 62, 62, 65, 70],
-  ib0: 0.05, ibs: 0.07, ibEnd: 0.03,
-  /* Cehennemin gücü seviyeyle artar: 1. seviyede hell0 kadar, her seviyede hellStep artar, 6. seviyede tam güç. */
-  hell0: 0.4, hellStep: 0.12,
+  normal: [20, 22, 22, 24, 24, 24, 26, 26, 28, 28],
+  hell:   [6, 6, 7, 7, 8, 8, 8, 9, 9, 10],
+  ib0: 0.02, ibs: 0.015, ibEnd: 0.1,
+  /* Cehennemin gücü seviyeyle artar: 1. seviyede hell0 kadar, her seviyede hellStep artar, 8. seviyede durur; 10. seviyeden sonra (sonsuz mod) yeniden artar. */
+  hell0: 0.1, hellStep: 0.04, hellEnd: 0.08,
   phase: {
-    normal: { hwM: 1,   omM: 1,    drain: 1,    pen: 1, dI: 0,     twin: 0.3,  pts: 1, coinHit: 0 },
-    heaven: { hwM: 1.3, omM: 0.85, drain: 0,    pen: 0, dI: -0.25, twin: 0,    pts: 2, coinHit: 0.5, bonusT: 3 },
-    hell:   { hwM: 0.8, omM: 1.2,  drain: 1.25, pen: 2, dI: 0.15,  twin: 0.75, pts: 1, coinHit: 1,   bonusT: 3 }
+    normal: { hwM: 1,   omM: 1,   drain: 1,    pen: 1,   dI: 0,   twin: 0.3, pts: 1, coinHit: 0 },
+    hell:   { hwM: 0.9, omM: 1.1, drain: 1.05, pen: 1.3, dI: 0.1, twin: 0.5, pts: 1, coinHit: 1, bonusT: 4 }
   }
 };
-const hellK = L => Math.min(1, JOURNEY.hell0 + JOURNEY.hellStep * (Math.min(L, 6) - 1));
+const hellK = L => Math.min(1, JOURNEY.hell0 + JOURNEY.hellStep * (Math.min(L, 8) - 1) + JOURNEY.hellEnd * Math.max(0, L - 10));
 const phaseMod = (ph, L) => {
   const b = JOURNEY.phase[ph] || JOURNEY.phase.normal;
   if (ph !== 'hell') return b;
   const n = JOURNEY.phase.normal, k = hellK(L), lp = (a, c) => a + (c - a) * k;
   return { hwM: lp(n.hwM, b.hwM), omM: lp(n.omM, b.omM), drain: lp(n.drain, b.drain), pen: lp(n.pen, b.pen), dI: lp(n.dI, b.dI), twin: lp(n.twin, b.twin), pts: b.pts, coinHit: b.coinHit, bonusT: b.bonusT };
 };
-const heavenLen = L => 10 + Math.min(L, 10);
+const hellLen = L => JOURNEY.hell[Math.min(L, 10) - 1];
 const jNormal = L => JOURNEY.normal[Math.min(L, 10) - 1];
-const jLen = L => jNormal(L) + 2 * heavenLen(L);
+const jLen = L => jNormal(L) + hellLen(L);
 const jStart = L => { let a = 0; for (let i = 1; i < L; i++) a += jLen(i); return a; };
 const jPhaseAt = t => {
   let L = 1, s = 0, len = jLen(1);
   while (t >= s + len) { s += len; L++; len = jLen(L); }
-  const u = t - s, nl = jNormal(L), hl = heavenLen(L);
-  if (u < nl) return { L, ph: 'normal', left: nl - u, start: s };
-  if (u < nl + hl) return { L, ph: 'heaven', left: nl + hl - u, start: s };
-  return { L, ph: 'hell', left: len - u, start: s };
+  const u = t - s, nl = jNormal(L);
+  if (u < nl) return { L, ph: 'normal', left: nl - u, start: s, len };
+  return { L, ph: 'hell', left: len - u, start: s, len };
 };
 /* Kilit olayları: [seviye, normal bölümün oranı, olay]. good + twin: iyi kilit ve engel ikizi birlikte açılır;
    star: bir kilit bir basamak güçlenir; combo: seri çarpanı açılır; mix: karışım. Yapılmamış kilitler oyunda atlanır. */
-const JEVENTS = [
-  [1, 0, { good: 'tek' }], [1, 0.4, { good: 'cift', twin: 'tuzak' }], [1, 0.75, { combo: 1 }],
-  [2, 0, { good: 'kayan', twin: 'kayanT' }], [2, 0.4, { star: 1 }], [2, 0.75, { mix: 1 }],
-  [3, 0, { good: 'nefes', twin: 'diken' }], [3, 0.4, { star: 1 }], [3, 0.75, { mix: 1 }],
-  [4, 0, { good: 'kasa', twin: 'alarm' }], [4, 0.4, { good: 'ritim', twin: 'sahte' }], [4, 0.75, { star: 1 }],
-  [5, 0, { good: 'iki', twin: 'kilitli' }], [5, 0.4, { star: 1 }], [5, 0.75, { mix: 1 }],
-  [6, 0, { good: 'altin', twin: 'lanetli' }], [6, 0.4, { star: 1 }], [6, 0.75, { mix: 1 }],
-  [7, 0, { good: 'hayalet', twin: 'hayaletT' }], [7, 0.4, { star: 1 }], [7, 0.75, { mix: 1 }],
-  [8, 0, { good: 'gelgit', twin: 'girdap' }], [8, 0.4, { good: 'sarkac', twin: 'balyoz' }], [8, 0.75, { star: 1 }],
-  [9, 0, { good: 'renk', twin: 'renkY' }], [9, 0.4, { good: 'sis', twin: 'zehirli' }], [9, 0.75, { star: 1 }],
-  [10, 0, { good: 'tutbirak', twin: 'sicak' }], [10, 0.4, { mix: 1 }], [10, 0.75, { star: 1 }]
-].map(([L, f, e]) => Object.assign({ t: jStart(L) + f * jNormal(L), L }, e));
+const JEV = [
+  [1, 0, { good: 'tek' }], [1, 0.3, { good: 'cift', twin: 'tuzak' }], [1, 0.65, { combo: 1 }],
+  [2, 0, { good: 'kayan', twin: 'kayanT' }], [2, 0.5, { mix: 1 }],
+  [3, 0, { good: 'nefes', twin: 'diken' }], [3, 0.5, { mix: 1 }],
+  [4, 0, { good: 'kasa', twin: 'alarm' }], [4, 0.5, { star: 1 }],
+  [5, 0, { good: 'iki', twin: 'kilitli' }], [5, 0.5, { mix: 1 }],
+  [6, 0, { good: 'altin', twin: 'lanetli' }], [6, 0.5, { star: 1 }],
+  [7, 0, { good: 'hayalet', twin: 'hayaletT' }], [7, 0.5, { star: 1 }],
+  [8, 0, { good: 'gelgit', twin: 'girdap' }], [8, 0.5, { star: 1 }],
+  [9, 0, { good: 'renk', twin: 'renkY' }], [9, 0.5, { star: 1 }],
+  [10, 0, { good: 'tutbirak', twin: 'sicak' }], [10, 0.5, { star: 1 }]
+];
+const JEVENTS = JEV.map(([L, f, e]) => Object.assign({ t: jStart(L) + f * jNormal(L), L }, e));
 /* Yolculuktaki iyi kilitler (yapılmış olanlar) ve engel ikizleri. w: seçilme ağırlığı, hwMul/omMul: hedef genişliği ve ibre hızı, gain: süre çarpanı. */
 const JKIND = {
   tek:   { w: 0.7, hwMul: 1.0,  omMul: 1.0,  gain: 1.0 },
   cift:  { w: 0.6, hwMul: 1.15, omMul: 1.0,  gain: 0.8 },
   kayan: { w: 0.5, hwMul: 1.2,  omMul: 0.92, gain: 1.0 },
-  nefes: { w: 0.5, hwMul: 0.9,  omMul: 1.0,  gain: 1.0 },
+  nefes: { w: 0.5, hwMul: 1.1,  omMul: 1.0,  gain: 1.0 },
   iki:   { w: 0.4, hwMul: 1.25, omMul: 0.82, gain: 0.65 }
 };
 const JTWIN = { tek: 'tuzak', cift: 'tuzak', kayan: 'kayanT', nefes: 'diken', iki: 'kilitli' };
 const pickJ = (open, relief, last, r, ph) => {
   if (relief || !open.length) return 'tek';
-  const newest = open[open.length - 1];
   const cand = open.filter(k => !(k === last && k !== 'tek'));
-  const ws = cand.map(k => JKIND[k].w * (ph === 'heaven' && k === newest ? 3 : 1));
+  const ws = cand.map(k => JKIND[k].w);
   let x = r * ws.reduce((a, b) => a + b, 0);
   for (let i = 0; i < cand.length; i++) { x -= ws[i]; if (x <= 0) return cand[i]; }
   return 'tek';
@@ -493,10 +541,10 @@ const planJourney = (L, ph, n, adapt, mercy) => {
 /* ---------- aletler: etki gücü seviyeyle artar ---------- */
 const TOOL_IDS = ['steto', 'kron', 'kalkan', 'kum'];
 const TOOL = {
-  steto:  { price: 30, up: [0, 90, 220], eff: l => 2 + l },
-  kron:   { price: 30, up: [0, 90, 220], eff: l => 2 + l },
-  kalkan: { price: 40, up: [0, 120, 260], eff: l => (l >= 3 ? 2 : 1) },
-  kum:    { price: 30, up: [0, 90, 220], eff: l => 3 + l }
+  steto:  { price: 30, up: [0, 90, 220], eff: l => 8 + 2 * l },
+  kron:   { price: 30, up: [0, 90, 220], eff: l => 3 + l },
+  kalkan: { price: 40, up: [0, 120, 260], eff: l => (l >= 3 ? 3 : 2) },
+  kum:    { price: 30, up: [0, 90, 220], eff: l => 4 + l }
 };
 const TOOL_ICON = {
   steto: '<path class="s" d="M6 3v5a5 5 0 0 0 10 0V3M11 13v2.5a4 4 0 0 0 8 0V14"/><circle class="s" cx="19" cy="12" r="2"/>',
@@ -524,25 +572,31 @@ const STR = {
     soundOn: 'Sesi kapat', soundOff: 'Sesi aç', overSr: 'Süre bitti. Skor {n}.',
     play_aria: 'Oyun alanı',
     k_cift: 'Çift pim', k_kayan: 'Kayan pim', k_iki: 'İki halka',
-    introNew: 'Yeni kilit: {k}',
-    hint_cift: 'İki hedefi de vur', hint_kayan: 'Hedef kayıyor, zamanlamayı ayarla',
-    hint_tuzak: 'Gül rengi bölgeye dokunma', hint_iki: 'Her ibreyi kendi hedefinde yakala', hint_combo: 'Arka arkaya vur, puan çarpanı artsın',
+    hint_combo: 'Arka arkaya vur, puan çarpanı artsın',
+    k_tek: 'Tek pim', rule_tek: 'Şeftali bölgedeyken dokun', rule_cift: 'İki hedefi de vur', rule_kayan: 'Hedef kayar, zamanla', rule_nefes: 'Nefes alır, açıkken vur', rule_iki: 'Her ibre kendi hedefinde',
+    warn_cift: 'Pembe tuzağa dokunma', warn_kayan: 'Pembe kayan tuzağa dokunma', warn_nefes: 'Dikenli kenara dokunma',
+    lbl_open: 'Açıkken vur', lbl_slide: 'Zamanla', lbl_avoid: 'Dokunma', lbl_thorn: 'Dikene dokunma',
+    lifeTag: 'Can', lifeGot: 'Can +1', lifeSaved: 'Can kurtardı: +3 sn',
+    smartMove: 'Akıllı hamle! +25', advNow: 'Şimdi kullan',
+    ts_steto: '{n} sn geniş', ts_kron: '+{n} sn', ts_kalkan: '{n} hata cezasız', ts_kum: '{n} sn yavaş',
+    resumeSub: 'Seviye {n} · {p} puan', newGame: 'Yeni oyun', newSure: 'Kayıt silinsin mi? Dokun', toMenu: 'Menü',
+    bookT: 'Kilit defteri', bkOpen: 'açık', bkNew: 'yeni', bkLockAt: 'Seviye {n}\'de açılır',
+    unusedJ: '{t} vardı, kullanmadan bitti. Bir dahaki sefere dene.',
     level: 'Zorluk', lv_rahat: 'Rahat', lv_normal: 'Normal', lv_usta: 'Usta', lvPicked: '{l} modu seçildi',
     tipEasy: 'Zor mu geldi?', tipEasyBtn: 'Rahat mod', tipHard: 'Çok kolay mı?', tipHardBtn: 'Usta mod',
-    lvlChip: 'Seviye {n}/10', lvlEnd: 'Seviye {n}', sectHeaven: 'Cennet · {s} sn', sectHell: 'Cehennem · {s} sn',
-    bnHeaven: 'Cennet bölümü', bnHeavenSub: 'Puan ×2 · ceza yok', bnHell: 'Cehennem bölümü', bnHellSub: 'Ceza ×{p} · süre hızlı erir', bnLevel: 'Seviye {n}',
-    rwHeaven: 'Cennet ödülü +{n} coin', rwHell: 'Cehennemden sağ çıktın +{n} coin', rwTool: 'Hediye: {t}',
+    lvlChip: 'Seviye {n}', sectHell: 'Cehennem · {s} sn',
+    bnHell: 'Cehennem bölümü', bnHellSub: 'Ceza ×{p} · süre hızlı erir', bnLevel: 'Seviye {n}',
+    rwHell: 'Seviye bitti +{n} coin', rwTool: 'Hediye: {t}',
     camp: 'Kamp · Seviye {n}', campRun: 'Kamp oyunu', overLevel: 'Seviye {n}',
     k_tuzak: 'Tuzak pim', k_kayanT: 'Kayan tuzak', k_nefes: 'Nefes pim', k_diken: 'Diken',
-    hint_nefes: 'Hedef nefes alır, açıkken vur', hint_diken: 'Dikenler açıkken dokunma', hint_kayanT: 'Kayan tuzak hedefin üstünden geçer',
-    evPair: 'Yeni kilit: {a} + {b}', evSolo: 'Yeni kilit: {a}', evStar: 'Güçlendi: {k}', evCombo: 'Seri çarpanı açıldı: art arda vur', evMix: 'Karışım: {a} + {b}', breathBonus: 'Tam açık +1',
+    evStar: 'Güçlendi: {k}', evCombo: 'Seri çarpanı açıldı: art arda vur', evMix: 'Karışım: {a} + {b}', breathBonus: 'Tam açık +1',
     narrow: 'Hedefler daraldı', done: 'Yolculuk tamamlandı!', doneSub: 'Sonsuz mod başladı',
     alarm: 'Alarm', shieldSave: 'Kalkan kurtardı',
     bag: 'Alet çantası', close: 'Kapat', stock: 'Stok', buy: '+1 al', upgrade: 'Yükselt', maxed: 'En üst seviye',
     tool_steto: 'Stetoskop', tool_kron: 'Kronometre', tool_kalkan: 'Kalkan', tool_kum: 'Kum saati',
-    d_steto: 'Sonraki {n} hedef daha geniş', d_kron: 'Süreye +{n} sn', d_kalkan: 'Sonraki {n} hatada ceza yok', d_kalkan1: 'Sonraki hatada ceza yok', d_kum: 'İbre {n} sn yavaşlar',
+    d_steto: '{n} sn boyunca hedefler %40 geniş', d_kron: 'Süreye +{n} sn', d_kalkan: 'Sonraki {n} hata cezasız, seri bozulmaz', d_kum: 'İbre {n} sn %35 yavaşlar',
     toolEmpty: 'Stokta yok. Alet çantasından alabilirsin.', shopAd: 'Reklam izle, +{n} coin', gotCoins: '+{n} coin',
-    fxSteto: 'Geniş {n}', fxShield: 'Kalkan {n}', fxSlow: 'Yavaş {n} sn', fxNarrow: 'Dar {n} sn'
+    fxSteto: 'Geniş {n} sn', fxShield: 'Kalkan {n}', fxSlow: 'Yavaş {n} sn', fxNarrow: 'Dar {n} sn'
   },
   en: {
     title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs', bestLvl: 'Level',
@@ -559,25 +613,31 @@ const STR = {
     soundOn: 'Mute sound', soundOff: 'Unmute sound', overSr: 'Time is up. Score {n}.',
     play_aria: 'Play area',
     k_cift: 'Double pin', k_kayan: 'Sliding pin', k_iki: 'Twin rings',
-    introNew: 'New lock: {k}',
-    hint_cift: 'Hit both targets', hint_kayan: 'The target slides, adjust your timing',
-    hint_tuzak: 'Stay off the rose zone', hint_iki: 'Catch each pointer in its own target', hint_combo: 'Hit again and again to raise your multiplier',
+    hint_combo: 'Hit again and again to raise your multiplier',
+    k_tek: 'Single pin', rule_tek: 'Tap while the pointer is in the peach zone', rule_cift: 'Hit both targets', rule_kayan: 'The target slides, time it', rule_nefes: 'It breathes, hit it while open', rule_iki: 'Each pointer in its own target',
+    warn_cift: 'Stay off the rose trap', warn_kayan: 'Stay off the sliding trap', warn_nefes: 'Stay off the thorny edge',
+    lbl_open: 'Hit while open', lbl_slide: 'Time it', lbl_avoid: 'Avoid', lbl_thorn: 'Avoid thorns',
+    lifeTag: 'Life', lifeGot: 'Life +1', lifeSaved: 'Life saved you: +3 s',
+    smartMove: 'Smart move! +25', advNow: 'Use now',
+    ts_steto: '{n} s wider', ts_kron: '+{n} s', ts_kalkan: '{n} free mistakes', ts_kum: '{n} s slower',
+    resumeSub: 'Level {n} · {p} pts', newGame: 'New game', newSure: 'Delete the save? Tap again', toMenu: 'Menu',
+    bookT: 'Lock book', bkOpen: 'open', bkNew: 'new', bkLockAt: 'Unlocks at level {n}',
+    unusedJ: 'You had {t} left. Try it next time.',
     level: 'Difficulty', lv_rahat: 'Easy', lv_normal: 'Normal', lv_usta: 'Master', lvPicked: '{l} mode selected',
     tipEasy: 'Too hard?', tipEasyBtn: 'Easy mode', tipHard: 'Too easy?', tipHardBtn: 'Master mode',
-    lvlChip: 'Level {n}/10', lvlEnd: 'Level {n}', sectHeaven: 'Heaven · {s} s', sectHell: 'Hell · {s} s',
-    bnHeaven: 'Heaven round', bnHeavenSub: 'Points ×2 · no penalties', bnHell: 'Hell round', bnHellSub: 'Penalties ×{p} · time melts faster', bnLevel: 'Level {n}',
-    rwHeaven: 'Heaven reward +{n} coins', rwHell: 'You survived hell +{n} coins', rwTool: 'Gift: {t}',
+    lvlChip: 'Level {n}', sectHell: 'Hell · {s} s',
+    bnHell: 'Hell round', bnHellSub: 'Penalties ×{p} · time melts faster', bnLevel: 'Level {n}',
+    rwHell: 'Level done +{n} coins', rwTool: 'Gift: {t}',
     camp: 'Camp · Level {n}', campRun: 'Camp run', overLevel: 'Level {n}',
     k_tuzak: 'Trap pin', k_kayanT: 'Sliding trap', k_nefes: 'Breathing pin', k_diken: 'Thorns',
-    hint_nefes: 'The target breathes, hit it while open', hint_diken: "Don't touch while thorns are out", hint_kayanT: 'The sliding trap crosses the target',
-    evPair: 'New lock: {a} + {b}', evSolo: 'New lock: {a}', evStar: 'Stronger: {k}', evCombo: 'Combo multiplier unlocked: hit again and again', evMix: 'Mix: {a} + {b}', breathBonus: 'Wide open +1',
+    evStar: 'Stronger: {k}', evCombo: 'Combo multiplier unlocked: hit again and again', evMix: 'Mix: {a} + {b}', breathBonus: 'Wide open +1',
     narrow: 'Targets narrowed', done: 'Journey complete!', doneSub: 'Endless mode begins',
     alarm: 'Alarm', shieldSave: 'Shield saved you',
     bag: 'Toolbag', close: 'Close', stock: 'Stock', buy: 'Buy +1', upgrade: 'Upgrade', maxed: 'Max level',
     tool_steto: 'Stethoscope', tool_kron: 'Stopwatch', tool_kalkan: 'Shield', tool_kum: 'Hourglass',
-    d_steto: 'Next {n} targets are wider', d_kron: '+{n} s on the clock', d_kalkan: 'No penalty for the next {n} mistakes', d_kalkan1: 'No penalty for the next mistake', d_kum: 'Pointer slows for {n} s',
+    d_steto: 'Targets 40% wider for {n} s', d_kron: '+{n} s on the clock', d_kalkan: 'Next {n} mistakes are free, streak stays', d_kum: 'Pointer 35% slower for {n} s',
     toolEmpty: 'Out of stock. Get more in the toolbag.', shopAd: 'Watch ad, +{n} coins', gotCoins: '+{n} coins',
-    fxSteto: 'Wide {n}', fxShield: 'Shield {n}', fxSlow: 'Slow {n} s', fxNarrow: 'Narrow {n} s'
+    fxSteto: 'Wide {n} s', fxShield: 'Shield {n}', fxSlow: 'Slow {n} s', fxNarrow: 'Narrow {n} s'
   }
 };
 const t = (k, v) => {
@@ -635,11 +695,12 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
+const VERSION = 'V0.4.1';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
   bests: { rahat: 0, normal: 0, usta: 0 },
-  tools: { steto: { n: 1, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 1, l: 1 }, kum: { n: 1, l: 1 } },
-  unl: {}, seen: {}, tips: {}, low: 0, high: 0, camp: 1, bestL: 0
+  tools: { steto: { n: 2, l: 1 }, kron: { n: 2, l: 1 }, kalkan: { n: 2, l: 1 }, kum: { n: 2, l: 1 } },
+  unl: {}, seen: {}, tips: {}, low: 0, high: 0, camp: 1, bestL: 0, run: null, book: {}, v: 2
 };
 try {
   const raw = localStorage.getItem('kilpayi.v1');
@@ -647,8 +708,13 @@ try {
     const o = JSON.parse(raw);
     Object.keys(save).forEach(k => { if (o && o[k] !== undefined) save[k] = o[k]; });
     if (o && !o.bests && typeof o.best === 'number') save.bests = { rahat: 0, normal: o.best | 0, usta: 0 };
+    /* V0.4.1'e geçiş: eski kayıtta her jokerden en az 2 olsun, her seferinde bir kez */
+    if (!(o && o.v >= 2)) for (const id in save.tools) save.tools[id].n = Math.max(save.tools[id].n | 0, 2);
   }
+  save.v = 2;
 } catch (e) {}
+if (!save.book || typeof save.book !== 'object') save.book = {};
+if (!save.run || typeof save.run !== 'object' || save.run.v !== 1) save.run = null;
 if (!save.bests || typeof save.bests !== 'object') save.bests = {};
 LEVELS.forEach(l => { save.bests[l] = Math.max(0, save.bests[l] | 0); });
 if (LEVELS.indexOf(save.lvl) < 0) save.lvl = 'normal';
@@ -658,29 +724,23 @@ save.camp = Math.max(1, save.camp | 0); save.bestL = save.bestL | 0;
 const LV = () => LEVEL[save.lvl];
 const bestNow = () => save.bests[save.lvl];
 TOOL_IDS.forEach(id => {
-  const s = save.tools[id] || (save.tools[id] = { n: 1, l: 1 });
+  const s = save.tools[id] || (save.tools[id] = { n: 2, l: 1 });
   s.n = Math.max(0, s.n | 0); s.l = clamp(s.l | 0 || 1, 1, 3);
 });
 const persist = () => { try { localStorage.setItem('kilpayi.v1', JSON.stringify(save)); } catch (e) {} };
 
 /* ---------- palet: renkler CSS değişkenlerinden okunur, açık/koyu tema kendiliğinden izlenir ---------- */
 const P = {};
-const P_KEYS = { bg: 1, surface: 1, track: 1, tick: 1, ink: 1, 'ink-2': 1, lilac: 1, 'lilac-soft': 1, btn: 1, 'on-btn': 1, peach: 1, 'peach-deep': 1, 'peach-soft': 1, rose: 1, 'rose-soft': 1 };
+const P_KEYS = { bg: 1, surface: 1, track: 1, tick: 1, ink: 1, 'ink-2': 1, lilac: 1, 'lilac-soft': 1, btn: 1, 'on-btn': 1, peach: 1, 'peach-deep': 1, 'peach-soft': 1, rose: 1, 'rose-soft': 1, life: 1 };
 let FD = 'sans-serif', FB = 'sans-serif';
 let onPalette = () => {};
 
-/* Cennet ve cehennem temaları: normal temaya (sistem açık/koyu) yumuşak karışır, koyu moda geçer gibi. */
-const TH_KEYS = ['bg', 'bg-2', 'surface', 'track', 'tick', 'line', 'ink', 'ink-2', 'ink-3', 'lilac', 'lilac-soft', 'btn', 'on-btn', 'peach', 'peach-deep', 'peach-soft', 'rose', 'rose-soft', 'blob-1', 'blob-2', 'glass', 'glass-edge', 'scrim'];
-const THEME_H = {
-  bg: '#FFF8E0', 'bg-2': '#FFEFC2', surface: '#FFFFFF', track: '#F6E7B8', tick: '#CFA84A', line: '#EBD79A',
-  ink: '#4A3500', 'ink-2': '#8C6A16', 'ink-3': '#B08C3C', lilac: '#F4B63F', 'lilac-soft': '#FBE3A6', btn: '#D9971A', 'on-btn': '#FFFFFF',
-  peach: '#F4B63F', 'peach-deep': '#C98A12', 'peach-soft': '#FBE3A6', rose: '#FF8A5C', 'rose-soft': '#FFD9C2',
-  'blob-1': '#FFE9B2', 'blob-2': '#FFF1CC', glass: 'rgba(255,250,232,.72)', 'glass-edge': 'rgba(255,255,255,.9)', scrim: 'rgba(120,80,0,.16)'
-};
+/* Cehennem teması: normal temaya (sistem açık/koyu) yumuşak karışır, koyu moda geçer gibi. */
+const TH_KEYS = ['bg', 'bg-2', 'surface', 'track', 'tick', 'line', 'ink', 'ink-2', 'ink-3', 'lilac', 'lilac-soft', 'btn', 'on-btn', 'peach', 'peach-deep', 'peach-soft', 'rose', 'rose-soft', 'life', 'blob-1', 'blob-2', 'glass', 'glass-edge', 'scrim'];
 const THEME_X = {
   bg: '#18080C', 'bg-2': '#0F0507', surface: '#3A161E', track: '#3A161E', tick: '#8A4A44', line: '#5A2A2A',
   ink: '#FFE9E2', 'ink-2': '#D6A096', 'ink-3': '#A8706A', lilac: '#FF5C38', 'lilac-soft': '#5A2118', btn: '#FF6A3D', 'on-btn': '#FFFFFF',
-  peach: '#FF7A45', 'peach-deep': '#FFC478', 'peach-soft': '#7A2D23', rose: '#FF4D8A', 'rose-soft': '#6A1F3A',
+  peach: '#FF7A45', 'peach-deep': '#FFC478', 'peach-soft': '#7A2D23', rose: '#FF4D8A', 'rose-soft': '#6A1F3A', life: '#45E0A8',
   'blob-1': '#34101A', 'blob-2': '#481216', glass: 'rgba(52,14,20,.72)', 'glass-edge': 'rgba(255,160,130,.22)', scrim: 'rgba(8,2,4,.55)'
 };
 const parseCol = str => {
@@ -698,23 +758,23 @@ const toCss = a => {
   if (a[3] >= 0.999) return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
   return 'rgba(' + r + ',' + g + ',' + b + ',' + a[3].toFixed(3) + ')';
 };
-const TH_H = {}, TH_X = {}, BASE = {};
-TH_KEYS.forEach(k => { TH_H[k] = parseCol(THEME_H[k]); TH_X[k] = parseCol(THEME_X[k]); });
-let thWh = 0, thWx = 0, thLast = [-1, -1];
+const TH_X = {}, BASE = {};
+TH_KEYS.forEach(k => { TH_X[k] = parseCol(THEME_X[k]); });
+let thWx = 0, thLast = -1;
 const applyTheme = force => {
-  if (!force && Math.abs(thWh - thLast[0]) < 0.002 && Math.abs(thWx - thLast[1]) < 0.002) return;
-  thLast = [thWh, thWx];
-  const root = document.documentElement, wb = Math.max(0, 1 - thWh - thWx), off = thWh < 0.002 && thWx < 0.002;
+  if (!force && Math.abs(thWx - thLast) < 0.002) return;
+  thLast = thWx;
+  const root = document.documentElement, off = thWx < 0.002;
   TH_KEYS.forEach(k => {
-    const b = BASE[k], h = TH_H[k], x = TH_X[k], o = [0, 0, 0, 0];
-    for (let i = 0; i < 4; i++) o[i] = b[i] * wb + h[i] * thWh + x[i] * thWx;
+    const b = BASE[k], x = TH_X[k], o = [0, 0, 0, 0];
+    for (let i = 0; i < 4; i++) o[i] = b[i] * (1 - thWx) + x[i] * thWx;
     const css = toCss(o);
     if (off) root.style.removeProperty('--' + k); else root.style.setProperty('--' + k, css);
     if (P_KEYS[k]) P[k] = css;
   });
 };
 const readPalette = () => {
-  const root = document.documentElement, cs = getComputedStyle(root), had = thWh > 0.002 || thWx > 0.002;
+  const root = document.documentElement, cs = getComputedStyle(root), had = thWx > 0.002;
   if (had) TH_KEYS.forEach(k => root.style.removeProperty('--' + k));
   TH_KEYS.forEach(k => { BASE[k] = parseCol(cs.getPropertyValue('--' + k)); });
   FD = cs.getPropertyValue('--font-display').trim() || 'sans-serif';
@@ -767,7 +827,8 @@ const Snd = {
   rev() { this.tone(520, 0.12, 'triangle', 0.1, 780); },
   fanfare() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.22, 'triangle', 0.14, null, i * 0.08)); },
   tool() { this.tone(500, 0.1, 'triangle', 0.14, 900); this.tone(900, 0.14, 'sine', 0.1, null, 0.08); },
-  heaven() { [659, 784, 988, 1319].forEach((f, i) => this.tone(f, 0.3, 'triangle', 0.13, null, i * 0.09)); },
+  life() { [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.18, 'triangle', 0.13, null, i * 0.06)); },
+  adv() { this.tone(880, 0.09, 'sine', 0.1); this.tone(1320, 0.12, 'sine', 0.08, null, 0.08); },
   hell() { this.tone(110, 0.7, 'sawtooth', 0.12, 55); this.tone(82, 0.9, 'square', 0.07, 41, 0.05); },
   level() { [523, 659, 784].forEach((f, i) => this.tone(f, 0.16, 'triangle', 0.12, null, i * 0.07)); },
   tick(go) { this.tone(go ? 988 : 660, go ? 0.2 : 0.09, 'triangle', 0.13); },
@@ -856,10 +917,9 @@ const Platform = {
 /* ---------- arayüz yardımcıları ---------- */
 const app = $('app'), cv = $('cv'), ctx = cv.getContext('2d');
 const hudEl = $('hud'), fillEl = $('fill'), tleftEl = $('tleft'), zoneEl = $('zone'), hudBestEl = $('hudBest'), fxEl = $('fx'), toolsEl = $('tools');
-const menuEl = $('menu'), overEl = $('over'), pauseEl = $('pause'), adEl = $('ad'), shopEl = $('shop'), toastEl = $('toast');
+const menuEl = $('menu'), overEl = $('over'), pauseEl = $('pause'), adEl = $('ad'), shopEl = $('shop'), bookEl = $('book'), toastEl = $('toast');
 const gaugeEl = fillEl.parentNode;
-const lvlChipEl = $('lvlChip'), pathEl = $('path'), sectEl = $('sect'), campEl = $('campBtn');
-pathEl.innerHTML = '<i></i>'.repeat(10);
+const lvlChipEl = $('lvlChip'), lprogEl = $('lprog'), sectEl = $('sect'), lifeEl = $('life'), campEl = $('campBtn');
 const show = el => { el.classList.add('on'); el.removeAttribute('aria-hidden'); };
 const hide = el => { el.classList.remove('on'); el.setAttribute('aria-hidden', 'true'); };
 let toastTimer = 0;
@@ -886,6 +946,8 @@ const applyI18n = () => {
   $('lvlSeg').setAttribute('aria-label', t('level'));
   toolsEl.setAttribute('aria-label', t('bag'));
   toolsEl.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-label', t('tool_' + b.getAttribute('data-tool'))));
+  $('bookBtn').setAttribute('aria-label', t('bookT'));
+  $('ver').textContent = VERSION;
 };
 const refreshSound = () => {
   const b = $('sndBtn');
@@ -902,16 +964,51 @@ const updateTools = () => {
     b.classList.toggle('empty', s.n <= 0);
   });
 };
+/* Kilit defteri: oyunda görülen kilitler, açıklamalarıyla acelesiz okunur. */
+const BOOK = [{ k: 'tek', lv: 1 }, { k: 'cift', lv: 1 }, { k: 'kayan', lv: 2 }, { k: 'nefes', lv: 3 }, { k: 'iki', lv: 5 }];
+const bookNew = () => BOOK.some(e => (save.seen[e.k] | 0) > 0 && !save.book[e.k]);
+const bookIcon = (c, kind) => {
+  /* defter simgeleri canvas ile çizilir, küçük bir tuvale basılıp resme çevrilir */
+  const cvs = document.createElement('canvas'); cvs.width = cvs.height = 96;
+  const g = cvs.getContext('2d');
+  drawLockIcon(g, kind, 48, 48, 44);
+  return cvs.toDataURL();
+};
+const renderBook = () => {
+  $('bookList').innerHTML = BOOK.map(e => {
+    const seen = (save.seen[e.k] | 0) > 0 || e.k === 'tek' && save.runs > 0, fresh = seen && !save.book[e.k];
+    const nm = seen ? t('k_' + e.k) : '???', rule = seen ? t('rule_' + e.k) : t('bkLockAt', { n: e.lv });
+    const warn = seen && STR[LANG]['warn_' + e.k] ? '<i>' + t('warn_' + e.k) + '</i>' : '';
+    return '<div class="brow' + (seen ? '' : ' lk') + (fresh ? ' nw' : '') + '"><span class="bt">' + (seen ? '<img alt="" width="36" height="36" src="' + bookIcon(null, e.k) + '">' : '') + '</span>' +
+      '<b>' + nm + '</b><small>' + rule + warn + '</small><span class="st">' + (seen ? (fresh ? t('bkNew') : t('bkOpen')) : '') + '</span></div>';
+  }).join('');
+};
+const openBook = () => {
+  renderBook(); hide(menuEl); show(bookEl); Snd.ui();
+  BOOK.forEach(e => { if ((save.seen[e.k] | 0) > 0) save.book[e.k] = 1; }); persist();
+};
+const closeBook = () => { hide(bookEl); show(menuEl); refreshStats(); Snd.ui(); requestAnimationFrame(() => relayout(false)); };
+/* Menü: kayıtlı oyun varsa "Devam et" en büyük düğme olur. */
+const refreshMenu = () => {
+  const has = !!save.run;
+  $('playT').textContent = t(has ? 'resume' : 'play');
+  const sub = $('playSub');
+  if (has) { sub.textContent = t('resumeSub', { n: save.run.L, p: Number(save.run.score || 0).toLocaleString(LANG === 'tr' ? 'tr-TR' : 'en-US') }); sub.hidden = false; } else sub.hidden = true;
+  $('playBtn').classList.toggle('two', has);
+  const nb = $('newBtn'); nb.hidden = !has; if (!nb.classList.contains('warn')) nb.textContent = t('newGame');
+  campEl.hidden = has || save.camp <= 1;
+  campEl.textContent = t('camp', { n: Math.min(save.camp, 11) });
+  $('menuJk').innerHTML = TOOL_IDS.map(id => '<span class="mj' + (save.tools[id].n <= 0 ? ' zero' : '') + '" data-tool="' + id + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + TOOL_ICON[id] + '</svg><em>' + save.tools[id].n + '</em></span>').join('');
+  $('bookBtn').classList.toggle('dot', bookNew());
+};
 const refreshStats = () => {
   $('coinN').textContent = String(save.coins);
   $('shopCoins').textContent = String(save.coins);
   $('menuBest').textContent = String(bestNow());
-  $('menuRuns').textContent = String(save.runs);
   $('menuLvlChip').hidden = save.bestL < 1;
   $('menuBestL').textContent = String(Math.min(save.bestL, 10));
   hudBestEl.innerHTML = t('best') + ' <b>' + bestNow() + '</b>';
-  campEl.hidden = save.camp <= 1;
-  campEl.textContent = t('camp', { n: Math.min(save.camp, 11) });
+  refreshMenu();
   updateTools();
 };
 
@@ -920,30 +1017,34 @@ const MENU_PINS = [{ kind: 'gate', ring: 0, c0: 1.0, amp: 0, f: 0, ph: 0, hw: 0.
 const G = {
   mode: 'menu', clock: 0, pt: 0,
   time: 0, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0,
-  ang: 0.4, dir: 1, omega: DIFF.omegaMin, ang2: 0, dir2: -1, omega2: 2, slow: 0,
+  ang: 0.4, dir: 1, omega: DIFF.omegaMin, ang2: 0, dir2: -1, omega2: 2, slow: 0, slowMul: 0.7,
   kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, gateT: 1,
   ta: 1.0, hw: 0.45,
   adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false,
-  boost: 0, glove: 0, waveSeen: 0, pendingRev: false, hint: null,
+  boostT: 0, glove: 0, waveSeen: 0, pendingRev: false, hint: null,
   shake: 0, flash: 0, flashKind: 'rose', tscale: 1, tsT: 0,
   parts: [], pops: [], rips: [], revT: 0, beep: 0, scorePulse: 0,
   continued: false, runCounted: false, coinsGiven: 0, gain: 0, deadT: 0, overAt: 0,
   nearMsg: '', newBest: false, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
-  jt: 0, L: 1, ph: 'normal', phLeft: 45, open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
-  campRun: false, startL: 1, banner: null, count: 0, thT: { h: 0, x: 0 }, thDirty: false, ec: 0, sp: [], em: []
+  jt: 0, L: 1, ph: 'normal', phLeft: 20, lvStart: 0, open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
+  campRun: false, startL: 1, banner: null, count: 0, thT: 0, thDirty: false, ec: 0, em: [],
+  life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
+  pendingNew: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0
 };
-const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100 };
+const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100, hudB: 0, dockTop: 0 };
 
 const pinCenter = p => p.amp ? norm(p.c0 + p.amp * Math.sin(TAU * p.f * G.pt + p.ph)) : p.c0;
 /* O anki yarı genişlik: nefes alan hedef ve dikenler nefes alır, diken yedikten sonra hedefler kısa süre daralır. */
-const pinHw = (p, vis) => {
+const pinHw = p => {
   let h = p.hw;
   if (p.br) {
     const f = 0.5 - 0.5 * Math.cos(TAU * G.pt / p.br.P + p.br.ph);
-    h *= 1 - p.br.a * (p.br.inv ? 1 - f : f);
+    h *= 1 - p.br.a * f;
   }
-  if (p.sp && !vis && h < p.hw * 0.25) return 0;
-  if (p.kind === 'gate' && G.narrow > 0) h *= 0.8;
+  if (p.kind === 'gate') {
+    if (G.narrow > 0) h *= 0.8;
+    if (G.boostT > 0) h = Math.min(0.8, h * 1.4);
+  }
   return h;
 };
 const syncPrimary = () => {
@@ -951,53 +1052,39 @@ const syncPrimary = () => {
 };
 const ahead = (ang, dir, d) => norm(ang + dir * d);
 
-const introduce = (kind, isNew) => {
-  if (G.hint) return;
-  const seen = save.seen[kind] || 0;
-  if (!isNew && seen >= 2) return;
-  save.seen[kind] = seen + 1; persist();
-  const lines = [];
-  if (isNew) lines.push({ txt: t('introNew', { k: t('k_' + kind) }), bg: 'lilac-soft' });
-  lines.push({ txt: t('hint_' + kind), bg: 'surface' });
-  G.hint = { lines, t: 0, max: isNew ? 4.4 : 3 };
-};
-
-/* ---------- yolculuk: kilit olayları, cennet ve cehennem, seviye atlama ---------- */
+/* ---------- yolculuk: kilit olayları, cehennem, seviye atlama ---------- */
 const IMPL_GOOD = { tek: 1, cift: 1, kayan: 1, nefes: 1, iki: 1 };
-/* Karışım olayları: seviye -> [ana kilit, katılan]. Yapılmamış kilitler için olay atlanır. */
-const MIXES = { 2: ['cift', 'kayan'], 3: ['nefes', 'tuzak'], 5: ['iki', 'tuzak'] };
 const IMPL_TWIN = { tuzak: 1, kayanT: 1, diken: 1 };
 const STAR_KINDS = { cift: 1, kayan: 1, nefes: 1 };
+/* Karışım olayları: seviye -> [ana kilit, katılan]. Yapılmamış kilitler için olay atlanır. */
+const MIXES = { 2: ['cift', 'kayan'], 3: ['nefes', 'tuzak'], 5: ['iki', 'tuzak'] };
 const banner = (title, sub, kind) => { G.banner = { title, sub: sub || '', kind: kind || '', t: 0 }; };
+/* Üst kart: yeni kilitte büyük (simge, ad, kural, uyarı), küçük haberlerde tek satır. */
+const bigCard = (kind, tw) => ({ type: 'big', icon: kind, title: t('k_' + kind), rule: t('rule_' + kind), warn: tw ? t('warn_' + kind) : '', t: 0, max: 6 });
+const lineCard = (txt, icon) => ({ type: 'line', icon: icon || '', title: txt, t: 0, max: 4 });
+const noteSeen = kind => { const v = save.seen[kind] = Math.min(99, (save.seen[kind] || 0) + 1); if (v <= 4) persist(); return v; };
 const fireEvent = (e, silent) => {
-  const lines = [];
+  let card = null;
   if (e.good) {
     const tw = e.twin && IMPL_TWIN[e.twin] ? e.twin : '';
-    let ok = false;
-    if (IMPL_GOOD[e.good] && G.open.indexOf(e.good) < 0) { G.open.push(e.good); ok = true; }
-    if (tw && !G.eng[tw]) { G.eng[tw] = true; ok = true; }
-    if (ok && !silent && e.good !== 'tek') {
-      lines.push({ txt: tw ? t('evPair', { a: t('k_' + e.good), b: t('k_' + tw) }) : t('evSolo', { a: t('k_' + e.good) }), bg: 'lilac-soft' });
-      if (STR[LANG]['hint_' + e.good] !== undefined) lines.push({ txt: t('hint_' + e.good), bg: 'surface' });
-    }
+    let isNew = false;
+    if (IMPL_GOOD[e.good] && G.open.indexOf(e.good) < 0) { G.open.push(e.good); isNew = true; }
+    if (tw && !G.eng[tw]) { G.eng[tw] = true; isNew = true; }
+    if (isNew && e.good !== 'tek') { card = bigCard(e.good, tw); if (!silent) { G.pendingNew = e.good; G.pendingT = 0; } }
   } else if (e.combo) {
-    G.comboOn = true;
-    if (!silent) lines.push({ txt: t('evCombo'), bg: 'lilac-soft' });
+    G.comboOn = true; card = lineCard(t('evCombo'), 'combo');
   } else if (e.star) {
     const cand = G.open.filter(k => STAR_KINDS[k] && (G.stars[k] | 0) < 2);
     if (cand.length) {
       cand.sort((a, b) => (G.stars[a] | 0) - (G.stars[b] | 0));
       const k = cand[0]; G.stars[k] = (G.stars[k] | 0) + 1;
-      if (!silent) lines.push({ txt: t('evStar', { k: t('k_' + k) }), bg: 'lilac-soft' });
+      card = lineCard(t('evStar', { k: t('k_' + k) }), 'star');
     }
   } else if (e.mix) {
     const m = MIXES[e.L];
-    if (m && G.open.indexOf(m[0]) >= 0) {
-      G.mixes.push(m);
-      if (!silent) lines.push({ txt: t('evMix', { a: t('k_' + m[0]), b: t('k_' + m[1]) }), bg: 'lilac-soft' });
-    }
+    if (m && G.open.indexOf(m[0]) >= 0) { G.mixes.push(m); card = lineCard(t('evMix', { a: t('k_' + m[0]), b: t('k_' + m[1]) }), 'mix'); }
   }
-  if (lines.length) { G.hint = { lines, t: 0, max: 4.4 }; Snd.fanfare(); Platform.haptic('medium'); }
+  if (card && !silent) { G.card = card; Snd.fanfare(); Platform.haptic('medium'); }
 };
 const applyEvents = silent => { while (G.evi < JEVENTS.length && JEVENTS[G.evi].t <= G.jt) fireEvent(JEVENTS[G.evi++], silent); };
 const giftTool = () => {
@@ -1005,17 +1092,11 @@ const giftTool = () => {
   save.tools[id].n++; updateTools();
   pop(t('rwTool', { t: t('tool_' + id) }), 'hype');
 };
-const rewardHeaven = L => {
-  const c = 5 + 2 * L;
-  save.coins += c; G.time = Math.min(CFG.maxTime, G.time + JOURNEY.phase.heaven.bonusT);
-  pop(t('rwHeaven', { n: c }), 'hype');
-  if (L % 3 === 0) giftTool();
-  persist(); refreshStats();
-};
 const rewardHell = L => {
   const c = 2 * (5 + 2 * Math.min(L, 10));
   save.coins += c; G.time = Math.min(CFG.maxTime, G.time + JOURNEY.phase.hell.bonusT);
   pop(t('rwHell', { n: c }), 'hype');
+  if (L % 2 === 0) giftTool();
   persist(); refreshStats();
 };
 const levelUp = () => {
@@ -1027,22 +1108,19 @@ const levelUp = () => {
 };
 const phaseChange = pi => {
   const prev = G.ph, prevL = G.L;
-  G.L = pi.L; G.ph = pi.ph;
-  G.ptsMul = phaseMod(pi.ph, pi.L).pts;
-  if (pi.ph === 'heaven') {
-    G.thT = { h: 1, x: 0 }; banner(t('bnHeaven'), t('bnHeavenSub'), 'h'); Snd.heaven(); Platform.haptic('medium');
-  } else if (pi.ph === 'hell') {
-    rewardHeaven(prevL);
-    G.thT = { h: 0, x: 1 }; banner(t('bnHell'), t('bnHellSub', { p: fx(phaseMod('hell', pi.L).pen) }), 'x'); Snd.hell(); Platform.haptic('heavy');
+  G.L = pi.L; G.ph = pi.ph; G.lvStart = pi.start; G.ptsMul = phaseMod(pi.ph, pi.L).pts;
+  if (pi.ph === 'hell') {
+    G.thT = 1; G.hellAge = 0;
+    banner(t('bnHell'), t('bnHellSub', { p: fx(phaseMod('hell', pi.L).pen) }), 'x'); Snd.hell(); Platform.haptic('heavy');
   } else {
     if (prev === 'hell') { rewardHell(prevL); levelUp(); }
-    G.thT = { h: 0, x: 0 };
+    G.thT = 0;
   }
   G.thDirty = true;
   spawnChallenge(false);
 };
 
-/* Engel ikizi: iyi kilidin yanına ya da üstüne konan tuzak. */
+/* Engel ikizi: iyi kilidin yanına ya da üstüne konan tuzak; diken ise nefes alan hedefin kapanan kenarına dizilir. */
 const addTwin = (tw, pins, hw) => {
   const g0 = pins.find(p => p.kind === 'gate'), th = hw * 1.1;
   if (!g0) return;
@@ -1057,56 +1135,85 @@ const addTwin = (tw, pins, hw) => {
     if (c < 0) return;
     pins.push({ kind: 'trap', tw, ring: 0, c0: c, amp: 0, f: 0, ph: 0, hw: th, done: false });
   } else if (tw === 'kayanT') {
-    pins.push({ kind: 'trap', tw, ring: 0, c0: g0.c0, amp: 0.95, f: 0.33, ph: rnd(0, TAU), hw: 0.28, prio: true, pen: 1.0, done: false });
+    /* kayan tuzak hedefin %45'inden dar: hedefin açıkta kalan parçası her zaman var */
+    pins.push({ kind: 'trap', tw, ring: 0, c0: g0.c0, amp: 0.95, f: 0.33, ph: rnd(0, TAU), hw: Math.min(0.28, 0.45 * g0.hw), prio: true, pen: 1.0, done: false });
   } else if (tw === 'diken') {
-    pins.push({ kind: 'trap', tw, ring: 0, c0: g0.c0, amp: 0, f: 0, ph: 0, hw: Math.max(g0.hw, 0.3), sp: true, prio: true, pen: 1.5, narrow: true, br: { a: 0.9, P: g0.br ? g0.br.P : 1.4, ph: g0.br ? g0.br.ph : rnd(0, TAU), inv: true }, done: false });
+    g0.thorn = true;
   }
+};
+
+/* Nesne etiketleri: yeni kilidin ilk 3 karşılaşmasında hedefin ve tuzağın yanında kısa yazı. */
+const makeLabels = (kind, pins, seenKind, seenTw) => {
+  const g = pins.find(p => p.kind === 'gate'), tr = pins.find(p => p.kind === 'trap');
+  const lab = { pins, t: 0, max: 5, gate: '', trap: '', gp: g, tp: null };
+  if (kind === 'nefes' && seenKind <= 3) lab.gate = t('lbl_open');
+  if (kind === 'kayan' && seenKind <= 3) lab.gate = t('lbl_slide');
+  if (kind === 'cift' && seenKind <= 3) lab.gate = '';
+  if (tr && seenTw <= 3) { lab.trap = t('lbl_avoid'); lab.tp = tr; }
+  if (g && g.thorn && seenTw <= 3) { lab.trap = t('lbl_thorn'); lab.tp = g; }
+  return (lab.gate || lab.trap) ? lab : null;
 };
 
 const spawnChallenge = (first, force) => {
   const lv = LV(), pm = phaseMod(G.ph, G.L);
   const plan = planJourney(G.L, G.ph, G.n, G.adapt, G.mercy);
-  let mix = null;
-  if (!first && !force && !plan.relief && G.mixes.length && Math.random() < 0.28) {
+  let mix = null, can = false;
+  if (!first && !force && G.lifeDue && !G.life) { can = true; G.lifeDue = false; }
+  else if (!first && !force && !plan.relief && G.mixes.length && Math.random() < 0.28) {
     mix = G.mixes[(Math.random() * G.mixes.length) | 0];
     if (mix[1] === 'tuzak' && pm.twin === 0) mix = null;
   }
-  const kind = first ? 'tek' : (force || (mix ? mix[0] : pickJ(G.open, plan.relief, G.lastKind, Math.random(), G.ph)));
+  G.firstOfKind = false;
+  let kind;
+  if (first || can) kind = 'tek';
+  else if (force) kind = force;
+  else if (G.pendingNew && G.pendingT >= 2) { kind = G.pendingNew; G.pendingNew = ''; G.firstOfKind = true; }
+  else if (mix) kind = mix[0];
+  else kind = pickJ(G.open.filter(k => k !== G.pendingNew), plan.relief, G.lastKind, Math.random(), G.ph);
   const prevKind = G.kind;
   const km = JKIND[kind] || JKIND.tek;
-  const boost = G.boost > 0 ? 1.4 : 1;
   G.kind = kind; G.lastKind = kind; G.gainMul = km.gain * lv.gain;
   G.I = plan.I; G.relief = plan.relief;
   G.omega = plan.omega * km.omMul * lv.om * pm.omM;
-  const hw = Math.min(0.8, plan.hw * km.hwMul * boost * lv.hw * pm.hwM);
+  let hw = Math.min(0.8, plan.hw * km.hwMul * lv.hw * pm.hwM);
+  if (can) hw = Math.min(0.8, hw * 1.15);
   const star = G.stars[kind] | 0;
+  const far = G.firstOfKind ? [2.0, 2.6] : null;
+  const dist = (lo, hi) => far ? rnd(far[0], far[1]) : rnd(lo, hi);
   const gate = (ring, c, h) => ({ kind: 'gate', ring, c0: c, amp: 0, f: 0, ph: 0, hw: h, done: false });
   const pins = [];
   if (kind === 'cift') {
-    const a = ahead(G.ang, G.dir, rnd(1.0, 2.0));
+    const a = ahead(G.ang, G.dir, dist(1.0, 2.0));
     pins.push(gate(0, a, hw), gate(0, ahead(a, G.dir, hw * 2 + rnd(0.5 - 0.1 * star, 1.0 - 0.2 * star)), hw));
   } else if (kind === 'kayan') {
-    const p = gate(0, ahead(G.ang, G.dir, rnd(1.4, 2.6)), hw);
+    const p = gate(0, ahead(G.ang, G.dir, dist(1.4, 2.6)), hw);
     p.amp = rnd(0.45, 0.8) * (1 + 0.1 * star); p.f = rnd(0.32, 0.5) * (1 + 0.08 * star); p.ph = rnd(0, TAU);
     pins.push(p);
   } else if (kind === 'nefes') {
-    const p = gate(0, ahead(G.ang, G.dir, rnd(CFG.spawnMin, CFG.spawnMax)), hw);
-    p.br = { a: [0.3, 0.5, 0.62][star], P: [1.7, 1.2, 0.9][star], ph: rnd(0, TAU) };
+    const p = gate(0, ahead(G.ang, G.dir, dist(CFG.spawnMin, CFG.spawnMax)), hw);
+    p.br = { a: [0.25, 0.38, 0.5][star], P: [2.0, 1.5, 1.2][star], ph: rnd(0, TAU) };
     pins.push(p);
   } else if (kind === 'iki') {
     if (prevKind !== 'iki') G.ang2 = norm(G.ang + Math.PI);
     G.dir2 = -G.dir; G.omega2 = G.omega * 0.85;
-    pins.push(gate(0, ahead(G.ang, G.dir, rnd(1.0, 2.2)), hw));
+    pins.push(gate(0, ahead(G.ang, G.dir, dist(1.0, 2.2)), hw));
     pins.push(gate(1, ahead(G.ang2, G.dir2, rnd(1.0, 2.0)), Math.min(0.85, hw * 1.15)));
   } else {
-    pins.push(gate(0, ahead(G.ang, G.dir, first ? rnd(1.6, 2.3) : rnd(CFG.spawnMin, CFG.spawnMax)), hw));
+    const p = gate(0, ahead(G.ang, G.dir, first ? rnd(1.6, 2.3) : (can ? rnd(1.4, 2.2) : rnd(CFG.spawnMin, CFG.spawnMax))), hw);
+    if (can) p.can = true;
+    pins.push(p);
   }
   if (mix && mix[1] === 'kayan') for (const p of pins) { p.amp = rnd(0.28, 0.45); p.f = rnd(0.3, 0.42); p.ph = rnd(0, TAU); }
   const tw = mix && mix[1] === 'tuzak' ? 'tuzak' : JTWIN[kind];
-  if (!first && tw && G.eng[tw] && (mix ? true : Math.random() < pm.twin)) addTwin(tw, pins, hw);
-  G.pins = pins; G.gateT = 0;
+  if (!first && !can && tw && G.eng[tw] && (mix ? true : Math.random() < pm.twin)) addTwin(tw, pins, hw);
+  G.pins = pins; G.gateT = 0; G.lab = null;
   syncPrimary();
-  if (kind !== 'tek' && !first) introduce(kind, false);
+  if (!first && !can) {
+    const hasTw = pins.some(p => p.kind === 'trap') || pins.some(p => p.thorn);
+    const twName = pins.some(p => p.thorn) ? 'diken' : (pins.find(p => p.kind === 'trap') || {}).tw;
+    const sk = kind !== 'tek' ? noteSeen(kind) : 99, st = hasTw && twName ? noteSeen(twName) : 99;
+    G.lab = makeLabels(kind, pins, sk, st);
+  }
 };
 
 const shake = s => { if (!RM) G.shake = Math.max(G.shake, s); };
@@ -1138,15 +1245,20 @@ const relayout = snap => {
     const hb = $('menuHead').getBoundingClientRect().bottom - top;
     const ft = $('menuFoot').getBoundingClientRect().top - top;
     cy = (hb + ft) / 2;
-    r = Math.min(w * 0.29, (ft - hb) / 2 - 36);
+    r = Math.min(w * 0.29, (ft - hb) / 2 - 54);
   } else {
-    cy = h * 0.46;
+    /* yukarıdan aşağı: HUD, yeni kilit kartının yeri, halka, halkanın altında joker sırası */
+    const hudB = (hudEl.offsetTop + hudEl.offsetHeight) || 140;
+    const short = h < 700, cardH = short ? 46 : 74, dockH = short ? 58 : 72;
+    const top = hudB + 6 + cardH, bottom = h - 14;
     r = Math.min(w * 0.33, h * 0.2);
-    /* kısa ekranlarda halka + iki satırlık ipucu, HUD ile alet çubuğu arasına sığmalı */
-    const hudB = (hudEl.offsetTop + hudEl.offsetHeight) || 88;
-    const room = (h - (toolsEl.offsetHeight || 88) + 8) - 4 - (hudB + 8);
-    const rFit = (room - 138) / 2.2;
-    if (rFit < r) { r = rFit; cy = hudB + 8 + 18 + 1.1 * Math.max(56, r) + 10; }
+    const rFit = (bottom - top - dockH - 12 - 46) / 2.2;
+    if (rFit < r) r = rFit;
+    r = Math.max(56, r);
+    const blockH = 2.2 * r + 46;
+    cy = Math.max(top + blockH / 2, h * 0.44);
+    view.dockTop = Math.min(cy + blockH / 2 + 8, h - 10 - dockH);
+    toolsEl.style.top = view.dockTop + 'px';
   }
   r = Math.max(56, r);
   view.hudB = G.mode === 'menu' ? 0 : (hudEl.offsetTop + hudEl.offsetHeight);
@@ -1161,36 +1273,54 @@ const resize = () => {
   relayout(true);
 };
 
-const start = fromL => {
+/* Oyun kaydı: uygulamadan çıkınca (kapansa bile) kaldığı yerden devam edebilmek için. */
+const RUN_KEYS = ['jt', 'L', 'ph', 'time', 'score', 'n', 'combo', 'maxCombo', 'near', 'raw', 'perf', 'missRun', 'adapt', 'mercy', 'open', 'eng', 'stars', 'mixes', 'comboOn', 'evi', 'glove', 'boostT', 'slow', 'slowMul', 'narrow', 'coinsJ', 'life', 'lifeLevel', 'campRun', 'startL', 'coinsGiven', 'continued', 'runCounted', 'waveSeen', 'dir'];
+const snapRun = () => { const o = { v: 1 }; RUN_KEYS.forEach(k => { o[k] = G[k]; }); return JSON.parse(JSON.stringify(o)); };
+const persistRun = () => { if (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause') { save.run = snapRun(); persist(); } };
+
+const start = (fromL, snap) => {
   const L0 = fromL || 1;
   Snd.ui();
   Object.assign(G, {
-    mode: 'play', time: LV().startT, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
+    mode: 'play', time: LV().startT, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0, slowMul: CFG.contSlowMul, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
     continued: false, runCounted: false, coinsGiven: 0, gain: 0, shake: 0, flash: 0, tscale: 1, tsT: 0,
     revT: 0, beep: 0, scorePulse: 0, parts: [], pops: [], rips: [], nearMsg: '',
     adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false, pt: 0,
-    kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, boost: 0, glove: 0, waveSeen: 0, pendingRev: false,
+    kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, boostT: 0, glove: 0, waveSeen: 0, pendingRev: false,
     hint: null, dir2: -1,
-    jt: jStart(L0), L: L0, ph: 'normal', phLeft: jNormal(L0), open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
-    campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: { h: 0, x: 0 }, thDirty: false, sp: [], em: []
+    jt: jStart(L0), L: L0, ph: 'normal', phLeft: jNormal(L0), lvStart: jStart(L0), open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
+    campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: 0, thDirty: false, em: [],
+    life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
+    pendingNew: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0
   });
-  thWh = thWx = 0; applyTheme(true);
-  applyEvents(true);
-  save.bestL = Math.max(save.bestL, L0);
-  banner(t('bnLevel', { n: L0 }), L0 > 1 ? t('campRun') : '');
-  spawnChallenge(true);
+  if (snap) {
+    RUN_KEYS.forEach(k => { if (snap[k] !== undefined) G[k] = snap[k]; });
+    const pi = jPhaseAt(G.jt);
+    G.L = pi.L; G.ph = pi.ph; G.lvStart = pi.start; G.phLeft = pi.left; G.thT = G.ph === 'hell' ? 1 : 0;
+  } else { save.run = null; persist(); applyEvents(true); }
+  thWx = G.thT; applyTheme(true);
+  save.bestL = Math.max(save.bestL, G.L);
+  if (!snap) banner(t('bnLevel', { n: L0 }), L0 > 1 ? t('campRun') : '');
+  spawnChallenge(!snap);
   hide(menuEl); hide(overEl); hide(pauseEl); hide(shopEl);
   app.classList.add('playing');
   hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
   toolsEl.classList.add('on');
   relayout(false);
   updateTools(); updateHud();
-  Platform.track('run_start', { run: save.runs + 1, level: L0 });
+  Platform.track('run_start', { run: save.runs + 1, level: L0, resume: !!snap });
+};
+/* Kayıtlı oyunu sürdür: durum geri yüklenir, 3-2-1 sayılır. */
+const resumeSaved = () => {
+  const snap = save.run;
+  if (!snap) return false;
+  start(snap.startL, snap); G.mode = 'count'; G.count = 3;
+  return true;
 };
 
 const goMenu = () => {
   G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0; G.kind = 'tek'; G.hint = null;
-  G.thT = { h: 0, x: 0 }; G.thDirty = true; G.banner = null; G.count = 0;
+  G.thT = 0; G.thDirty = true; G.banner = null; G.count = 0; G.card = null; G.lab = null; G.adv = null;
   hide(overEl); hide(pauseEl); hide(shopEl);
   app.classList.remove('playing');
   hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
@@ -1214,6 +1344,10 @@ const tap = () => {
     if (d <= h + CFG.grace && d / h < bn) { best = p; bn = d / h; bd = d; }
   }
   if (best) { hit(bd, best); return; }
+  /* nefes alan hedefin kapanan kenarı dikenliyse (diken ikizi) ceza */
+  for (const p of G.pins) {
+    if (p.kind === 'gate' && p.thorn && !p.done && angd(p.ring ? G.ang2 : G.ang, pinCenter(p)) <= p.hw + CFG.grace) { trap({ pen: 1.5, narrow: true }); return; }
+  }
   for (const p of G.pins) {
     if (p.kind === 'trap' && !p.prio && angd(G.ang, pinCenter(p)) <= pinHw(p)) { trap(p); return; }
   }
@@ -1231,9 +1365,9 @@ const cheer = (mult, prevMult, near, perfect) => {
     Snd.combo(mult); Platform.haptic('heavy');
     G.rips.push({ x: view.cx, y: view.cy, t: 0, max: 0.8, r0: view.r * 0.35, r1: view.r * 1.3, c: col });
     burst(view.cx, view.cy, up ? 34 : 20, [col, P.peach, P['peach-soft']], 320);
-    if (c === COMBO.tiers[0] && G.comboOn && !save.seen.combo && !G.hint) {
+    if (c === COMBO.tiers[0] && G.comboOn && !save.seen.combo) {
       save.seen.combo = 1; persist();
-      G.hint = { lines: [{ txt: t('hint_combo'), bg: 'lilac-soft' }], t: 0, max: 3.2 };
+      if (!G.card) G.card = lineCard(t('hint_combo'), 'combo');
     }
   } else if (near && Math.random() < 0.35) {
     pop(pickLine('near'), 'hype');
@@ -1249,13 +1383,13 @@ const hit = (d, pin) => {
   G.hw = pinHw(pin); G.comboOff = !G.comboOn; G.ptsMul = pm.pts;
   const { perfect, near, pts, mult } = resolveHit(G, d);
   G.coinsJ += pm.coinHit;
-  if (pin.br && !pin.br.inv && G.hw >= pin.hw * 0.93) { G.score += pm.pts; pop(t('breathBonus'), 'perfect'); }
+  if (pin.br && G.hw >= pin.hw * 0.93) { G.score += pm.pts; pop(t('breathBonus'), 'perfect'); }
+  if (pin.can) grantLife();
   const prevMult = G.comboOn ? comboMult(G.combo - 1) : 1;
   G.scorePulse = 1; G.missRun = 0;
   G.perf = perfect ? G.perf + 1 : 0;
-  if (G.boost > 0) G.boost--;
   const p = pinXY(pin);
-  const cols = near ? [P.rose, P['rose-soft'], P.peach] : (perfect ? [P['peach-deep'], P.peach, P.lilac] : [P.peach, P.lilac, P['peach-soft']]);
+  const cols = pin.can ? [P.life, P.peach, P.lilac] : (near ? [P.rose, P['rose-soft'], P.peach] : (perfect ? [P['peach-deep'], P.peach, P.lilac] : [P.peach, P.lilac, P['peach-soft']]));
   burst(p.x, p.y, near ? 26 : (perfect ? 18 : 11), cols, near ? 260 : 190);
   G.rips.push({ x: p.x, y: p.y, t: 0, max: near ? 0.7 : 0.5, r0: 10, r1: near ? 90 : 56, c: near ? P.rose : P.peach });
   if (near) {
@@ -1293,9 +1427,22 @@ const scold = was => {
   pop(txt, kind);
 };
 
+/* Can (yedek): halkada yeşil "+" hedefi vurulursa kazanılır, en fazla 1. Süre bitince kendiliğinden devreye girer. */
+const grantLife = () => {
+  if (G.life) return;
+  G.life = true; G.lifeFx = 1; pop(t('lifeGot'), 'hype'); Snd.life(); Platform.haptic('medium');
+};
+const revive = () => {
+  G.life = false; G.time = 3; G.slow = Math.max(G.slow, 3); G.slowMul = CFG.contSlowMul; G.lifeFx = 1;
+  pop(t('lifeSaved'), 'hype'); Snd.life(); Platform.haptic('heavy'); flash('peach', 0.22); shake(0.3);
+  burst(view.cx, view.cy, 30, [P.life, P.peach, P.lilac], 300);
+  G.rips.push({ x: view.cx, y: view.cy, t: 0, max: 0.8, r0: view.r * 0.3, r1: view.r * 1.3, c: P.life });
+  Platform.track('life_saved', { level: G.L });
+};
+const lethal = () => { if (G.life) revive(); else die(); };
+
 const miss = () => {
   const pm = phaseMod(G.ph, G.L);
-  if (pm.pen === 0) { pop(t('miss'), 'miss'); Platform.haptic('light'); return; }   /* cennette ceza yok */
   if (G.glove > 0) {
     G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
     return;
@@ -1306,12 +1453,11 @@ const miss = () => {
   shake(0.2); flash('rose', 0.14);
   scold(was);
   Snd.miss(); Platform.haptic('warn');
-  if (G.time <= 0) die();
+  if (G.time <= 0) lethal();
 };
 
 const trap = p => {
   const pm = phaseMod(G.ph, G.L);
-  if (pm.pen === 0) { pop(t('alarm'), 'miss'); Platform.haptic('light'); return; }
   if (G.glove > 0) {
     G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
     return;
@@ -1323,7 +1469,7 @@ const trap = p => {
   pop(t('alarm'), 'near'); Snd.alarm(); Platform.haptic('error');
   if (p && p.narrow) { G.narrow = 3; pop(t('narrow'), 'miss'); }
   if (was >= COMBO.tiers[0]) pop(pickLine('broke'), 'roast');
-  if (G.time <= 0) die();
+  if (G.time <= 0) lethal();
 };
 
 const useTool = id => {
@@ -1333,20 +1479,37 @@ const useTool = id => {
   if (s.n <= 0) { toast(t('toolEmpty')); return; }
   s.n--; persist();
   const e = TOOL[id].eff(s.l);
-  if (id === 'steto') {
-    G.boost = Math.max(G.boost, e);
-    for (const p of G.pins) if (p.kind === 'gate' && !p.done) p.hw = Math.min(0.8, p.hw * 1.4);
-  } else if (id === 'kron') {
-    G.time = Math.min(CFG.maxTime, G.time + e);
-  } else if (id === 'kalkan') {
-    G.glove += e;
-  } else if (id === 'kum') {
-    G.slow = Math.max(G.slow, e);
-  }
+  if (id === 'steto') G.boostT = Math.max(G.boostT, e);
+  else if (id === 'kron') G.time = Math.min(CFG.maxTime, G.time + e);
+  else if (id === 'kalkan') G.glove += e;
+  else if (id === 'kum') { G.slow = Math.max(G.slow, e); G.slowMul = 0.65; }
+  const smart = G.adv === id;
   pop(toolDesc(id, e), 'perfect');
+  if (smart) { G.adv = null; G.advT = 0; G.score += 25; G.scorePulse = 1; pop(t('smartMove'), 'hype'); }
+  G.usedAny = true; save.seen.jokerUse = (save.seen.jokerUse | 0) + 1;
   Snd.tool(); Platform.haptic('medium');
   updateTools(); updateHud();
-  Platform.track('tool_use', { id, level: s.l });
+  Platform.track('tool_use', { id, level: s.l, smart });
+};
+/* Akıllı joker: işe yarayacağı an parlar ve büyür; aynı anda yalnızca biri önerilir. */
+const adviceFor = () => {
+  const have = id => save.tools[id].n > 0 && (G.advCool[id] || 0) <= G.clock;
+  const hellNew = G.ph === 'hell' && G.hellAge < 3 && hellK(G.L) >= 0.2;
+  if (have('kron') && G.time <= 2.5) return 'kron';
+  if (have('kalkan') && G.glove <= 0 && (G.missRun >= 2 || hellNew)) return 'kalkan';
+  if (have('steto') && G.boostT <= 0 && (G.hw < 0.24 || hellNew)) return 'steto';
+  if (have('kum') && G.slow <= 0 && (G.omega > 3.3 || G.missRun >= 2)) return 'kum';
+  return null;
+};
+const updateAdvice = dt => {
+  if (G.adv) {
+    G.advT += dt;
+    if (adviceFor() !== G.adv || G.advT > 6) { G.advCool[G.adv] = G.clock + (G.advT > 6 ? 12 : 4); G.adv = null; G.advT = 0; }
+  }
+  if (!G.adv) {
+    const a = adviceFor();
+    if (a) { G.adv = a; G.advT = 0; G.lastAdv = a; Snd.adv(); Platform.haptic('light'); }
+  }
 };
 
 const die = () => {
@@ -1358,6 +1521,7 @@ const die = () => {
   const secs = (norm((G.ta - G.ang) * G.dir) - G.hw) / w;
   G.nearMsg = inside ? t('overInside') : (secs > 0 && secs <= 0.6 ? t('overClose', { s: f1(Math.max(0.1, secs)) }) : '');
   shake(0.5); flash('rose', 0.3); Snd.over(); Platform.haptic('error');
+  save.run = null; G.adv = null;
   G.newBest = !G.campRun && G.score > bestNow();
   if (G.newBest) save.bests[save.lvl] = G.score;
   save.bestL = Math.max(save.bestL, G.L);
@@ -1402,6 +1566,11 @@ const showOver = () => {
   else { d.textContent = t('toBest', { n: Math.max(1, bestNow() - G.score) }); d.className = 'delta rise'; }
   const nm = $('ovNear');
   if (G.nearMsg) { nm.textContent = G.nearMsg; nm.hidden = false; } else { nm.hidden = true; }
+  const jn = $('ovJoker'), spare = TOOL_IDS.filter(id => save.tools[id].n > 0);
+  if (!G.usedAny && spare.length && G.n >= 8) {
+    const id = G.lastAdv && save.tools[G.lastAdv].n > 0 ? G.lastAdv : spare[0];
+    jn.textContent = t('unusedJ', { t: t('tool_' + id) }); jn.hidden = false;
+  } else jn.hidden = true;
   const coinIcon = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach);width:16px;height:16px"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg>';
   const chips = ['<span class="chip sm">' + t('overLevel', { n: G.L }) + '</span>'];
   if (G.near > 0) chips.push('<span class="chip sm">' + t('statNear') + ' <b>' + G.near + '</b></span>');
@@ -1419,7 +1588,7 @@ const showOver = () => {
 };
 
 const doContinue = () => {
-  G.mode = 'play'; G.continued = true; G.time = CFG.contTime; G.slow = CFG.contSlow;
+  G.mode = 'play'; G.continued = true; G.time = CFG.contTime; G.slow = CFG.contSlow; G.slowMul = CFG.contSlowMul;
   G.combo = 0; G.tscale = 1; G.tsT = 0;
   const g0 = G.pins.find(p => p.kind === 'gate' && !p.done && p.ring === 0);
   if (g0) G.ang = norm(pinCenter(g0) - G.dir * 1.3);
@@ -1433,7 +1602,7 @@ const doContinue = () => {
   Platform.track('continue', { score: G.score });
 };
 
-const pause = () => { if ((G.mode !== 'play' && G.mode !== 'count')/*NOPAUSE*/) return; G.mode = 'pause'; show(pauseEl); };
+const pause = () => { if ((G.mode !== 'play' && G.mode !== 'count')/*NOPAUSE*/) return; G.mode = 'pause'; persistRun(); show(pauseEl); };
 /* Devam edince 3-2-1 geri sayım; sayaçlar (süre, seviye, cennet/cehennem) sayım bitene kadar donuk kalır. */
 const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'count'; G.count = 3; Snd.ui(); };
 
@@ -1489,7 +1658,7 @@ $('shopList').addEventListener('click', e => {
   Platform.track('shop', { id, act: b.getAttribute('data-act') });
 });
 
-let lastT = '', lastFx = '', lastLvl = '', lastSect = '', lastSectCls = '';
+let lastT = '', lastFx = '', lastLvl = '', lastSect = '', lastLife = false, lastAdvDock = '';
 const updateHud = () => {
   const f = clamp(G.time / CFG.maxTime, 0, 1);
   fillEl.style.width = (f * 100).toFixed(1) + '%';
@@ -1500,34 +1669,47 @@ const updateHud = () => {
   gaugeEl.classList.toggle('warn', warn);
   zoneEl.classList.toggle('hot', crit && G.mode === 'play');
   const fx = [];
-  if (G.boost > 0) fx.push(t('fxSteto', { n: G.boost }));
+  if (G.boostT > 0) fx.push(t('fxSteto', { n: Math.ceil(G.boostT) }));
   if (G.glove > 0) fx.push(t('fxShield', { n: G.glove }));
   if (G.slow > 0) fx.push(t('fxSlow', { n: Math.ceil(G.slow) }));
   if (G.narrow > 0) fx.push(t('fxNarrow', { n: Math.ceil(G.narrow) }));
   const key = fx.join('|');
   if (key !== lastFx) { lastFx = key; fxEl.innerHTML = fx.map(x => '<span class="chip sm">' + x + '</span>').join(''); }
-  const lv = G.L > 10 ? t('lvlEnd', { n: G.L }) : t('lvlChip', { n: G.L });
-  if (lv !== lastLvl) {
-    lastLvl = lv; lvlChipEl.textContent = lv;
-    for (let i = 0; i < pathEl.children.length; i++) pathEl.children[i].className = i + 1 < G.L ? 'on' : (i + 1 === G.L ? 'cur' : '');
-  }
-  const sk = G.ph === 'normal' ? '' : G.ph + Math.ceil(Math.max(0, G.phLeft));
+  const lv = t('lvlChip', { n: G.L });
+  if (lv !== lastLvl) { lastLvl = lv; lvlChipEl.textContent = lv; }
+  const frac = clamp((G.jt - G.lvStart) / Math.max(1, jLen(G.L)), 0, 1);
+  lprogEl.style.width = (frac * 100).toFixed(1) + '%';
+  lprogEl.parentNode.classList.toggle('x', G.ph === 'hell');
+  const sk = G.ph === 'hell' ? 'x' + Math.ceil(Math.max(0, G.phLeft)) : '';
   if (sk !== lastSect) {
     lastSect = sk;
-    if (sk) { sectEl.textContent = t(G.ph === 'heaven' ? 'sectHeaven' : 'sectHell', { s: Math.ceil(Math.max(0, G.phLeft)) }); sectEl.className = 'sect on ' + (G.ph === 'heaven' ? 'h' : 'x'); }
-    else sectEl.className = 'sect ' + (lastSectCls || 'h');
-    if (sk) lastSectCls = G.ph === 'heaven' ? 'h' : 'x';
+    if (sk) { sectEl.textContent = t('sectHell', { s: Math.ceil(Math.max(0, G.phLeft)) }); sectEl.className = 'sect on x'; }
+    else sectEl.className = 'sect x';
+  }
+  if (G.life !== lastLife) {
+    lastLife = G.life; lifeEl.classList.toggle('on', G.life); gaugeEl.classList.toggle('hasLife', G.life);
+    if (G.life) { lifeEl.classList.remove('pop'); void lifeEl.offsetWidth; lifeEl.classList.add('pop'); }
   }
 };
+/* Joker sırası: önerilen joker parlar, büyür ve etiketini gösterir. */
+const toolShort = (id, n) => t('ts_' + id, { n });
+const updateDock = () => {
+  const a = G.mode === 'play' ? (G.adv || '') : '';
+  if (a === lastAdvDock) return;
+  lastAdvDock = a;
+  toolsEl.querySelectorAll('.tool').forEach(b => b.classList.toggle('adv', b.getAttribute('data-tool') === a));
+  const lbl = $('advLbl');
+  if (a) {
+    const sv = save.tools[a], e = TOOL[a].eff(sv.l), b = toolsEl.querySelector('.tool[data-tool="' + a + '"]');
+    lbl.textContent = t('tool_' + a) + ' ' + toolShort(a, e) + ((save.seen.jokerUse | 0) < 3 ? ' · ' + t('advNow') : '');
+    lbl.style.left = (b.offsetLeft + b.offsetWidth / 2) + 'px';
+    lbl.classList.add('on');
+  } else lbl.classList.remove('on');
+};
 
-/* Ortam parçacıkları: cennette yükselen ışık tozları, cehennemde közler. Tema ağırlığı kadar görünür. */
+/* Ortam parçacıkları: cehennemde yükselen közler. Tema ağırlığı kadar görünür. */
 const envStep = raw => {
   const w = view.w, h = view.h, k = RM ? 0.5 : 1;
-  if (thWh > 0.08 && G.sp.length < 26 * k && Math.random() < raw * 16 * thWh * k) {
-    G.sp.push({ x: rnd(0, w), y: h + 8, vy: rnd(14, 38), r: rnd(1.4, 3.2), ph: rnd(0, TAU), sw: rnd(8, 22) });
-  }
-  for (const q of G.sp) { q.y -= q.vy * raw; q.x += Math.sin(G.clock * 0.9 + q.ph) * q.sw * raw; }
-  G.sp = thWh < 0.01 ? [] : G.sp.filter(q => q.y > -10);
   if (thWx > 0.08 && G.em.length < 34 * k && Math.random() < raw * 22 * thWx * k) {
     G.em.push({ x: rnd(0, w), y: h + 6, vy: rnd(40, 110), r: rnd(1.2, 3), ph: rnd(0, TAU), sw: rnd(10, 30), life: 0, max: rnd(2.2, 4.2) });
   }
@@ -1557,41 +1739,50 @@ const update = raw => {
     else if (Math.ceil(G.count) !== n0) Snd.tick(false);
     updateHud();
   } else if (G.mode === 'play') {
-    const sl = G.slow > 0 ? CFG.contSlowMul : 1;
+    const sl = G.slow > 0 ? G.slowMul : 1;
     G.pt += dt; G.jt += dt;
     applyEvents(false);
     const pi = jPhaseAt(G.jt);
     if (pi.L !== G.L || pi.ph !== G.ph) phaseChange(pi);
     G.phLeft = pi.left;
+    if (G.ph === 'hell') G.hellAge += dt;
+    /* can fırsatı: çift seviyelerin ortasında, canın yoksa bir sonraki hedef yeşil "+" olur */
+    if (G.ph === 'normal' && G.L % 2 === 0 && G.lifeLevel !== G.L && G.jt - pi.start >= 0.55 * jNormal(G.L)) { G.lifeLevel = G.L; if (!G.life) G.lifeDue = true; }
+    if (G.pendingNew) G.pendingT += dt;
     const pm = phaseMod(G.ph, G.L);
     G.ang = norm(G.ang + G.dir * G.omega * sl * dt);
     if (G.kind === 'iki') G.ang2 = norm(G.ang2 + G.dir2 * G.omega2 * sl * dt);
     G.time -= dt * pm.drain;
     if (G.slow > 0) G.slow -= raw;
+    if (G.boostT > 0) G.boostT = Math.max(0, G.boostT - raw);
     if (G.narrow > 0) G.narrow = Math.max(0, G.narrow - raw);
     if (G.lock > 0) G.lock = Math.max(0, G.lock - raw);
     if (G.revT > 0) G.revT -= raw;
     G.gateT = Math.min(1, G.gateT + raw * 4);
     syncPrimary();
-    if (G.time < CFG.nearAt && pm.drain > 0) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
-    if (G.time <= 0) { G.time = 0; die(); }
-    updateHud();
+    updateAdvice(dt);
+    G.saveT += raw; if (G.saveT > 5) { G.saveT = 0; persistRun(); }
+    if (G.time < CFG.nearAt) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
+    if (G.time <= 0) { G.time = 0; lethal(); }
+    updateHud(); updateDock();
   } else if (G.mode === 'dead') {
     G.deadT -= raw;
-    updateHud();
+    updateHud(); updateDock();
     if (G.deadT <= 0) showOver();
   }
 
-  if (G.banner && (G.mode === 'play' || G.mode === 'count' || G.mode === 'dead')) { G.banner.t += raw; if (G.banner.t > 2.4) G.banner = null; }
+  const live = G.mode === 'play' || G.mode === 'count' || G.mode === 'dead';
+  if (G.banner && live) { G.banner.t += raw; if (G.banner.t > 2.4) G.banner = null; }
+  if (G.card && (G.mode === 'play' || G.mode === 'count')) { G.card.t += raw; if (G.card.t > G.card.max) G.card = null; }
+  if (G.lab && G.mode === 'play') { G.lab.t += raw; if (G.lab.t > G.lab.max) G.lab = null; }
   const kT = 1 - Math.exp(-2.6 * raw);
-  thWh += (G.thT.h - thWh) * kT; thWx += (G.thT.x - thWx) * kT;
-  if (Math.abs(thWh - G.thT.h) < 0.004) thWh = G.thT.h;
-  if (Math.abs(thWx - G.thT.x) < 0.004) thWx = G.thT.x;
+  thWx += (G.thT - thWx) * kT;
+  if (Math.abs(thWx - G.thT) < 0.004) thWx = G.thT;
   applyTheme();
-  if (G.thDirty && thWh === G.thT.h && thWx === G.thT.x) { G.thDirty = false; onPalette(); }
+  if (G.thDirty && thWx === G.thT) { G.thDirty = false; onPalette(); }
   G.ec += raw;
   envStep(raw);
-  if (G.hint) { G.hint.t += raw; if (G.hint.t > G.hint.max) G.hint = null; }
+  G.lifeFx = Math.max(0, G.lifeFx - raw * 1.4);
   G.shake = Math.max(0, G.shake - raw);
   G.flash = Math.max(0, G.flash - raw);
   G.scorePulse = Math.max(0, G.scorePulse - raw * 5);
@@ -1617,6 +1808,7 @@ const onColor = hex => {
   const v = parseInt((hex || '#ffffff').slice(1), 16);
   return (0.299 * ((v >> 16) & 255) + 0.587 * ((v >> 8) & 255) + 0.114 * (v & 255)) > 150 ? '#29233F' : '#FFFFFF';
 };
+const rrect = (c, x, y, w, h, r) => { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); };
 const pill = (c, txt, x, y, bg, fg, size, free) => {
   c.font = '800 ' + size + 'px ' + FB;
   const w = c.measureText(txt).width + size * 1.7, h = size * 2.1;
@@ -1629,10 +1821,10 @@ const pill = (c, txt, x, y, bg, fg, size, free) => {
   c.fillStyle = fg; c.textAlign = 'center'; c.textBaseline = 'middle';
   c.fillText(txt, px, y + 1);
 };
-/* Diken: halkanın iki yanına dizilen üçgen dişler. */
-const drawSpikes = (c, cx, cy, Rr, RWr, ce, hw, ext) => {
-  const n = Math.max(3, Math.round(hw * 2 / 0.12)), step = hw * 2 / n, s0 = ce - hw - HALF;
-  const ro = Rr + RWr / 2, ri = Rr - RWr / 2, len = RWr * 0.62 * ext;
+/* Diken dişleri: halkanın iki yanına dizilen üçgenler (a0..a1, oyun açısı). */
+const drawTeeth = (c, cx, cy, Rr, RWr, a0, a1) => {
+  const n = Math.max(2, Math.round((a1 - a0) / 0.11)), step = (a1 - a0) / n, s0 = a0 - HALF;
+  const ro = Rr + RWr / 2, ri = Rr - RWr / 2, len = RWr * 0.55;
   c.beginPath();
   for (let i = 0; i < n; i++) {
     const a = s0 + i * step, m = a + step / 2, e = a + step;
@@ -1646,15 +1838,13 @@ const drawSpikes = (c, cx, cy, Rr, RWr, ce, hw, ext) => {
   c.fill();
 };
 const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
-  const ce = pinCenter(p), hwv = pinHw(p, true), hw = hwv * (0.35 + 0.65 * gk);
+  const ce = pinCenter(p), hwv = pinHw(p), hw = hwv * (0.35 + 0.65 * gk);
   const a0 = ce - hw - HALF, a1 = ce + hw - HALF;
   c.lineCap = 'butt';
   if (p.kind === 'trap') {
-    const live = pinHw(p) > 0;
-    c.globalAlpha = gk * (live ? 1 : 0.4);
+    c.globalAlpha = gk;
     c.lineWidth = RWr + 10; c.strokeStyle = P['rose-soft']; arc(c, cx, cy, Rr, a0, a1);
     c.lineWidth = RWr; c.strokeStyle = P.rose; arc(c, cx, cy, Rr, a0, a1);
-    if (p.sp) { c.fillStyle = P.rose; drawSpikes(c, cx, cy, Rr, RWr, ce, hw, live ? 1 : 0.5); }
     const mx = cx + Math.cos(ce - HALF) * Rr, my = cy + Math.sin(ce - HALF) * Rr, s = RWr * 0.22;
     c.strokeStyle = '#FFFFFF'; c.lineWidth = 3; c.lineCap = 'round';
     c.beginPath(); c.moveTo(mx - s, my - s); c.lineTo(mx + s, my + s); c.moveTo(mx + s, my - s); c.lineTo(mx - s, my + s); c.stroke();
@@ -1668,10 +1858,22 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
   }
   if (p.done) {
     c.globalAlpha = 0.5;
-    c.lineWidth = RWr; c.strokeStyle = P.lilac; arc(c, cx, cy, Rr, a0, a1);
+    c.lineWidth = RWr; c.strokeStyle = p.can ? P.life : P.lilac; arc(c, cx, cy, Rr, a0, a1);
     const mx = cx + Math.cos(ce - HALF) * Rr, my = cy + Math.sin(ce - HALF) * Rr, s = RWr * 0.2;
     c.globalAlpha = 0.9; c.strokeStyle = '#FFFFFF'; c.lineWidth = 3; c.lineCap = 'round';
     c.beginPath(); c.moveTo(mx - s, my + s * 0.1); c.lineTo(mx - s * 0.3, my + s * 0.8); c.lineTo(mx + s, my - s * 0.7); c.stroke();
+    c.globalAlpha = 1;
+    return;
+  }
+  if (p.can) {
+    /* can hedefi: yeşil, ortasında beyaz "+"; nabız gibi atan halesi dikkat çeker */
+    const pu = 0.5 + 0.5 * Math.sin(G.clock * 6);
+    c.globalAlpha = gk * (0.18 + 0.2 * pu); c.lineWidth = RWr + 16; c.strokeStyle = P.life; arc(c, cx, cy, Rr, a0, a1);
+    c.globalAlpha = gk; c.lineWidth = RWr + 4; c.strokeStyle = P.life; arc(c, cx, cy, Rr, a0, a1);
+    c.lineWidth = RWr; c.strokeStyle = mixHex(P.life, '#FFFFFF', 0.25); arc(c, cx, cy, Rr, ce - hw * CFG.perfectFrac - HALF, ce + hw * CFG.perfectFrac - HALF);
+    const mx = cx + Math.cos(ce - HALF) * Rr, my = cy + Math.sin(ce - HALF) * Rr, s = RWr * 0.34;
+    c.strokeStyle = '#FFFFFF'; c.lineWidth = 3.4; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(mx - s, my); c.lineTo(mx + s, my); c.moveTo(mx, my - s); c.lineTo(mx, my + s); c.stroke();
     c.globalAlpha = 1;
     return;
   }
@@ -1686,6 +1888,15 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
   c.lineWidth = RWr + 10; c.strokeStyle = pc[0]; arc(c, cx, cy, Rr, a0, a1);
   c.lineWidth = RWr; c.strokeStyle = pc[1]; arc(c, cx, cy, Rr, a0, a1);
   c.strokeStyle = pc[2]; arc(c, cx, cy, Rr, ce - hw * CFG.perfectFrac - HALF, ce + hw * CFG.perfectFrac - HALF);
+  if (p.thorn) {
+    /* diken ikizi: hedefin kapanan kenarları dikenli; ortası her zaman açık */
+    const out = p.hw * (0.35 + 0.65 * gk), core = hw;
+    if (out - core > 0.03) {
+      c.lineWidth = RWr; c.strokeStyle = P.rose; c.fillStyle = P.rose;
+      arc(c, cx, cy, Rr, ce - out - HALF, ce - core - HALF); arc(c, cx, cy, Rr, ce + core - HALF, ce + out - HALF);
+      drawTeeth(c, cx, cy, Rr, RWr, ce - out, ce - core); drawTeeth(c, cx, cy, Rr, RWr, ce + core, ce + out);
+    }
+  }
   if (numbered) {
     const mx = cx + Math.cos(ce - HALF) * (Rr - RWr * 1.15), my = cy + Math.sin(ce - HALF) * (Rr - RWr * 1.15);
     c.fillStyle = P.surface; c.beginPath(); c.arc(mx, my, RWr * 0.42, 0, TAU); c.fill();
@@ -1712,18 +1923,7 @@ const drawPointer = (c, cx, cy, Rr, RWr, ang, dir, col, trailCol) => {
 
 
 /* ---------- ortam: cennet ve cehennem arka planı ---------- */
-let cloudSpr = null, crackKey = '', cracks = [];
-const getCloud = () => {
-  if (cloudSpr) return cloudSpr;
-  const cs = document.createElement('canvas'); cs.width = 256; cs.height = 112;
-  const g = cs.getContext('2d');
-  for (const [x, y, r] of [[70, 66, 40], [112, 50, 48], [160, 58, 44], [196, 70, 34], [128, 76, 52]]) {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(0.6, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
-  }
-  cloudSpr = cs; return cs;
-};
+let crackKey = '', cracks = [];
 const buildCracks = () => {
   crackKey = view.w + 'x' + view.h; cracks = [];
   let sd = 11; const rr = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
@@ -1736,32 +1936,6 @@ const buildCracks = () => {
 };
 const drawEnv = c => {
   const w = view.w, h = view.h, T = G.ec;
-  if (thWh > 0.01) {
-    c.save(); c.globalAlpha = thWh;
-    const g = c.createRadialGradient(view.cx, view.cy, view.r * 0.2, view.cx, view.cy, Math.max(w, h) * 0.75);
-    g.addColorStop(0, 'rgba(255,214,120,.5)'); g.addColorStop(0.55, 'rgba(255,230,160,.16)'); g.addColorStop(1, 'rgba(255,230,160,0)');
-    c.fillStyle = g; c.fillRect(0, 0, w, h);
-    const Rm = Math.max(w, h) * 1.1;
-    c.fillStyle = 'rgba(255,226,150,.1)';
-    for (let i = 0; i < 9; i++) {
-      const a = T * 0.05 + i * TAU / 9;
-      c.beginPath(); c.moveTo(view.cx, view.cy); c.arc(view.cx, view.cy, Rm, a - 0.07, a + 0.07); c.closePath(); c.fill();
-    }
-    const cl = getCloud();
-    [[0.16, 1.0, 9, 0], [0.74, 1.35, 6, 0.4], [0.92, 0.8, 12, 0.75]].forEach(([fy, sc, v, off]) => {
-      const cw = 256 * sc, x = ((T * v + off * (w + cw)) % (w + cw)) - cw;
-      c.globalAlpha = thWh * 0.55;
-      c.drawImage(cl, x, h * fy - 56 * sc, cw, 112 * sc);
-    });
-    for (const q of G.sp) {
-      const tw = 0.35 + 0.65 * Math.abs(Math.sin(T * 2 + q.ph)), r = q.r;
-      c.globalAlpha = thWh * tw; c.fillStyle = 'rgba(255,238,170,1)';
-      c.beginPath(); c.moveTo(q.x, q.y - r * 2.2); c.lineTo(q.x + r * 0.55, q.y); c.lineTo(q.x, q.y + r * 2.2); c.lineTo(q.x - r * 0.55, q.y); c.closePath();
-      c.moveTo(q.x - r * 2.2, q.y); c.lineTo(q.x, q.y + r * 0.55); c.lineTo(q.x + r * 2.2, q.y); c.lineTo(q.x, q.y - r * 0.55); c.closePath();
-      c.fill();
-    }
-    c.restore();
-  }
   if (thWx > 0.01) {
     c.save(); c.globalAlpha = thWx;
     const pulse = 0.85 + 0.15 * Math.sin(T * 1.7);
@@ -1789,7 +1963,7 @@ const drawEnv = c => {
 const bannerAl = b => { const k = b.t / 2.4; return k < 0.1 ? k / 0.1 : (k > 0.78 ? Math.max(0, (1 - k) / 0.22) : 1); };
 const drawBanner = (c, cx, cy, R) => {
   const b = G.banner, al = bannerAl(b), sc = 0.88 + 0.12 * easeOut(Math.min(1, b.t / 0.28));
-  const bg = b.kind === 'h' ? '#F4B63F' : (b.kind === 'x' ? '#D9503A' : P.btn), fg = b.kind === 'h' ? '#4A3500' : (b.kind === 'x' ? '#FFFFFF' : (P['on-btn'] || '#FFFFFF'));
+  const bg = b.kind === 'x' ? '#D9503A' : P.btn, fg = b.kind === 'x' ? '#FFFFFF' : (P['on-btn'] || '#FFFFFF');
   let fs = clamp(Math.round(R * 0.27), 18, 34);
   c.font = '600 ' + fs + 'px ' + FD;
   const maxW = Math.min(R * 1.75, view.w - 40);
@@ -1819,6 +1993,80 @@ const drawCount = (c, cx, cy, R) => {
   c.fillStyle = P.btn; c.font = '600 ' + Math.round(R * 0.62) + 'px ' + FD; c.textAlign = 'center'; c.textBaseline = 'middle';
   c.fillText(String(n), 0, 0);
   c.restore();
+};
+
+/* Kilit simgeleri: küçük resim olarak kartta ve defterde; yarıçap s, merkez (x, y). */
+const drawLockIcon = (c, kind, x, y, s) => {
+  c.save(); c.translate(x, y); c.lineCap = 'butt';
+  const w = s * 0.34;
+  const ring = (a0, a1, lw, col, r) => { c.beginPath(); c.arc(0, 0, r || s * 0.62, a0 - HALF, a1 - HALF); c.lineWidth = lw; c.strokeStyle = col; c.stroke(); };
+  if (kind === 'cift') { ring(-1.25, -0.45, w, P.peach); ring(0.45, 1.25, w, P.peach); ring(-0.2, 0.2, w * 0.7, P.rose); }
+  else if (kind === 'kayan') { ring(-0.55, 0.55, w, P.peach); ring(-1.3, -0.85, 2.6, P.lilac, s * 0.62 + w * 0.9); ring(0.85, 1.3, 2.6, P.lilac, s * 0.62 + w * 0.9); }
+  else if (kind === 'nefes') { ring(-0.55, 0.55, w, P.peach); ring(-0.18, 0.18, w, P['peach-deep']); ring(-0.95, -0.55, w, P.rose); ring(0.55, 0.95, w, P.rose); }
+  else if (kind === 'iki') { ring(-0.7, 0.7, w * 0.8, P.peach, s * 0.78); ring(1.7, 3.1, w * 0.8, P.lilac, s * 0.4); }
+  else { ring(-0.55, 0.55, w, P.peach); }
+  c.restore();
+};
+/* Yazıyı verilen genişliğe sığdır: gerekirse puntoyu küçült. */
+const fitPx = (c, txt, wt, size, face, maxW, minSize) => {
+  let z = size; c.font = wt + ' ' + z + 'px ' + face;
+  const w = c.measureText(txt).width;
+  if (w > maxW) { z = Math.max(minSize, Math.floor(size * maxW / w)); c.font = wt + ' ' + z + 'px ' + face; }
+  return z;
+};
+/* Yeni kilit kartı: HUD'un hemen altında; yeni kilitte büyük, küçük haberlerde tek satır. Dokunuşları engellemez. */
+const drawCard = c => {
+  if (G.mode !== 'play' && G.mode !== 'count') return;
+  let cd = G.card, persist = false;
+  if (!cd && G.mode === 'play' && !save.tut && G.n < CFG.tutHits) { cd = { type: 'line', title: G.n < 2 ? t('tut1') : t('tut2'), t: 99, max: 999 }; persist = true; }
+  if (!cd) return;
+  const w = Math.min(view.w - 28, 380), x = (view.w - w) / 2, y = (view.hudB || 0) + 8;
+  const al = persist ? 1 : Math.min(1, cd.t / 0.25, (cd.max - cd.t) / 0.4);
+  const slide = persist ? 0 : -18 * (1 - easeOut(Math.min(1, cd.t / 0.3)));
+  c.save(); c.globalAlpha = clamp(al, 0, 1); c.translate(0, slide);
+  c.textAlign = 'left'; c.textBaseline = 'middle';
+  if (cd.type === 'big') {
+    const small = view.h < 700, h = small ? 46 : 72, ts = small ? 32 : 46;
+    rrect(c, x, y, w, h, 18); c.fillStyle = P.surface; c.fill(); c.lineWidth = 1.5; c.strokeStyle = P.lilac; c.globalAlpha *= 0.55; c.stroke(); c.globalAlpha = clamp(al, 0, 1);
+    rrect(c, x + 10, y + (h - ts) / 2, ts, ts, 12); c.fillStyle = P['lilac-soft']; c.fill();
+    drawLockIcon(c, cd.icon, x + 10 + ts / 2, y + h / 2, ts * 0.46);
+    const tx0 = x + 10 + ts + 12, mw = w - (tx0 - x) - 12;
+    if (small) {
+      fitPx(c, cd.title, 600, 15, FD, mw, 12); c.fillStyle = P.ink; c.fillText(cd.title, tx0, y + 15);
+      fitPx(c, cd.rule, 800, 12, FB, mw, 10); c.fillStyle = P['ink-2']; c.fillText(cd.rule, tx0, y + 33);
+    } else {
+      fitPx(c, cd.title, 600, 17, FD, mw, 13); c.fillStyle = P.ink; c.fillText(cd.title, tx0, y + 20);
+      fitPx(c, cd.rule, 800, 13, FB, mw, 11); c.fillStyle = P['ink-2']; c.fillText(cd.rule, tx0, y + 39);
+      if (cd.warn) { fitPx(c, cd.warn, 800, 13, FB, mw, 11); c.fillStyle = P.rose; c.fillText(cd.warn, tx0, y + 56); }
+      const k = clamp(1 - cd.t / cd.max, 0, 1);
+      rrect(c, x + 16, y + h - 5, (w - 32) * k, 2.5, 1.2); c.fillStyle = P.lilac; c.fill();
+    }
+  } else {
+    const z = fitPx(c, cd.title, 800, 14, FB, w - 44, 11), tw = c.measureText(cd.title).width, pw = Math.min(w, tw + 36), ph = 34;
+    const px = (view.w - pw) / 2;
+    rrect(c, px, y + 2, pw, ph, ph / 2); c.fillStyle = P.surface; c.fill(); c.lineWidth = 1.5; c.strokeStyle = P['lilac-soft']; c.stroke();
+    c.fillStyle = P.ink; c.textAlign = 'center'; c.font = '800 ' + z + 'px ' + FB; c.fillText(cd.title, view.w / 2, y + 2 + ph / 2 + 1);
+  }
+  c.restore();
+};
+/* Nesne etiketleri: yeni kilidin ilk karşılaşmalarında hedefin ve tuzağın yanında kısa yazı. */
+const drawLabels = (c, cx, cy, R, RW) => {
+  const lb = G.lab;
+  if (!lb || lb.pins !== G.pins || G.mode !== 'play') return;
+  const al = clamp(Math.min(lb.t / 0.3, (lb.max - lb.t) / 0.5), 0, 1);
+  if (al <= 0) return;
+  const put = (p, txt, bg, fg, da) => {
+    const a = pinCenter(p) + da - HALF;
+    let rr2 = R + RW / 2 + 24, x = cx + Math.cos(a) * rr2, y = cy + Math.sin(a) * rr2;
+    if (y < (view.hudB || 0) + 34) { rr2 = R - RW / 2 - 24; x = cx + Math.cos(a) * rr2; y = cy + Math.sin(a) * rr2; }
+    const e = pinXY(p), lx = cx + Math.cos(a) * (R + RW / 2 + 2), ly = cy + Math.sin(a) * (R + RW / 2 + 2);
+    c.globalAlpha = al * (0.78 + 0.22 * Math.sin(G.clock * 5)); c.strokeStyle = bg; c.lineWidth = 1.6; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(lx, ly); c.lineTo(x, y); c.stroke();
+    pill(c, txt, x, y, bg, fg, 12);
+    c.globalAlpha = 1;
+  };
+  if (lb.gate && lb.gp) put(lb.gp, lb.gate, P.peach, '#3A1D00', lb.tp === lb.gp ? -0.55 : 0);
+  if (lb.trap && lb.tp) put(lb.tp, lb.trap, P.rose, '#FFFFFF', lb.tp === lb.gp ? 0.55 : 0);
 };
 
 const render = () => {
@@ -1872,6 +2120,7 @@ const render = () => {
   const trail = mult >= 2 ? tierCol(mult) : P.lilac;
   drawPointer(c, cx, cy, R, RW, G.ang, G.dir, P.ink, trail);
   if (two) drawPointer(c, cx, cy, R2, RW2, G.ang2, G.dir2, P.btn, trail);
+  drawLabels(c, cx, cy, R, RW);
 
   for (const r of G.rips) {
     const p = r.t / r.max;
@@ -1919,20 +2168,10 @@ const render = () => {
     else if (G.banner) drawBanner(c, cx, cy, R);
   }
 
-  const lineY = cy + r0 + 13 + 36;
-  if (G.mode === 'play') {
-    if (G.hint) {
-      const al = G.hint.t < 0.2 ? G.hint.t / 0.2 : (G.hint.t > G.hint.max - 0.5 ? (G.hint.max - G.hint.t) / 0.5 : 1);
-      c.globalAlpha = clamp(al, 0, 1);
-      G.hint.lines.forEach((ln, i) => pill(c, ln.txt, cx, lineY + i * 36, P[ln.bg], P.ink, 14));
-      c.globalAlpha = 1;
-    } else if (!save.tut && G.n < CFG.tutHits) {
-      pill(c, G.n < 2 ? t('tut1') : t('tut2'), cx, lineY, P.surface, P.ink, 14);
-    }
-  }
-  const topY = cy - (r0 + 13) - 26, minY = (view.hudB || 0) + 22;
+  drawCard(c);
+  /* puan balonları halkanın iç bölgesinde, ibre halkasının üstüne binmez: en yeni skorun üstünde, eskisi altında */
   G.pops.forEach((p, i) => {
-    const k = p.t / p.max, rise = 20 * easeOut(Math.min(1, k * 1.4));
+    const k = p.t / p.max, slot = G.pops.length - 1 - i;
     const al = k < 0.12 ? k / 0.12 : (k > 0.65 ? (1 - k) / 0.35 : 1);
     const sc = 0.85 + 0.15 * Math.min(1, k / 0.15);
     let bg = P.surface, fg = P.ink;
@@ -1945,7 +2184,7 @@ const render = () => {
     const psz = p.kind === 'near' ? 17 : (p.kind === 'hype' ? 18 : 15);
     c.font = '800 ' + psz + 'px ' + FB;
     const pw = c.measureText(p.txt).width + psz * 1.7;
-    c.save(); c.globalAlpha = al; c.translate(clamp(cx, pw / 2 + 8, view.w - pw / 2 - 8), Math.max(minY, topY - rise - (G.pops.length - 1 - i) * 36)); c.scale(sc, sc);
+    c.save(); c.globalAlpha = al; c.translate(clamp(cx, pw / 2 + 8, view.w - pw / 2 - 8), slot ? cy + R * 0.58 : cy - R * 0.5 - 6 * easeOut(Math.min(1, k * 1.4))); c.scale(sc, sc);
     pill(c, p.txt, 0, 0, bg, fg, psz, true);
     c.restore();
   });
@@ -1960,22 +2199,34 @@ const render = () => {
 };
 
 /* ---------- giriş ---------- */
-const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on');
+const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on') || bookEl.classList.contains('on');
 app.addEventListener('pointerdown', e => {
   Snd.unlock();
   const tg = e.target;
   if (tg.closest && (tg.closest('button') || tg.closest('#tools'))) return;
   if (overlayOpen()) return;
   if (G.mode === 'play') tap(e.clientX - app.getBoundingClientRect().left);
-  else if (G.mode === 'menu') start();
+  else if (G.mode === 'menu') { if (!save.run) start(); }
   else if (G.mode === 'over' && performance.now() - G.overAt > 700) start(G.startL);
   else if (G.mode === 'pause') resume();
 });
+/* Joker düğmeleri: parlayan joker dokununca çalışır. Parlamayan jokeri kullanmak için basılı tutulur;
+   kısa dokunuş oyuna geçer, böylece joker sırası vuruşları çalmaz. */
 toolsEl.addEventListener('pointerdown', e => {
   const b = e.target.closest && e.target.closest('button.tool');
   if (!b) return;
   e.preventDefault(); Snd.unlock();
-  useTool(b.getAttribute('data-tool'));
+  const id = b.getAttribute('data-tool');
+  if (b.classList.contains('adv')) { useTool(id); return; }
+  b.classList.add('holding');
+  let done = false;
+  const timer = setTimeout(() => { done = true; b.classList.remove('holding'); useTool(id); }, 450);
+  const up = () => {
+    clearTimeout(timer); b.classList.remove('holding');
+    window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);
+    if (!done && G.mode === 'play') tap();
+  };
+  window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
 });
 window.addEventListener('keydown', e => {
   if (e.repeat) return;
@@ -1986,11 +2237,12 @@ window.addEventListener('keydown', e => {
   e.preventDefault(); Snd.unlock();
   if (overlayOpen()) return;
   if (G.mode === 'play') tap(right ? view.w : (left ? 0 : null));
-  else if (G.mode === 'menu') start();
+  else if (G.mode === 'menu') { if (save.run) resumeSaved(); else start(); }
   else if (G.mode === 'over' && performance.now() - G.overAt > 500) start(G.startL);
   else if (G.mode === 'pause') resume();
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+window.addEventListener('pagehide', () => persistRun());
 
 const setLevel = l => {
   if (LEVELS.indexOf(l) < 0 || l === save.lvl) return;
@@ -2007,7 +2259,20 @@ $('ovTipBtn').addEventListener('click', () => {
   Snd.unlock(); Snd.ui(); setLevel(to); $('ovTip').hidden = true;
   toast(t('lvPicked', { l: t('lv_' + to) }));
 });
-$('playBtn').addEventListener('click', () => { Snd.unlock(); start(); });
+$('playBtn').addEventListener('click', () => { Snd.unlock(); if (save.run) resumeSaved(); else start(); });
+/* Kayıtlı oyun varken "Yeni oyun": önce sorar, 3,5 sn içinde ikinci dokunuşla silip başlar. */
+let newAsk = 0;
+$('newBtn').addEventListener('click', () => {
+  Snd.unlock();
+  const nb = $('newBtn');
+  if (newAsk && performance.now() - newAsk < 3500) { newAsk = 0; nb.classList.remove('warn'); start(); return; }
+  newAsk = performance.now(); nb.classList.add('warn'); nb.textContent = t('newSure'); Snd.ui();
+  setTimeout(() => { if (newAsk && performance.now() - newAsk >= 3400) { newAsk = 0; nb.classList.remove('warn'); nb.textContent = t('newGame'); } }, 3500);
+});
+$('bookBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openBook(); });
+$('bookClose').addEventListener('click', closeBook);
+$('menuJk').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
+$('pauseMenuBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); persistRun(); goMenu(); });
 $('againBtn').addEventListener('click', () => { Snd.unlock(); start(G.startL); });
 campEl.addEventListener('click', () => { Snd.unlock(); start(save.camp); });
 $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
@@ -2058,7 +2323,8 @@ if (AppP) {
     AppP.addListener('pause', () => pause());
     AppP.addListener('backButton', () => {
       if (adEl.classList.contains('on')) return;
-      if (shopEl.classList.contains('on')) closeShop();
+      if (bookEl.classList.contains('on')) closeBook();
+      else if (shopEl.classList.contains('on')) closeShop();
       else if (G.mode === 'play' || G.mode === 'count') pause();
       else if (G.mode === 'pause') resume();
       else if (G.mode === 'over') goMenu();
