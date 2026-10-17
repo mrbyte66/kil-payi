@@ -7,7 +7,7 @@
    Gelgit hızlanmasını (etaTo), kilitli halkayı, tut-bırak (bas ve bırak), trafik ışığı, bomba, sabır pimi ve hayalet pimi bilir.
    Tuzakların (kayan tuzak, diken, lanetli altın, alarm, sahte nota, hayalet tuzak) üstündeyse trapAvoid olasılığıyla dokunmaz.
    Altına yalnızca beceriye bağlı bir olasılıkla uzanır (ince hedef riskli).
-   Beceri düzeyleri: yeni 0,12 sn, orta 0,08 sn, iyi 0,05 sn, usta 0,03 sn (standart sapma). Her oyunda sapma log-normal sallanır
+   Beceri düzeyleri: yeni 0,12 sn, orta 0,08 sn, iyi 0,05 sn, usta 0,03 sn, pro 0,02 sn (standart sapma; pro = "refleksi çok iyi"). Her oyunda sapma log-normal sallanır
    (insanın günlük formu) ve her dokunuşta küçük bir dikkat kaybı olasılığı vardır (sapma 3 katına çıkar).
    Sonuç: ölüm anındaki yolculuk süresi (medyan, sn), medyan seviye, "L>=k" oranları ve ölüm anındaki kilit türü dağılımı. */
 (() => {
@@ -104,7 +104,7 @@
     }
     return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss, kind: G.kind, chal: G.chal && G.chal.tw ? G.chal.tw : '', alive: G.mode === 'play', time: G.time };
   };
-  const SKILLS = [['yeni', 0.12, 0.5], ['orta', 0.08, 0.75], ['iyi', 0.05, 0.9], ['usta', 0.03, 0.95]];
+  const SKILLS = [['yeni', 0.12, 0.5], ['orta', 0.08, 0.75], ['iyi', 0.05, 0.9], ['usta', 0.03, 0.95], ['pro', 0.02, 1]];
   window.kindStats = () => Object.keys(window.__stats).sort().map(kd => { const x = window.__stats[kd]; return kd + ': ' + x.ch + ' tur, ' + (x.dur / Math.max(1, x.ch)).toFixed(2) + ' sn/tur, vuruş %' + Math.round(100 * x.hits / Math.max(1, x.taps)) + ' (' + x.taps + ' dokunuş)'; });
   /* cehennem bölümlerinde hayatta kalma: seviye başına girenlerin yüzde kaçı çıktı (bulk sonrası) */
   window.hellStats = () => Object.keys(window.__hell).map(Number).sort((a, b) => a - b).filter(L => L <= 12).map(L => { const h = window.__hell[L]; return 'S' + L + ' %' + Math.round(100 * h.pass / Math.max(1, h.enter)) + ' (' + h.enter + ')'; }).join('  ');
@@ -124,7 +124,7 @@
     return 'S' + L + ' %' + Math.round(100 * ok / n) + (ok ? ' (kalan ' + (left / ok).toFixed(1) + ' sn)' : '');
   };
   window.hellLine = (sg, av, n = 100, t0 = 6, Ls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) => Ls.map(L => window.hellTest(L, sg, av, n, t0)).join('  ');
-  window.bulk = (levels = ['normal'], n = 40, skills = SKILLS, ups = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12]) => {
+  window.bulk = (levels = ['normal'], n = 40, skills = SKILLS, ups = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]) => {
     window.__stats = {}; window.__hell = {};
     const out = {};
     for (const lvl of levels) {

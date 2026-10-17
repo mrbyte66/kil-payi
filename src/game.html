@@ -134,15 +134,17 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
 .tools{position:absolute;left:0;right:0;top:0;bottom:auto;padding:0 16px;display:flex;justify-content:center;align-items:flex-end;gap:16px;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-slow) var(--ease)}
 .tools.on{opacity:1;transform:none}
-.tool{appearance:none;border:0;position:relative;width:52px;height:52px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-s);display:grid;place-items:center;cursor:pointer;pointer-events:auto;touch-action:none;transition:transform var(--dur-fast) var(--ease),opacity var(--dur-fast),width var(--dur-fast) var(--ease),height var(--dur-fast) var(--ease)}
+.tool{appearance:none;border:0;position:relative;width:60px;height:60px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-s);display:grid;place-items:center;cursor:pointer;pointer-events:auto;touch-action:none;transition:transform var(--dur-fast) var(--ease),opacity var(--dur-fast),width var(--dur-fast) var(--ease),height var(--dur-fast) var(--ease)}
 .tools:not(.on) .tool{pointer-events:none}
 .tool:active{transform:scale(.94)}
 .tool.empty{opacity:.55}
-.tool.adv{width:70px;height:70px;background:#F4B63F;color:#3F2A00;box-shadow:0 0 0 5px rgba(244,182,63,.3),var(--shadow-s);animation:advpulse .9s ease-in-out infinite}
+.tool.adv{width:76px;height:76px;background:#F4B63F;color:#3F2A00;box-shadow:0 0 0 5px rgba(244,182,63,.3),var(--shadow-s);animation:advpulse .9s ease-in-out infinite}
 .tool.adv .badge{background:#3F2A00;color:#F4B63F}
 @keyframes advpulse{50%{box-shadow:0 0 0 12px rgba(244,182,63,.08),var(--shadow-s);transform:scale(1.05)}}
-.tool.holding::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--btn);animation:holdring var(--hold,.45s) linear forwards}
-@keyframes holdring{from{transform:scale(.75);opacity:.2}to{transform:scale(1);opacity:1}}
+.tool.bump .badge{animation:bump .4s var(--ease)}
+@keyframes bump{40%{transform:scale(1.55)}}
+@media (max-height:700px){.tool{width:54px;height:54px}.tool.adv{width:66px;height:66px}}
+@media (max-width:340px){.tools{gap:8px}}
 .advlbl{position:absolute;top:-36px;transform:translateX(-50%);padding:6px 13px;border-radius:999px;background:#F4B63F;color:#3F2A00;font:800 13px/1 var(--font-body);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
 .advlbl.on{opacity:1}
 .tool svg{width:26px;height:26px;display:block}
@@ -187,6 +189,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .pdots i{display:block;width:14px;height:14px;border-radius:50%;background:var(--track)}
 .pdots i.on{background:var(--peach)}
 .pdt{margin:0;font-family:var(--font-display);font-weight:700;font-size:var(--fs-28);color:var(--ink)}
+.swapsub{margin:0;max-width:300px;color:var(--ink-2);font-weight:700;font-size:var(--fs-14);line-height:1.5}
 
 .scr.dim{background:var(--scrim);justify-content:center}
 .card{width:min(100%,380px);padding:26px 20px 20px;border-radius:var(--r-l);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
@@ -249,7 +252,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .toast{position:absolute;left:50%;bottom:92px;max-width:calc(100% - 40px);padding:12px 18px;border-radius:var(--r-pill);background:var(--glass);border:1px solid var(--glass-edge);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow-m);font-weight:800;font-size:var(--fs-14);color:var(--ink);text-align:center;opacity:0;transform:translate(-50%,16px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-base) var(--ease);z-index:5}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
-@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tool{width:52px;height:52px}.tagline{display:none}.seg button{min-height:36px}.menu-foot{gap:12px}}
+@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tagline{display:none}.seg button{min-height:36px}.menu-foot{gap:12px}}
 @media (prefers-reduced-motion:reduce){.amb i,.breathe{animation:none}.scr.on .rise,.scr.on .card{animation-duration:1ms;animation-delay:0s}.btn,.icon-btn,.hud,.tools,.tool{transition:none}}
 </style>
 
@@ -353,6 +356,15 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     </div>
   </section>
 
+  <section class="scr dim" id="swap" aria-label="Yarım kalan oyun" aria-hidden="true">
+    <div class="card glass">
+      <p class="eyebrow rise" style="--i:0" data-i18n="swapT">Yarım kalan oyun silinsin mi?</p>
+      <p class="swapsub rise" style="--i:1" id="swapSub"></p>
+      <button class="btn primary big rise" style="--i:2" id="swapYes" type="button" data-i18n="swapYes">Sil ve geç</button>
+      <button class="btn quiet rise" style="--i:3" id="swapNo" type="button" data-i18n="swapNo">Vazgeç</button>
+    </div>
+  </section>
+
   <section class="scr dim" id="pracDone" aria-label="Deneme bitti" aria-hidden="true">
     <div class="card glass">
       <p class="eyebrow rise" style="--i:0" id="pdKind"></p>
@@ -442,14 +454,15 @@ const KIND = {
 };
 /* Seviyeler: hw = hedef genişliği, om = ibre hızı, gain = vuruş başına süre, miss ve trap = ıska ve tuzak bedeli çarpanı,
    kind = kilit eşiği çarpanı, startT = başlangıç süresi, coin = coin kazancı çarpanı.
+   hell = cehennem bölümleri: 'none' (hiç yok: Rahat ve Normal), 'phases' (her seviyenin sonunda açılıp kapanır: Usta), 'always' (baştan sona: Cehennem).
    Yalnızca Cehennem kademesinde: drain = süre erime çarpanı, twins = engel ikizi olasılığının alt sınırı (ikizler kilitle birlikte açılır),
-   hellTheme = baştan sona cehennem teması. */
+   hellScale = cehennem gücü çarpanı. */
 const LEVELS = ['rahat', 'normal', 'usta', 'cehennem'];
 const LEVEL = {
-  rahat:  { hw: 1.2,  om: 0.9,  gain: 1.15, miss: 0.7,  trap: 0.7,  kind: 1.4, startT: 7,   coin: 0.7 },
-  normal: { hw: 1,    om: 1,    gain: 1,    miss: 1,   trap: 1,    kind: 1,   startT: 6,   coin: 1 },
-  usta:   { hw: 0.9,  om: 1.1,  gain: 0.8,  miss: 1.4,  trap: 1.25, kind: 0.6, startT: 5.5, coin: 1.4 },
-  cehennem: { hw: 0.72, om: 1.22, gain: 1,  miss: 1.8,  trap: 1.8,  kind: 0.5, startT: 5.5, coin: 2, drain: 1.35, twins: 0.85, hellTheme: 1 }
+  rahat:  { hw: 1.2,  om: 0.9,  gain: 1.15, miss: 0.7,  trap: 0.7,  kind: 1.4, startT: 7,   coin: 0.7, hell: 'none' },
+  normal: { hw: 1,    om: 1,    gain: 1,    miss: 1,   trap: 1,    kind: 1,   startT: 6,   coin: 1, hell: 'none' },
+  usta:   { hw: 0.9,  om: 1.1,  gain: 0.8,  miss: 1.4,  trap: 1.25, kind: 0.6, startT: 5.5, coin: 1.4, hell: 'phases' },
+  cehennem: { hw: 0.82, om: 1.18, gain: 1,  miss: 1.5,  trap: 1.5,  kind: 0.5, startT: 5.5, coin: 2, drain: 1.25, twins: 0.85, hell: 'always', hellScale: 0.64 }
 };
 /* Seri (kombo): ardışık vuruşlar puan çarpanı kazandırır, ıska seriyi sıfırlar. tiers: çarpanın arttığı seri sayıları. */
 const COMBO = { tiers: [5, 10, 20, 35] };
@@ -518,7 +531,8 @@ const JOURNEY = {
     hell:   { hwM: 0.82, omM: 1.13, drain: 1.18, pen: 1.4, dI: 0.09, twin: 0.78, pts: 1, coinHit: 1, bonusT: 2 }
   }
 };
-const hellK = L => Math.min(1.5, JOURNEY.hellTab[Math.min(L, 10) - 1] + JOURNEY.hellEnd * Math.max(0, L - 10));
+let HELL_SCALE = 1;
+const hellK = L => Math.min(2, (JOURNEY.hellTab[Math.min(L, 10) - 1] + JOURNEY.hellEnd * Math.max(0, L - 10)) * HELL_SCALE);
 const hellTier = L => (L <= 3 ? 0 : L <= 6 ? 1 : L <= 9 ? 2 : 3);
 const phaseMod = (ph, L) => {
   const b = JOURNEY.phase[ph] || JOURNEY.phase.normal;
@@ -608,11 +622,14 @@ const planJourney = (L, ph, n, adapt, mercy) => {
 const PRAC = { omega: 2.2, hw: 0.46, need: 3 };
 const PRAC_NEED = { sabir: 1 };
 const PRAC_TWIN = { cift: 'tuzak', kayan: 'kayanT', nefes: 'diken', altin: 'lanetli', kasa: 'alarm', ritim: 'sahtenota', iki: 'kilitli', hayalet: 'hayaletT', gelgit: 'girdap', tutbirak: 'sicak' };
-/* Süreye göre hedef uzunluğu (V0.5.1): süre doluyken hedefler biraz dar (ilk üç seviyede yavaş yavaş), süre azalınca (tam yanacakken) uzar. */
-const WIDE = { full: 0.9, empty: 1.3 };
+/* Süreye göre hedef uzunluğu: süre çubuğunun her saniyesinde başka uzunlukta hedef çıkar (V0.6.1). Anahtar noktalar saniye başına, aralarında doğrusal.
+   8 sn en dar (zor), 1 sn en uzun (en kolay). Dar tarafı ilk üç seviyede yavaş yavaş devreye girer. */
+const WIDE_TAB = [1.8, 1.62, 1.42, 1.25, 1.12, 1.02, 0.94, 0.87, 0.8];
 const wideAt = (tm, L) => {
-  const f = Math.min(1, Math.max(0, tm / CFG.maxTime)), full = 1 - (1 - WIDE.full) * Math.min(1, Math.max(0, ((L || 10) - 1) / 3));
-  return WIDE.empty + (full - WIDE.empty) * f;
+  const x = Math.min(WIDE_TAB.length - 1, Math.max(0, tm / CFG.maxTime * (WIDE_TAB.length - 1))), i = Math.min(WIDE_TAB.length - 2, Math.floor(x)), f = x - i;
+  let v = WIDE_TAB[i] * (1 - f) + WIDE_TAB[i + 1] * f;
+  if (v < 1) v = 1 - (1 - v) * Math.min(1, Math.max(0, ((L || 10) - 1) / 3));
+  return v;
 };
 /*TUNE-END*/
 
@@ -655,9 +672,10 @@ const STR = {
     warn_cift: 'Pembe tuzağa dokunma', warn_kayan: 'Pembe kayan tuzağa dokunma', warn_nefes: 'Dikenli kenara dokunma',
     lbl_open: 'Açıkken vur', lbl_slide: 'Zamanla', lbl_avoid: 'Dokunma', lbl_thorn: 'Dikene dokunma',
     lifeTag: 'Can', lifeGot: 'Can +1', lifeSaved: 'Can kurtardı: +3 sn',
-    smartMove: 'Akıllı hamle! +25', advNow: 'Basılı tut',
+    smartMove: 'Akıllı hamle! +25', advNow: 'Dokun',
     ts_steto: '{n} sn geniş', ts_kron: '+{n} sn', ts_kalkan: '{n} hata cezasız', ts_kum: '{n} sn yavaş',
-    resumeSub: 'Seviye {n} · {p} puan', newGame: 'Yeni oyun', newSure: 'Kayıt silinsin mi? Dokun', toMenu: 'Menü',
+    resumeSub: '{lv} · Seviye {n} · {p} puan', newGame: 'Yeni oyun', newSure: 'Kayıt silinsin mi? Dokun', toMenu: 'Menü',
+    swapT: 'Yarım kalan oyun silinsin mi?', swapSub: '{lv} · Seviye {n} · {p} puan. Başka moda geçersen bu oyun ve kazandığın {c} coin kaybolur.', swapSub0: '{lv} · Seviye {n} · {p} puan. Başka moda geçersen bu oyun kaybolur.', swapYes: 'Sil ve geç', swapNo: 'Vazgeç',
     bookT: 'Kilit defteri', bkOpen: 'açık', bkNew: 'yeni', bkLockAt: 'Seviye {n}\'de açılır',
     bookCap: 'Açılmamış kilitleri de görebilir ve deneyebilirsin.', bookCnt: '{n} / {m} açıldı', bkTry: 'Dene', bkNext: 'Sıradaki · Seviye {n}', bkLv: 'Seviye {n}',
     pracT: 'Dene', pracEnd: 'Bitir', pracOk: 'Doğru! {n}/{m}', pracRetry: 'Olmadı, tekrar', pracMiss: 'Iska · burada ceza yok', pracLearned: 'Öğrendin', pracAgain: 'Tekrar dene', pracBack: 'Deftere dön', pracCount: '{n} / {m}',
@@ -723,9 +741,10 @@ const STR = {
     warn_cift: 'Stay off the rose trap', warn_kayan: 'Stay off the sliding trap', warn_nefes: 'Stay off the thorny edge',
     lbl_open: 'Hit while open', lbl_slide: 'Time it', lbl_avoid: 'Avoid', lbl_thorn: 'Avoid thorns',
     lifeTag: 'Life', lifeGot: 'Life +1', lifeSaved: 'Life saved you: +3 s',
-    smartMove: 'Smart move! +25', advNow: 'Hold to use',
+    smartMove: 'Smart move! +25', advNow: 'Tap',
     ts_steto: '{n} s wider', ts_kron: '+{n} s', ts_kalkan: '{n} free mistakes', ts_kum: '{n} s slower',
-    resumeSub: 'Level {n} · {p} pts', newGame: 'New game', newSure: 'Delete the save? Tap again', toMenu: 'Menu',
+    resumeSub: '{lv} · Level {n} · {p} pts', newGame: 'New game', newSure: 'Delete the save? Tap again', toMenu: 'Menu',
+    swapT: 'Discard the unfinished game?', swapSub: '{lv} · Level {n} · {p} pts. If you switch mode, this game and the {c} coins you earned are lost.', swapSub0: '{lv} · Level {n} · {p} pts. If you switch mode, this game is lost.', swapYes: 'Discard and switch', swapNo: 'Cancel',
     bookT: 'Lock book', bkOpen: 'open', bkNew: 'new', bkLockAt: 'Unlocks at level {n}',
     bookCap: 'You can preview and try locks you haven\'t unlocked yet.', bookCnt: '{n} / {m} unlocked', bkTry: 'Try', bkNext: 'Next · Level {n}', bkLv: 'Level {n}',
     pracT: 'Practice', pracEnd: 'Done', pracOk: 'Nice! {n}/{m}', pracRetry: 'Not quite, again', pracMiss: 'Miss · no penalty here', pracLearned: 'Got it', pracAgain: 'Try again', pracBack: 'Back to the book', pracCount: '{n} / {m}',
@@ -827,7 +846,7 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.6.0';
+const VERSION = 'V0.6.1';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -851,6 +870,8 @@ if (!save.run || typeof save.run !== 'object' || save.run.v !== 2) save.run = nu
 if (!save.bests || typeof save.bests !== 'object') save.bests = {};
 LEVELS.forEach(l => { save.bests[l] = Math.max(0, save.bests[l] | 0); });
 if (LEVELS.indexOf(save.lvl) < 0) save.lvl = 'normal';
+/* Yarım kalan oyun kendi kademesinde sürer: kademe seçici onunla aynı olur (eski kayıtta kademe yoksa şimdikini al). */
+if (save.run) { if (LEVELS.indexOf(save.run.lvl) < 0) save.run.lvl = save.lvl; else save.lvl = save.run.lvl; }
 if (!save.tips || typeof save.tips !== 'object') save.tips = {};
 save.low = save.low | 0; save.high = save.high | 0; save.highU = save.highU | 0;
 save.camp = Math.max(1, save.camp | 0); save.bestL = save.bestL | 0;
@@ -1143,7 +1164,7 @@ const refreshMenu = () => {
   const has = !!save.run;
   $('playT').textContent = t(has ? 'resume' : 'play');
   const sub = $('playSub');
-  if (has) { sub.textContent = t('resumeSub', { n: save.run.L, p: Number(save.run.score || 0).toLocaleString(LANG === 'tr' ? 'tr-TR' : 'en-US') }); sub.hidden = false; } else sub.hidden = true;
+  if (has) { sub.textContent = t('resumeSub', { lv: t('lv_' + save.run.lvl), n: save.run.L, p: Number(save.run.score || 0).toLocaleString(LANG === 'tr' ? 'tr-TR' : 'en-US') }); sub.hidden = false; } else sub.hidden = true;
   $('playBtn').classList.toggle('two', has);
   const nb = $('newBtn'); nb.hidden = !has; if (!nb.classList.contains('warn')) nb.textContent = t('newGame');
   campEl.hidden = has || save.camp <= 1;
@@ -1279,16 +1300,20 @@ const levelUp = () => {
   persist(); Snd.level(); Platform.haptic('medium');
   Platform.track('journey_level', { level: G.L, score: G.score });
 };
+/* Kademeye göre cehennem: 'none' hiç yok, 'phases' her seviyenin sonunda açılıp kapanır, 'always' baştan sona. */
+const tierPh = ph => { const m = LV().hell; return m === 'phases' ? ph : (m === 'always' ? 'hell' : 'normal'); };
 const phaseChange = pi => {
   const prev = G.ph, prevL = G.L;
   G.L = pi.L; G.ph = pi.ph; G.lvStart = pi.start; G.ptsMul = phaseMod(pi.ph, pi.L).pts;
+  if (pi.L > prevL) { rewardHell(prevL); levelUp(); }
   if (pi.ph === 'hell') {
-    G.thT = 1; G.hellAge = 0;
-    banner(t('hellT' + hellTier(pi.L)), t('bnHellSub', { p: fx(phaseMod('hell', pi.L).pen) }), 'x'); Snd.hell(); Platform.haptic('heavy');
-  } else {
-    if (prev === 'hell') { rewardHell(prevL); levelUp(); }
-    G.thT = LV().hellTheme ? 1 : 0;
-  }
+    G.thT = 1;
+    if (prev !== 'hell') {
+      G.hellAge = 0;
+      const always = LV().hell === 'always';
+      banner(always ? t('hellT3') : t('hellT' + hellTier(pi.L)), t('bnHellSub', { p: fx(phaseMod('hell', pi.L).pen) }), 'x'); Snd.hell(); Platform.haptic('heavy');
+    }
+  } else G.thT = 0;
   G.thDirty = true;
   /* Çalışan tur bozulmaz: yeni bölümün ayarları bir sonraki turdan başlar (ibre hedefe varmak üzereyken hedef ortadan kalkmasın). */
 };
@@ -1452,7 +1477,7 @@ const spawnChallenge = (first, force) => {
     pins.push(p);
   } else if (kind === 'nefes') {
     const p = gate(0, ahead(G.ang, G.dir, dist(CFG.spawnMin, CFG.spawnMax)), hw);
-    p.br = { a: [0.25, 0.38, 0.5][star], P: [2.0, 1.5, 1.2][star], ph: rnd(0, TAU) };
+    p.br = { a: clamp(0.22 + 0.4 * plan.I + 0.05 * star, 0.22, 0.62), P: [2.0, 1.5, 1.2][star], ph: rnd(0, TAU) };
     pins.push(p);
   } else if (kind === 'iki') {
     if (prevKind !== 'iki') G.ang2 = norm(G.ang + Math.PI);
@@ -1549,17 +1574,17 @@ const relayout = snap => {
   } else {
     /* yukarıdan aşağı: HUD, yeni kilit kartının yeri, halka, halkanın altında joker sırası */
     const hudB = (hudEl.offsetTop + hudEl.offsetHeight) || 140;
-    const short = h < 700, cardH = short ? 62 : 102, dockH = G.practice ? 0 : (short ? 58 : 72);
-    const top = hudB + 6 + cardH, bottom = h - 14;
+    const short = h < 700, cardH = short ? 62 : 102, prac = !!G.practice;
+    /* Joker sırası ekranın altında; halka ile arasında parmak boyunda (yaklaşık 1,5 cm) boş alan kalır, oyun dokunuşları jokerlere değmesin (V0.6.1). */
+    const dockH = prac ? 0 : (short ? 68 : 80), lblH = prac ? 0 : 34, gapMin = short ? 54 : 70, bottomPad = short ? 14 : 24;
+    const top = hudB + 6 + cardH, dockTop = prac ? h : h - bottomPad - dockH;
+    const ringMax = prac ? h - 14 : dockTop - lblH - gapMin;
     view.cardB = top;
-    r = Math.min(w * 0.33, h * 0.2);
-    const rFit = (bottom - top - dockH - 12 - 58) / 2.2;
-    if (rFit < r) r = rFit;
+    r = Math.min(w * 0.33, h * 0.2, (ringMax - top - 12) / 2.2);
     r = Math.max(56, r);
-    const blockH = 2.2 * r + 58;
-    cy = G.practice ? top + (bottom - top) * 0.47 : Math.max(top + blockH / 2, h * 0.44);
-    view.dockTop = Math.min(cy + blockH / 2 + 8, h - 10 - dockH);
-    toolsEl.style.top = view.dockTop + 'px';
+    cy = top + Math.max(r * 1.1 + 6, (ringMax - top) * (prac ? 0.47 : 0.5));
+    view.dockTop = dockTop;
+    toolsEl.style.top = dockTop + 'px';
   }
   r = Math.max(56, r);
   view.hudB = G.mode === 'menu' ? 0 : (hudEl.offsetTop + hudEl.offsetHeight);
@@ -1576,7 +1601,7 @@ const resize = () => {
 
 /* Oyun kaydı: uygulamadan çıkınca (kapansa bile) kaldığı yerden devam edebilmek için. */
 const RUN_KEYS = ['jt', 'L', 'ph', 'time', 'score', 'n', 'combo', 'maxCombo', 'near', 'raw', 'perf', 'missRun', 'adapt', 'mercy', 'open', 'eng', 'stars', 'mixes', 'comboOn', 'evi', 'glove', 'boostT', 'slow', 'slowMul', 'narrow', 'coinsJ', 'life', 'lifeLevel', 'campRun', 'startL', 'coinsGiven', 'continued', 'runCounted', 'waveSeen', 'dir'];
-const snapRun = () => { const o = { v: 2 }; RUN_KEYS.forEach(k => { o[k] = G[k]; }); return JSON.parse(JSON.stringify(o)); };
+const snapRun = () => { const o = { v: 2, lvl: save.lvl }; RUN_KEYS.forEach(k => { o[k] = G[k]; }); return JSON.parse(JSON.stringify(o)); };
 const persistRun = () => { if (!G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause')) { save.run = snapRun(); persist(); } };
 
 /* Yeni oyunun başlangıç durumu; Dene modu da aynısından yola çıkar. */
@@ -1601,13 +1626,13 @@ const start = (fromL, snap) => {
   if (snap) {
     RUN_KEYS.forEach(k => { if (snap[k] !== undefined) G[k] = snap[k]; });
     const pi = jPhaseAt(G.jt);
-    G.L = pi.L; G.ph = pi.ph; G.lvStart = pi.start; G.phLeft = pi.left; G.thT = (G.ph === 'hell' || LV().hellTheme) ? 1 : 0;
+    G.L = pi.L; G.ph = tierPh(pi.ph); G.lvStart = pi.start; G.phLeft = pi.left; G.thT = G.ph === 'hell' ? 1 : 0;
   } else {
     /* Önceki seviyelerin olayları sessizce uygulanır; bu seviyenin başındaki yeni kilit ise kartıyla, normal ilerleyişteki gibi ilk karede gelir. */
     save.run = null; persist(); G.jt = jStart(L0) - 0.001; applyEvents(true); G.jt = jStart(L0);
   }
+  HELL_SCALE = LV().hellScale || 1;
   thWx = G.thT; applyTheme(true);
-  if (LV().hellTheme) { G.thT = 1; G.thDirty = true; }
   lvlChipEl.classList.toggle('x', save.lvl === 'cehennem');
   save.bestL = Math.max(save.bestL, G.L);
   if (!snap) banner(t('bnLevel', { n: L0 }), L0 > 1 ? t('campRun') : '');
@@ -2065,6 +2090,8 @@ const useTool = id => {
   G.usedAny = true; save.seen.jokerUse = (save.seen.jokerUse | 0) + 1;
   Snd.tool(); Platform.haptic('medium');
   updateTools(); updateHud();
+  const bb = toolsEl.querySelector('.tool[data-tool="' + id + '"]');
+  if (bb) { bb.classList.remove('bump'); void bb.offsetWidth; bb.classList.add('bump'); }
   Platform.track('tool_use', { id, level: s.l, smart });
 };
 /* Akıllı joker: işe yarayacağı an parlar ve büyür; aynı anda yalnızca biri önerilir. */
@@ -2266,7 +2293,7 @@ const updateHud = () => {
   const frac = clamp((G.jt - G.lvStart) / Math.max(1, jLen(G.L)), 0, 1);
   lprogEl.style.width = (frac * 100).toFixed(1) + '%';
   lprogEl.parentNode.classList.toggle('x', G.ph === 'hell');
-  const sk = G.ph === 'hell' ? 'x' + Math.ceil(Math.max(0, G.phLeft)) : '';
+  const sk = G.ph === 'hell' && LV().hell === 'phases' ? 'x' + Math.ceil(Math.max(0, G.phLeft)) : '';
   if (sk !== lastSect) {
     lastSect = sk;
     if (sk) { sectEl.textContent = t('sectHell', { s: Math.ceil(Math.max(0, G.phLeft)) }); sectEl.className = 'sect on x'; }
@@ -2331,8 +2358,8 @@ const update = raw => {
     if (!PR) {
       G.jt += dt;
       applyEvents(false);
-      const pi = jPhaseAt(G.jt);
-      if (pi.L !== G.L || pi.ph !== G.ph) phaseChange(pi);
+      const pi = jPhaseAt(G.jt), ph = tierPh(pi.ph);
+      if (pi.L !== G.L || ph !== G.ph) phaseChange(Object.assign({}, pi, { ph }));
       G.phLeft = pi.left;
       if (G.ph === 'hell') G.hellAge += dt;
       /* can fırsatı: çift seviyelerin ortasında, canın yoksa bir sonraki hedef yeşil "+" olur */
@@ -3084,7 +3111,7 @@ const render = () => {
 };
 
 /* ---------- giriş ---------- */
-const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on') || bookEl.classList.contains('on');
+const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on') || bookEl.classList.contains('on') || $('swap').classList.contains('on');
 app.addEventListener('pointerup', () => { if (G.mode === 'play') release(); });
 app.addEventListener('pointercancel', () => { if (G.mode === 'play') release(); });
 app.addEventListener('pointerdown', e => {
@@ -3097,36 +3124,13 @@ app.addEventListener('pointerdown', e => {
   else if (G.mode === 'over' && performance.now() - G.overAt > 700) start(G.startL);
   else if (G.mode === 'pause') resume();
 });
-/* Dokunuş oyunda bir şeye denk gelir mi (hedef, tuzak, tut-bırak başı)? Joker sırasına gelen dokunuşlar için. */
-const tapNear = () => {
-  const m = CFG.grace + 0.14;
-  for (const p of G.pins) {
-    if (p.done || p.locked) continue;
-    if (p.kind === 'hold') { if (Math.abs(holdRel(p)) <= p.hw + m) return true; }
-    else if (p.kind === 'gate' || p.kind === 'trap' || p.kind === 'lockpin') {
-      if (angd(p.ring ? G.ang2 : G.ang, pinCenter(p)) <= Math.max(pinHw(p), p.hw || 0) + m) return true;
-    }
-  }
-  return false;
-};
-/* Joker düğmeleri (V0.5.1): jokeri kullanmak için basılı tutulur (parlayan joker 0,28 sn, diğerleri 0,48 sn); kısa dokunuş her zaman oyuna geçer.
-   İbre bir hedefin üstündeyse dokunuş hemen oyuna gider, vuruş gecikmez; böylece ekrana vururken jokerler yanlışlıkla harcanmaz. */
+/* Joker düğmeleri: dokununca çalışır (V0.6.1). Yanlışlıkla basılmasın diye sıra ekranın altındadır ve halkayla arasında parmak boyunda boş alan vardır;
+   o boşluğa dokunuşlar oyuna gider. */
 toolsEl.addEventListener('pointerdown', e => {
   const b = e.target.closest && e.target.closest('button.tool');
   if (!b) return;
   e.preventDefault(); Snd.unlock();
-  if (G.mode !== 'play') return;
-  if (tapNear()) { tap(); return; }
-  const id = b.getAttribute('data-tool'), need = b.classList.contains('adv') ? 280 : 480;
-  b.style.setProperty('--hold', need + 'ms'); b.classList.add('holding');
-  let done = false;
-  const timer = setTimeout(() => { done = true; b.classList.remove('holding'); useTool(id); }, need);
-  const up = () => {
-    clearTimeout(timer); b.classList.remove('holding');
-    window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);
-    if (!done && G.mode === 'play') { tap(); release(); }
-  };
-  window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+  useTool(b.getAttribute('data-tool'));
 });
 window.addEventListener('keyup', e => { if ((e.code === 'Space' || e.code === 'Enter') && G.mode === 'play') release(); });
 window.addEventListener('keydown', e => {
@@ -3145,11 +3149,35 @@ window.addEventListener('keydown', e => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 window.addEventListener('pagehide', () => persistRun());
 
-const setLevel = l => {
-  if (LEVELS.indexOf(l) < 0 || l === save.lvl) return;
+/* Yarım kalan oyundaki henüz coine çevrilmemiş kazanç (oyun bitince verilecek olan). */
+const runPending = r => {
+  const lv = LEVEL[r.lvl] || LEVEL.normal;
+  return Math.max(0, Math.round((Math.floor((r.raw || 0) / CFG.coinDiv) + (r.near || 0) * CFG.nearCoin) * lv.coin) + Math.floor(r.coinsJ || 0) - (r.coinsGiven || 0));
+};
+const doSetLevel = l => {
   save.lvl = l; persist(); refreshLevel(); refreshStats();
   Platform.track('level', { level: l });
 };
+let swapTo = '';
+/* Başka kademeye geçmek yarım kalan oyunu siler; önce sorulur. */
+const setLevel = l => {
+  if (LEVELS.indexOf(l) < 0 || l === save.lvl) return;
+  if (save.run) {
+    const r = save.run, c = runPending(r);
+    swapTo = l;
+    $('swapSub').textContent = t(c > 0 ? 'swapSub' : 'swapSub0', { lv: t('lv_' + r.lvl), n: r.L, p: Number(r.score || 0).toLocaleString(LANG === 'tr' ? 'tr-TR' : 'en-US'), c });
+    show($('swap')); Snd.ui();
+    return;
+  }
+  doSetLevel(l);
+};
+$('swapYes').addEventListener('click', () => {
+  Snd.unlock(); Snd.ui();
+  const to = swapTo; hide($('swap'));
+  save.run = null; persist(); doSetLevel(to);
+  toast(t('lvPicked', { l: t('lv_' + to) }));
+});
+$('swapNo').addEventListener('click', () => { Snd.unlock(); Snd.ui(); hide($('swap')); });
 $('lvlSeg').addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('button[data-lvl]');
   if (!b) return;
@@ -3232,6 +3260,7 @@ if (AppP) {
     AppP.addListener('pause', () => pause());
     AppP.addListener('backButton', () => {
       if (adEl.classList.contains('on')) return;
+      if ($('swap').classList.contains('on')) { hide($('swap')); return; }
       if (G.practice) endPractice(true);
       else if (bookEl.classList.contains('on')) closeBook();
       else if (shopEl.classList.contains('on')) closeShop();

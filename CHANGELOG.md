@@ -3,6 +3,23 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.6.1 — Süreye göre hedef, mod geçişi, sağlam jokerler (2026-10-17)
+
+- **Hedefin uzunluğu süre çubuğunun her saniyesinde farklı.** Süre doluyken (8. saniye) hedefler en dar (×0,8: zor), sonra saniye saniye uzar: 7. sn ×0,87, 6. sn ×0,94, 5. sn ×1,02, 4. sn ×1,12, 3. sn ×1,25, 2. sn ×1,42, 1. sn ×1,62, süre bitmek üzereyken ×1,8 (en kolay).
+  Dar kısım ilk üç seviyede yavaş yavaş devreye girer (1. seviyede hedefler hiç daralmaz).
+- **Cehennem bölümü yalnızca Usta'da açılıp kapanır.** Rahat ve Normal'de artık hiç cehennem bölümü yok, seviyeler kesintisiz akar (botla ölçüldü: Normal'de orta bot 10. seviyeye %40, iyi bot %77 ulaşıyor; V0.6.0'da %30 ve %80'di, yani zorluk neredeyse aynı kaldı). Usta'da her seviyenin sonunda kısa cehennem eskisi gibi sürer.
+  Cehennem kademesinde baştan sona cehennem bölümü vardır ve cehennem gücü artık her seviyede etkindir.
+- **Cehennem gerçekten zor.** Baştan sona cehennem bölümü olarak yeniden ayarlandı (hedef ×0,82, ibre ×1,18, süre erimesi ×1,25, hata cezası ×1,5, cehennem gücü ×0,64). Botla ölçüldü (10 seviyeyi bitirme): kusursuza yakın oynayan bot (pro) %25'ini,
+  usta bot %5'ini, iyi bot hiçbirini bitiriyor (iyi bot çoğunlukla 5.-6. seviyede kalıyor). Aynı ölçümle V0.6.0'daki Cehennem ayarlarını pro bot %35, usta bot %18 bitiriyordu; yani en iyi oyuncu için de belirgin biçimde zorlaştı.
+  Bot insan değildir: insan yeni kuralı ilk görüşte öğrenmek zorundadır ama jokerleri kullanabilir, gerçek oyuncuda sayılar farklı çıkabilir. Çok zor gelirse bir tık kolaylaştırılır.
+- **Dikende nefes oyun ilerledikçe büyüyor.** Diken ikizinde hedefin kapanan payı seviyeyle artar: 3. seviyede yaklaşık %24, 7. seviyede %35, 10. seviyede %50 (★'lı kilitte ve cehennemde en çok %62); yani ortadaki açıklık gitgide daralır.
+- **Jokerler tek dokunuşla çalışıyor.** Basılı tutmak kalktı. Kullanınca sayı hemen azalır, düğme zıplar. Joker istediğin an kullanılabilir (yandığında değil); parlaması yalnızca "şimdi işe yarar" ipucudur.
+  Sıra ekranın en altında ve düğmeler büyüdü (60 px, parlayan 76 px); halka ile jokerler arasında en az parmak boyu (yaklaşık 1,5 cm) boş alan kalır, oyun dokunuşları oraya gider ve jokerlere değmez.
+- **Mod değiştirince yarım kalan oyun silinir, uyarılırsın.** Yarım kalan oyun varken başka bir kademe (Rahat, Normal, Usta, Cehennem) seçersen "Yarım kalan oyun silinsin mi?" penceresi çıkar: bu oyun ve henüz alınmamış coinin kaybolacağı yazar, "Sil ve geç" ya da "Vazgeç".
+  "Devam et" artık kademeyi de gösterir ("Normal · Seviye 5 · 4.200 puan"); yarım kalan oyun kendi kademesinde sürer, yanlış moda karışmaz. Eski kayıtta kademe yoksa şimdi seçili olan kademeye bağlanır.
+- Küçük: Cehennem'de "Cehennem" haberi yalnızca bir kez, oyun başında çıkar; HUD'daki cehennem geri sayım rozeti yalnızca Usta'da; botta "pro" becerisi eklendi (`tools/bot.js`).
+- Bekleyen: **Işınlanma pimi** (ibre kapıya girer, rastgele bir an sonra çıkar). Önce görsel tasarım gösterilip onaylanacak, sonra yapılacak.
+
 ## V0.6.0 — Dene ve Cehennem zorluğu (2026-10-17)
 
 - **Kilit defteri baştan yazıldı.** Artık 14 kilidin hepsi görünür: açtıkların tam açıklamalarıyla, açmadıkların adı ve açılacağı seviyeyle (sıradaki kesikli çerçeveli "Sıradaki · Seviye 4"). Başlıkta "3 / 14 açıldı" yazar.
