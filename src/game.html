@@ -161,17 +161,32 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .ver{font-weight:800;font-size:var(--fs-12);color:var(--ink-3);opacity:.85;margin-top:-4px}
 .icon-btn{position:relative}
 .icon-btn.dot::after{content:"";position:absolute;top:8px;right:8px;width:10px;height:10px;border-radius:50%;background:var(--rose);box-shadow:0 0 0 2px var(--surface)}
-.brow{display:grid;grid-template-columns:44px 1fr auto;gap:2px 12px;align-items:center;padding:10px 12px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);text-align:left}
-.brow .bt{grid-row:1/3;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--lilac-soft)}
+.brow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);text-align:left}
+.brow .bt{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--lilac-soft)}
 .brow .bt img{display:block}
+.brow .bx{min-width:0;display:flex;flex-direction:column;gap:2px}
 .brow b{font-family:var(--font-display);font-weight:600;font-size:var(--fs-16)}
-.brow small{grid-column:2;color:var(--ink-2);font-weight:700;font-size:var(--fs-12);line-height:1.3}
+.brow small{color:var(--ink-2);font-weight:700;font-size:var(--fs-12);line-height:1.3}
 .brow small i{display:block;font-style:normal;color:var(--rose)}
-.brow .st{grid-column:3;grid-row:1/3;font-weight:800;font-size:var(--fs-12);color:var(--life)}
-.brow.lk{opacity:.55}
-.brow.lk .st{color:var(--ink-3)}
+.brow .tg{align-self:flex-start;font-style:normal;font-weight:800;font-size:11px;line-height:1;padding:4px 9px;border-radius:999px;background:var(--peach);color:#3A1D00}
+.brow .tg.g{background:var(--track);color:var(--ink-2)}
+.brow .tg.nw{background:var(--btn);color:var(--on-btn)}
+.brow .try{appearance:none;cursor:pointer;border:1.5px solid var(--lilac);background:transparent;color:var(--ink);font-family:var(--font-body);font-weight:800;font-size:var(--fs-12);padding:8px 14px;border-radius:999px;min-height:34px}
+.brow .try:active{transform:scale(.95)}
+.brow.lk .bt img,.brow.lk .bx b,.brow.lk .bx small{opacity:.62}
+.brow.nx{outline:2px dashed var(--peach);outline-offset:-2px}
 .brow.nw{outline:2px solid var(--btn);outline-offset:-2px}
-.brow.nw .st{color:var(--btn)}
+@media (max-width:340px){.brow{grid-template-columns:38px minmax(0,1fr) auto;gap:8px;padding:8px 9px}.brow .bt{width:38px;height:38px}.brow .bt img{width:30px;height:30px}.brow .try{padding:7px 10px}}
+.bcap{margin:0;width:100%;color:var(--ink-3);font-weight:700;font-size:var(--fs-12);text-align:left}
+.bcnt{font-weight:800;font-size:var(--fs-12);color:var(--ink-2);white-space:nowrap}
+.prac-bar{display:none;align-items:center;justify-content:space-between;gap:10px}
+#app.prac .gauge-row,#app.prac .hud-row,#app.prac .hud-row2{display:none}
+#app.prac .prac-bar{display:flex}
+.prac-bar .btn{pointer-events:auto;min-height:40px;padding:0 16px;font-size:var(--fs-14);background:var(--surface);box-shadow:var(--shadow-s);color:var(--ink)}
+.pdots{display:flex;gap:8px}
+.pdots i{display:block;width:14px;height:14px;border-radius:50%;background:var(--track)}
+.pdots i.on{background:var(--peach)}
+.pdt{margin:0;font-family:var(--font-display);font-weight:700;font-size:var(--fs-28);color:var(--ink)}
 
 .scr.dim{background:var(--scrim);justify-content:center}
 .card{width:min(100%,380px);padding:26px 20px 20px;border-radius:var(--r-l);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
@@ -192,9 +207,16 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .cont-actions .btn{min-height:52px;padding:0 12px;font-size:var(--fs-16);white-space:nowrap;background:var(--bg);box-shadow:none}
 .cont-actions .btn.ad{background:var(--btn);color:var(--on-btn)}
 .row2{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-.seg{display:flex;gap:4px;padding:4px;border-radius:var(--r-pill);background:var(--surface);box-shadow:var(--shadow-s)}
-.seg button{appearance:none;border:0;cursor:pointer;min-height:40px;padding:0 18px;border-radius:var(--r-pill);background:transparent;color:var(--ink-2);font-family:var(--font-display);font-weight:600;font-size:var(--fs-16);line-height:1;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:var(--r-pill);background:var(--surface);box-shadow:var(--shadow-s);width:min(100%,372px)}
+.seg button{appearance:none;border:0;cursor:pointer;min-height:40px;padding:0 4px;border-radius:var(--r-pill);background:transparent;color:var(--ink-2);font-family:var(--font-display);font-weight:600;font-size:var(--fs-14);line-height:1;white-space:nowrap;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
 .seg button[aria-checked="true"]{background:var(--btn);color:var(--on-btn)}
+.seg button[data-lvl="cehennem"][aria-checked="true"]{background:#D9503A;color:#fff}
+.lvhint{margin:-8px 0 0;max-width:320px;min-height:16px;color:var(--ink-3);font-weight:700;font-size:var(--fs-12);text-align:center}
+.chip.x{background:#D9503A;color:#fff}
+.chip.x b{color:#fff}
+@media (max-width:360px){.seg button{font-size:13px;padding:0 2px}}
+@media (max-width:330px){.seg button{font-size:12px}}
+@media (max-height:700px){.lvhint{display:none}}
 .seg button:focus-visible{outline:3px solid var(--lilac);outline-offset:2px}
 .tip{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 6px 6px 16px;border-radius:var(--r-pill);background:var(--lilac-soft);color:var(--ink);font-weight:800;font-size:var(--fs-14);text-align:left}
 .tip .btn{min-height:36px;padding:0 14px;font-size:var(--fs-14);background:var(--surface);box-shadow:none;white-space:nowrap}
@@ -227,7 +249,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .toast{position:absolute;left:50%;bottom:92px;max-width:calc(100% - 40px);padding:12px 18px;border-radius:var(--r-pill);background:var(--glass);border:1px solid var(--glass-edge);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:var(--shadow-m);font-weight:800;font-size:var(--fs-14);color:var(--ink);text-align:center;opacity:0;transform:translate(-50%,16px);pointer-events:none;transition:opacity var(--dur-base) var(--ease),transform var(--dur-base) var(--ease);z-index:5}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
-@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tool{width:52px;height:52px}.tagline{display:none}.seg button{min-height:36px;padding:0 14px}.menu-foot{gap:12px}}
+@media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tool{width:52px;height:52px}.tagline{display:none}.seg button{min-height:36px}.menu-foot{gap:12px}}
 @media (prefers-reduced-motion:reduce){.amb i,.breathe{animation:none}.scr.on .rise,.scr.on .card{animation-duration:1ms;animation-delay:0s}.btn,.icon-btn,.hud,.tools,.tool{transition:none}}
 </style>
 
@@ -249,6 +271,11 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     <div class="hud-row2">
       <div class="lvl"><span class="chip sm" id="lvlChip"></span><i class="lprog"><b id="lprog"></b></i></div>
       <span class="sect x" id="sect"></span>
+    </div>
+    <div class="prac-bar">
+      <span class="chip sm"><span data-i18n="pracT">Dene</span></span>
+      <span class="pdots" id="pracDots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <button class="btn quiet" id="pracEnd" type="button" data-i18n="pracEnd">Bitir</button>
     </div>
   </div>
 
@@ -284,7 +311,9 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
         <button type="button" role="radio" data-lvl="rahat" aria-checked="false" data-i18n="lv_rahat">Rahat</button>
         <button type="button" role="radio" data-lvl="normal" aria-checked="true" data-i18n="lv_normal">Normal</button>
         <button type="button" role="radio" data-lvl="usta" aria-checked="false" data-i18n="lv_usta">Usta</button>
+        <button type="button" role="radio" data-lvl="cehennem" aria-checked="false" data-i18n="lv_cehennem">Cehennem</button>
       </div>
+      <p class="lvhint rise" style="--i:4" id="lvHint"></p>
       <button class="btn primary big breathe rise" style="--i:5" id="playBtn" type="button"><span id="playT">Oyna</span><small id="playSub" hidden></small></button>
       <button class="btn quiet rise" style="--i:6" id="newBtn" type="button" hidden></button>
       <button class="btn quiet rise" style="--i:6" id="campBtn" type="button" hidden></button>
@@ -324,9 +353,19 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     </div>
   </section>
 
+  <section class="scr dim" id="pracDone" aria-label="Deneme bitti" aria-hidden="true">
+    <div class="card glass">
+      <p class="eyebrow rise" style="--i:0" id="pdKind"></p>
+      <h2 class="pdt rise" style="--i:1" data-i18n="pracLearned">Öğrendin</h2>
+      <button class="btn primary big rise" style="--i:2" id="pdAgain" type="button" data-i18n="pracAgain">Tekrar dene</button>
+      <button class="btn quiet rise" style="--i:3" id="pdBack" type="button" data-i18n="pracBack">Deftere dön</button>
+    </div>
+  </section>
+
   <section class="scr dim" id="book" aria-label="Kilit defteri" aria-hidden="true">
     <div class="card glass shop">
-      <div class="shop-head"><h2 data-i18n="bookT">Kilit defteri</h2></div>
+      <div class="shop-head"><h2 data-i18n="bookT">Kilit defteri</h2><span class="bcnt" id="bookCnt"></span></div>
+      <p class="bcap" data-i18n="bookCap">Açılmamış kilitleri de görebilir ve deneyebilirsin.</p>
       <div class="shop-list" id="bookList"></div>
       <button class="btn quiet" id="bookClose" type="button" data-i18n="close">Kapat</button>
     </div>
@@ -402,12 +441,15 @@ const KIND = {
   iki:   { min: 38, w: 0.4, gain: 0.65, hwMul: 1.25, omMul: 0.82 }
 };
 /* Seviyeler: hw = hedef genişliği, om = ibre hızı, gain = vuruş başına süre, miss ve trap = ıska ve tuzak bedeli çarpanı,
-   kind = kilit eşiği çarpanı, startT = başlangıç süresi, coin = coin kazancı çarpanı. */
-const LEVELS = ['rahat', 'normal', 'usta'];
+   kind = kilit eşiği çarpanı, startT = başlangıç süresi, coin = coin kazancı çarpanı.
+   Yalnızca Cehennem kademesinde: drain = süre erime çarpanı, twins = engel ikizi olasılığının alt sınırı (ikizler kilitle birlikte açılır),
+   hellTheme = baştan sona cehennem teması. */
+const LEVELS = ['rahat', 'normal', 'usta', 'cehennem'];
 const LEVEL = {
   rahat:  { hw: 1.2,  om: 0.9,  gain: 1.15, miss: 0.7,  trap: 0.7,  kind: 1.4, startT: 7,   coin: 0.7 },
   normal: { hw: 1,    om: 1,    gain: 1,    miss: 1,   trap: 1,    kind: 1,   startT: 6,   coin: 1 },
-  usta:   { hw: 0.9,  om: 1.1,  gain: 0.8,  miss: 1.4,  trap: 1.25, kind: 0.6, startT: 5.5, coin: 1.4 }
+  usta:   { hw: 0.9,  om: 1.1,  gain: 0.8,  miss: 1.4,  trap: 1.25, kind: 0.6, startT: 5.5, coin: 1.4 },
+  cehennem: { hw: 0.72, om: 1.22, gain: 1,  miss: 1.8,  trap: 1.8,  kind: 0.5, startT: 5.5, coin: 2, drain: 1.35, twins: 0.85, hellTheme: 1 }
 };
 /* Seri (kombo): ardışık vuruşlar puan çarpanı kazandırır, ıska seriyi sıfırlar. tiers: çarpanın arttığı seri sayıları. */
 const COMBO = { tiers: [5, 10, 20, 35] };
@@ -562,6 +604,10 @@ const planJourney = (L, ph, n, adapt, mercy) => {
     relief: ph === 'normal' && wp > DIFF.rise + 1e-9
   };
 };
+/* Dene modu (kilit defterinden kısa deneme): yavaş ibre, geniş hedef, 3 doğru tur; süre ve ceza yok. Engel ikizi yalnızca ikinci turdan sonra gelir. */
+const PRAC = { omega: 2.2, hw: 0.46, need: 3 };
+const PRAC_NEED = { sabir: 1 };
+const PRAC_TWIN = { cift: 'tuzak', kayan: 'kayanT', nefes: 'diken', altin: 'lanetli', kasa: 'alarm', ritim: 'sahtenota', iki: 'kilitli', hayalet: 'hayaletT', gelgit: 'girdap', tutbirak: 'sicak' };
 /* Süreye göre hedef uzunluğu (V0.5.1): süre doluyken hedefler biraz dar (ilk üç seviyede yavaş yavaş), süre azalınca (tam yanacakken) uzar. */
 const WIDE = { full: 0.9, empty: 1.3 };
 const wideAt = (tm, L) => {
@@ -613,9 +659,12 @@ const STR = {
     ts_steto: '{n} sn geniş', ts_kron: '+{n} sn', ts_kalkan: '{n} hata cezasız', ts_kum: '{n} sn yavaş',
     resumeSub: 'Seviye {n} · {p} puan', newGame: 'Yeni oyun', newSure: 'Kayıt silinsin mi? Dokun', toMenu: 'Menü',
     bookT: 'Kilit defteri', bkOpen: 'açık', bkNew: 'yeni', bkLockAt: 'Seviye {n}\'de açılır',
+    bookCap: 'Açılmamış kilitleri de görebilir ve deneyebilirsin.', bookCnt: '{n} / {m} açıldı', bkTry: 'Dene', bkNext: 'Sıradaki · Seviye {n}', bkLv: 'Seviye {n}',
+    pracT: 'Dene', pracEnd: 'Bitir', pracOk: 'Doğru! {n}/{m}', pracRetry: 'Olmadı, tekrar', pracMiss: 'Iska · burada ceza yok', pracLearned: 'Öğrendin', pracAgain: 'Tekrar dene', pracBack: 'Deftere dön', pracCount: '{n} / {m}',
     unusedJ: '{t} vardı, kullanmadan bitti. Bir dahaki sefere dene.',
-    level: 'Zorluk', lv_rahat: 'Rahat', lv_normal: 'Normal', lv_usta: 'Usta', lvPicked: '{l} modu seçildi',
-    tipEasy: 'Zor mu geldi?', tipEasyBtn: 'Rahat mod', tipHard: 'Çok kolay mı?', tipHardBtn: 'Usta mod',
+    level: 'Zorluk', lv_rahat: 'Rahat', lv_normal: 'Normal', lv_usta: 'Usta', lv_cehennem: 'Cehennem', lvPicked: '{l} modu seçildi',
+    lvHint_rahat: 'Geniş hedef, yavaş ibre, hafif ceza', lvHint_normal: 'Dengeli oyun', lvHint_usta: 'Dar hedef, hızlı ibre, ağır ceza', lvHint_cehennem: 'Baştan sona cehennem: çok dar hedef, çok hızlı ibre',
+    tipEasy: 'Zor mu geldi?', tipEasyBtn: 'Rahat mod', tipHard: 'Çok kolay mı?', tipHardBtn: 'Usta mod', tipHell: 'Usta kolay mı?', tipHellBtn: 'Cehennem modu',
     lvlChip: 'Seviye {n}', sectHell: 'Cehennem · {s} sn',
     bnHell: 'Cehennem bölümü', bnHellSub: 'Ceza ×{p} · süre hızlı erir', bnLevel: 'Seviye {n}',
     hellT0: 'Kolay cehennem', hellT1: 'Orta cehennem', hellT2: 'Zor cehennem', hellT3: 'Cehennem',
@@ -678,9 +727,12 @@ const STR = {
     ts_steto: '{n} s wider', ts_kron: '+{n} s', ts_kalkan: '{n} free mistakes', ts_kum: '{n} s slower',
     resumeSub: 'Level {n} · {p} pts', newGame: 'New game', newSure: 'Delete the save? Tap again', toMenu: 'Menu',
     bookT: 'Lock book', bkOpen: 'open', bkNew: 'new', bkLockAt: 'Unlocks at level {n}',
+    bookCap: 'You can preview and try locks you haven\'t unlocked yet.', bookCnt: '{n} / {m} unlocked', bkTry: 'Try', bkNext: 'Next · Level {n}', bkLv: 'Level {n}',
+    pracT: 'Practice', pracEnd: 'Done', pracOk: 'Nice! {n}/{m}', pracRetry: 'Not quite, again', pracMiss: 'Miss · no penalty here', pracLearned: 'Got it', pracAgain: 'Try again', pracBack: 'Back to the book', pracCount: '{n} / {m}',
     unusedJ: 'You had {t} left. Try it next time.',
-    level: 'Difficulty', lv_rahat: 'Easy', lv_normal: 'Normal', lv_usta: 'Master', lvPicked: '{l} mode selected',
-    tipEasy: 'Too hard?', tipEasyBtn: 'Easy mode', tipHard: 'Too easy?', tipHardBtn: 'Master mode',
+    level: 'Difficulty', lv_rahat: 'Easy', lv_normal: 'Normal', lv_usta: 'Master', lv_cehennem: 'Hell', lvPicked: '{l} mode selected',
+    lvHint_rahat: 'Wide targets, slow pointer, light penalties', lvHint_normal: 'Balanced', lvHint_usta: 'Narrow targets, fast pointer, heavy penalties', lvHint_cehennem: 'Hell all the way: tiny targets, very fast pointer',
+    tipEasy: 'Too hard?', tipEasyBtn: 'Easy mode', tipHard: 'Too easy?', tipHardBtn: 'Master mode', tipHell: 'Master too easy?', tipHellBtn: 'Hell mode',
     lvlChip: 'Level {n}', sectHell: 'Hell · {s} s',
     bnHell: 'Hell round', bnHellSub: 'Penalties ×{p} · time melts faster', bnLevel: 'Level {n}',
     hellT0: 'Easy hell', hellT1: 'Medium hell', hellT2: 'Hard hell', hellT3: 'Full hell',
@@ -775,12 +827,12 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.5.1';
+const VERSION = 'V0.6.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
-  bests: { rahat: 0, normal: 0, usta: 0 },
+  bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
   tools: { steto: { n: 2, l: 1 }, kron: { n: 2, l: 1 }, kalkan: { n: 2, l: 1 }, kum: { n: 2, l: 1 } },
-  unl: {}, seen: {}, tips: {}, low: 0, high: 0, camp: 1, bestL: 0, run: null, book: {}, v: 2
+  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, v: 2
 };
 try {
   const raw = localStorage.getItem('kilpayi.v1');
@@ -800,7 +852,7 @@ if (!save.bests || typeof save.bests !== 'object') save.bests = {};
 LEVELS.forEach(l => { save.bests[l] = Math.max(0, save.bests[l] | 0); });
 if (LEVELS.indexOf(save.lvl) < 0) save.lvl = 'normal';
 if (!save.tips || typeof save.tips !== 'object') save.tips = {};
-save.low = save.low | 0; save.high = save.high | 0;
+save.low = save.low | 0; save.high = save.high | 0; save.highU = save.highU | 0;
 save.camp = Math.max(1, save.camp | 0); save.bestL = save.bestL | 0;
 const LV = () => LEVEL[save.lvl];
 const bestNow = () => save.bests[save.lvl];
@@ -1049,6 +1101,7 @@ const refreshSound = () => {
 };
 const refreshLevel = () => {
   $('lvlSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', b.getAttribute('data-lvl') === save.lvl ? 'true' : 'false'));
+  $('lvHint').textContent = t('lvHint_' + save.lvl);
 };
 const updateTools = () => {
   toolsEl.querySelectorAll('.tool').forEach(b => {
@@ -1067,13 +1120,17 @@ const bookIcon = (c, kind) => {
   drawLockIcon(g, kind, 48, 48, 44);
   return cvs.toDataURL();
 };
+const bookSeen = e => (save.seen[e.k] | 0) > 0 || (e.k === 'tek' && save.runs > 0);
 const renderBook = () => {
+  const nx = BOOK.find(e => !bookSeen(e)), n = BOOK.filter(bookSeen).length;
+  $('bookCnt').textContent = t('bookCnt', { n, m: BOOK.length });
   $('bookList').innerHTML = BOOK.map(e => {
-    const seen = (save.seen[e.k] | 0) > 0 || e.k === 'tek' && save.runs > 0, fresh = seen && !save.book[e.k];
-    const nm = seen ? t('k_' + e.k) : '???', rule = seen ? t('rule_' + e.k) : t('bkLockAt', { n: e.lv });
+    const seen = bookSeen(e), fresh = seen && !save.book[e.k], isNx = !seen && nx && nx.k === e.k;
     const warn = seen && STR[LANG]['warn_' + e.k] ? '<i>' + t('warn_' + e.k) + '</i>' : '';
-    return '<div class="brow' + (seen ? '' : ' lk') + (fresh ? ' nw' : '') + '"><span class="bt">' + (seen ? '<img alt="" width="36" height="36" src="' + bookIcon(null, e.k) + '">' : '') + '</span>' +
-      '<b>' + nm + '</b><small>' + rule + warn + '</small><span class="st">' + (seen ? (fresh ? t('bkNew') : t('bkOpen')) : '') + '</span></div>';
+    const tag = seen ? (fresh ? '<em class="tg nw">' + t('bkNew') + '</em>' : '') : '<em class="tg' + (isNx ? '' : ' g') + '">' + t(isNx ? 'bkNext' : 'bkLv', { n: e.lv }) + '</em>';
+    return '<div class="brow' + (seen ? '' : ' lk') + (isNx ? ' nx' : '') + (fresh ? ' nw' : '') + '"><span class="bt"><img alt="" width="36" height="36" src="' + bookIcon(null, e.k) + '"></span>' +
+      '<span class="bx">' + tag + '<b>' + t('k_' + e.k) + '</b><small>' + t('rule_' + e.k) + warn + '</small></span>' +
+      '<button class="try" type="button" data-try="' + e.k + '" aria-label="' + t('bkTry') + ' · ' + t('k_' + e.k) + '">' + t('bkTry') + '</button></div>';
   }).join('');
 };
 const openBook = () => {
@@ -1123,7 +1180,7 @@ const G = {
   campRun: false, startL: 1, banner: null, count: 0, thT: 0, thDirty: false, ec: 0, em: [],
   life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
   pendingNew: '', pendingTw: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0,
-  chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false
+  chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null
 };
 const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100, hudB: 0, dockTop: 0, cardB: 0 };
 
@@ -1176,7 +1233,7 @@ const noteSeen = kind => { const v = save.seen[kind] = Math.min(99, (save.seen[k
 const fireEvent = (e, silent) => {
   let card = null;
   if (e.good) {
-    const tw = e.twin && IMPL_TWIN[e.twin] ? e.twin : '';
+    const tw0 = e.twin || (LV().twins && JTWIN[e.good]) || '', tw = tw0 && IMPL_TWIN[tw0] ? tw0 : '';
     let isNew = false;
     if (IMPL_GOOD[e.good] && G.open.indexOf(e.good) < 0) { G.open.push(e.good); isNew = true; }
     if (tw && !G.eng[tw]) { G.eng[tw] = true; isNew = true; }
@@ -1230,7 +1287,7 @@ const phaseChange = pi => {
     banner(t('hellT' + hellTier(pi.L)), t('bnHellSub', { p: fx(phaseMod('hell', pi.L).pen) }), 'x'); Snd.hell(); Platform.haptic('heavy');
   } else {
     if (prev === 'hell') { rewardHell(prevL); levelUp(); }
-    G.thT = 0;
+    G.thT = LV().hellTheme ? 1 : 0;
   }
   G.thDirty = true;
   /* Çalışan tur bozulmaz: yeni bölümün ayarları bir sonraki turdan başlar (ibre hedefe varmak üzereyken hedef ortadan kalkmasın). */
@@ -1354,8 +1411,10 @@ const makeLabels = (kind, pins, seenKind, seenTw) => {
 };
 
 const spawnChallenge = (first, force) => {
-  const lv = LV(), pm = phaseMod(G.ph, G.L);
-  const plan = planJourney(G.L, G.ph, G.n, G.adapt, G.mercy);
+  const PR = G.practice;
+  const lv = PR ? LEVEL.normal : LV(), pm = PR ? JOURNEY.phase.normal : phaseMod(G.ph, G.L);
+  const plan = PR ? { I: 0.1, omega: PRAC.omega, hw: PRAC.hw, relief: false } : planJourney(G.L, G.ph, G.n, G.adapt, G.mercy);
+  if (PR) force = PR.kind;
   let mix = null, can = false, forceTw = '';
   if (!first && !force && G.lifeDue && !G.life) { can = true; G.lifeDue = false; }
   else if (!first && !force && !plan.relief && G.mixes.length && Math.random() < 0.28) {
@@ -1363,6 +1422,7 @@ const spawnChallenge = (first, force) => {
     if (mix[1] === 'tuzak' && pm.twin === 0) mix = null;
   }
   G.firstOfKind = false;
+  if (PR) { PR.spawns++; forceTw = PR.spawns > 1 ? (PRAC_TWIN[PR.kind] || '') : ''; }
   let kind;
   if (first || can) kind = 'tek';
   else if (force) kind = force;
@@ -1374,12 +1434,12 @@ const spawnChallenge = (first, force) => {
   G.kind = kind; G.lastKind = kind; G.gainMul = km.gain * lv.gain;
   G.I = plan.I; G.relief = plan.relief;
   G.omega = plan.omega * km.omMul * lv.om * pm.omM;
-  let hw = Math.min(0.8, plan.hw * km.hwMul * lv.hw * pm.hwM * wideAt(G.time, G.L));
+  let hw = Math.min(0.8, plan.hw * km.hwMul * lv.hw * pm.hwM * (PR ? 1 : wideAt(G.time, G.L)));
   if (can) hw = Math.min(0.8, hw * 1.15);
   const star = G.stars[kind] | 0, sIx = Math.min(2, star);
   G.chal = { kind, t: 0, star, tw: '' };
   G.holding = false; G.lockLeft = 0;
-  const far = G.firstOfKind ? [2.0, 2.6] : null;
+  const far = (G.firstOfKind || PR) ? [2.0, 2.6] : null;
   const dist = (lo, hi) => far ? rnd(far[0], far[1]) : rnd(lo, hi);
   const gate = mkGate;
   const pins = [];
@@ -1446,12 +1506,12 @@ const spawnChallenge = (first, force) => {
     pins.push(p);
   }
   if (mix && mix[1] === 'kayan') for (const p of pins) { p.amp = rnd(0.28, 0.45); p.f = rnd(0.3, 0.42); p.ph = rnd(0, TAU); }
-  const tw = forceTw || (mix && mix[1] === 'tuzak' ? 'tuzak' : JTWIN[kind]);
-  if (!first && !can && tw && G.eng[tw] && (mix || forceTw ? true : Math.random() < pm.twin)) G.chal.tw = addTwin(tw, pins, hw);
+  const tw = PR ? forceTw : (forceTw || (mix && mix[1] === 'tuzak' ? 'tuzak' : JTWIN[kind]));
+  if (!first && !can && tw && G.eng[tw] && (mix || forceTw ? true : Math.random() < Math.max(pm.twin, lv.twins || 0))) G.chal.tw = addTwin(tw, pins, hw);
   G.pins = pins; G.gateT = 0; G.lab = null;
   syncPrimary();
   if (!first && !can) {
-    const sk = kind !== 'tek' ? noteSeen(kind) : 99, st = G.chal.tw ? noteSeen(G.chal.tw) : 99;
+    const sk = PR ? 1 : (kind !== 'tek' ? noteSeen(kind) : 99), st = PR ? 1 : (G.chal.tw ? noteSeen(G.chal.tw) : 99);
     G.lab = makeLabels(kind, pins, sk, st);
   }
 };
@@ -1489,7 +1549,7 @@ const relayout = snap => {
   } else {
     /* yukarıdan aşağı: HUD, yeni kilit kartının yeri, halka, halkanın altında joker sırası */
     const hudB = (hudEl.offsetTop + hudEl.offsetHeight) || 140;
-    const short = h < 700, cardH = short ? 62 : 102, dockH = short ? 58 : 72;
+    const short = h < 700, cardH = short ? 62 : 102, dockH = G.practice ? 0 : (short ? 58 : 72);
     const top = hudB + 6 + cardH, bottom = h - 14;
     view.cardB = top;
     r = Math.min(w * 0.33, h * 0.2);
@@ -1497,7 +1557,7 @@ const relayout = snap => {
     if (rFit < r) r = rFit;
     r = Math.max(56, r);
     const blockH = 2.2 * r + 58;
-    cy = Math.max(top + blockH / 2, h * 0.44);
+    cy = G.practice ? top + (bottom - top) * 0.47 : Math.max(top + blockH / 2, h * 0.44);
     view.dockTop = Math.min(cy + blockH / 2 + 8, h - 10 - dockH);
     toolsEl.style.top = view.dockTop + 'px';
   }
@@ -1517,12 +1577,10 @@ const resize = () => {
 /* Oyun kaydı: uygulamadan çıkınca (kapansa bile) kaldığı yerden devam edebilmek için. */
 const RUN_KEYS = ['jt', 'L', 'ph', 'time', 'score', 'n', 'combo', 'maxCombo', 'near', 'raw', 'perf', 'missRun', 'adapt', 'mercy', 'open', 'eng', 'stars', 'mixes', 'comboOn', 'evi', 'glove', 'boostT', 'slow', 'slowMul', 'narrow', 'coinsJ', 'life', 'lifeLevel', 'campRun', 'startL', 'coinsGiven', 'continued', 'runCounted', 'waveSeen', 'dir'];
 const snapRun = () => { const o = { v: 2 }; RUN_KEYS.forEach(k => { o[k] = G[k]; }); return JSON.parse(JSON.stringify(o)); };
-const persistRun = () => { if (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause') { save.run = snapRun(); persist(); } };
+const persistRun = () => { if (!G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause')) { save.run = snapRun(); persist(); } };
 
-const start = (fromL, snap) => {
-  const L0 = fromL || 1;
-  Snd.ui();
-  Object.assign(G, {
+/* Yeni oyunun başlangıç durumu; Dene modu da aynısından yola çıkar. */
+const runState = L0 => ({
     mode: 'play', time: LV().startT, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0, slowMul: CFG.contSlowMul, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
     continued: false, runCounted: false, coinsGiven: 0, gain: 0, shake: 0, flash: 0, tscale: 1, tsT: 0,
     revT: 0, beep: 0, scorePulse: 0, parts: [], pops: [], rips: [], nearMsg: '',
@@ -1533,17 +1591,24 @@ const start = (fromL, snap) => {
     campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: 0, thDirty: false, em: [],
     life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
     pendingNew: '', pendingTw: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0,
-    chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false
-  });
+    chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null
+});
+
+const start = (fromL, snap) => {
+  const L0 = fromL || 1;
+  Snd.ui();
+  Object.assign(G, runState(L0));
   if (snap) {
     RUN_KEYS.forEach(k => { if (snap[k] !== undefined) G[k] = snap[k]; });
     const pi = jPhaseAt(G.jt);
-    G.L = pi.L; G.ph = pi.ph; G.lvStart = pi.start; G.phLeft = pi.left; G.thT = G.ph === 'hell' ? 1 : 0;
+    G.L = pi.L; G.ph = pi.ph; G.lvStart = pi.start; G.phLeft = pi.left; G.thT = (G.ph === 'hell' || LV().hellTheme) ? 1 : 0;
   } else {
     /* Önceki seviyelerin olayları sessizce uygulanır; bu seviyenin başındaki yeni kilit ise kartıyla, normal ilerleyişteki gibi ilk karede gelir. */
     save.run = null; persist(); G.jt = jStart(L0) - 0.001; applyEvents(true); G.jt = jStart(L0);
   }
   thWx = G.thT; applyTheme(true);
+  if (LV().hellTheme) { G.thT = 1; G.thDirty = true; }
+  lvlChipEl.classList.toggle('x', save.lvl === 'cehennem');
   save.bestL = Math.max(save.bestL, G.L);
   if (!snap) banner(t('bnLevel', { n: L0 }), L0 > 1 ? t('campRun') : '');
   spawnChallenge(!snap);
@@ -1566,6 +1631,7 @@ const resumeSaved = () => {
 const goMenu = () => {
   G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0; G.kind = 'tek'; G.hint = null;
   G.thT = 0; G.thDirty = true; G.banner = null; G.count = 0; G.card = null; G.lab = null; G.adv = null;
+  G.practice = null; hide($('pracDone')); app.classList.remove('prac');
   hide(overEl); hide(pauseEl); hide(shopEl);
   app.classList.remove('playing');
   hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
@@ -1575,10 +1641,56 @@ const goMenu = () => {
   requestAnimationFrame(() => relayout(false));
 };
 
+/* ---------- Dene: kilit defterinden kısa canlı deneme (süre, ceza, puan ve kayıt yok) ---------- */
+const syncPracDots = () => {
+  const d = $('pracDots').children, PR = G.practice;
+  for (let i = 0; i < d.length; i++) { d[i].className = PR && i < PR.ok ? 'on' : ''; d[i].style.display = PR && i >= PR.need ? 'none' : ''; }
+};
+const startPractice = kind => {
+  Snd.ui();
+  Object.assign(G, runState(1));
+  const tw = PRAC_TWIN[kind] || '';
+  G.mode = 'play'; G.time = CFG.maxTime; G.dir = 1;
+  G.practice = { kind, tw, ok: 0, need: PRAC_NEED[kind] || PRAC.need, spawns: 0 };
+  G.open = Object.keys(IMPL_GOOD); Object.keys(IMPL_TWIN).forEach(x => { G.eng[x] = true; });
+  G.thT = 0; thWx = 0; applyTheme(true);
+  G.card = Object.assign(bigCard(kind, tw), { max: 1e9, wait: '' });
+  hide(menuEl); hide(bookEl); hide(overEl); hide(pauseEl); hide(shopEl); hide($('pracDone'));
+  app.classList.add('playing', 'prac');
+  hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
+  toolsEl.classList.remove('on');
+  syncPracDots();
+  spawnChallenge(false);
+  relayout(false); updateHud();
+  Platform.track('practice', { kind });
+};
+const practiceStep = () => {
+  const PR = G.practice;
+  if (!G.chal.fail) {
+    PR.ok++; syncPracDots();
+    if (PR.ok >= PR.need) { practiceDone(); return; }
+    pop(t('pracOk', { n: PR.ok, m: PR.need }), 'hype'); Snd.tick(true);
+  } else pop(t('pracRetry'), 'miss');
+  spawnChallenge(false);
+};
+const practiceDone = () => {
+  const PR = G.practice;
+  G.mode = 'pracdone'; G.pins = []; G.lab = null; G.holding = false;
+  $('pdKind').textContent = t('k_' + PR.kind);
+  burst(view.cx, view.cy, 34, [P.peach, P.lilac, GOLD, '#FFFFFF'], 300);
+  Snd.fanfare(); Platform.haptic('medium');
+  show($('pracDone'));
+};
+const endPractice = toBook => {
+  goMenu();
+  if (toBook) openBook();
+};
+
 /* ---------- yeni kilitlerin işleyişi: kilit, tut-bırak, ışık, bomba, girdap ---------- */
 const primaryPin = () => G.pins.find(p => isReq(p) && p.ring === 0) || G.pins.find(p => !p.done && p.kind === 'gate' && p.ring === 0) || null;
 const holdRel = p => sdiff(G.ang, p.c0) * p.dirH;
 const advance = wasRelief => {
+  if (G.practice) { practiceStep(); return; }
   if (G.pendingRev) {
     G.pendingRev = false;
     G.dir = -G.dir; G.revT = 0.8; pop(t('reverse'), 'rev'); Snd.rev();
@@ -1643,9 +1755,10 @@ const tickLight = dt => {
   const ch = G.chal.light, ls = G.pins.filter(p => p.light && !p.done);
   if (!ch || !ls.length) return;
   ch.left -= dt;
-  const inside = ls.some(p => angd(G.ang, p.c0) <= pinHw(p) + 0.06);
+  /* ibre içerideyken değişmez; Dene modunda ibre yaklaşırken de değişmez (öğretirken adil kalsın) */
+  const inside = ls.some(p => angd(G.ang, p.c0) <= pinHw(p) + 0.06 || (G.practice && aheadOf(p.c0) < 1.4 + pinHw(p)));
   if (ch.left <= 0 && !inside) {
-    ls.forEach(p => { p.green = !p.green; }); ch.left = ch.per;
+    ls.forEach(p => { p.green = !p.green; }); ch.left = ch.per * rnd(0.78, 1.22);
     ls.forEach(p => { const q = pinXY(p); burst(q.x, q.y, 5, ['#FFFFFF', p.green ? P.life : P.rose], 90); });
     Snd.tone(p0Tone(ls[0]), 0.07, 'sine', 0.06);
   }
@@ -1653,6 +1766,7 @@ const tickLight = dt => {
 };
 const p0Tone = p => p.green ? 880 : 440;
 const blast = p => {
+  G.chal.fail = true;
   p.done = true; p.bomb.st = 'boom';
   const q = pinXY(p), pm = phaseMod(G.ph, G.L);
   G.craters.push({ a: p.c0, t: 0 });
@@ -1764,6 +1878,7 @@ const tap = () => {
   miss();
 };
 const lockRattle = p => {
+  G.chal.fail = true;
   const pm = phaseMod(G.ph, G.L);
   if (G.glove > 0) { G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light'); return; }
   const was = G.combo;
@@ -1891,9 +2006,10 @@ const revive = () => {
   G.rips.push({ x: view.cx, y: view.cy, t: 0, max: 0.8, r0: view.r * 0.3, r1: view.r * 1.3, c: P.life });
   Platform.track('life_saved', { level: G.L });
 };
-const lethal = () => { if (G.life) revive(); else die(); };
+const lethal = () => { if (G.practice) { G.time = CFG.maxTime; return; } if (G.life) revive(); else die(); };
 
 const miss = () => {
+  if (G.practice) { pop(t('pracMiss'), 'miss'); Snd.ui(); return; }
   const pm = phaseMod(G.ph, G.L);
   if (G.glove > 0) {
     G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
@@ -1909,6 +2025,7 @@ const miss = () => {
 };
 
 const trap = p => {
+  G.chal.fail = true;
   const pm = phaseMod(G.ph, G.L);
   if (G.glove > 0) {
     G.glove--; pop(t('shieldSave'), 'perfect'); Snd.ui(); Platform.haptic('light');
@@ -1988,6 +2105,7 @@ const die = () => {
     save.runs++; G.runCounted = true;
     save.low = G.n < 10 ? save.low + 1 : 0;
     if (save.lvl === 'normal') save.high = G.n >= 60 ? save.high + 1 : 0;
+    if (save.lvl === 'usta') save.highU = G.n >= 60 ? save.highU + 1 : 0;
   }
   const total = Math.max(0, Math.round((Math.floor(G.raw / CFG.coinDiv) + G.near * CFG.nearCoin) * LV().coin) + Math.floor(G.coinsJ));
   G.gain = total - G.coinsGiven; G.coinsGiven = total; save.coins += G.gain;
@@ -2011,11 +2129,13 @@ const showOver = () => {
   let tk = '';
   if (save.lvl !== 'rahat' && save.low >= 3 && !save.tips.easy) tk = 'easy';
   else if (save.lvl === 'normal' && save.high >= 2 && !save.tips.hard) tk = 'hard';
+  else if (save.lvl === 'usta' && save.highU >= 2 && !save.tips.hell) tk = 'hell';
   if (tk) {
     save.tips[tk] = true; persist();
-    $('ovTipT').textContent = t(tk === 'easy' ? 'tipEasy' : 'tipHard');
-    $('ovTipBtn').textContent = t(tk === 'easy' ? 'tipEasyBtn' : 'tipHardBtn');
-    tipEl.setAttribute('data-to', tk === 'easy' ? 'rahat' : 'usta'); tipEl.hidden = false;
+    const to = tk === 'easy' ? (save.lvl === 'cehennem' ? 'usta' : 'rahat') : (tk === 'hard' ? 'usta' : 'cehennem');
+    $('ovTipT').textContent = t(tk === 'easy' ? 'tipEasy' : (tk === 'hard' ? 'tipHard' : 'tipHell'));
+    $('ovTipBtn').textContent = t(to === 'rahat' ? 'tipEasyBtn' : (to === 'usta' ? 'tipHardBtn' : 'tipHellBtn'));
+    tipEl.setAttribute('data-to', to); tipEl.hidden = false;
   } else tipEl.hidden = true;
   countUp($('ovScore'), G.score, 600);
   const d = $('ovDelta');
@@ -2031,7 +2151,8 @@ const showOver = () => {
     jn.textContent = t('unusedJ', { t: t('tool_' + id) }); jn.hidden = false;
   } else jn.hidden = true;
   const coinIcon = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach);width:16px;height:16px"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg>';
-  const chips = ['<span class="chip sm">' + t('overLevel', { n: G.L }) + '</span>'];
+  const isHell = save.lvl === 'cehennem';
+  const chips = ['<span class="chip sm' + (isHell ? ' x' : '') + '">' + (isHell ? t('lv_cehennem') + ' · ' : '') + t('overLevel', { n: G.L }) + '</span>'];
   if (G.near > 0) chips.push('<span class="chip sm">' + t('statNear') + ' <b>' + G.near + '</b></span>');
   if (G.maxCombo >= 3) chips.push('<span class="chip sm">' + t('statCombo') + ' <b>' + G.maxCombo + '</b></span>');
   if (G.gain > 0) chips.push('<span class="chip sm">' + coinIcon + '<b>+' + G.gain + '</b></span>');
@@ -2063,6 +2184,7 @@ const doContinue = () => {
 
 const pause = () => {
   if ((G.mode !== 'play' && G.mode !== 'count')/*NOPAUSE*/) return;
+  if (G.practice) { endPractice(true); return; }
   G.mode = 'pause'; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
   persistRun(); show(pauseEl);
 };
@@ -2204,21 +2326,24 @@ const update = raw => {
     else if (Math.ceil(G.count) !== n0) Snd.tick(false);
     updateHud();
   } else if (G.mode === 'play') {
-    const sl = G.slow > 0 ? G.slowMul : 1;
-    G.pt += dt; G.jt += dt;
-    applyEvents(false);
-    const pi = jPhaseAt(G.jt);
-    if (pi.L !== G.L || pi.ph !== G.ph) phaseChange(pi);
-    G.phLeft = pi.left;
-    if (G.ph === 'hell') G.hellAge += dt;
-    /* can fırsatı: çift seviyelerin ortasında, canın yoksa bir sonraki hedef yeşil "+" olur */
-    if (G.ph === 'normal' && G.L % 2 === 0 && G.lifeLevel !== G.L && G.jt - pi.start >= 0.55 * jNormal(G.L)) { G.lifeLevel = G.L; if (!G.life) G.lifeDue = true; }
-    if (G.pendingNew) G.pendingT += dt;
-    const pm = phaseMod(G.ph, G.L);
+    const PR = G.practice, sl = G.slow > 0 ? G.slowMul : 1;
+    G.pt += dt;
+    if (!PR) {
+      G.jt += dt;
+      applyEvents(false);
+      const pi = jPhaseAt(G.jt);
+      if (pi.L !== G.L || pi.ph !== G.ph) phaseChange(pi);
+      G.phLeft = pi.left;
+      if (G.ph === 'hell') G.hellAge += dt;
+      /* can fırsatı: çift seviyelerin ortasında, canın yoksa bir sonraki hedef yeşil "+" olur */
+      if (G.ph === 'normal' && G.L % 2 === 0 && G.lifeLevel !== G.L && G.jt - pi.start >= 0.55 * jNormal(G.L)) { G.lifeLevel = G.L; if (!G.life) G.lifeDue = true; }
+      if (G.pendingNew) G.pendingT += dt;
+    }
+    const pm = PR ? JOURNEY.phase.normal : phaseMod(G.ph, G.L);
     G.ang = norm(G.ang + G.dir * G.omega * sl * ptrFactor() * dt);
     if (G.kind === 'iki' && G.lockLeft <= 0) G.ang2 = norm(G.ang2 + G.dir2 * G.omega2 * sl * dt);
     updateChal(dt);
-    G.time -= dt * pm.drain;
+    if (PR) G.time = CFG.maxTime; else G.time -= dt * pm.drain * (LV().drain || 1);
     if (G.slow > 0) G.slow -= raw;
     if (G.boostT > 0) G.boostT = Math.max(0, G.boostT - raw);
     if (G.narrow > 0) G.narrow = Math.max(0, G.narrow - raw);
@@ -2226,10 +2351,12 @@ const update = raw => {
     if (G.revT > 0) G.revT -= raw;
     G.gateT = Math.min(1, G.gateT + raw * 4);
     syncPrimary();
-    updateAdvice(dt);
-    G.saveT += raw; if (G.saveT > 5) { G.saveT = 0; persistRun(); }
-    if (G.time < CFG.nearAt) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
-    if (G.time <= 0) { G.time = 0; lethal(); }
+    if (!PR) {
+      updateAdvice(dt);
+      G.saveT += raw; if (G.saveT > 5) { G.saveT = 0; persistRun(); }
+      if (G.time < CFG.nearAt) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
+      if (G.time <= 0) { G.time = 0; lethal(); }
+    }
     updateHud(); updateDock();
   } else if (G.mode === 'dead') {
     G.deadT -= raw;
@@ -2609,6 +2736,19 @@ const drawBanner = c => {
   if (b.sub) { c.globalAlpha = al * 0.88; fitPx(c, b.sub, 800, 13, FB, w - 32, 10); c.fillText(b.sub, view.w / 2, y + 44); }
   c.restore();
 };
+/* Dene: halkanın ortasında üç nokta (doğru turlar) ve yazılı sayı. */
+const drawPracCenter = (c, cx, cy, R, two) => {
+  const PR = G.practice, n = PR.need, r = clamp(R * (two ? 0.06 : 0.075), 5, 11), gap = r * 3, y = cy + (two ? R * 0.16 : R * 0.04);
+  c.save(); c.globalAlpha = 1;
+  for (let i = 0; i < n; i++) {
+    const x = cx + (i - (n - 1) / 2) * gap;
+    c.beginPath(); c.arc(x, y, r, 0, TAU);
+    if (i < PR.ok) { c.fillStyle = P.peach; c.fill(); } else { c.lineWidth = 2.4; c.strokeStyle = P['ink-3']; c.stroke(); }
+  }
+  c.fillStyle = P['ink-2']; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '800 ' + Math.max(12, Math.round(R * (two ? 0.1 : 0.13))) + 'px ' + FB;
+  c.fillText(t('pracCount', { n: PR.ok, m: n }), cx, y + r * 2.6);
+  c.restore();
+};
 const drawCount = (c, cx, cy, R) => {
   const n = Math.ceil(G.count), f = clamp(n - G.count, 0, 1);
   c.save();
@@ -2886,15 +3026,17 @@ const render = () => {
     c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
     c.fillText(t('best'), cx, cy + R * 0.36);
   } else {
+    if (G.practice) drawPracCenter(c, cx, cy, R, two);
     const sc = 1 + (0.2 + 0.04 * mult) * G.scorePulse;
     const txt = String(G.score);
     const cover = G.mode === 'count' ? 1 : 0;
-    c.globalAlpha = 1 - 0.88 * cover;
+    c.globalAlpha = G.practice ? 0 : 1 - 0.88 * cover;
     c.save(); c.translate(cx, cy - (two ? 0 : R * 0.04)); c.scale(sc, sc);
     c.fillStyle = P.ink; fitFont(txt, big, R * (two ? 0.95 : 1.5));
     c.fillText(txt, 0, 0);
     c.restore();
-    if (mult >= 2) {
+    if (G.practice) {
+    } else if (mult >= 2) {
       const col = tierCol(mult);
       pill(c, '×' + mult + ' · ' + G.combo, cx, cy + R * (two ? 0.3 : 0.4), col, onColor(col), Math.max(11, Math.round(R * (two ? 0.1 : 0.12))));
     } else if (!two) {
@@ -3029,6 +3171,14 @@ $('newBtn').addEventListener('click', () => {
   setTimeout(() => { if (newAsk && performance.now() - newAsk >= 3400) { newAsk = 0; nb.classList.remove('warn'); nb.textContent = t('newGame'); } }, 3500);
 });
 $('bookBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openBook(); });
+$('bookList').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('button[data-try]');
+  if (!b || G.mode !== 'menu') return;
+  Snd.unlock(); startPractice(b.getAttribute('data-try'));
+});
+$('pracEnd').addEventListener('click', () => { Snd.unlock(); Snd.ui(); endPractice(true); });
+$('pdAgain').addEventListener('click', () => { Snd.unlock(); if (G.practice) startPractice(G.practice.kind); });
+$('pdBack').addEventListener('click', () => { Snd.unlock(); Snd.ui(); endPractice(true); });
 $('bookClose').addEventListener('click', closeBook);
 $('menuJk').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
 $('pauseMenuBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); persistRun(); goMenu(); });
@@ -3082,7 +3232,8 @@ if (AppP) {
     AppP.addListener('pause', () => pause());
     AppP.addListener('backButton', () => {
       if (adEl.classList.contains('on')) return;
-      if (bookEl.classList.contains('on')) closeBook();
+      if (G.practice) endPractice(true);
+      else if (bookEl.classList.contains('on')) closeBook();
       else if (shopEl.classList.contains('on')) closeShop();
       else if (G.mode === 'play' || G.mode === 'count') pause();
       else if (G.mode === 'pause') resume();

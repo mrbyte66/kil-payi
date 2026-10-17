@@ -1,7 +1,7 @@
-# Yolculuk tasarımı (V0.5.1, onaylı 2026-10-17)
+# Yolculuk tasarımı (V0.6.0, onaylı 2026-10-17)
 
 Bu belge oyunun güncel yolculuk tasarımıdır. V0.4.0'daki ilk tasarımdan (cennet bölümü, 15 dakikalık yolculuk) sonra kullanıcı geri bildirimiyle
-üç kez değişti (V0.4.1 tempo, V0.5.0 çeşitlilik, V0.5.1 cehennem ve düzeltmeler); değişiklik nedenleri `CHANGELOG.md` içinde. Kilit fikirlerinin tam listesi (yapılanlar ve
+dört kez değişti (V0.4.1 tempo, V0.5.0 çeşitlilik, V0.5.1 cehennem ve düzeltmeler, V0.6.0 Dene ve Cehennem zorluğu); değişiklik nedenleri `CHANGELOG.md` içinde. Kilit fikirlerinin tam listesi (yapılanlar ve
 yapılmayanlar, Kolay/Orta/Zor grupları) `docs/kilit-katalogu.md` içinde. Hikaye/harita yok.
 
 ## Fikir
@@ -51,8 +51,11 @@ Her vuruşta +1 coin; cehennem bitince +2 sn. Adlar (`hellTier`, açılışta ç
   Her kilidin kendi süre/puan değerleri `MECH` tablosunda (altın vuruşu süre vermez, hayalet ×2, sabır ×3, bomba +25 vb.).
 - **Süreye göre hedef uzunluğu (`WIDE`, `wideAt`):** süre çubuğu doluyken hedefler ×0,9, süre azaldıkça doğrusal uzar, süre bitmek üzereyken ×1,3 (kıl payı kurtulma). İlk üç seviyede dar kısım yavaş devreye girer
   (1. seviyede ×1,0). Tur başında hesaplanır (hedefin yanındaki tuzak yerleşimiyle çakışmaz). Zayıf oyuncuyu kurtarır, süresi hep dolu olan güçlü oyuncuyu çok az sıkıştırır.
-- Zorluk seçici (`LEVEL`): Rahat (hedef ×1,2, ibre ×0,9, vuruş ×1,15, ceza ×0,7, başlangıç 7 sn), Normal, Usta (hedef ×0,9, ibre ×1,1, vuruş ×0,8,
-  ıska ×1,4, tuzak ×1,25, başlangıç 5,5 sn).
+- Zorluk seçici (`LEVEL`, dört kademe): Rahat (hedef ×1,2, ibre ×0,9, vuruş ×1,15, ceza ×0,7, başlangıç 7 sn), Normal, Usta (hedef ×0,9, ibre ×1,1, vuruş ×0,8,
+  ıska ×1,4, tuzak ×1,25, başlangıç 5,5 sn), **Cehennem** (V0.6.0: hedef ×0,72, ibre ×1,22, süre erimesi ×1,35 (`drain`), ıska ve tuzak cezası ×1,8, coin ×2, başlangıç 5,5 sn;
+  engel ikizleri kilitle birlikte açılır ve en az %85 olasılıkla gelir (`twins`); baştan sona cehennem teması (`hellTheme`), HUD'da ve sonuç ekranında kırmızı rozet; ayrı rekor).
+  Taslakta süre erimesi ×1,5 ve ceza ×2 önerilmişti; botla ölçünce kazanılamayacak kadar sert çıktığı için (usta bot %3) ×1,35 ve ×1,8'e indirildi.
+  Her kademenin rekoru ayrıdır; Normal'de iki uzun oyun sonra Usta, Usta'da iki uzun oyun sonra Cehennem önerisi çıkar; Cehennem'de üç kısa oyun sonra Usta önerisi.
 - Sonsuz modda zorluk hızlanır; Sarkaç, Sis ve Renk kilitleri sonraki sürümlere (sonsuz mod havuzuna) bırakıldı.
 
 ## Adil oyun kuralları (bütün kilitlere uygulanır)
@@ -95,7 +98,8 @@ güçlendirir (`STAR_KINDS`).
 - **Yeni kilit kartı** (üst kart, V0.5.0'da büyüdü): HUD'un altında; yeni kilitte hareketli mini simge + ad (22 punto) + kural (şeftali nokta) + uyarı (gül
   noktası); ilk hedef vurulana ya da ıskalanana kadar kalır (en çok 8 sn). ★/karışım/seri gibi küçük haberler tek satır, 4 sn.
   **Nesne işareti:** yeni kilidin ilk karşılaşmalarında hedefin ve tuzağın dışında küçük ✓ (vur) ve ✕ (dokunma) rozeti; halkanın üstüne yazı konmaz
-  (görüşü kapatıyordu). Menüde **Kilit defteri**: görülen kilitlerin açıklamaları (14 giriş).
+  (görüşü kapatıyordu). Menüde **Kilit defteri** (V0.6.0): 14 kilidin hepsi görünür; görülenler tam açıklamalıdır, görülmeyenler adı ve açılacağı seviyeyle ("Sıradaki · Seviye 4" kesikli çerçeveli, sonrakiler "Seviye N") soluk gösterilir; başlıkta "N / 14 açıldı".
+  Her satırda **Dene** düğmesi vardır (açılmamış kilitler için de).
 - **Jokerler:** halkanın altında, başparmak bölgesinde (etiket için halkayla arasında boşluk bırakılır). İşe yarayacağı an biri parlar, büyür, etiketini gösterir (etiket ekranın dışına taşmaz)
   (Kronometre: süre ≤ 2,5 sn; Kalkan: art arda iki hata ya da cehennem başı; Stetoskop: hedef dar ya da cehennem başı; Kum saati: ibre çok hızlı ya da iki ıska).
   **Jokeri kullanmak için basılı tutulur** (V0.5.1: parlayan 0,28 sn, diğerleri 0,48 sn, halka dolar; doğru zamanda +25 puan, "Akıllı hamle!"). Kısa dokunuş her zaman oyuna geçer;
@@ -106,7 +110,11 @@ güçlendirir (`STAR_KINDS`).
 - **Devam etme:** oyun her 5 sn'de ve çıkarken kaydedilir (`save.run`); uygulama kapansa bile menüde "Devam et", dokununca 3-2-1.
   Duraklatma basılı tutulan tut-bırak pinini bırakır (pim yeniden beklemeye döner).
 - **Yazılar:** bölüm ve cehennem haberi (`drawBanner`) halkanın üstündeki kart bandına çizilir (kart ya da ilk dokunuş ipucu varken çizilmez, HUD rozeti yeter); iki halkada puan balonları halkaların dışındadır.
-- **Menü:** en iyi puan, ulaşılan seviye, joker stoğu, zorluk seçici, büyük Devam et/Oyna, Kamp, Kilit defteri, sürüm adı.
+- **Dene (V0.6.0):** kilit defterinden bir kilidin kısa canlı denemesi (`startPractice`, `G.practice`). Aynı oyun kodu çalışır ama yolculuk, süre, puan, coin, kayıt ve rekor yoktur (`G.time` hep dolu, `lethal` etkisiz,
+  `persistRun` kapalı, `noteSeen` çağrılmaz). Yavaş ibre (2,2) ve geniş hedefle (0,46) o kilit tekrar tekrar gelir; engel ikizi ikinci turdan sonra eklenir (`PRAC_TWIN`; trafik ışığı, bomba ve sabır pimi ikizsizdir).
+  Bir tur, ceza nesnesine (tuzak, kırmızı ışık, patlama, kilide dokunma; `G.chal.fail`) dokunmadan bitirilirse doğru sayılır; 3 doğru tur deneme biter (sabır pimi 1). Ekranda: üstte "Dene" rozeti, üç nokta, "Bitir"; kural kartı sürekli açık; halkanın ortasında
+  doğru turlar (nokta ve "2 / 3"); joker sırası yok. Bitince "Öğrendin" + Tekrar dene / Deftere dön. Yaklaşırken ışık değişmez (trafik ışığı denemede adil kalsın). Arka plana gidince ya da geri tuşuyla deneme kapanıp deftere dönülür.
+- **Menü:** en iyi puan, ulaşılan seviye, joker stoğu, dört kademeli zorluk seçici (seçilen kademenin tek satırlık açıklaması altında), büyük Devam et/Oyna, Kamp, Kilit defteri, sürüm adı.
 
 ## Kamp, rekor, duraklatma
 
@@ -125,8 +133,7 @@ güçlendirir (`STAR_KINDS`).
    rozetleri; diken yavaş çıkar; bonuslar kısıldı; zorluk botla yeniden ayarlandı; seviyeler 20-32 sn'e uzadı.
 4. **V0.5.1: TAMAM.** Cehennem güçlendi (tablo, kademe adları), süreye göre hedef uzunluğu, diken ibre hızına uyar ve kapanır, altın önce gelir, bölüm geçişinde tur bozulmaz, banner ve balonlar halkanın dışında,
    jokerler basılı tutularak çalışır.
-5. **Onay bekleyen tasarımlar (V0.6.0):** (a) kilit defterinde açılmamış kilitleri de göster (ad, açılış seviyesi) ve her satırda **Dene**: kilit başına kısa canlı deneme (ceza ve süre yok, 3 doğru vuruşla biter; en çok tut-bırak, hayalet, altın
-   için işe yarar); (b) dört kademeli zorluk: Rahat, Normal, Usta, **Cehennem** (baştan sona cehennem teması, hedef ×0,72, ibre ×1,22, süre erimesi ×1,5, ceza ×2, engel ikizleri hep açık, ayrı rekor ve rozet).
+5. **V0.6.0: TAMAM.** Kilit defteri yaklaşan kilitleri gösterir ve her satırda **Dene** (kısa canlı deneme) vardır; dördüncü zorluk kademesi **Cehennem**; trafik ışığı değişim aralığı ±%22 rastgele (devri daim kilitlenmesin); bot kırmızı ışıkta takılmıyor.
 6. **Sıradaki (Faz 4):** `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Işınlanma, Şifre, Makas,
    Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için; Antrenman modu; yeni tür kutlaması. Kullanıcının oyun sonrası geri bildirimine göre sıra belirlenir.
 7. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
@@ -143,18 +150,20 @@ tuzakların üstündeyse sıklıkla dokunmaz, altına beceriye bağlı olasılı
 `window.kindStats()` kilit türü başına tur sayısı, süre ve vuruş oranını verir; `bulk()` seviyeye ulaşma yüzdesini, ölümlerin kilit dağılımını, cehennemde ölenlerin payını ve seviye başına cehennemi geçme yüzdesini;
 `hellLine(sigma, kaçınma, n, girişSüresi)` yalnızca cehennem bölümünü seviye seviye ölçer (hızlı, ayar denemesi için).
 
-**V0.5.1 ölçümü** (10. seviyeye ulaşma oranı; n = 20-100 oyun, yaklaşık ±6-10 puan hata payı; "—" ölçülmedi):
+**V0.6.0 ölçümü** (10. seviyeye ulaşma oranı; n = 14-100 oyun, yaklaşık ±6-12 puan hata payı; "—" ölçülmedi). Bu sürümde botun kırmızı ışıkta takılma hatası düzeltildi (önceki sürümlerin ölçümlerinde trafik ışığı olduğundan çok öldürüyordu), bu yüzden sayılar V0.5.1 belgesinden biraz yüksektir:
 
 | Mod | yeni (0,12) | orta (0,08) | iyi (0,05) | usta (0,03) |
 |---|---|---|---|---|
-| Rahat | %14 | %70 | — | — |
-| Normal | %3 | %24 | %74 | %90 |
-| Usta | — | %2 | %43 | — |
+| Rahat | %30 | %77 | — | — |
+| Normal | %6 | %30 | %80 | %100 |
+| Usta | — | %0 | %25 | %93 |
+| Cehennem | — | %0 | %0 | %37 |
 
-Cehennem bölümünü geçme (girişte yeni 5 sn, orta 6 sn süre; seviye 1 → 10), eski cehennem → yeni cehennem:
+Cehennem bölümünü geçme (V0.5.1 ölçümü; girişte yeni 5 sn, orta 6 sn süre; seviye 1 → 10), eski cehennem → yeni cehennem:
 yeni %98 93 97 93 93 80 70 42 43 20 → %99 95 85 71 63 44 51 35 23 11; orta %100 99 100 100 98 97 94 90 78 53 → %100 99 99 94 96 81 84 91 63 38.
 Cehennemde ölenlerin payı artık tüm ölümlerin %40-45'i (eskiden %30). Hedef tablosu (`docs/kilit-katalogu.md`): Normal %5 / %35 / %60 / %90, Rahat %40 / %80 / %95 / %100, Usta %0 / %8 / %25 / %60.
-Cehennemin güçlenmesi ve süreye göre hedef uzunluğu orta botu hedefin biraz altına (%24 / %35), iyi botu hedefe yaklaştırdı (%74 / %60); Normal'de usta bot hedefte (%90). Güçlü botlar için cehennem hâlâ kolay (iyi bot %95+ geçiyor): beceri arttıkça ölümler
-hassasiyetten değil rastgele dikkat kayıplarından geldiği için çarpanlarla zorlaştırmak orta oyuncuyu da ezer; güçlü oyuncu için asıl çözüm Usta (ve onaylanırsa Cehennem) kademesidir.
-`DIFF.adaptCap` 0,15 ve 0,2 denendi: orta oyuncuyu çok düşürüp (%27, %8) iyi oyuncuyu yeterince düşürmedi, 0,12'de bırakıldı. En çok öldüren kilitler: tut-bırak, trafik ışığı, ritim, sabır pimi ve (yeni oyuncuda) tek pin.
+Normal'de orta bot hedefin biraz altında (%30 / %35), iyi bot hedefin üstünde (%80 / %60), usta bot hepsini bitiriyor. Güçlü botlar için cehennem bölümü hâlâ kolay (iyi bot %95+ geçiyor): beceri arttıkça ölümler
+hassasiyetten değil rastgele dikkat kayıplarından geldiği için çarpanlarla zorlaştırmak orta oyuncuyu da ezer; güçlü oyuncu için asıl çözüm Usta ve Cehennem kademeleridir (Cehennem'de usta bot %37, iyi bot %0).
+`DIFF.adaptCap` 0,15 ve 0,2 denendi: orta oyuncuyu çok düşürüp (%27, %8) iyi oyuncuyu yeterince düşürmedi, 0,12'de bırakıldı. En çok öldüren kilitler: tut-bırak, ritim, sabır pimi, nefes ve (yeni oyuncuda) tek pin.
+Dene modunda bot her kilidi 2-13 sn'de 3 doğru turla bitiriyor (`tools/bot.js` içinde `runBot(..., { setup: () => startPractice(tür) })`).
 Bu sayılar insan değil bot sonucudur: insan yeni kilitlerin kuralını ilk görüşte öğrenmek zorunda olduğu için ilk oyunlarda daha çok ölür.
