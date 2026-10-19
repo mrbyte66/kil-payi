@@ -1,45 +1,31 @@
-/* Mağaza testi (V0.9.2): node tools/store-test.mjs
-   DEBUG=1 derlemesini yapar, oyunu başsız Chrome'da açar ve şunları kontrol eder:
+/* Mağaza, dil, müzik ve görünüm testi: node tools/store-test.mjs
+   DEBUG=1 derlemesini yapar, oyunu başsız Chrome'da (tools/cdp.mjs) açar ve şunları kontrol eder:
    - fiyat ve stok kuralları (merdiven, en çok 5, yetersiz coin, yuva sırası, takas),
-   - yükseltme ile stok alma sırasının toplam tutarı değiştirmediği (açık kapatıldı),
-   - hediye merdiveni (20 · 30 · 40 · 50 · 100, sonra 12 saat),
+   - yükseltme ile stok alma sırasının toplam tutarı değiştirmediği,
+   - hediye: 24 saatlik pencere (20 · 30 · 40 · 50 · 500), pencere dolunca sıfırlanma, saat oyunu,
    - eski ve bozuk kayıtların geçişi,
-   - ekran akışı (sokak, dükkân, fiş, satın alma, seçici, geri tuşu, ayarlar, oyun içi joker sırası, otomatik joker).
+   - ekran akışı: sokak, dükkân, fiş, satın alma, seçici, geri tuşu, geçiş animasyonları, ayarlar, oyun içi joker sırası, otomatik joker,
+   - dil seçimi (sistem dili, Türkçe, English; kalıcı), menü müziğinin ne zaman çaldığı, gündüz ve akşam sahnesi, Türkçe harflerin yazı tipi.
    Chrome yolu CHROME ortam değişkeniyle verilebilir. Hata varsa 1 ile çıkar. */
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, rmSync, mkdtempSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { launch } from './cdp.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 execFileSync('sh', ['-c', 'DEBUG=1 ./build.sh'], { cwd: root, stdio: 'ignore' });
-const base = readFileSync(join(root, 'www', 'index.html'), 'utf8');
-const made = [];
+const URL = 'file://' + join(root, 'www', 'index.html');
 
-const run = (name, pre, post) => {
-  const fn = 't-store-' + name + '.html';
-  const path = join(root, 'www', fn);
-  writeFileSync(path, base.replace('<div id="app">', '<script>try{localStorage.clear();' + pre + '}catch(e){}</script><div id="app">').replace('</body>', '<script>' + post + '</script></body>'));
-  made.push(path);
-  const prof = mkdtempSync(join(tmpdir(), 'kp-store-'));
-  let out = '';
-  try { out = execFileSync(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--user-data-dir=' + prof, '--dump-dom', 'file://' + path], { encoding: 'utf8', timeout: 90000, stdio: ['ignore', 'pipe', 'ignore'] }); } catch (e) { out = e.stdout || ''; }
-  rmSync(prof, { recursive: true, force: true });
-  const m = out.match(/<pre id="res">([\s\S]*?)<\/pre>/);
-  return m ? m[1].replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&').replace(/&quot;/g, '"') : 'SONUÇ YOK (sayfa açılmadı)';
-};
-/* sayfa içi test çatısı: T(ad, koşul, ek) */
-const HEAD = `var out=[],ok=0,bad=0;function T(n,c,e){if(c){ok++}else{bad++;out.push('HATA '+n+(e!==undefined?' → '+JSON.stringify(e):''))}}
+/* sayfa içi test çatısı */
+const HEAD = `(async()=>{var out=[],ok=0,bad=0;function T(n,c,e){if(c){ok++}else{bad++;out.push('HATA '+n+(e!==undefined?' → '+JSON.stringify(e):''))}}
 function $(i){return document.getElementById(i)}
+var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
 function click(s){var e=document.querySelector(s);if(!e){out.push('YOK '+s);bad++;return null}e.dispatchEvent(new MouseEvent('click',{bubbles:true}));return e}
-function done(){var r=document.createElement('pre');r.id='res';r.textContent=ok+' tamam, '+bad+' hata\\n'+out.join('\\n');document.body.appendChild(r)}
 var K=window.__kp,S=K.save,G=K.G;try{`;
-const TAIL = `}catch(e){out.push('İSTİSNA '+e.stack)}done();`;
+const TAIL = `}catch(e){out.push('İSTİSNA '+e.stack)}return ok+' tamam, '+bad+' hata'+(out.length?'\\n'+out.join('\\n'):'')})()`;
 
 const LOGIC = HEAD + `
-function reset(){S.coins=0;S.own={kron:1};S.slots=1;S.equip=['kron','','',''];S.autoOwn=false;S.autoJ=false;S.gift={n:0,t:0};['steto','kron','kalkan','kum'].forEach(function(i){S.tools[i]={n:i==='kron'?1:0,l:1}});}
+function reset(){S.coins=0;S.own={kron:1};S.slots=1;S.equip=['kron','','',''];S.autoOwn=false;S.autoJ=false;S.gift={n:0,t0:0};['steto','kron','kalkan','kum'].forEach(function(i){S.tools[i]={n:i==='kron'?1:0,l:1}});}
 reset();
 T('yeni kurulum yalnız kron',S.own.kron===1&&!S.own.kalkan&&S.slots===1&&K.equipped().join()==='kron');
 var seq=[],n;for(n=0;n<5;n++)seq.push(K.unitPrice('kron',n,1));T('kron merdiveni',seq.join()==='30,45,60,90,120',seq);
@@ -64,21 +50,33 @@ function total(o){reset();S.coins=1e6;var c=S.coins;o.forEach(function(a){if(a==
 var A=total(['s','s','s','s','u']),B=total(['u','s','s','s','s']);T('al-yükselt = yükselt-al',A===B,[A,B]);
 var A2=total(['s','s','u','s','s','u']),B2=total(['u','u','s','s','s','s']),C2=total(['s','u','s','u','s','s']);T('iki yükseltme, her sıra eşit',A2===B2&&B2===C2,[A2,B2,C2]);
 reset();S.coins=1e6;K.buyUpgrade('kron');K.buyUpgrade('kron');T('seviye 3 son',S.tools.kron.l===3&&K.upPrice('kron')===0&&K.buyUpgrade('kron')===false);
-reset();var v=[];for(var i=0;i<5;i++)v.push(K.giftClaim());T('hediye 20-30-40-50-100',v.join()==='20,30,40,50,100',v);
-var g=K.giftState();T('5. sonra 12 saat bekleme',g.wait>11.99*3600000&&g.wait<=12*3600000&&g.next===0,g);T('6. hediye reddedilir',K.giftClaim()===0);
-S.gift.t=Date.now()-1;g=K.giftState();T('bekleme bitince başa döner',g.next===20&&g.wait===0&&S.gift.n===0,g);
-S.gift={n:5,t:Date.now()+100*3600000};g=K.giftState();T('saat oyunu: bekleme 12 saati aşmaz',g.wait<=12*3600000,g.wait);
+// hediye: 24 saatlik pencere
+var H=3600000;
+reset();T('hediye basamakları 20-30-40-50-500',K.GIFT_STEP.join()==='20,30,40,50,500',K.GIFT_STEP);
+T('ilk reklamdan önce pencere yok',S.gift.t0===0&&K.giftState().left===24*H);
+var v=[];for(var i=0;i<5;i++)v.push(K.giftClaim());T('hediye 20-30-40-50-500',v.join()==='20,30,40,50,500',v);
+T('ilk reklamla pencere başladı',S.gift.t0>0&&Math.abs(Date.now()-S.gift.t0)<3000);
+var g=K.giftState();T('5. sonra bekleme = pencerenin kalanı (~24 saat)',g.wait>23.99*H&&g.wait<=24*H&&g.next===0,g);T('6. hediye reddedilir',K.giftClaim()===0);
+reset();K.giftClaim();var t0=S.gift.t0;K.giftClaim();T('ikinci reklam pencereyi kaydırmaz',S.gift.t0===t0);
+S.gift={n:2,t0:Date.now()-H};g=K.giftState();T('1 saat sonra: kalan ~23 saat, sıradaki 40',g.left>22.99*H&&g.left<=23*H&&g.next===40&&g.wait===0,g);
+S.gift={n:2,t0:Date.now()-25*H};g=K.giftState();T('24 saat dolunca baştan (20), 2 reklamla bile',g.next===20&&g.n===0&&S.gift.t0===0,g);
+S.gift={n:5,t0:Date.now()-24*H-1};g=K.giftState();T('beş reklamdan sonra 24 saatte sıfırlanır',g.next===20&&g.wait===0,g);
+S.gift={n:5,t0:Date.now()+100*H};g=K.giftState();T('saat oyunu: pencere 24 saati aşmaz',g.left<=24*H&&g.wait<=24*H,g);
 reset();S.tools.kron.n=5;for(i=0;i<30;i++)K.giftTool();T('hediye joker 5 üstüne çıkmaz',S.tools.kron.n===5&&!S.tools.kalkan.n,S.tools);
 ` + TAIL;
 
 const FLOW = HEAD + `
 S.coins=5000;S.own={kron:1};S.slots=1;S.equip=['kron','','',''];S.tools.kron.n=1;K.persist();K.refreshStats();
 T('menüde 4 yuva düğmesi',document.querySelectorAll('#menuJk button.sl').length===4);
-K.openShop('menu');T('mağaza açıldı',$('shop').classList.contains('on')&&!$('menu').classList.contains('on'));
-T('4 dükkân',document.querySelectorAll('#stHub .fc').length===4);K.shopGo('alet');
+K.openShop('menu');T('mağaza açıldı',$('shop').classList.contains('on'));
+await sleep(800);T('alttaki ekran belirme bitince saklandı',!$('menu').classList.contains('on'));
+T('4 dükkân',document.querySelectorAll('#stHub .fc').length===4);
+var plq=document.querySelector('#stHub .fc[data-s=alet] .plq').innerText;T('Alet tabelası: Joker ve Yuva sayıları',/Joker/.test(plq)&&/Yuva/.test(plq)&&/1\\/4/.test(plq),plq);
+K.shopGo('alet');
 T('alet odası',K.SS.view==='shop'&&document.querySelectorAll('#stShop .pch').length===4&&document.querySelectorAll('#stShop .itm').length===4);
 click('#stShop .itm[data-k="kalkan"]');T('kilitli fiş',$('stSheet').classList.contains('on')&&!!$('stSheet').querySelector('[data-a="unl"]'));
 click('#stSheet [data-a="unl"]');T('kalkan açıldı',S.own.kalkan===1&&S.coins===4200&&S.tools.kalkan.n===1,[S.coins]);T('fiş kapandı',!$('stSheet').classList.contains('on'));
+T('açılan ürün sıçrar',!!document.querySelector('#stShop .itm.pop'));
 click('#stShop .pch[data-i="1"]');T('yuva fişi',!!$('stSheet').querySelector('[data-a="slotbuy"]'));
 click('#stSheet [data-a="slotbuy"]');T('yuva 2 açıldı, kalkan takıldı',S.slots===2&&K.isEq('kalkan')&&S.coins===3000,[S.slots,S.equip,S.coins]);
 click('#stShop .pch[data-i="0"]');T('seçici açıldı',!!$('stSheet').querySelector('[data-a="eq"]'));
@@ -87,14 +85,23 @@ click('#stShop .itm[data-k="kron"]');var c0=S.coins;click('#stSheet [data-a="plu
 c0=S.coins;var up=K.upPrice('kron');click('#stSheet [data-a="upg"]');T('yükseltme düştü',S.tools.kron.l===2&&c0-S.coins===up,[S.tools.kron.l,c0-S.coins,up]);
 S.coins=100;K.persist();K.refreshStats();K.shopGo('alet');click('#stShop .itm[data-k="kum"]');
 T('yetersiz coin: eksik yazısı',/eksik|short/.test($('stSheet').textContent)&&!$('stSheet').querySelector('[data-a="unl"]'));click('#stSheet [data-a="poor"]');T('yetersizde açılmadı',!S.own.kum&&S.coins===100);
-K.storeBack();T('geri: fiş kapanır',!$('stSheet').classList.contains('on')&&K.SS.view==='shop');K.storeBack();T('geri: sokak',K.SS.view==='hub');K.storeBack();T('geri: menü',!$('shop').classList.contains('on')&&$('menu').classList.contains('on'));
-S.coins=5000;K.persist();K.refreshStats();K.openShop('menu',{shop:'yet',sheet:'bolt'});click('#stSheet [data-a="unlA"]');
-T('otomatik açıldı',S.autoOwn===true&&S.autoJ===true&&S.coins===1000,[S.autoOwn,S.autoJ,S.coins]);click('#stSheet [data-a="auto"]');T('otomatik kapatıldı',S.autoJ===false);K.closeShop();
-K.openSettings();T('ayarlar 4 satır',document.querySelectorAll('#setRows .srow').length===4);
+K.storeBack();T('geri: fiş kapanır',!$('stSheet').classList.contains('on')&&K.SS.view==='shop');
+K.storeBack();T('geri: sokak',K.SS.view==='hub');await sleep(900);
+// dükkânlar arası geçiş ve + düğmesi
+K.goShop('hed');await sleep(1700);T('+ düğmesi: sokaktan Hediye dükkânına kaydırıp girer',K.SS.view==='shop'&&K.SS.shop==='hed'&&!!$('stGiftBtn'),[K.SS.view,K.SS.shop]);
+K.goShop('yet');await sleep(900);T('dükkândan dükkâna yumuşak geçiş',K.SS.view==='shop'&&K.SS.shop==='yet'&&!K.SS.busy,[K.SS.view,K.SS.shop,K.SS.busy]);
+K.storeBack();await sleep(900);T('geri: sokak (animasyonlu)',K.SS.view==='hub'&&$('stHub').classList.contains('on'));
+K.storeBack();T('çıkış başladı: solarak kapanır',$('shop').classList.contains('leaving')&&$('menu').classList.contains('on'));
+await sleep(700);T('çıkış bitti: mağaza gizli, menü açık',!$('shop').classList.contains('on')&&!$('shop').classList.contains('leaving')&&K.SS.closing===false);
+S.coins=5000;K.persist();K.refreshStats();K.openShop('menu',{shop:'yet',sheet:'bolt'});await sleep(700);click('#stSheet [data-a="unlA"]');
+T('otomatik açıldı',S.autoOwn===true&&S.autoJ===true&&S.coins===1000,[S.autoOwn,S.autoJ,S.coins]);click('#stSheet [data-a="auto"]');T('otomatik kapatıldı',S.autoJ===false);K.closeShop();await sleep(600);
+K.openSettings();T('ayarlar 5 satır (müzik, ses, titreşim, otomatik, dil)',document.querySelectorAll('#setRows .srow').length===5,document.querySelectorAll('#setRows .srow').length);
 click('#setRows [data-set="snd"]');T('ses kapandı',S.snd===false);click('#setRows [data-set="snd"]');T('ses açıldı',S.snd===true);
+click('#setRows [data-set="mus"]');T('müzik kapandı',S.music===false);click('#setRows [data-set="mus"]');T('müzik açıldı',S.music===true);
 click('#setRows [data-set="vib"]');T('titreşim kapandı',S.vib===false);click('#setRows [data-set="vib"]');click('#setRows [data-set="auto"]');T('ayarlardan otomatik açıldı',S.autoJ===true);K.closeSettings();
 click('#menuJk button[data-slot="0"]');T('menüden seçici (hızlı)',$('shop').classList.contains('on')&&K.SS.quick===true);
-click('#stSheet [data-a="eq"][data-j="kron"][data-i="0"]');T('seçince menüye dönülür',!$('shop').classList.contains('on')&&$('menu').classList.contains('on')&&S.equip[0]==='kron'&&S.equip[1]==='kalkan',S.equip);
+await sleep(300);click('#stSheet [data-a="eq"][data-j="kron"][data-i="0"]');await sleep(700);
+T('seçince menüye dönülür',!$('shop').classList.contains('on')&&$('menu').classList.contains('on')&&S.equip[0]==='kron'&&S.equip[1]==='kalkan',S.equip);
 K.start();var shown=[].slice.call(document.querySelectorAll('#tools .tool')).filter(function(b){return !b.classList.contains('off')}).map(function(b){return b.getAttribute('data-tool')});
 T('dock: yuva sırasıyla yalnız takılı jokerler',shown.join()==='kron,kalkan',shown);
 S.own.kum=1;S.tools.kum.n=3;var n0=S.tools.kum.n;K.useTool('kum');T('takılı olmayan joker kullanılamaz',S.tools.kum.n===n0);
@@ -104,26 +111,87 @@ S.autoOwn=true;S.autoJ=true;G.adv='kron';G.advT=0.71;S.tools.kron.n=2;var kn=S.t
 S.autoJ=false;G.adv='kron';G.advT=0.71;kn=S.tools.kron.n;G.time=1.5;G.advCool={};K.updateAdvice(0.016);T('otomatik kapalıyken kullanılmaz',S.tools.kron.n===kn,[S.tools.kron.n,kn]);
 ` + TAIL;
 
+const SCENE = HEAD + `
+K.G.mode='menu';K.SS.force='day';K.openShop('menu');await sleep(700);
+T('gündüz: sahne gündüz sınıfı',$('stHub').classList.contains('day')&&K.SS.day===true);
+T('gündüz: güneş ve bulut var, ay ve yıldız yok',!!document.querySelector('#stHub .sun')&&document.querySelectorAll('#stHub .cld').length>=3&&!document.querySelector('#stHub .moon')&&!document.querySelector('#stHub .stars'));
+T('gündüz: ışık parlamaları ve ateş böcekleri yok',!document.querySelector('#stHub .ffs')&&getComputedStyle(document.querySelector('#stHub .lts.lg')).display==='none');
+K.SS.force='night';K.renderHub();
+T('akşam: ay, yıldızlar, iki kayan yıldız, ateş böcekleri',!!document.querySelector('#stHub .moon')&&!!document.querySelector('#stHub .stars')&&document.querySelectorAll('#stHub .shoot').length===2&&!!document.querySelector('#stHub .ffs')&&!$('stHub').classList.contains('day'));
+T('akşam: güneş yok',!document.querySelector('#stHub .sun'));
+K.SS.force='';T('saat 06:30-18:00 arası gündüz sayılır',(function(){var d=new Date(),h=d.getHours()+d.getMinutes()/60;return K.stDay()===(h>=6.5&&h<18)})());
+// sığma: buton ile alttaki şerit çakışmaz
+K.renderHub();var cta=$('stCta').getBoundingClientRect(),dock=$('stDock').getBoundingClientRect();T('İçeri gir butonu ile alt şerit çakışmaz (en az 8 px boşluk)',dock.top-cta.bottom>=8*K.SS.k,[cta.bottom,dock.top,K.SS.k]);
+K.closeShop();await sleep(600);
+` + TAIL;
+
+const MUSIC = HEAD + `
+var st=function(){return {on:K.Music.on,wanted:K.Music.wanted(),ctx:K.Snd.ctx&&K.Snd.ctx.state,bars:K.Music.n}};
+await sleep(1300);var a=st();T('menüde müzik çalıyor',a.on&&a.wanted&&a.ctx==='running'&&a.bars>=1,a);
+await sleep(3200);T('müzik ölçü ölçü ilerliyor',K.Music.n>a.bars,[K.Music.n,a.bars]);
+K.openSettings();click('#setRows [data-set="mus"]');await sleep(400);T('anahtar kapalı: müzik susar',st().on===false&&S.music===false);
+click('#setRows [data-set="mus"]');await sleep(400);T('anahtar açık: müzik başlar',st().on===true&&S.music===true);K.closeSettings();
+K.openShop('menu');await sleep(700);T('mağazada çalar',st().on===true);K.closeShop();await sleep(600);
+K.start();await sleep(700);T('oyun başlayınca susar',st().on===false&&G.mode==='play',st());
+G.mode='menu';await sleep(700);T('menüye dönünce yeniden çalar',st().on===true);
+S.music=false;await sleep(500);T('kayıtlı tercih kapalıyken çalmaz',st().on===false);S.music=true;
+// çevrimdışı çalma: yaklaşık ses düzeyi ve kırpma
+var sr=22050,beat=60/72,oc=new OfflineAudioContext(2,Math.ceil(sr*(4*4*beat+2.5)),sr),g=K.Music.graph(oc,oc.destination,K.Music.level);for(var q=0;q<4;q++)K.Music.play(g,0.1+q*4*beat,q);
+var buf=await oc.startRendering(),L=buf.getChannelData(0),pk=0,sm=0;for(var j=0;j<L.length;j++){var ab=Math.abs(L[j]);if(ab>pk)pk=ab;sm+=L[j]*L[j]}var rms=Math.sqrt(sm/L.length);
+T('müzik kırpmıyor (tepe < -6 dB) ve duyulur (RMS > -42 dB)',pk<0.5&&rms>0.008,{pk:+pk.toFixed(3),rms:+rms.toFixed(4)});
+` + TAIL;
+
+const LANG = HEAD + `
+T('telefon dili Türkçe: açılış Türkçe',K.getLang()==='tr'&&$('playT').textContent==='Oyna'&&S.lang==='',[K.getLang(),S.lang]);
+K.openSettings();
+T('dil satırı: Sistem, Türkçe, English',document.querySelectorAll('#setRows [data-lang]').length===3);
+click('#setRows [data-lang="en"]');
+T('English seçilince hemen İngilizce',K.getLang()==='en'&&S.lang==='en'&&$('playT').textContent==='Play'&&document.documentElement.lang==='en'&&document.title==='Close call'&&$('lvHint').textContent==='Balanced',[K.getLang(),$('playT').textContent]);
+T('ayarlar da İngilizce',/Music/.test($('setRows').innerText)&&/Language/.test($('setRows').innerText));
+click('#setRows [data-lang=""]');T('Sistem: telefonun diline döner',K.getLang()==='tr'&&S.lang===''&&$('playT').textContent==='Oyna');
+click('#setRows [data-lang="en"]');K.closeSettings();K.openShop('menu');await sleep(700);
+T('mağaza İngilizce',/Shop/.test(document.querySelector('#stHub .tt').innerText));K.closeShop();await sleep(600);
+` + TAIL;
+
+const FONT = HEAD + `
+await document.fonts.load('600 100px Fredoka','ğĞşŞİ');
+var c=document.createElement('canvas').getContext('2d');var w=function(f,ch){c.font=f;return +c.measureText(ch).width.toFixed(1)};
+T('ğ Fredoka\\'nın kendi harfi (g ile aynı genişlik)',Math.abs(w('600 100px Fredoka','ğ')-w('600 100px Fredoka','g'))<0.6,[w('600 100px Fredoka','ğ'),w('600 100px Fredoka','g')]);
+T('ş s ile, Ş S ile, Ğ G ile, İ I ile aynı genişlik',Math.abs(w('600 100px Fredoka','ş')-w('600 100px Fredoka','s'))<0.6&&Math.abs(w('600 100px Fredoka','Ş')-w('600 100px Fredoka','S'))<0.6&&Math.abs(w('600 100px Fredoka','Ğ')-w('600 100px Fredoka','G'))<0.6&&Math.abs(w('600 100px Fredoka','İ')-w('600 100px Fredoka','I'))<0.6);
+T('500 ve 700 kalınlığında da var',w('700 100px Fredoka','ğ')>w('600 100px Fredoka','ğ')-1&&w('500 100px Fredoka','ğ')>0);
+` + TAIL;
+
 const MIG = [
   ['eski_v2', { coins: 777, v: 2, tools: { steto: { n: 3, l: 2 }, kron: { n: 2, l: 1 }, kalkan: { n: 0, l: 3 }, kum: { n: 1, l: 1 } }, bests: { normal: 120 }, runs: 9 },
-    "S.coins===777&&S.slots===4&&K.equipped().length===4&&S.own.steto&&S.own.kron&&S.own.kalkan&&S.own.kum&&S.tools.steto.n===3&&S.tools.steto.l===2&&S.tools.kalkan.l===3&&!S.autoOwn&&!S.autoJ&&S.v===3&&S.bests.normal===120"],
-  ['yeni_bos', null, "S.slots===1&&S.own.kron===1&&!S.own.kalkan&&S.tools.kron.n===1&&S.tools.steto.n===0&&K.equipped().join()==='kron'&&S.equip.length===4&&S.coins===0"],
-  ['v3_secili', { v: 3, coins: 50, own: { kron: 1, steto: 1 }, slots: 2, equip: ['steto', 'kron', '', ''], tools: { steto: { n: 4, l: 2 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } }, autoOwn: true, autoJ: true, gift: { n: 2, t: 0 } },
-    "K.equipped().join()==='steto,kron'&&S.slots===2&&S.autoOwn&&S.autoJ&&S.gift.n===2&&S.tools.steto.n===4"],
-  ['bozuk', { v: 3, own: { kron: 0, kum: 1 }, slots: 99, equip: 'x', tools: { steto: { n: -4, l: 9 }, kron: { n: 'a', l: 0 } }, autoOwn: false, autoJ: true, gift: { n: 9, t: 0 } },
-    "S.slots===4&&S.own.kum===1&&S.own.kron===0&&Array.isArray(S.equip)&&S.equip.length===4&&K.isEq('kum')&&S.tools.steto.n===0&&S.tools.steto.l===3&&S.tools.kron.l===1&&S.autoJ===false&&S.gift.n===0"],
+    "S.coins===777&&S.slots===4&&K.equipped().length===4&&S.own.steto&&S.own.kron&&S.own.kalkan&&S.own.kum&&S.tools.steto.n===3&&S.tools.steto.l===2&&S.tools.kalkan.l===3&&!S.autoOwn&&!S.autoJ&&S.v===3&&S.bests.normal===120&&S.lang===''&&S.music===true"],
+  ['yeni_bos', null, "S.slots===1&&S.own.kron===1&&!S.own.kalkan&&S.tools.kron.n===1&&S.tools.steto.n===0&&K.equipped().join()==='kron'&&S.equip.length===4&&S.coins===0&&S.music===true&&S.lang===''"],
+  ['v3_secili', { v: 3, coins: 50, own: { kron: 1, steto: 1 }, slots: 2, equip: ['steto', 'kron', '', ''], tools: { steto: { n: 4, l: 2 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } }, autoOwn: true, autoJ: true, gift: { n: 2, t0: 0 }, music: false, lang: 'en' },
+    "K.equipped().join()==='steto,kron'&&S.slots===2&&S.autoOwn&&S.autoJ&&S.gift.n===2&&S.tools.steto.n===4&&S.music===false&&S.lang==='en'&&K.getLang()==='en'"],
+  ['v092_hediye', { v: 3, coins: 10, gift: { n: 5, t: Date.now() + 5 * 3600000 } }, "S.gift.n===0&&S.gift.t0===0&&S.gift.t===undefined"],
+  ['bozuk', { v: 3, own: { kron: 0, kum: 1 }, slots: 99, equip: 'x', tools: { steto: { n: -4, l: 9 }, kron: { n: 'a', l: 0 } }, autoOwn: false, autoJ: true, gift: { n: 9, t0: 0 }, lang: 'xx', music: 'abc' },
+    "S.slots===4&&S.own.kum===1&&S.own.kron===0&&Array.isArray(S.equip)&&S.equip.length===4&&K.isEq('kum')&&S.tools.steto.n===0&&S.tools.steto.l===3&&S.tools.kron.l===1&&S.autoJ===false&&S.gift.n===0&&S.lang===''&&S.music===true"],
   ['otomatik_yok', { v: 3, own: { kron: 1 }, slots: 1, equip: ['kron', 'kum', '', ''], autoOwn: false, autoJ: true }, "S.autoJ===false&&K.equipped().join()==='kron'&&S.equip[1]===''"]
 ];
 
 let bad = 0;
-const show = (name, r) => { const first = r.split('\n')[0]; if (!/ 0 hata/.test(first)) bad++; console.log((name + ':').padEnd(16) + r.replace(/\n/g, '\n' + ' '.repeat(16))); };
-show('fiyat ve stok', run('logic', '', LOGIC));
-show('ekran akışı', run('flow', '', FLOW));
+const show = (name, r) => { const first = String(r).split('\n')[0]; if (!/ 0 hata/.test(first)) bad++; console.log((name + ':').padEnd(20) + String(r).replace(/\n/g, '\n' + ' '.repeat(20))); };
+const run = async (name, script, o = {}) => {
+  const b = await launch(Object.assign({ width: 390, height: 844, dpr: 1, lang: 'tr-TR' }, o));
+  let r;
+  try { await b.goto(URL); r = await b.eval(script, { timeout: 120000 }); if (b.logs.length) r += '\n' + b.logs.join('\n'); } catch (e) { r = 'ÇÖKTÜ ' + e.message; }
+  await b.close();
+  show(name, r);
+};
+await run('fiyat ve stok', LOGIC);
+await run('ekran akışı', FLOW);
+await run('gündüz / akşam', SCENE);
+await run('müzik', MUSIC);
+await run('dil', LANG);
+await run('yazı tipi', FONT);
 for (const [name, save, cond] of MIG) {
-  const pre = save === null ? '' : 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify(save)) + ');';
-  const post = `var K=window.__kp,S=K.save,ok=false,err='';try{ok=!!(${cond})}catch(e){err=String(e)}var r=document.createElement('pre');r.id='res';r.textContent=(ok?'1 tamam, 0 hata':'0 tamam, 1 hata HATA '+err+' '+JSON.stringify({slots:S.slots,own:S.own,equip:S.equip,auto:[S.autoOwn,S.autoJ],gift:S.gift}));document.body.appendChild(r);`;
-  show('kayıt: ' + name, run('m-' + name, pre, post));
+  const seed = save === null ? '' : 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify(save)) + ');';
+  const post = `(async()=>{var K=window.__kp,S=K.save,ok=false,err='';try{ok=!!(${cond})}catch(e){err=String(e)}return ok?'1 tamam, 0 hata':'0 tamam, 1 hata HATA '+err+' '+JSON.stringify({slots:S.slots,own:S.own,equip:S.equip,auto:[S.autoOwn,S.autoJ],gift:S.gift,lang:S.lang,music:S.music})})()`;
+  await run('kayıt: ' + name, post, { seed });
 }
-for (const f of made) rmSync(f, { force: true });
 console.log(bad ? '\nHATA: ' + bad + ' grup başarısız' : '\nmağaza testleri tamam');
 process.exit(bad ? 1 : 0);

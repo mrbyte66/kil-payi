@@ -1,5 +1,6 @@
 // Google Fonts'tan Fredoka ve Nunito'yu (latin + latin-ext) indirip src/fonts içine yazar.
 // Android sürümü fontları internetten çekmesin, uygulamanın içinden okusun diye.
+// Türkçe ğ Ğ ş Ş İ için ayrıca python3 tools/make-tr-glyphs.py çalıştırılır (Fredoka bu harfleri içermez).
 // Kullanım: node tools/fetch-fonts.mjs
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -28,5 +29,7 @@ for (const [, subset, body] of blocks) {
   result += `@font-face{font-family:'${family}';font-style:normal;font-weight:${weight};font-display:swap;src:url(${file}) format('woff2');unicode-range:${range}}\n`;
   console.log(file.padEnd(26), String(buf.length).padStart(7), 'bayt', weight);
 }
+/* Fredoka ğ Ğ ş Ş İ harflerini içermez; tools/make-tr-glyphs.py bunları kendi parçalarından üretir (fredoka-tr-*.woff2). Bu kurallar sonda olmalı: örtüşen aralıkta sonradan yazılan kazanır. */
+for (const w of [500, 600, 700]) result += `@font-face{font-family:'Fredoka';font-style:normal;font-weight:${w};font-display:swap;src:url(fredoka-tr-${w}.woff2) format('woff2');unicode-range:U+011E-011F, U+015E-015F, U+0130}\n`;
 await fs.writeFile(path.join(out, 'fonts.css'), result);
 console.log('fonts.css yazıldı');
