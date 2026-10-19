@@ -3,6 +3,17 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.9.1 — İlk görüşte "Hayalet gösteri", titreşim düğmesi (2026-10-19)
+
+- **Yeni kilit ve engel artık "Hayalet gösteri" ile tanıtılıyor** (kullanıcı geri bildirimi: "spot ışığı sürekli öğretiyor, bir kere göster; amaç kullanıcıya ilk defa gördüğü şeyi yanmadan öğretmek; bilgi kartı çok yer kaplıyor"; 5 tasarım gösterildi, **Hayalet gösteri** seçildi).
+  Bir kilit ya da engel ilk kez geleceği an oyun durur (süre akmaz). Gerçek halkada yeni pinler spot ışığıyla aydınlanır, saydam bir **hayalet ibre** ve **hayalet parmak** doğru hamleyi bir kez oynar; halkanın altındaki tek satırlık şerit ne olduğunu söyler ("Bomba pim · Süre dolmadan vur: +25").
+  Sonra gerçek pinler gelir, şerit "Sıra sende!" der ve oyun sürer. Gösteri dokunarak geçilir (ilk 0,7 sn yok sayılır: tempoda vuran parmak kazara atlatmasın); geri tuşu hepsini geçer; ana ekrana gidip dönünce baştan başlar (görüldü sayılmaz).
+  Her kilit ve engel için **yalnızca bir kez** çıkar (14 kilit, 11 engel; Dene modunda çıkmaz; eski sürümde zaten karşılaşılmışsa da çıkmaz). Gerçek tur gösteriyle birlikte gelmez, gösteriden sonra gelir; yani öğrenmek için ölmek gerekmez. Hayalet ibre, gerçek ibrenin durduğu yerden doğar; Cehennem çemberi dönerken gösteri de onunla döner.
+- **Üstteki büyük bilgi kartı kalktı, ✓/✕ işaretleri ve tekrar eden spot ışığı da** (kullanıcı seçimi). Kilit açılınca artık yukarıda 8 sn duran kart çıkmaz, ilk üç görünüşte ibreyi yavaşlatan ışık ve hedefin yanındaki küçük ✓ / ✕ rozetleri yoktur; öğretim yalnızca ilk görüşteki gösteridir.
+  Büyük kart yalnızca Dene modunda kalır. Uzun ekranlarda kart yeri 102 → 56 px küçüldü (haber satırı ve seviye bandı sığar); halka orta boy ekranlarda biraz büyür, altında gösterinin şeridine yer var.
+- **Titreşim açma/kapama düğmesi** (kullanıcı isteği): ana ekranda ses düğmesinin yanında; kapalıyken oyun hiç titremez, ayar kaydedilir. Dört düğme dar telefonda bile tek sıraya sığar (320 px altında düğmeler biraz küçülür).
+- Zorluk aynı kaldı (botla, n = 30: Normal orta oyuncu medyan seviye 8, 10. seviyeye %33; Usta iyi oyuncu %30; Cehennem pro bot %37; V0.9.0 ölçümüyle aynı düzey). Emülatörde gerçek dokunuşla denendi: ilk Çift pim gösterisi, atlama, "Sıra sende!", ana ekrana gidip dönme, İngilizce metinler.
+
 ## V0.9.0 — Süre ortada, yeni kilit ipucu, rekor kutlaması, ikinci şans, yeni ekonomi (2026-10-19)
 
 - **Süre artık çemberin ortasında, puan üstte** (kullanıcı isteği: "süre ile puanı yer değiştirsek"; 3 tasarım gösterildi, **Sıvı seviyesi** seçildi). Halkanın içi bir kap gibidir: süre azaldıkça sıvı alçalır, ortada kalan süre yazar.
