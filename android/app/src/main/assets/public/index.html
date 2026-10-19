@@ -153,12 +153,6 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .tool .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .tool .badge{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--btn);color:var(--on-btn);font:800 12px/22px var(--font-body);text-align:center;font-variant-numeric:tabular-nums}
 .tool.empty .badge{background:var(--track);color:var(--ink-2)}
-.mjk{display:flex;gap:10px}
-.mj{position:relative;width:40px;height:40px;border-radius:50%;background:var(--surface);color:var(--ink-2);box-shadow:var(--shadow-s);display:grid;place-items:center}
-.mj svg{width:22px;height:22px}
-.mj .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.mj em{position:absolute;top:-4px;right:-4px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--btn);color:var(--on-btn);font:800 11px/19px var(--font-body);font-style:normal;text-align:center}
-.mj.zero em{background:var(--track);color:var(--ink-2)}
 .btn.big small{display:block;font:800 var(--fs-12)/1 var(--font-body);opacity:.85}
 .btn.big.two{flex-direction:column;gap:4px;min-height:70px}
 .btn.warn{color:var(--rose)}
@@ -249,19 +243,6 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .shop-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .shop-head h2{margin:0;font-family:var(--font-display);font-weight:600;font-size:var(--fs-28);line-height:1.1}
 .shop-list{width:100%;display:flex;flex-direction:column;gap:10px;overflow:auto;min-height:0;padding:2px}
-.trow{display:grid;grid-template-columns:48px 1fr;gap:2px 12px;padding:12px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);text-align:left}
-.trow .ti{grid-row:1/3;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:var(--lilac-soft);color:var(--btn)}
-.trow .ti svg{width:26px;height:26px}
-.trow .ti .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.trow .nm{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--font-display);font-weight:600;font-size:var(--fs-16)}
-.trow .ds{color:var(--ink-2);font-weight:700;font-size:var(--fs-12);display:flex;justify-content:space-between;align-items:center;gap:8px}
-.trow .ac{grid-column:1/3;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.trow .ac .btn{min-height:42px;font-size:var(--fs-14);padding:0 10px;background:var(--bg);box-shadow:none;white-space:nowrap}
-.trow .ac .btn[aria-disabled="true"]{opacity:.5}
-.pips{display:inline-flex;gap:4px;align-items:center}
-.pips i{width:8px;height:8px;border-radius:50%;background:var(--track)}
-.pips i.on{background:var(--lilac)}
-.stock{font-family:var(--font-display);font-weight:600;color:var(--ink);font-size:var(--fs-14);white-space:nowrap}
 
 .ad-badge{margin:0;padding:6px 12px;border-radius:var(--r-pill);background:var(--lilac-soft);color:var(--ink);font-weight:800;font-size:var(--fs-12)}
 .ad-text{margin:0;color:var(--ink-2);font-weight:700;font-size:var(--fs-14);max-width:280px;text-wrap:balance}
@@ -273,6 +254,372 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 @media (max-width:339px){.tb-right{gap:6px}.topbar .icon-btn{width:38px;height:38px}}
 @media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tagline{display:none}.seg button{min-height:36px}.menu-foot{gap:12px}}
 @media (prefers-reduced-motion:reduce){.amb i,.breathe{animation:none}.scr.on .rise,.scr.on .card{animation-duration:1ms;animation-delay:0s}.btn,.icon-btn,.hud,.tools,.tool{transition:none}}
+#shop .vw{position:absolute;inset:0;transition:opacity .4s,transform .5s cubic-bezier(.2,.9,.25,1);opacity:0;pointer-events:none;transform:scale(1.05)}
+#shop .vw.on{opacity:1;pointer-events:auto;transform:none}
+#shop .hd{position:absolute;left:14px;right:14px;top:16px;display:flex;align-items:center;gap:8px;height:44px;z-index:7}
+#shop .hd .tt{flex:1;min-width:0}
+#shop .hd h4{margin:0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:26px;line-height:1;color:#fff;letter-spacing:-.01em;text-shadow:0 2px 10px rgba(20,10,80,.55)}
+#shop .hd small{display:block;font-size:12px;font-weight:700;color:#E3DBFF;margin-top:3px;text-shadow:0 1px 6px rgba(20,10,80,.6)}
+#shop .rb{width:36px;height:36px;border-radius:50%;background:rgba(24,14,82,.5);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;color:#fff;cursor:pointer;flex:none;padding:0;transition:transform .15s,background .2s}
+#shop .rb:hover{background:rgba(24,14,82,.7)}
+#shop .rb:active{transform:scale(.92)}
+#shop .cc{height:36px;border-radius:999px;background:rgba(24,14,82,.5);border:1px solid rgba(255,255,255,.28);display:flex;align-items:center;gap:6px;padding:0 5px 0 9px;flex:none}
+#shop .cc b{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:15px;color:#fff;font-variant-numeric:tabular-nums}
+#shop .cc i{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#FFE08A,#F0A020);color:#4A2D00;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:16px;line-height:1;cursor:pointer}
+/* sokak */
+#shop .sky{position:absolute;left:0;right:0;top:0;height:calc(var(--hz) + 2px);background:linear-gradient(180deg,#1B1262 0%,#3E2F9C 28.6%,#7A63DC 54.5%,#C99BE4 72.7%,#FFB791 88.3%,#FFD3AA 98.7%,#FFD3AA 100%)}
+#shop .moon{position:absolute;right:40px;top:76px;width:30px;height:30px;border-radius:50%;box-shadow:inset -9px -3px 0 0 #FFF0C2;filter:drop-shadow(0 0 10px rgba(255,236,170,.8));transform:rotate(-18deg)}
+#shop .stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.7;animation:aTw 3.2s ease-in-out infinite}
+@keyframes aTw{50%{opacity:.1;transform:scale(.5)}}
+#shop .sk{position:absolute;left:0;will-change:transform}
+#shop .skf{top:calc(var(--hz) - 122px);height:118px}
+#shop .skn{top:calc(var(--hz) - 96px);height:112px}
+#shop .ground{position:absolute;left:0;right:0;top:var(--hz);bottom:0;background:linear-gradient(180deg,#3A2B92 0%,#241A6C 100%)}
+#shop .ground::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 30px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 20px);-webkit-mask-image:linear-gradient(180deg,#000,transparent);mask-image:linear-gradient(180deg,#000,transparent)}
+#shop .car{position:absolute;left:0;right:0;top:calc(78px + var(--cy));height:420px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;cursor:grab}
+#shop .car::-webkit-scrollbar{display:none}
+#shop .strip{position:relative;display:flex;gap:12px;padding:0 calc((var(--sw) - 220px) / 2);height:100%;width:max-content}
+#shop .lts{position:absolute;left:0;top:6px;pointer-events:none;z-index:4}
+#shop .lts .bg{animation:aGl 2.6s ease-in-out infinite}
+@keyframes aGl{50%{opacity:.12}}
+#shop .fc{flex:none;width:220px;height:364px;margin-top:48px;position:relative;scroll-snap-align:center;transition:transform .55s cubic-bezier(.45,.05,.3,1),opacity .35s;cursor:pointer}
+#shop .fc .wall{position:absolute;inset:0;border-radius:20px 20px 4px 4px;background:linear-gradient(180deg,var(--w1),var(--w2));box-shadow:inset 0 0 0 2px rgba(255,255,255,.14),0 26px 44px -12px rgba(8,4,40,.7)}
+#shop .fc .wall::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,rgba(255,255,255,.2),rgba(255,255,255,0)) left/13px 100% no-repeat,linear-gradient(270deg,rgba(255,255,255,.2),rgba(255,255,255,0)) right/13px 100% no-repeat,radial-gradient(ellipse at 50% 14%,rgba(255,226,160,.38),rgba(255,226,160,0) 58%)}
+#shop .fc .wall::before{content:"";position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 2px,transparent 2px 16px),repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 2px,transparent 2px 22px)}
+#shop .fc .cor{position:absolute;left:-7px;right:-7px;top:-10px;height:20px;border-radius:10px;background:linear-gradient(180deg,var(--t1),var(--t2));box-shadow:0 6px 10px -4px rgba(8,4,40,.6),inset 0 2px 0 rgba(255,255,255,.55)}
+#shop .fc .cor::after{content:"";position:absolute;left:14px;right:14px;bottom:4px;height:3px;border-radius:2px;background:rgba(0,0,0,.16)}
+#shop .fc .sign{position:absolute;left:14px;right:14px;top:22px;height:48px;border-radius:14px;background:linear-gradient(180deg,#FFF9EC,#FFE3BF);box-shadow:0 10px 16px -8px rgba(8,4,40,.7),inset 0 0 0 3px var(--ac),inset 0 0 0 5px rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px;z-index:3}
+#shop .fc .sign b{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:21px;line-height:1;color:#2B2166;white-space:nowrap}
+#shop .fc .sign .md{flex:none;filter:drop-shadow(0 3px 4px rgba(40,20,100,.35))}
+#shop .fc .lmp{position:absolute;top:14px;width:12px;height:8px;border-radius:6px 6px 2px 2px;background:#FFE08A;box-shadow:0 0 18px 8px rgba(255,224,138,.7);z-index:4}
+#shop .fc .awn{position:absolute;left:-6px;top:62px;z-index:5;filter:drop-shadow(0 10px 6px rgba(8,4,40,.5));transform-origin:50% 0;animation:aSway 6s ease-in-out infinite}
+@keyframes aSway{50%{transform:skewX(-.9deg) scaleY(1.02)}}
+#shop .fc .win{position:absolute;left:12px;right:12px;top:100px;height:154px;border-radius:16px;background:radial-gradient(ellipse at 50% 78%,var(--g1) 0%,var(--g2) 46%,var(--g3) 100%);box-shadow:inset 0 0 0 4px var(--t1),inset 0 10px 22px rgba(0,0,0,.35),0 0 0 3px rgba(0,0,0,.15);overflow:hidden}
+#shop .fc .win::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 22%,rgba(255,255,255,.32) 25%,rgba(255,255,255,.08) 31%,transparent 33%,transparent 41%,rgba(255,255,255,.2) 43%,transparent 46%);pointer-events:none}
+#shop .fc .plk{position:absolute;left:0;right:0;bottom:34px;height:9px;background:linear-gradient(180deg,#D49A68,#8E5A34);box-shadow:0 6px 8px -2px rgba(40,20,0,.45)}
+#shop .fc .its{position:absolute;left:0;right:0;bottom:43px;display:flex;justify-content:center;align-items:flex-end;gap:7px}
+#shop .fc .its.c{bottom:34px}
+#shop .fc .it{display:block;animation:aBob 3.6s ease-in-out infinite;filter:drop-shadow(0 8px 6px rgba(40,20,0,.35))}
+#shop .fc .it.a2{animation-delay:-1.2s}#shop .fc .it.a3{animation-delay:-2.4s}
+@keyframes aBob{50%{transform:translateY(-4px)}}
+#shop .fc .rays2{position:absolute;left:50%;top:50%;width:260px;height:260px;margin:-150px 0 0 -130px;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.5) 0 8deg,transparent 8deg 24deg);-webkit-mask-image:radial-gradient(circle,#000 6%,transparent 62%);mask-image:radial-gradient(circle,#000 6%,transparent 62%);animation:aRot 26s linear infinite}
+@keyframes aRot{to{transform:rotate(360deg)}}
+#shop .fc .tw{position:absolute;width:10px;height:10px;background:#fff;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:aTw 2.4s ease-in-out infinite}
+#shop .fc .tw.t1{left:24px;top:30px}#shop .fc .tw.t2{right:28px;top:48px;animation-delay:-.8s;transform:scale(1.3)}#shop .fc .tw.t3{left:52px;bottom:30px;animation-delay:-1.6s}
+#shop .fc .slat{position:absolute;left:0;right:0;top:0;height:82%;background:repeating-linear-gradient(180deg,#9690BD 0 8px,#7F78AA 8px 10px);box-shadow:0 10px 14px rgba(20,8,50,.5),inset 0 -6px 0 #6C6598;display:grid;place-items:center;z-index:2}
+#shop .fc .slat::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 34%,transparent 40%)}
+#shop .fc .slat .pd{width:46px;height:46px;border-radius:50%;background:linear-gradient(160deg,#FFC0D4,#E8456E);display:grid;place-items:center;box-shadow:0 6px 12px rgba(80,10,40,.5),inset 0 2px 0 rgba(255,255,255,.5);z-index:1;color:#fff}
+#shop .fc .tape{position:absolute;left:-24px;right:-24px;top:52px;height:24px;background:repeating-linear-gradient(-45deg,#FFD35A 0 12px,#2B2166 12px 24px);transform:rotate(-8deg);z-index:3;box-shadow:0 4px 8px rgba(0,0,0,.4)}
+#shop .fc .gl{position:absolute;left:10px;right:10px;bottom:6px;height:22px;border-radius:12px;background:radial-gradient(ellipse,#fff 0%,rgba(255,255,255,0) 70%);opacity:.85}
+#shop .fc .bln{position:absolute;top:8px;animation:aSw2 4.2s ease-in-out infinite;transform-origin:50% 100%}
+#shop .fc .bln.b1{left:24px}#shop .fc .bln.b2{right:24px;animation-delay:-2s}
+@keyframes aSw2{50%{transform:rotate(7deg)}}
+#shop .fc .door{position:absolute;left:16px;top:274px;width:58px;height:90px;border-radius:29px 29px 0 0;background:linear-gradient(180deg,#FFEAB8,#FFB45E);box-shadow:inset 0 0 0 4px var(--t1),0 0 26px rgba(255,200,120,.6)}
+#shop .fc .door .leaf{position:absolute;left:4px;top:4px;bottom:0;width:30px;border-radius:25px 0 0 0;background:linear-gradient(90deg,#2C2170,#4A3DB0);transform-origin:left;transform:perspective(220px) rotateY(-42deg);box-shadow:0 0 12px rgba(0,0,0,.4)}
+#shop .fc .door .kn{position:absolute;left:26px;top:48px;width:6px;height:6px;border-radius:50%;background:#FFE08A;box-shadow:0 0 6px #FFE08A}
+#shop .fc .door.cl{background:linear-gradient(180deg,#5A5384,#3A3460);box-shadow:inset 0 0 0 4px var(--t1)}
+#shop .fc .door.cl .leaf{left:4px;width:calc(100% - 8px);transform:none;border-radius:25px 25px 0 0;background:repeating-linear-gradient(180deg,#8B85B3 0 7px,#757097 7px 9px)}
+#shop .fc .door .sg{position:absolute;left:50%;top:44px;margin-left:-23px;width:46px;padding:3px 0;border-radius:6px;background:#FFF3DC;color:#2B2166;font-weight:800;font-size:11px;text-align:center;letter-spacing:.04em;box-shadow:0 4px 8px rgba(0,0,0,.4);transform-origin:50% -10px;animation:aSw3 3.8s ease-in-out infinite;z-index:2}
+#shop .fc .door .sg::before{content:"";position:absolute;left:50%;top:-12px;width:1.5px;height:12px;background:#FFE3B8}
+#shop .fc .door.cl .sg{background:#FFD35A;color:#4A2D00}
+@keyframes aSw3{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+#shop .fc .plq{position:absolute;left:88px;right:14px;top:288px;height:60px;border-radius:12px;background:rgba(10,4,50,.3);border:1px solid rgba(255,255,255,.2);padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:5px}
+#shop .fc .plq small{font-size:11px;font-weight:800;color:#E5DEFF;line-height:1.1}
+#shop .fc .plq b{font-family:Fredoka,system-ui,sans-serif;font-weight:500;font-size:14px;line-height:1.1;color:#fff}
+#shop .fc .plq .bar{display:block;height:6px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}
+#shop .fc .plq .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--ac),#fff)}
+#shop .fc .pool{position:absolute;left:-30px;right:-30px;bottom:-46px;height:70px;background:radial-gradient(ellipse at 50% 0,rgba(255,206,130,.75),rgba(255,206,130,0) 68%);pointer-events:none}
+#shop .fc .curb{position:absolute;left:-9px;right:-9px;bottom:-8px;height:14px;border-radius:7px;background:linear-gradient(180deg,#6454C4,#34288A);box-shadow:0 8px 12px -4px rgba(8,4,40,.7),inset 0 1px 0 rgba(255,255,255,.35)}
+#shop .fc .cat{position:absolute;right:24px;top:-34px;z-index:6}
+#shop .fc .cat .tl{transform-origin:24px 30px;animation:aTail 3s ease-in-out infinite}
+@keyframes aTail{50%{transform:rotate(14deg)}}
+#shop .fc .cat .ey{transform-origin:50% 50%;animation:aBlink 5s infinite}
+@keyframes aBlink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+#shop .fc .ribbon{position:absolute;top:96px;right:-12px;background:linear-gradient(90deg,#FF9DBE,#E8456E);color:#fff;font-weight:800;font-size:11px;padding:4px 12px;border-radius:6px 0 0 6px;z-index:7;box-shadow:0 6px 10px rgba(80,10,40,.5)}
+#shop .fc .ribbon::after{content:"";position:absolute;right:0;bottom:-6px;border-style:solid;border-width:6px 12px 0 0;border-color:#9E2A52 transparent transparent}
+#shop .cta{position:absolute;left:50%;top:calc(496px + var(--cy));margin-left:-84px;width:168px;height:44px;border-radius:999px;border:0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:17px;color:#2B2166;background:linear-gradient(135deg,#FFE9A8,#F4B63F);box-shadow:0 12px 24px -6px rgba(244,166,42,.8),inset 0 1px 0 rgba(255,255,255,.7);cursor:pointer;overflow:hidden;z-index:6}
+#shop .cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.7),rgba(255,255,255,0));transform:skewX(-18deg);animation:aSh 3.6s ease-in-out infinite}
+@keyframes aSh{0%,55%{left:-60%}100%{left:130%}}
+#shop .cta.soon{background:rgba(255,255,255,.14);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.3)}
+#shop .cta.soon::after{display:none}
+#shop .dock{position:absolute;left:14px;right:14px;bottom:12px;height:58px;border-radius:22px;background:rgba(18,10,68,.62);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:6}
+#shop .dock .dk{width:56px;height:46px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:background .25s,transform .25s;position:relative}
+#shop .dock .dk .md{transition:transform .25s}
+#shop .dock .dk small{font-size:11px;font-weight:800;color:#CFC6F5;line-height:1}
+#shop .dock .dk.on{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1.5px rgba(255,224,138,.9)}
+#shop .dock .dk.on small{color:#FFE9A8}
+#shop .dock .dk.on .md{transform:scale(1.12)}
+#shop .hub.zoom .hd,#shop .hub.zoom .cta,#shop .hub.zoom .dock{opacity:0;transition:opacity .25s}
+#shop .hub.zoom .fc.sel{transform:scale(2.5);transform-origin:50% 72%;z-index:20}
+#shop .hub.zoom .fc:not(.sel){opacity:0}
+/* iç mekân */
+#shop .room{position:absolute;inset:0;overflow:hidden}
+#shop .wallp{position:absolute;inset:0;background:linear-gradient(180deg,var(--w1),var(--w2))}
+#shop .wallp::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.045) 0 2px,transparent 2px 22px),repeating-linear-gradient(-45deg,rgba(255,255,255,.045) 0 2px,transparent 2px 22px)}
+#shop .wallp::after{content:"";position:absolute;left:50%;top:-60px;width:360px;height:360px;margin-left:-180px;border-radius:50%;background:radial-gradient(circle,rgba(255,226,160,.4),rgba(255,226,160,0) 66%)}
+#shop .flr{position:absolute;left:0;right:0;bottom:0;height:70px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.14) 0 2px,transparent 2px 38px),linear-gradient(180deg,#8A5A44,#5E3A30);box-shadow:inset 0 6px 10px rgba(0,0,0,.3)}
+#shop .lamp{position:absolute;right:30px;top:0;width:60px;height:70px;transform-origin:50% 0;animation:aLmp 5s ease-in-out infinite;pointer-events:none;z-index:1}
+#shop .lamp::before{content:"";position:absolute;left:29px;top:0;width:2px;height:34px;background:#E8C9A0}
+#shop .lamp::after{content:"";position:absolute;left:14px;top:32px;width:32px;height:18px;border-radius:16px 16px 3px 3px;background:linear-gradient(180deg,#FFF0C2,#F4B63F);box-shadow:0 0 26px 12px rgba(255,214,120,.5)}
+@keyframes aLmp{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+#shop .shopv .hd{z-index:8}
+#shop .hs{position:relative;flex:1;min-width:0;height:34px;border-radius:12px;background:linear-gradient(180deg,#FFF9EC,#FFE3BF);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 14px -6px rgba(8,4,40,.7),inset 0 0 0 3px var(--ac),inset 0 0 0 5px rgba(255,255,255,.7);margin-top:12px}
+#shop .hs::before,#shop .hs::after{content:"";position:absolute;top:-14px;width:1.6px;height:14px;background:#E8C9A0}
+#shop .hs::before{left:20px}#shop .hs::after{right:20px}
+#shop .hs b{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:17px;color:#2B2166;white-space:nowrap}
+#shop .body{position:absolute;left:14px;right:14px;top:64px;bottom:0}
+#shop .lab{display:flex;justify-content:space-between;align-items:center;font-family:Fredoka,system-ui,sans-serif;font-weight:500;font-size:15px;color:#fff;margin:0 2px 6px;text-shadow:0 1px 6px rgba(8,4,40,.5)}
+#shop .lab em{font-style:normal;font-family:Nunito,system-ui,sans-serif;font-weight:800;font-size:11px;color:#EDE6FF;background:rgba(10,4,50,.4);border-radius:999px;padding:3px 9px}
+#shop .blt{position:relative;height:128px}
+#shop .strap{position:absolute;left:-4px;right:-4px;top:26px;height:20px;border-radius:10px;background:linear-gradient(180deg,#9A8BF5,#5B49C9);box-shadow:0 6px 10px -4px rgba(8,4,40,.7),inset 0 1px 0 rgba(255,255,255,.5)}
+#shop .strap::before{content:"";position:absolute;left:8px;right:8px;top:6px;height:0;border-top:2px dashed rgba(255,255,255,.55)}
+#shop .pchs{position:absolute;left:0;right:0;top:28px;display:flex;justify-content:space-between}
+#shop .pch{position:relative;width:62px;height:100px;cursor:pointer;transition:transform .2s}
+#shop .pch:hover{transform:translateY(-3px)}
+#shop .pch .rg{position:absolute;left:50%;top:-3px;margin-left:-6px;width:12px;height:12px;border-radius:50%;border:3px solid #FFE08A;z-index:4;box-shadow:0 2px 4px rgba(0,0,0,.35)}
+#shop .pch .bd{position:absolute;left:0;right:0;top:8px;bottom:0;border-radius:10px 10px 18px 18px;background:linear-gradient(180deg,var(--p1),var(--p2));box-shadow:0 12px 16px -6px rgba(8,4,40,.8),inset 0 1px 0 rgba(255,255,255,.4);z-index:2}
+#shop .pch .bd::before{content:"";position:absolute;left:5px;right:5px;bottom:5px;top:5px;border-radius:7px 7px 14px 14px;border:1.8px dashed rgba(255,255,255,.42)}
+#shop .pch .mm{position:absolute;left:50%;top:36px;margin-left:-18px;filter:drop-shadow(0 4px 4px rgba(8,4,40,.4))}
+#shop .pch .fl{position:absolute;left:-2px;right:-2px;top:8px;height:28px;border-radius:10px 10px 22px 22px/10px 10px 18px 18px;background:linear-gradient(180deg,var(--p1),var(--p2));box-shadow:0 6px 8px -2px rgba(8,4,40,.55),inset 0 1px 0 rgba(255,255,255,.5);z-index:3;display:grid;place-items:center;color:#fff;filter:brightness(1.08)}
+#shop .pch .fl::after{content:"";position:absolute;left:50%;bottom:-3px;margin-left:-4px;width:8px;height:8px;border-radius:50%;background:#FFE08A;box-shadow:0 2px 3px rgba(0,0,0,.4)}
+#shop .pch small{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(8,4,40,.6);z-index:3}
+#shop .pch.e{--p1:#6F5FD6;--p2:#463A99}
+#shop .pch.e .bd{background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+#shop .pch.e .fl{background:rgba(111,95,214,.55);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
+#shop .pch.l{--p1:#4D4390;--p2:#2B2468}
+#shop .pch .pr{position:absolute;left:50%;top:44px;margin-left:-26px;width:52px;height:22px;border-radius:7px;background:linear-gradient(180deg,#FFE9A8,#F4B63F);color:#4A2D00;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:11px;display:flex;align-items:center;justify-content:center;gap:2px;box-shadow:0 4px 6px -2px rgba(0,0,0,.5);z-index:3}
+#shop .pch.nx .bd,#shop .pch.nx .fl{box-shadow:0 0 0 2px #FFE08A,0 0 20px 3px rgba(255,214,90,.8),0 12px 16px -6px rgba(8,4,40,.8)}
+#shop .pch.nx{animation:aNxp 2s ease-in-out infinite}
+@keyframes aNxp{50%{transform:translateY(-3px)}}
+#shop .shl{position:relative;margin-top:2px;height:150px}
+#shop .shl .pl{position:absolute;left:-14px;right:-14px;top:92px;height:14px;background:linear-gradient(180deg,#F2C79A,#C98E58 60%,#9C6B3E);box-shadow:0 10px 14px -2px rgba(8,4,40,.7),inset 0 1px 0 rgba(255,255,255,.55)}
+#shop .shl .pl::before{content:"";position:absolute;left:0;right:0;top:100%;height:6px;background:linear-gradient(180deg,rgba(8,4,40,.45),transparent)}
+#shop .shl .shr{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-around}
+#shop .itm{position:relative;width:124px;height:150px;cursor:pointer;transition:transform .2s}
+#shop .itm:hover{transform:translateY(-3px)}
+#shop .itm .gw{position:absolute;left:50%;top:2px;width:120px;height:120px;margin:0 0 0 -60px;border-radius:50%;background:radial-gradient(circle,var(--c) 0%,transparent 66%);opacity:.55}
+#shop .itm .pc{position:absolute;left:50%;top:18px;margin-left:-35px;animation:aBob 3.8s ease-in-out infinite;filter:drop-shadow(0 10px 8px rgba(8,4,40,.45))}
+#shop .itm .ck{position:absolute;right:16px;top:10px;width:22px;height:22px;border-radius:50%;background:#3FCB8A;color:#073D27;display:grid;place-items:center;z-index:3;box-shadow:0 4px 8px rgba(0,0,0,.4)}
+#shop .itm .case{position:absolute;left:50%;top:6px;margin-left:-46px;width:92px;height:90px;border-radius:46px 46px 12px 12px;background:linear-gradient(160deg,rgba(255,255,255,.3),rgba(255,255,255,.05) 55%,rgba(255,255,255,.16));border:1.5px solid rgba(255,255,255,.45);z-index:2}
+#shop .itm .case::before{content:"";position:absolute;left:12px;top:10px;width:10px;height:40px;border-radius:6px;background:rgba(255,255,255,.35);transform:rotate(12deg)}
+#shop .itm.lk .pc{animation:none;opacity:.9}
+#shop .tg2{position:absolute;left:50%;top:100px;margin-left:-48px;width:96px;border-radius:9px;background:linear-gradient(180deg,#FFF9EC,#FFE3BF);padding:5px 4px 5px;text-align:center;box-shadow:0 8px 12px -4px rgba(8,4,40,.65);transform-origin:50% -6px;animation:aSw3 5s ease-in-out infinite;z-index:4}
+#shop .tg2::before{content:"";position:absolute;left:50%;top:-8px;width:1.5px;height:8px;background:#FFE3B8}
+#shop .tg2 h6{margin:0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:13px;line-height:1.1;color:#2B2166}
+#shop .tg2 span{display:flex;align-items:center;justify-content:center;gap:3px;margin-top:2px;font-size:11px;font-weight:800;color:#6B6490;line-height:1.15}
+#shop .tg2 span.g{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:12px;color:#7A4A00}
+#shop .itm.nx .gw{opacity:.95;animation:aNx 2s ease-in-out infinite}
+@keyframes aNx{50%{transform:scale(1.18);opacity:.6}}
+#shop .nxt{position:absolute;left:50%;top:-6px;margin-left:-30px;width:60px;text-align:center;background:linear-gradient(135deg,#FFE9A8,#F4B63F);color:#4A2D00;font-weight:800;font-size:11px;padding:2px 0;border-radius:999px;z-index:5;box-shadow:0 4px 8px rgba(0,0,0,.4)}
+#shop .note{position:absolute;left:14px;right:14px;bottom:12px;text-align:center;font-size:12px;font-weight:700;color:#EDE6FF;text-shadow:0 1px 4px rgba(8,4,40,.6)}
+/* kağıt fiş */
+#shop .scrim{position:absolute;inset:0;background:rgba(10,4,40,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+#shop .scrim.on{opacity:1;pointer-events:auto}
+#shop .sheet{position:absolute;left:0;right:0;bottom:0;z-index:21;background:#FFF8EC;padding:12px 18px 22px;box-shadow:0 -20px 50px rgba(8,4,40,.45);transform:translateY(calc(100% + 120px));transition:transform .45s cubic-bezier(.2,.9,.25,1);display:flex;flex-direction:column;align-items:center;text-align:center;border-radius:0 0 36px 36px;color:#2B2166}
+#shop .sheet::before{content:"";position:absolute;left:0;right:0;top:-9px;height:10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10'%3E%3Cpath d='M0 10L8 1L16 10Z' fill='%23FFF8EC'/%3E%3C/svg%3E") repeat-x}
+#shop .sheet.on{transform:none}
+#shop .sheet .hdl{display:none}
+#shop .spot{position:relative;width:180px;height:70px;display:grid;place-items:center;margin-top:-62px}
+#shop .spot::before{content:"";position:absolute;left:50%;top:50%;width:190px;height:190px;margin:-100px 0 0 -95px;border-radius:50%;background:radial-gradient(circle,var(--a) 0%,rgba(255,255,255,0) 64%);opacity:.9}
+#shop .spot .md{position:relative;animation:aBob 3.4s ease-in-out infinite;filter:drop-shadow(0 12px 10px rgba(30,16,90,.45))}
+#shop .sheet h3{margin:20px 0 0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:24px;line-height:1.1;color:#2B2166}
+#shop .sheet .kind{margin-top:5px;font-size:11px;font-weight:800;color:#5440C9;background:#EFE9FF;border-radius:999px;padding:3px 10px}
+#shop .sheet p{margin:9px 6px 0;font-size:13px;line-height:1.45;font-weight:700;color:#6B6490;padding-bottom:10px;border-bottom:2px dashed #E4D6BC;width:100%}
+#shop .stats{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+#shop .pill{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 10px;border-radius:999px;font-family:Fredoka,system-ui,sans-serif;font-weight:500;font-size:13px;background:#F3EAD6;color:#6B4A1E}
+#shop .pill.soon{background:#FFE0EA;color:#B3264F;font-family:Nunito,system-ui,sans-serif;font-weight:800;font-size:11px}
+#shop .pill.g{background:linear-gradient(135deg,#FFE79A,#F4B63F);color:#4A2D00}
+#shop .acts{display:flex;gap:8px;margin-top:13px;width:100%}
+#shop .sbt{flex:1;height:48px;border-radius:999px;border:0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;transition:transform .15s}
+#shop .sbt:active{transform:scale(.97)}
+#shop .sbt.p{background:linear-gradient(135deg,#9A8BF5,#6D58E0);color:#fff;box-shadow:0 10px 20px -8px #6D58E0,inset 0 1px 0 rgba(255,255,255,.4)}
+#shop .sbt.gd{background:linear-gradient(135deg,#FFE79A,#F4B63F);color:#3F2800;box-shadow:0 10px 20px -8px #F4A62A,inset 0 1px 0 rgba(255,255,255,.6)}
+#shop .sbt.s{background:#fff;color:#5440C9;border:1.5px solid #D9D0F2}
+#shop .sbt.off{background:#EDE4D2;color:#A39A86;cursor:default}
+#shop .row{width:100%;display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:18px;background:#fff;border:1.5px solid #EDE4D2;margin-top:8px;text-align:left}
+#shop .row .ri{width:34px;height:34px;border-radius:12px;background:#F3EAD6;display:grid;place-items:center;color:#8A5A1E;flex:none}
+#shop .row b{flex:1;font-weight:800;font-size:14px;color:#2B2166}
+#shop .row small{display:block;font-weight:700;font-size:11px;color:#8A84A8}
+#shop .row.pick{cursor:pointer}
+#shop .row.pick.sel{border-color:#8E7CF2;background:#F4F0FF}
+#shop .tg{width:46px;height:26px;border-radius:13px;background:#D9D0F2;position:relative;flex:none;cursor:pointer;transition:background .25s}
+#shop .tg::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 2px 6px rgba(60,40,140,.35)}
+#shop .tg.on{background:linear-gradient(135deg,#9A8BF5,#6D58E0)}
+#shop .tg.on::after{left:23px}
+#shop .ckb{width:22px;height:22px;border-radius:50%;border:1.5px solid #CFC6EE;display:grid;place-items:center;color:transparent;flex:none}
+#shop .sel .ckb{background:#6D58E0;border-color:#6D58E0;color:#fff}
+#shop .stt{position:absolute;left:50%;top:62px;transform:translate(-50%,-14px);background:rgba(20,10,70,.95);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 14px;font-weight:800;font-size:12px;color:#fff;opacity:0;transition:all .35s;z-index:40;white-space:nowrap;pointer-events:none}
+#shop .stt.on{opacity:1;transform:translate(-50%,0)}
+#shop .sp{position:absolute;width:7px;height:7px;border-radius:2px;pointer-events:none;z-index:41;animation:aSpk .95s ease-out forwards}
+@keyframes aSpk{from{opacity:1;transform:translate(0,0) rotate(0) scale(1)}to{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(260deg) scale(.4)}}
+/* yetenekler */
+#shop .domes{display:flex;justify-content:space-between;margin-top:10px}
+#shop .dm{position:relative;width:132px;height:210px;cursor:pointer}
+#shop .dm .gls{position:absolute;left:0;right:0;top:0;height:168px;border-radius:66px 66px 14px 14px;background:linear-gradient(160deg,rgba(255,255,255,.32),rgba(255,255,255,.05) 52%,rgba(255,255,255,.18));border:1.5px solid rgba(255,255,255,.5);box-shadow:inset 0 0 24px rgba(255,255,255,.12),0 16px 24px -10px rgba(8,4,40,.6);overflow:hidden;z-index:3}
+#shop .dm .gls::before{content:"";position:absolute;left:16px;top:18px;width:12px;height:70px;border-radius:8px;background:rgba(255,255,255,.4);transform:rotate(14deg)}
+#shop .dm .knob{position:absolute;left:50%;top:-8px;margin-left:-8px;width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,#FFE9A8,#C98A1A);z-index:4;box-shadow:0 3px 6px rgba(0,0,0,.4)}
+#shop .dm .ped{position:absolute;left:8px;right:8px;bottom:42px;height:26px;border-radius:50%/60%;background:linear-gradient(180deg,#F2C79A,#B27A48);box-shadow:0 10px 12px -4px rgba(8,4,40,.7)}
+#shop .dm .ped::before{content:"";position:absolute;left:10%;right:10%;top:-4px;height:12px;border-radius:50%;background:#FFE0BB}
+#shop .dm .gem{position:absolute;left:50%;top:34px;margin-left:-40px;z-index:2;animation:aBob 3.6s ease-in-out infinite;filter:drop-shadow(0 10px 8px rgba(8,4,40,.45))}
+#shop .dm .gg{position:absolute;left:50%;top:50px;width:150px;height:150px;margin:-20px 0 0 -75px;border-radius:50%;background:radial-gradient(circle,var(--c),transparent 62%);opacity:.75;z-index:1}
+#shop .dm .tg2{top:176px;z-index:5}
+#shop .dm.cv .cloth{position:absolute;left:4px;right:4px;top:22px;height:150px;border-radius:60px 60px 6px 6px;background:linear-gradient(105deg,#B9B1E2 0%,#9990CC 30%,#C9C2EE 52%,#9A91CE 78%,#B0A7DB 100%);z-index:4;box-shadow:0 16px 22px -8px rgba(8,4,40,.65);clip-path:polygon(0 0,100% 0,100% 88%,92% 96%,82% 90%,70% 98%,58% 91%,46% 99%,34% 91%,22% 97%,10% 90%,0 96%)}
+#shop .dm.cv .cloth::before{content:"?";position:absolute;left:50%;top:22px;transform:translateX(-50%);font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:46px;color:rgba(255,255,255,.7)}
+#shop .dm.cv .rbn{position:absolute;left:-6px;right:-6px;top:106px;height:26px;background:linear-gradient(180deg,#FF9DBE,#E8456E);transform:rotate(-8deg);z-index:6;display:grid;place-items:center;color:#fff;font-weight:800;font-size:12px;letter-spacing:.03em;box-shadow:0 6px 10px rgba(80,10,40,.55)}
+#shop .ctr{position:absolute;left:-14px;right:-14px;top:262px;height:16px;background:linear-gradient(180deg,#F2C79A,#B27A48);box-shadow:0 10px 14px -2px rgba(8,4,40,.7),inset 0 1px 0 rgba(255,255,255,.55)}
+#shop .more{position:absolute;left:0;right:0;top:308px;display:flex;flex-direction:column;align-items:center;gap:8px}
+#shop .more small{font-size:12px;font-weight:800;color:#EDE6FF}
+#shop .more div{display:flex;gap:10px}
+#shop .more i{width:44px;height:44px;border-radius:50%;border:2px dashed rgba(255,255,255,.4);display:grid;place-items:center;font-style:normal;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:20px;color:rgba(255,255,255,.55)}
+/* görünüm */
+#shop .gal{margin-top:6px}
+#shop .gal .lab{margin:8px 2px 5px}
+#shop .frs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+#shop .frm{position:relative;height:92px;border-radius:12px;background:linear-gradient(145deg,#FFE9A8,#D49A2E 55%,#F4C860);padding:5px;cursor:pointer;box-shadow:0 10px 14px -6px rgba(8,4,40,.7);transition:transform .2s}
+#shop .frm:hover{transform:translateY(-2px)}
+#shop .frm .mat{height:100%;border-radius:8px;background:linear-gradient(180deg,#2B2166,#1B1450);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:inset 0 3px 8px rgba(0,0,0,.5)}
+#shop .frm h6{margin:0;font-family:Fredoka,system-ui,sans-serif;font-weight:500;font-size:11px;color:#fff;line-height:1}
+#shop .frm .pr{display:flex;align-items:center;gap:3px;font-family:Fredoka,system-ui,sans-serif;font-weight:500;font-size:11px;color:#FFE08A}
+#shop .soonb{position:absolute;left:14px;right:14px;top:62px;height:26px;border-radius:999px;background:linear-gradient(90deg,#FF9DBE,#E8456E);display:flex;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:12px;color:#fff;box-shadow:0 8px 14px -6px rgba(80,10,40,.6);z-index:3}
+/* hediye */
+#shop .gf{position:absolute;left:0;right:0;top:64px;display:flex;flex-direction:column;align-items:center}
+#shop .gf .tbl{position:relative;width:220px;height:200px;display:grid;place-items:center}
+#shop .gf .tbl::before{content:"";position:absolute;left:50%;top:50%;width:260px;height:260px;margin:-140px 0 0 -130px;border-radius:50%;background:radial-gradient(circle,rgba(255,226,140,.65),rgba(255,226,140,0) 64%)}
+#shop .gf .tbl .md{position:relative;animation:aBob 3.4s ease-in-out infinite;filter:drop-shadow(0 14px 12px rgba(8,4,40,.5))}
+#shop .gf .tbl .top{position:absolute;left:50%;bottom:6px;margin-left:-90px;width:180px;height:22px;border-radius:50%;background:linear-gradient(180deg,#F2C79A,#B27A48);box-shadow:0 14px 16px -4px rgba(8,4,40,.7)}
+#shop .gf h3{margin:14px 0 0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:26px;color:#fff;text-shadow:0 2px 10px rgba(8,4,40,.5)}
+#shop .gf p{margin:8px 24px 0;font-size:13px;font-weight:700;line-height:1.4;color:#EDE6FF;text-align:center}
+#shop .gf .sbt{flex:none;width:230px;margin-top:18px}
+
+#shop .beam{position:absolute;top:56px;width:150px;height:300px;background:linear-gradient(180deg,rgba(255,232,170,.42),rgba(255,232,170,0));clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);pointer-events:none}
+#shop .bnt{position:absolute;left:0;top:60px;pointer-events:none}
+#shop .bnt .fg{transform-origin:50% 0;animation:aFlag 3s ease-in-out infinite}
+@keyframes aFlag{50%{transform:skewX(5deg)}}
+#shop .cf{position:absolute;left:0;right:0;top:80px;height:480px;overflow:hidden;pointer-events:none}
+#shop .cf i{position:absolute;top:-16px;width:8px;height:12px;border-radius:2px;animation:aFall 5s linear infinite;opacity:0}
+@keyframes aFall{0%{transform:translateY(0) rotate(0);opacity:0}8%{opacity:1}92%{opacity:1}100%{transform:translateY(500px) rotate(540deg);opacity:0}}
+#shop .gf{top:84px}
+#shop .gf .tbl{position:relative;width:268px;height:238px;display:block}
+#shop .gf .tbl::before{content:"";position:absolute;left:50%;top:50%;width:300px;height:300px;margin:-170px 0 0 -150px;border-radius:50%;background:radial-gradient(circle,rgba(255,226,140,.55),rgba(255,226,140,0) 62%)}
+#shop .gf .gbx{position:absolute;left:50%;top:60px;margin-left:-84px;transform-origin:50% 100%;animation:aWig 3.4s ease-in-out infinite;filter:drop-shadow(0 12px 10px rgba(8,4,40,.4))}
+@keyframes aWig{0%,70%,100%{transform:rotate(0)}76%{transform:rotate(-3deg)}82%{transform:rotate(3deg)}88%{transform:rotate(-2deg)}94%{transform:rotate(1deg)}}
+#shop .gf .bln{top:70px}
+#shop .gf .bln.b1{left:10px}#shop .gf .bln.b2{right:10px}
+#shop .gf .bln{transform-origin:50% 100%}
+#shop .gf .slab{position:absolute;left:-14px;right:-14px;bottom:0;height:18px;background:linear-gradient(180deg,#F2C79A,#B27A48);box-shadow:0 12px 14px -2px rgba(8,4,40,.7),inset 0 1px 0 rgba(255,255,255,.55)}
+#shop .gf .tbl::after{content:none}
+
+#shop .ffs i{position:absolute;width:4px;height:4px;border-radius:50%;background:#FFE9A8;box-shadow:0 0 8px 3px rgba(255,226,140,.7);animation:aFf 9s ease-in-out infinite;opacity:0}
+@keyframes aFf{0%{transform:translate(0,0);opacity:0}15%{opacity:.9}50%{transform:translate(18px,-60px);opacity:.6}85%{opacity:.9}100%{transform:translate(-10px,-130px);opacity:0}}
+#shop .ffs{position:absolute;inset:0;pointer-events:none;z-index:5}
+
+#shop .rem{position:relative;display:block;flex:none}
+#shop .rem::before{content:"";position:absolute;inset:4%;border-radius:50%;box-shadow:0 0 7px 1px var(--nc);opacity:.9;pointer-events:none}
+#shop .rem svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#shop .rem .ptw{position:absolute;inset:0;display:block;animation:aSpin 8s linear infinite;font-style:normal}
+#shop .rem .emc{position:absolute;left:50%;top:50%;display:grid;place-items:center;animation:aBob 3.6s ease-in-out infinite}
+@keyframes aSpin{to{transform:rotate(360deg)}}
+#shop .fc .win{background:radial-gradient(ellipse at 50% 58%,var(--g3) 0%,#1e1364 52%,#120a45 100%)}
+#shop .fc .win .nglow{position:absolute;left:50%;top:50%;width:190px;height:190px;margin:-95px 0 0 -95px;border-radius:50%;background:radial-gradient(circle,var(--g2) 0%,transparent 66%);opacity:.5}
+#shop .fc .win .hr{position:absolute;left:50%;top:50%;margin:-70px 0 0 -70px}
+#shop .fc .slat .pd2{z-index:1;display:block}
+#shop .fc .sign{gap:7px}
+#shop .dock .dk.on .rem{transform:scale(1.12)}
+#shop .itm .pc{margin-left:-43px;top:4px}
+#shop .itm .case{width:100px;height:98px;margin-left:-50px;top:0}
+#shop .itm.lk .pc{opacity:1}
+#shop .dm .gem{margin-left:-53px;top:28px}
+#shop .spot{width:140px;height:120px;margin-top:-92px}
+#shop .gf .tbl .rem.big{position:absolute;left:50%;top:-2px;margin-left:-100px}
+#shop .row .rem{flex:none}
+
+/* V0.9.2: menüdeki çanta satırı, oyun içi dock'ta Oto göstergesi, Ayarlar penceresi */
+.bagrow{display:flex;flex-direction:column;align-items:center;gap:8px}
+.mjk{display:flex;gap:10px}
+.sl{appearance:none;border:0;position:relative;width:44px;height:44px;border-radius:50%;background:var(--surface);color:var(--lilac);box-shadow:var(--shadow-s);display:grid;place-items:center;cursor:pointer;padding:0;transition:transform var(--dur-fast) var(--ease)}
+.sl:active{transform:scale(.94)}
+.sl:focus-visible,.lnk:focus-visible,.srow:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+.sl svg{display:block}
+.sl i{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--btn);color:var(--on-btn);font:800 11px/19px var(--font-body);font-style:normal;text-align:center;font-variant-numeric:tabular-nums}
+.sl.zero i{background:var(--track);color:var(--ink-2)}
+.sl.zero svg{opacity:.55}
+.sl.em,.sl.lk{background:transparent;box-shadow:none}
+.sl.em{border:1.5px dashed var(--lilac);color:var(--lilac)}
+.sl.lk{border:1.5px dashed var(--tick);color:var(--ink-3)}
+.sl.new{animation:slpulse 2.4s ease-in-out infinite}
+@keyframes slpulse{50%{box-shadow:0 0 0 5px rgba(142,124,242,.18)}}
+.capr{display:flex;align-items:center;gap:8px;font-weight:800;font-size:var(--fs-12);color:var(--ink-3)}
+.lnk{appearance:none;border:0;background:transparent;cursor:pointer;padding:6px 8px;margin:-6px -8px;font:800 var(--fs-12)/1 var(--font-body);color:var(--gold-ink)}
+.icon-btn.gdot::after{content:"";position:absolute;top:8px;right:8px;width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px var(--surface)}
+.tool.off{display:none}
+.tool .arc{display:none;position:absolute;left:-9px;top:-9px;width:calc(100% + 18px);height:calc(100% + 18px);pointer-events:none}
+.tool .arc circle{fill:none;stroke:#E8A21B;stroke-width:3;stroke-linecap:round;stroke-dasharray:276;stroke-dashoffset:276}
+.tool .oto{display:none;position:absolute;left:-10px;top:-8px;height:20px;padding:0 7px;border-radius:10px;background:#3F2A00;color:#F4B63F;font:800 11px/20px var(--font-body);font-style:normal;letter-spacing:.03em;z-index:2}
+.tool.adv.auto .arc,.tool.adv.auto .oto{display:block}
+.tool.adv.auto .arc circle{animation:autoarc .7s linear forwards}
+@keyframes autoarc{to{stroke-dashoffset:0}}
+.setrows{width:100%;display:flex;flex-direction:column;gap:8px}
+.card h2.sett{margin:0;font-family:var(--font-display);font-weight:600;font-size:var(--fs-28);line-height:1.1}
+.srow{appearance:none;border:0;cursor:pointer;width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);text-align:left;color:var(--ink);font:inherit}
+div.srow{cursor:default}
+.srow .si{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--lilac-soft);color:var(--btn);flex:none}
+.srow .si svg{display:block}
+.srow b{flex:1;min-width:0;font-family:var(--font-display);font-weight:600;font-size:var(--fs-16)}
+.srow small{display:block;margin-top:2px;font:700 var(--fs-12)/1.2 var(--font-body);color:var(--ink-2)}
+.srow .sw{position:relative;width:46px;height:26px;border-radius:13px;background:var(--track);flex:none;transition:background var(--dur-fast) var(--ease)}
+.srow .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(41,35,63,.3);transition:left var(--dur-fast) var(--ease)}
+.srow[aria-checked="true"] .sw{background:var(--btn)}
+.srow[aria-checked="true"] .sw::after{left:23px}
+.srow .pl2{display:inline-flex;align-items:center;gap:4px;font:800 11px/1 var(--font-body);padding:6px 10px;border-radius:999px;background:var(--track);color:var(--ink-2);flex:none}
+.srow.lock .si{background:var(--track);color:var(--ink-3)}
+.setver{margin:0;font-weight:800;font-size:var(--fs-12);color:var(--ink-3)}
+
+/* V0.9.2: mağaza (akşam çarşısı). Sahne 296 × 604'lük tasarım alanında çizilir, ekrana oranlanır (fitStore). */
+#shop{display:block;padding:0;overflow:hidden;background:#241b6e;color:#fff;font-family:var(--font-body)}
+#shop .stg{position:absolute;left:0;top:0;width:296px;height:604px;transform-origin:0 0;overflow:hidden;--cy:calc(var(--ex,0px) * .35);--hz:calc(468px + var(--cy))}
+#shop button{font-family:inherit;color:inherit}
+#shop:not(.on) *{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){#shop *{animation:none!important;transition:none!important}}
+#shop .hd small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#shop .hd h4{white-space:nowrap}
+#shop .pch .cn{position:absolute;right:-5px;top:-1px;z-index:5;min-width:24px;height:20px;padding:0 6px;border-radius:10px;background:linear-gradient(135deg,#FFE9A8,#F4B63F);color:#3F2800;font:600 12px/20px Fredoka,system-ui,sans-serif;font-style:normal;text-align:center;box-shadow:0 3px 6px rgba(0,0,0,.4)}
+#shop .pch .cn.z{background:#6B6490;color:#E9E4FF}
+#shop .tgm{display:inline-block;width:8px;height:8px;border-radius:50%;background:#C7C0DD;margin-right:4px}
+#shop .tgm.on{background:#3FCB8A}
+#shop .fine{display:block;margin-top:9px;font-size:11px;font-weight:700;line-height:1.35;color:#8A84A8}
+#shop .lad{display:flex;gap:6px;margin-top:12px;justify-content:center}
+#shop .lad span{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:42px;height:26px;padding:0 8px;border-radius:999px;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:12px;background:rgba(10,4,50,.35);color:#CFE9DC;border:1px solid rgba(255,255,255,.18)}
+#shop .lad span.dn{background:rgba(63,203,138,.92);color:#053B25;border-color:transparent}
+#shop .lad span.cu{background:linear-gradient(135deg,#FFE79A,#F4B63F);color:#3F2800;border-color:transparent;box-shadow:0 0 0 3px rgba(244,182,63,.35)}
+#shop .gf #stGiftWrap{display:flex;justify-content:center}
+#shop .sheet{border-radius:0}
+#shop .body{top:calc(64px + var(--ex,0px) * .06)}
+#shop .blt{margin-bottom:calc(var(--ex,0px) * .16)}
+#shop .shl + .shl{margin-top:calc(var(--ex,0px) * .16)}
+#shop .sbt{white-space:nowrap;padding:0 8px}
+/* hafifletme: sahne dışı animasyonlar durur, tuval ve arka plan mağaza açıkken çizilmez */
+#app.shopping .amb{display:none}
+#shop .fc.far *,#shop .fc.far *::after{animation-play-state:paused!important}
+#shop .lts.lg{animation:aGl2 2.6s ease-in-out infinite}
+#shop .lts.lg1{animation-delay:-.87s}
+#shop .lts.lg2{animation-delay:-1.73s}
+@keyframes aGl2{50%{opacity:.35}}
+#shop .stars i{animation:none;opacity:.7}
+#shop .stars .sg{position:absolute;left:0;top:0;width:100%;height:220px;animation:aTw2 3.2s ease-in-out infinite}
+#shop .stars .sg1{animation-delay:-1.07s}
+#shop .stars .sg2{animation-delay:-2.13s}
+@keyframes aTw2{50%{opacity:.3}}
+#shop .fc .cat{width:36px;height:34px}
+#shop .fc .cat svg,#shop .fc .cat .tlw,#shop .fc .cat .eyw{position:absolute;left:0;top:0}
+#shop .fc .cat .tlw{width:36px;height:34px;transform-origin:24px 30px;animation:aTail 3s ease-in-out infinite;font-style:normal}
+#shop .fc .cat .eyw{width:36px;height:34px;transform-origin:18px 13px;animation:aBlink 5s infinite;font-style:normal}
+#shop .cta::after{left:-60%;transform:skewX(-18deg);animation:aSh2 3.6s ease-in-out infinite}
+@keyframes aSh2{0%,55%{transform:translateX(0) skewX(-18deg)}100%{transform:translateX(475%) skewX(-18deg)}}
+/* hareketli içeriği saran süzgeç (filter) her karede yeniden hesaplanır: gölge ve parıltı sabit katmanlarla yapılır */
+#shop .itm .pc,#shop .dm .gem{filter:none}
+#shop .itm::before{content:"";position:absolute;left:50%;top:86px;width:76px;height:14px;margin-left:-38px;border-radius:50%;background:radial-gradient(ellipse,rgba(8,4,40,.55),rgba(8,4,40,0) 70%);z-index:1}
+#shop .rem::before{inset:-9%;box-shadow:none;border-radius:50%;background:radial-gradient(circle closest-side,rgba(0,0,0,0) 68%,var(--nc) 79%,rgba(0,0,0,0) 100%);opacity:.6}
+#shop .fc .awn{animation:none}
 </style>
 
 <div id="app">
@@ -303,10 +650,10 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
   <div class="tools" id="tools" role="group" aria-label="Aletler">
     <div class="advlbl" id="advLbl"></div>
-    <button class="tool" data-tool="steto" type="button" style="color:var(--btn)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M6 3v5a5 5 0 0 0 10 0V3M11 13v2.5a4 4 0 0 0 8 0V14"/><circle class="s" cx="19" cy="12" r="2"/></svg><b class="badge">0</b></button>
-    <button class="tool" data-tool="kron" type="button" style="color:var(--peach-deep)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="s" cx="12" cy="13.5" r="7"/><path class="s" d="M12 13.5V10M10 3h4M12 3v3.5"/></svg><b class="badge">0</b></button>
-    <button class="tool" data-tool="kalkan" type="button" style="color:var(--rose)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3z"/></svg><b class="badge">0</b></button>
-    <button class="tool" data-tool="kum" type="button" style="color:var(--lilac)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M7 3h10M7 21h10M8 3c0 5 4 5 4 9s-4 4-4 9M16 3c0 5-4 5-4 9s4 4 4 9"/></svg><b class="badge">0</b></button>
+    <button class="tool" data-tool="steto" type="button" style="color:var(--btn)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M6 3v5a5 5 0 0 0 10 0V3M11 13v2.5a4 4 0 0 0 8 0V14"/><circle class="s" cx="19" cy="12" r="2"/></svg><svg class="arc" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="44" transform="rotate(-90 48 48)"/></svg><i class="oto" data-i18n="autoTag">Oto</i><b class="badge">0</b></button>
+    <button class="tool" data-tool="kron" type="button" style="color:var(--peach-deep)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="s" cx="12" cy="13.5" r="7"/><path class="s" d="M12 13.5V10M10 3h4M12 3v3.5"/></svg><svg class="arc" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="44" transform="rotate(-90 48 48)"/></svg><i class="oto" data-i18n="autoTag">Oto</i><b class="badge">0</b></button>
+    <button class="tool" data-tool="kalkan" type="button" style="color:var(--rose)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3z"/></svg><svg class="arc" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="44" transform="rotate(-90 48 48)"/></svg><i class="oto" data-i18n="autoTag">Oto</i><b class="badge">0</b></button>
+    <button class="tool" data-tool="kum" type="button" style="color:var(--lilac)"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M7 3h10M7 21h10M8 3c0 5 4 5 4 9s-4 4-4 9M16 3c0 5-4 5-4 9s4 4 4 9"/></svg><svg class="arc" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="44" transform="rotate(-90 48 48)"/></svg><i class="oto" data-i18n="autoTag">Oto</i><b class="badge">0</b></button>
   </div>
 
   <section class="scr on" id="menu" aria-label="Ana ekran">
@@ -314,10 +661,9 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
       <div class="topbar rise" style="--i:0">
         <span class="chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><b id="coinN">0</b></span>
         <span class="tb-right">
-          <button class="icon-btn" id="bagBtn" type="button" aria-label="Alet çantası"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg></button>
+          <button class="icon-btn" id="bagBtn" type="button" aria-label="Mağaza"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg></button>
           <button class="icon-btn" id="bookBtn" type="button" aria-label="Kilit defteri"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5zM5 17a3 3 0 0 1 3-3h10"/></svg></button>
-          <button class="icon-btn" id="sndBtn" type="button" aria-label="Ses"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M4 9.5v5h3.6L12.5 19V5L7.6 9.5H4z"/><path class="s" id="sndWaves" d="M16 9a4.2 4.2 0 0 1 0 6M18.6 6.4a8 8 0 0 1 0 11.2"/></svg></button>
-          <button class="icon-btn" id="vibBtn" type="button" aria-label="Titreşim"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect class="s" x="8" y="3.5" width="8" height="17" rx="2.2"/><path class="s" id="vibWaves" d="M4.9 8.5v7M2.7 10.5v3M19.1 8.5v7M21.3 10.5v3"/></svg></button>
+          <button class="icon-btn" id="setBtn" type="button" aria-label="Ayarlar"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M4 7h8.5M17 7h3M4 17h3M11.5 17H20"/><circle class="s" cx="14.7" cy="7" r="2.3"/><circle class="s" cx="9.3" cy="17" r="2.3"/></svg></button>
         </span>
       </div>
       <h1 class="title rise" style="--i:1" data-i18n="title">Kıl payı</h1>
@@ -329,7 +675,10 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
         <span class="chip"><span data-i18n="best">En iyi</span><b id="menuBest">0</b></span>
         <span class="chip" id="menuLvlChip" hidden><span data-i18n="bestLvl">Seviye</span><b id="menuBestL">0</b></span>
       </div>
-      <div class="mjk rise" style="--i:3" id="menuJk" role="group" aria-label="Aletler"></div>
+      <div class="bagrow rise" style="--i:3">
+        <div class="mjk" id="menuJk" role="group" aria-label="Çanta"></div>
+        <div class="capr"><span id="bagCap"></span><button class="lnk" id="bagShop" type="button"></button></div>
+      </div>
       <div class="seg rise" style="--i:4" id="lvlSeg" role="radiogroup" aria-label="Zorluk">
         <button type="button" role="radio" data-lvl="rahat" aria-checked="false" data-i18n="lv_rahat">Rahat</button>
         <button type="button" role="radio" data-lvl="normal" aria-checked="true" data-i18n="lv_normal">Normal</button>
@@ -363,7 +712,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
       </div>
       <button class="btn primary big rise" style="--i:6" id="againBtn" type="button" data-i18n="again">Tekrar dene</button>
       <div class="row2 rise" style="--i:7">
-        <button class="btn quiet" id="bagBtn2" type="button" data-i18n="bag">Alet çantası</button>
+        <button class="btn quiet" id="bagBtn2" type="button" data-i18n="shop">Mağaza</button>
         <button class="btn quiet" id="homeBtn" type="button" data-i18n="home">Ana ekran</button>
       </div>
     </div>
@@ -404,15 +753,22 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     </div>
   </section>
 
-  <section class="scr dim" id="shop" aria-label="Alet çantası" aria-hidden="true">
-    <div class="card glass shop">
-      <div class="shop-head">
-        <h2 data-i18n="bag">Alet çantası</h2>
-        <span class="chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><b id="shopCoins">0</b></span>
-      </div>
-      <div class="shop-list" id="shopList"></div>
-      <button class="btn" id="shopAd" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M8 5.5v13l11-6.5z"/></svg><span id="shopAdT"></span></button>
-      <button class="btn quiet" id="shopClose" type="button" data-i18n="close">Kapat</button>
+  <section class="scr" id="shop" aria-label="Mağaza" aria-hidden="true">
+    <div class="stg" id="stg">
+      <div class="vw hub on" id="stHub"></div>
+      <div class="vw shopv" id="stShop"></div>
+      <div class="scrim" id="stScrim"></div>
+      <div class="sheet" id="stSheet" role="dialog" aria-modal="true"></div>
+      <div class="stt" id="stToast" role="status"></div>
+    </div>
+  </section>
+
+  <section class="scr dim" id="settings" aria-label="Ayarlar" aria-hidden="true">
+    <div class="card glass">
+      <h2 class="sett" data-i18n="setT">Ayarlar</h2>
+      <div class="setrows" id="setRows"></div>
+      <p class="setver" id="setVer"></p>
+      <button class="btn quiet" id="setClose" type="button" data-i18n="close">Kapat</button>
     </div>
   </section>
 
@@ -451,7 +807,7 @@ const CFG = {
   perfectFrac: 0.32, grace: 0.05,
   spawnMin: 1.0, spawnMax: 2.2,
   contTime: 4, contCoins: 25, contAds: 2, contMax: 3, contWait: 5, contSlow: 3, contSlowMul: 0.7,
-  coinDiv: 4, nearCoin: 2, adSeconds: 3, tutHits: 5, adCoins: 20, recMin: 25, newAfter: 0
+  coinDiv: 4, nearCoin: 2, adSeconds: 3, tutHits: 5, recMin: 10, newAfter: 0
 };
 /* Zorluk dalgalı: taban yavaşça yükselir, her dalga (period vuruş) önce yükselir sonra gevşer.
    adapt: oyuncu iyi oynadıkça yükselir, hata yaptıkça düşer. mercy: hatadan sonra kısa süre nefes verir. */
@@ -707,7 +1063,7 @@ const STR = {
     rule_tuzak: 'Yine şeftali hedefe vur', warn_tuzak: 'Pembe tuzağa dokunma', rule_kayanT: 'Tuzak hedefin üstünde gezer', warn_kayanT: 'Pembe kayan tuzağa dokunma',
     rule_diken: 'Hedefin kenarı dikenle kapanır', warn_diken: 'Dikenli kenara dokunma',
     lifeTag: 'Can', lifeGot: 'Can +1', lifeSaved: 'Can kurtardı: +3 sn',
-    smartMove: 'Akıllı hamle! +25', advNow: 'Dokun',
+    smartMove: 'Akıllı hamle! +25', advNow: 'Dokun', autoTag: 'Oto',
     ts_steto: '{n} sn geniş', ts_kron: '+{n} sn', ts_kalkan: '{n} hata cezasız', ts_kum: '{n} sn yavaş',
     resumeSub: '{lv} · Seviye {n} · {p} puan', newGame: 'Yeni oyun', newSure: 'Kayıt silinsin mi? Dokun', toMenu: 'Menü',
     swapT: 'Yarım kalan oyun silinsin mi?', swapSub: '{lv} · Seviye {n} · {p} puan. Başka moda geçersen bu oyun ve kazandığın {c} coin kaybolur.', swapSub0: '{lv} · Seviye {n} · {p} puan. Başka moda geçersen bu oyun kaybolur.', swapYes: 'Sil ve geç', swapNo: 'Vazgeç',
@@ -727,10 +1083,30 @@ const STR = {
     evStar: 'Güçlendi: {k}', evCombo: 'Seri çarpanı açıldı: art arda vur', evMix: 'Karışım: {a} + {b}', breathBonus: 'Tam açık +1',
     narrow: 'Hedefler daraldı', done: 'Yolculuk tamamlandı!', doneSub: 'Sonsuz mod başladı',
     alarm: 'Alarm', shieldSave: 'Kalkan kurtardı',
-    bag: 'Alet çantası', close: 'Kapat', stock: 'Stok', buy: '+1 al', upgrade: 'Yükselt', maxed: 'En üst seviye',
-    tool_steto: 'Stetoskop', tool_kron: 'Kronometre', tool_kalkan: 'Kalkan', tool_kum: 'Kum saati',
+    bag: 'Alet çantası', close: 'Kapat', maxed: 'En üst seviye',
+    tool_steto: 'Steteskop', tool_kron: 'Kronometre', tool_kalkan: 'Kalkan', tool_kum: 'Kum saati',
     d_steto: '{n} sn boyunca hedefler %40 geniş', d_kron: 'Süreye +{n} sn', d_kalkan: 'Sonraki {n} hata cezasız, seri bozulmaz', d_kum: 'İbre {n} sn %35 yavaşlar',
-    toolEmpty: 'Stokta yok. Alet çantasından alabilirsin.', shopAd: 'Reklam izle, +{n} coin', gotCoins: '+{n} coin',
+    toolEmpty: 'Stokta yok. Mağazadan alabilirsin.', gotCoins: '+{n} coin',
+    shop: 'Mağaza', setT: 'Ayarlar', setSnd: 'Ses', setVib: 'Titreşim', setAutoLock: 'Yetenekler dükkânında açılır', setLang: 'Dil', setLangSub: 'Telefonun diline göre',
+    st_title: 'Mağaza', st_sub: 'Dükkân dükkân gez', st_back: 'Geri',
+    st_n_alet: 'Alet çantası', st_n_yet: 'Yetenekler', st_n_gor: 'Görünüm', st_n_hed: 'Hediye',
+    st_s_alet: 'Alet', st_s_yet: 'Yetenek', st_s_gor: 'Görünüm', st_s_hed: 'Hediye',
+    st_onShelf: 'Rafta', st_openN: '{n} / {m} açık', st_verySoon: 'Çok yakında', st_workshop: 'Atölye hazırlanıyor', st_giftNext: 'Sıradaki video', st_giftNew: 'Yeni hediyeye',
+    st_soon: 'Yakında', st_soonCaps: 'YAKINDA', st_signOpen: 'AÇIK', st_signSoon: 'YAKINDA', st_ctaEnter: 'İçeri gir', st_ctaLook: 'Göz at', st_ctaGift: 'Hediyeni al',
+    st_belt: 'Kemerin', st_slotsOf: '{n} / 4 yuva', st_shelves: 'Raflar', st_jokersOpen: '{n} / 4 joker açık', st_slotN: 'Yuva {n}', st_next: 'Sıradaki', st_stock: 'Stok ×{n} · Sv {l}',
+    st_beltNote: 'Yuva sayısı kadar joker taşıyabilirsin', st_perm: 'Kalıcı güçler', st_auto: 'Otomatik joker', st_life: 'Yedek canla başla', st_moreSoon: 'Yeni yetenekler yolda', st_on: 'Açık', st_off: 'Kapalı',
+    st_openSoon: 'Açılış yakında', st_lkNeedle: 'İbre', st_lkRing: 'Halka', st_lkConf: 'Konfeti', st_lkClassic: 'Klasik', st_lkSpark: 'Kıvılcım', st_lkNeon: 'Neon', st_lkLilac: 'Lila', st_lkSunset: 'Gün batımı', st_lkGold: 'Altın', st_lkStar: 'Yıldız', st_lkHeart: 'Kalp',
+    st_giftBox: 'Hediye kutusu', st_giftText: 'Kısa bir video izle, hemen {n} coin kazan.', st_giftDone: 'Bugünkü hediyelerin bitti. Yenisi hazır olunca buradan alırsın.', st_giftBtn: 'Reklam izle · +{n}', st_giftWait: '{w} sonra gel', st_giftWaitToast: 'Yeni hediye için {w} sonra gel',
+    st_waitHM: '{h} saat {m} dk', st_waitH: '{h} saat', st_waitM: '{m} dk',
+    st_kindJoker: 'Joker', st_kindJokerLocked: 'Joker · kilitli', st_kindSlot: 'Çanta yuvası', st_kindSkill: 'Yetenek', st_kindLook: 'Görünüm',
+    st_dd_kron: 'Süreye saniye ekler. Son saniyelerde hayat kurtarır.', st_dd_kalkan: 'Sıradaki hataları cezasız geçirir, seri bozulmaz.', st_dd_steto: 'Hedefleri bir süre geniş gösterir, vurması kolaylaşır.', st_dd_kum: 'İbreyi bir süre yavaşlatır, nefes aldırır.',
+    st_dd_slot: 'Oyuna bir joker daha alabilirsin. Sahip olduğun jokerlerden dilediğini yuvaya takarsın.', st_dd_slotLocked: 'Önce {n}. yuvayı açman gerekir. Yuvalar sırayla açılır.',
+    st_dd_auto: 'Joker işe yarayacağı an kendiliğinden kullanılır. Sen de dokunabilirsin.', st_dd_life: 'Her oyuna yedek canla başlarsın ve bir hatanı affeder.', st_dd_look: 'İbreni, halkanı ve konfetini istediğin gibi süsle. Oyunu etkilemez, yalnızca güzel gösterir.',
+    st_pStock: 'Stok ×{n}', st_pLevel: 'Seviye {l} / 3', st_plus: '+1 al · {p}', st_full: 'Stok dolu', st_up: 'Yükselt · {p}', st_upNote: 'Yükselince elindeki stok da yükselir; bu yüzden stok doluyken yükseltmek daha pahalıdır.',
+    st_open: 'Aç', st_openSlot: 'Yuvayı aç', st_locked: 'Kilitli', st_short: '{n} coin eksik', st_soonPrice: 'Yakında · {p}', st_autoP1: '0,7 sn sonra', st_autoP2: 'Elle de kullan', st_autoUse: 'Otomatik kullan', st_lifeP: 'Her oyunda +1 can', st_lookP: 'Yalnızca süs',
+    st_pickT: '{n}. yuvaya hangi joker?', st_pickSub: 'Yuva sayısı kadar joker taşıyabilirsin.', st_inSlot: "Yuva {n}'de", st_none: 'Boş bırak',
+    st_unlocked: '{n} açıldı', st_unlockedEq: '{n} açıldı, yuvaya takıldı', st_slotOpened: 'Yuva {n} açıldı', st_plus1: '{n} +1', st_upped: '{n} yükseldi', st_autoOpened: 'Otomatik joker açıldı', st_equipped: '{n} yuvaya takıldı', st_slotCleared: 'Yuva boşaltıldı',
+    st_bagCap: 'Çanta · {n} / 4 yuva', st_bagShop: 'Mağaza ›',
     fxSteto: 'Geniş {n} sn', fxShield: 'Kalkan {n}', fxSlow: 'Yavaş {n} sn', fxNarrow: 'Dar {n} sn',
     popGoldOpen: 'Altın açıldı!',
     k_altin: 'Altın pim', rule_altin: 'Önce hedefi vur, altın açılır: ×3 puan', warn_altin: 'Lanetli altına dokunma',
@@ -794,7 +1170,7 @@ const STR = {
     rule_tuzak: 'Hit the peach target as before', warn_tuzak: 'Stay off the rose trap', rule_kayanT: 'The trap slides over the target', warn_kayanT: 'Stay off the sliding trap',
     rule_diken: 'The target edges close with thorns', warn_diken: 'Stay off the thorny edge',
     lifeTag: 'Life', lifeGot: 'Life +1', lifeSaved: 'Life saved you: +3 s',
-    smartMove: 'Smart move! +25', advNow: 'Tap',
+    smartMove: 'Smart move! +25', advNow: 'Tap', autoTag: 'Auto',
     ts_steto: '{n} s wider', ts_kron: '+{n} s', ts_kalkan: '{n} free mistakes', ts_kum: '{n} s slower',
     resumeSub: '{lv} · Level {n} · {p} pts', newGame: 'New game', newSure: 'Delete the save? Tap again', toMenu: 'Menu',
     swapT: 'Discard the unfinished game?', swapSub: '{lv} · Level {n} · {p} pts. If you switch mode, this game and the {c} coins you earned are lost.', swapSub0: '{lv} · Level {n} · {p} pts. If you switch mode, this game is lost.', swapYes: 'Discard and switch', swapNo: 'Cancel',
@@ -814,10 +1190,30 @@ const STR = {
     evStar: 'Stronger: {k}', evCombo: 'Combo multiplier unlocked: hit again and again', evMix: 'Mix: {a} + {b}', breathBonus: 'Wide open +1',
     narrow: 'Targets narrowed', done: 'Journey complete!', doneSub: 'Endless mode begins',
     alarm: 'Alarm', shieldSave: 'Shield saved you',
-    bag: 'Toolbag', close: 'Close', stock: 'Stock', buy: 'Buy +1', upgrade: 'Upgrade', maxed: 'Max level',
+    bag: 'Toolbag', close: 'Close', maxed: 'Max level',
     tool_steto: 'Stethoscope', tool_kron: 'Stopwatch', tool_kalkan: 'Shield', tool_kum: 'Hourglass',
     d_steto: 'Targets 40% wider for {n} s', d_kron: '+{n} s on the clock', d_kalkan: 'Next {n} mistakes are free, streak stays', d_kum: 'Pointer 35% slower for {n} s',
-    toolEmpty: 'Out of stock. Get more in the toolbag.', shopAd: 'Watch ad, +{n} coins', gotCoins: '+{n} coins',
+    toolEmpty: 'Out of stock. Get more in the shop.', gotCoins: '+{n} coins',
+    shop: 'Shop', setT: 'Settings', setSnd: 'Sound', setVib: 'Vibration', setAutoLock: 'Unlock it in the Skills shop', setLang: 'Language', setLangSub: 'Follows your phone',
+    st_title: 'Shop', st_sub: 'Take a stroll', st_back: 'Back',
+    st_n_alet: 'Toolbag', st_n_yet: 'Skills', st_n_gor: 'Looks', st_n_hed: 'Gift',
+    st_s_alet: 'Tools', st_s_yet: 'Skills', st_s_gor: 'Looks', st_s_hed: 'Gift',
+    st_onShelf: 'On the shelf', st_openN: '{n} / {m} open', st_verySoon: 'Coming soon', st_workshop: 'Workshop is being set up', st_giftNext: 'Next video', st_giftNew: 'Next gift in',
+    st_soon: 'Soon', st_soonCaps: 'COMING SOON', st_signOpen: 'OPEN', st_signSoon: 'SOON', st_ctaEnter: 'Step in', st_ctaLook: 'Take a look', st_ctaGift: 'Get your gift',
+    st_belt: 'Your belt', st_slotsOf: '{n} / 4 slots', st_shelves: 'Shelves', st_jokersOpen: '{n} / 4 jokers open', st_slotN: 'Slot {n}', st_next: 'Next', st_stock: 'Stock ×{n} · Lv {l}',
+    st_beltNote: 'You can carry as many jokers as you have slots', st_perm: 'Lasting powers', st_auto: 'Auto joker', st_life: 'Spare life', st_moreSoon: 'More skills on the way', st_on: 'On', st_off: 'Off',
+    st_openSoon: 'Opening soon', st_lkNeedle: 'Pointer', st_lkRing: 'Ring', st_lkConf: 'Confetti', st_lkClassic: 'Classic', st_lkSpark: 'Spark', st_lkNeon: 'Neon', st_lkLilac: 'Lilac', st_lkSunset: 'Sunset', st_lkGold: 'Gold', st_lkStar: 'Star', st_lkHeart: 'Heart',
+    st_giftBox: 'Gift box', st_giftText: 'Watch a short video and get {n} coins right away.', st_giftDone: 'You have used all your gifts for now. Come back here when the next one is ready.', st_giftBtn: 'Watch ad · +{n}', st_giftWait: 'Come back in {w}', st_giftWaitToast: 'Come back in {w} for a new gift',
+    st_waitHM: '{h}h {m}m', st_waitH: '{h}h', st_waitM: '{m}m',
+    st_kindJoker: 'Joker', st_kindJokerLocked: 'Joker · locked', st_kindSlot: 'Bag slot', st_kindSkill: 'Skill', st_kindLook: 'Looks',
+    st_dd_kron: 'Adds seconds to the clock. A lifesaver in the last moments.', st_dd_kalkan: 'The next mistakes cost nothing and your streak stays.', st_dd_steto: 'Shows the targets wider for a while, so they are easier to hit.', st_dd_kum: 'Slows the pointer for a while to give you room to breathe.',
+    st_dd_slot: 'Take one more joker into the game. You choose which of your jokers goes in the slot.', st_dd_slotLocked: 'Open slot {n} first. Slots open in order.',
+    st_dd_auto: 'A joker is used the moment it would help. You can tap it yourself too.', st_dd_life: 'Start every game with a spare life that forgives one mistake.', st_dd_look: 'Dress up your pointer, ring and confetti. It does not change the game, it only looks good.',
+    st_pStock: 'Stock ×{n}', st_pLevel: 'Level {l} / 3', st_plus: '+1 · {p}', st_full: 'Stock full', st_up: 'Upgrade · {p}', st_upNote: 'Upgrading also upgrades the stock you hold, so it costs more when your stock is full.',
+    st_open: 'Unlock', st_openSlot: 'Open slot', st_locked: 'Locked', st_short: '{n} coins short', st_soonPrice: 'Soon · {p}', st_autoP1: '0.7 s later', st_autoP2: 'Tap it too', st_autoUse: 'Use automatically', st_lifeP: '+1 life every game', st_lookP: 'Cosmetic only',
+    st_pickT: 'Which joker for slot {n}?', st_pickSub: 'You can carry as many jokers as you have slots.', st_inSlot: 'in slot {n}', st_none: 'Leave empty',
+    st_unlocked: '{n} unlocked', st_unlockedEq: '{n} unlocked and equipped', st_slotOpened: 'Slot {n} opened', st_plus1: '{n} +1', st_upped: '{n} upgraded', st_autoOpened: 'Auto joker unlocked', st_equipped: '{n} equipped', st_slotCleared: 'Slot emptied',
+    st_bagCap: 'Bag · {n} / 4 slots', st_bagShop: 'Shop ›',
     fxSteto: 'Wide {n} s', fxShield: 'Shield {n}', fxSlow: 'Slow {n} s', fxNarrow: 'Narrow {n} s',
     popGoldOpen: 'Gold unlocked!',
     k_altin: 'Gold pin', rule_altin: 'Hit the target first, then the gold opens: ×3', warn_altin: 'Stay off the cursed gold',
@@ -916,12 +1312,14 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.9.1';
+const VERSION = 'V0.9.2';
 const save = {
-  coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
+  coins: 0, runs: 0, snd: true, vib: true, autoJ: false, tut: false, lvl: 'normal',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
-  tools: { steto: { n: 2, l: 1 }, kron: { n: 2, l: 1 }, kalkan: { n: 2, l: 1 }, kum: { n: 2, l: 1 } },
-  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, intro: {}, v: 2
+  tools: { steto: { n: 0, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } },
+  /* Mağaza (V0.9.2): açık jokerler, açık yuva sayısı, yuvalardaki jokerler, Otomatik joker yeteneği, Hediye (reklam) basamağı ve bekleme bitişi */
+  own: { kron: 1 }, slots: 1, equip: ['kron', '', '', ''], autoOwn: false, gift: { n: 0, t: 0 },
+  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, intro: {}, v: 3
 };
 try {
   const raw = localStorage.getItem('kilpayi.v1');
@@ -931,8 +1329,10 @@ try {
     if (o && !o.bests && typeof o.best === 'number') save.bests = { rahat: 0, normal: o.best | 0, usta: 0 };
     /* V0.4.1'e geçiş: eski kayıtta her jokerden en az 2 olsun, her seferinde bir kez */
     if (!(o && o.v >= 2)) for (const id in save.tools) save.tools[id].n = Math.max(save.tools[id].n | 0, 2);
+    /* V0.9.2'ye geçiş: mağaza öncesi kayıtta dört joker ve dört yuva zaten kullanımdaydı, açık kalır (elindekini kimse kaybetmez); yeni kurulumda yalnızca Kronometre ve tek yuva vardır. */
+    if (!(o && o.v >= 3)) { save.own = { steto: 1, kron: 1, kalkan: 1, kum: 1 }; save.slots = 4; save.equip = ['steto', 'kron', 'kalkan', 'kum']; }
   }
-  save.v = 2;
+  save.v = 3;
 } catch (e) {}
 if (!save.book || typeof save.book !== 'object') save.book = {};
 if (!save.intro || typeof save.intro !== 'object') save.intro = {};
@@ -950,10 +1350,124 @@ save.camp = Math.max(1, save.camp | 0); save.bestL = save.bestL | 0;
 const LV = () => LEVEL[save.lvl];
 const bestNow = () => save.bests[save.lvl];
 TOOL_IDS.forEach(id => {
-  const s = save.tools[id] || (save.tools[id] = { n: 2, l: 1 });
-  s.n = Math.max(0, s.n | 0); s.l = clamp(s.l | 0 || 1, 1, 3);
+  const s = save.tools[id] || (save.tools[id] = { n: 0, l: 1 });
+  s.n = clamp(s.n | 0, 0, 99); s.l = clamp(s.l | 0 || 1, 1, 3);
 });
+if (!save.own || typeof save.own !== 'object') save.own = { kron: 1 };
+TOOL_IDS.forEach(id => { save.own[id] = save.own[id] ? 1 : 0; });
+if (!TOOL_IDS.some(id => save.own[id])) save.own.kron = 1;
+save.slots = clamp(save.slots | 0 || 1, 1, 4);
+save.autoOwn = !!save.autoOwn; if (!save.autoOwn) save.autoJ = false;
+if (!save.gift || typeof save.gift !== 'object') save.gift = { n: 0, t: 0 };
+save.gift.n = clamp(save.gift.n | 0, 0, 5); save.gift.t = +save.gift.t || 0;
+if (save.gift.n >= 5 && !save.gift.t) save.gift.n = 0;
 const persist = () => { try { localStorage.setItem('kilpayi.v1', JSON.stringify(save)); } catch (e) {} };
+
+/* ---------- mağaza ekonomisi (V0.9.2) ----------
+   Bir Normal oyun ≈ 85 coin kazandırır; açılışlar kasten pahalıdır (hepsi birkaç saatlik oyun).
+   Stok en çok 5: bir sonraki jokerin fiyatı elindeki sayıyla ve joker seviyesiyle artar.
+   Yükseltme, elindeki stoğun da yükselen değerini öder; böylece önce biriktirip sonra yükseltmek ya da önce yükseltip sonra biriktirmek toplamda aynı tutardır. */
+const JK_PRICE = { kron: 0, kalkan: 800, steto: 1500, kum: 2500 };
+const SLOT_PRICE = [0, 0, 1200, 2400, 4000];
+const AUTO_PRICE = 4000, LIFE_PRICE = 2000;
+const STOCK_MAX = 5, STOCK_STEP = [1, 1.5, 2, 3, 4], LV_MUL = [1, 1.3, 1.6];
+const GIFT_STEP = [20, 30, 40, 50, 100], GIFT_WAIT = 12 * 3600 * 1000;
+const r5 = x => Math.round(x / 5) * 5;
+/* Elinde n tane varken (n → n+1) l seviyesindeki jokerin tanesi. */
+const unitPrice = (id, n, l) => r5(TOOL[id].price * STOCK_STEP[Math.min(n, STOCK_STEP.length - 1)] * LV_MUL[l - 1]);
+const stockPrice = id => { const s = save.tools[id]; return s.n >= STOCK_MAX ? 0 : unitPrice(id, s.n, s.l); };
+const upPrice = id => {
+  const s = save.tools[id];
+  if (s.l >= 3) return 0;
+  let c = TOOL[id].up[s.l];
+  for (let k = 0; k < Math.min(s.n, STOCK_MAX); k++) c += unitPrice(id, k, s.l + 1) - unitPrice(id, k, s.l);
+  return c;
+};
+
+/* Yuvalar: save.equip[i] yuvadaki jokerdir; yalnızca açık yuvalardakiler oyuna girer. */
+const isEq = id => { const i = save.equip.indexOf(id); return i >= 0 && i < save.slots; };
+const equipped = () => save.equip.slice(0, save.slots).filter(Boolean);
+const fixEquip = () => {
+  const eq = Array.isArray(save.equip) ? save.equip.slice(0, 4) : [], seen = {};
+  while (eq.length < 4) eq.push('');
+  for (let i = 0; i < 4; i++) {
+    const j = eq[i];
+    if (i >= save.slots || !j || TOOL_IDS.indexOf(j) < 0 || !save.own[j] || seen[j]) eq[i] = ''; else seen[j] = 1;
+  }
+  save.equip = eq;
+};
+/* Boş açık yuvaya, henüz takılı olmayan ilk açık jokeri koyar; takılan yuvayı (yoksa -1) verir. */
+const autoEquip = id => {
+  const i = save.equip.findIndex((x, q) => q < save.slots && !x);
+  if (i < 0 || isEq(id)) return -1;
+  save.equip[i] = id; return i;
+};
+const setEquip = (slot, id) => {
+  if (slot < 0 || slot >= save.slots) return;
+  if (id) {
+    if (!save.own[id]) return;
+    const at = save.equip.indexOf(id);
+    if (at >= 0 && at !== slot) save.equip[at] = save.equip[slot];
+    save.equip[slot] = id;
+  } else save.equip[slot] = '';
+  fixEquip(); persist();
+};
+const ownCount = () => TOOL_IDS.filter(id => save.own[id]).length;
+/* Mağazadaki sıradaki hedef: en ucuz kapalı yuva ya da joker. */
+const nextGoal = () => {
+  const c = [];
+  if (save.slots < 4) c.push({ k: 'slot' + (save.slots + 1), p: SLOT_PRICE[save.slots + 1] });
+  TOOL_IDS.forEach(id => { if (!save.own[id]) c.push({ k: id, p: JK_PRICE[id] }); });
+  c.sort((a, b) => a.p - b.p);
+  return c[0] || null;
+};
+/* Menüdeki Mağaza düğmesinin altın noktası: alınabilecek yeni bir şey var. */
+const shopDot = () => { const g = nextGoal(); return (!!g && save.coins >= g.p) || (!save.autoOwn && save.coins >= AUTO_PRICE); };
+
+/* Alışverişler: yeterli coin varsa düşer, durumu değiştirir, kaydeder; başarı true. */
+const spendCoins = c => { if (save.coins < c) return false; save.coins -= c; return true; };
+const buyStock = id => {
+  const s = save.tools[id];
+  if (!save.own[id] || s.n >= STOCK_MAX || !spendCoins(stockPrice(id))) return false;
+  s.n++; persist(); return true;
+};
+const buyUpgrade = id => {
+  const s = save.tools[id];
+  if (!save.own[id] || s.l >= 3 || !spendCoins(upPrice(id))) return false;
+  s.l++; persist(); return true;
+};
+const unlockJoker = id => {
+  if (save.own[id] || !spendCoins(JK_PRICE[id])) return false;
+  save.own[id] = 1; save.tools[id].n = Math.max(save.tools[id].n, 1);
+  autoEquip(id); persist(); return true;
+};
+const buySlot = n => {
+  if (n !== save.slots + 1 || n > 4 || !spendCoins(SLOT_PRICE[n])) return false;
+  save.slots = n;
+  const free = TOOL_IDS.find(id => save.own[id] && !isEq(id));
+  if (free) autoEquip(free);
+  persist(); return true;
+};
+const buyAuto = () => {
+  if (save.autoOwn || !spendCoins(AUTO_PRICE)) return false;
+  save.autoOwn = true; save.autoJ = true; persist(); return true;
+};
+/* Hediye (reklam): 20 · 30 · 40 · 50 · 100; beşincide 12 saat beklenir. Saat geri alınsa bile bekleme 12 saati aşmaz. */
+const giftState = () => {
+  const g = save.gift, now = Date.now();
+  if (g.t && g.t > now + GIFT_WAIT) g.t = now + GIFT_WAIT;
+  if (g.t && now >= g.t) { g.n = 0; g.t = 0; persist(); }
+  return { n: g.n, wait: g.t ? g.t - now : 0, next: g.t ? 0 : GIFT_STEP[Math.min(g.n, GIFT_STEP.length - 1)] };
+};
+const giftClaim = () => {
+  const s = giftState();
+  if (s.wait > 0) return 0;
+  const g = save.gift, c = s.next;
+  save.coins += c; g.n++;
+  if (g.n >= GIFT_STEP.length) g.t = Date.now() + GIFT_WAIT;
+  persist(); return c;
+};
+{ const badEq = !Array.isArray(save.equip); fixEquip(); if (badEq) TOOL_IDS.forEach(id => { if (save.own[id]) autoEquip(id); }); }
 
 /* ---------- palet: renkler CSS değişkenlerinden okunur, açık/koyu tema kendiliğinden izlenir ---------- */
 const P = {};
@@ -1163,6 +1677,7 @@ const lvlChipEl = $('lvlChip'), lprogEl = $('lprog'), sectEl = $('sect'), lifeEl
 const contEl = $('cont'), cdArc = $('cdArc'), contActsEl = $('contActs');
 const show = el => { el.classList.add('on'); el.removeAttribute('aria-hidden'); };
 const hide = el => { el.classList.remove('on'); el.setAttribute('aria-hidden', 'true'); };
+const hideShop = () => { hide(shopEl); app.classList.remove('shopping'); };
 let toastTimer = 0;
 const toast = msg => {
   toastEl.textContent = msg; toastEl.classList.add('on');
@@ -1181,32 +1696,28 @@ const applyI18n = () => {
   document.documentElement.lang = LANG;
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
   cv.setAttribute('aria-label', t('play_aria'));
-  $('bagBtn').setAttribute('aria-label', t('bag'));
+  $('bagBtn').setAttribute('aria-label', t('shop')); $('setBtn').setAttribute('aria-label', t('setT'));
   $('lvlSeg').setAttribute('aria-label', t('level'));
   toolsEl.setAttribute('aria-label', t('bag'));
   toolsEl.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-label', t('tool_' + b.getAttribute('data-tool'))));
   $('bookBtn').setAttribute('aria-label', t('bookT'));
   $('ver').textContent = VERSION;
 };
-const refreshSound = () => {
-  const b = $('sndBtn');
-  b.setAttribute('aria-label', save.snd ? t('soundOn') : t('soundOff'));
-  $('sndWaves').style.opacity = save.snd ? '1' : '0.25';
-};
-const refreshVib = () => {
-  $('vibBtn').setAttribute('aria-label', save.vib ? t('vibOn') : t('vibOff'));
-  $('vibWaves').style.opacity = save.vib ? '1' : '0.25';
-};
 const refreshLevel = () => {
   $('lvlSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', b.getAttribute('data-lvl') === save.lvl ? 'true' : 'false'));
   $('lvHint').textContent = t('lvHint_' + save.lvl);
 };
+/* Dock'ta yalnızca yuvalardaki jokerler görünür, yuva sırasıyla. */
+let lastEquipKey = '';
 const updateTools = () => {
+  const eq = equipped(), key = eq.join(',');
   toolsEl.querySelectorAll('.tool').forEach(b => {
-    const s = save.tools[b.getAttribute('data-tool')];
+    const id = b.getAttribute('data-tool'), s = save.tools[id];
+    b.classList.toggle('off', eq.indexOf(id) < 0);
     b.querySelector('.badge').textContent = String(s.n);
     b.classList.toggle('empty', s.n <= 0);
   });
+  if (key !== lastEquipKey) { lastEquipKey = key; eq.forEach(id => toolsEl.appendChild(toolsEl.querySelector('.tool[data-tool="' + id + '"]'))); }
 };
 /* Kilit defteri: oyunda görülen kilitler, açıklamalarıyla acelesiz okunur. */
 const BOOK = [{ k: 'tek', lv: 1 }, { k: 'cift', lv: 1 }, { k: 'kayan', lv: 2 }, { k: 'nefes', lv: 3 }, { k: 'altin', lv: 4 }, { k: 'sabir', lv: 4 }, { k: 'kasa', lv: 5 }, { k: 'ritim', lv: 6 }, { k: 'trafik', lv: 6 }, { k: 'iki', lv: 7 }, { k: 'isin', lv: 7 }, { k: 'hayalet', lv: 8 }, { k: 'bomba', lv: 8 }, { k: 'gelgit', lv: 9 }, { k: 'tutbirak', lv: 10 }];
@@ -1246,7 +1757,7 @@ const refreshMenu = () => {
   const nb = $('newBtn'); nb.hidden = !has; if (!nb.classList.contains('warn')) nb.textContent = t('newGame');
   campEl.hidden = has || save.camp <= 1;
   campEl.textContent = t('camp', { n: Math.min(save.camp, 11) });
-  $('menuJk').innerHTML = TOOL_IDS.map(id => '<span class="mj' + (save.tools[id].n <= 0 ? ' zero' : '') + '" data-tool="' + id + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + TOOL_ICON[id] + '</svg><em>' + save.tools[id].n + '</em></span>').join('');
+  renderBagRow();
   $('bookBtn').classList.toggle('dot', bookNew());
 };
 /* "En iyi" etiketi: oyun içinde rekor geçilince altın olur ve skorla birlikte yükselir (V0.9.0). */
@@ -1258,7 +1769,6 @@ const paintBest = () => {
 };
 const refreshStats = () => {
   $('coinN').textContent = String(save.coins);
-  $('shopCoins').textContent = String(save.coins);
   $('menuBest').textContent = String(bestNow());
   $('menuLvlChip').hidden = save.bestL < 1;
   $('menuBestL').textContent = String(Math.min(save.bestL, 10));
@@ -1372,7 +1882,10 @@ const fireEvent = (e, silent) => {
 };
 const applyEvents = silent => { while (G.evi < JEVENTS.length && JEVENTS[G.evi].t <= G.jt) fireEvent(JEVENTS[G.evi++], silent); };
 const giftTool = () => {
-  const id = TOOL_IDS[(Math.random() * TOOL_IDS.length) | 0];
+  /* hediye yalnızca açık ve stoğu dolmamış jokere gelir */
+  const c = TOOL_IDS.filter(id => save.own[id] && save.tools[id].n < STOCK_MAX);
+  if (!c.length) return;
+  const id = c[(Math.random() * c.length) | 0];
   save.tools[id].n++; updateTools();
   pop(t('rwTool', { t: t('tool_' + id) }), 'hype');
 };
@@ -1644,18 +2157,20 @@ const burst = (x, y, n, cols, speed) => {
   }
 };
 /* Rekor kutlaması (V0.9.0): oyun sırasında rekor ilk kez geçilince halkanın arkasında konfeti yağar ve üstte altın bir kapsül çıkar; kamera, süre ve oyun akışı bozulmaz.
-   Oyun sonunda yeni rekorda kartın arkasında konfeti patlar. */
+   Oyun sonunda yeni rekorda kartın arkasında konfeti patlar.
+   V0.9.2: kullanıcı "konfeti yağmuru yok, rekoru fark etmiyorum bile" dedi. Konfeti telefondaki "animasyonları kaldır" ayarına (RM) BAKMAZ (o ayar açıkken hiç çıkmıyordu; küçük ve kısa konfeti,
+   sarsıntı ve ışıktan farklı olarak sakin bir kutlamadır), parçalar ekran genişliğine göre büyür, yağmur 1,4 sn boyunca sürer; eşik (CFG.recMin) 25 → 10. Kamp oyunlarında rekor sayılmaz, kutlama da çıkmaz. */
 const GOLD_INK = '#5A3C00', CONF_COLS = ['lilac', 'peach', 'gold', 'rose', 'lilac-soft', 'peach-deep'];
 const spawnConf = (n, o) => {
-  if (RM) return;
+  const k = clamp(view.w / 360, 1, 1.5);
   for (let i = 0; i < n; i++) {
     G.conf.push({ x: o.x0 + (o.x1 - o.x0) * Math.random(), y: o.y0 + (Math.random() - 0.5) * 16, vx: (Math.random() - 0.5) * o.vx, vy: o.vy0 + Math.random() * o.vy1, rot: Math.random() * TAU, vr: (Math.random() - 0.5) * 10,
-      w: 5 + Math.random() * 5, h: 3 + Math.random() * 4, ci: (Math.random() * CONF_COLS.length) | 0, age: -(o.delay + Math.random() * o.spread), life: o.life, sw: Math.random() * TAU });
+      w: (7 + Math.random() * 7) * k, h: (4 + Math.random() * 5) * k, ci: (Math.random() * CONF_COLS.length) | 0, age: -(o.delay + Math.random() * o.spread), life: o.life, sw: Math.random() * TAU });
   }
 };
 const celebrateRecord = () => {
   G.recDone = true; G.recPill = { t: 0, wait: 0 };
-  spawnConf(84, { x0: 8, x1: view.w - 8, y0: -10, vx: 40, vy0: 60, vy1: 80, delay: 0, spread: 0.9, life: 2.8 });
+  spawnConf(170, { x0: 4, x1: view.w - 4, y0: -14, vx: 50, vy0: 70, vy1: 90, delay: 0, spread: 1.4, life: 3.2 });
   Snd.fanfare(); Platform.haptic('medium');
   Platform.track('record_run', { score: G.score, was: G.best0 });
 };
@@ -1702,6 +2217,7 @@ const resize = () => {
   cv.height = Math.max(1, Math.round(view.h * view.dpr));
   cv2.width = cv.width; cv2.height = cv.height;
   relayout(true);
+  if (shopEl.classList.contains('on') && fitStore()) { renderHub(); if (SS.view === 'shop') fillShop(); }
 };
 
 /* Oyun kaydı: uygulamadan çıkınca (kapansa bile) kaldığı yerden devam edebilmek için. */
@@ -1746,7 +2262,7 @@ const start = (fromL, snap) => {
   save.bestL = Math.max(save.bestL, G.L);
   if (!snap) banner(t('bnLevel', { n: L0 }), L0 > 1 ? t('campRun') : '');
   spawnQuiet = true; spawnChallenge(!snap); spawnQuiet = false;
-  hide(menuEl); hide(overEl); hide(pauseEl); hide(shopEl);
+  hide(menuEl); hide(overEl); hide(pauseEl); hideShop();
   app.classList.add('playing');
   hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
   toolsEl.classList.add('on');
@@ -1766,7 +2282,7 @@ const goMenu = () => {
   G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0; G.kind = 'tek'; G.hint = null;
   G.thT = 0; G.thDirty = true; G.banner = null; G.count = 0; G.card = null; G.tail = null; G.adv = null;
   G.practice = null; hide($('pracDone')); app.classList.remove('prac');
-  hide(overEl); hide(pauseEl); hide(shopEl);
+  hide(overEl); hide(pauseEl); hideShop();
   app.classList.remove('playing');
   hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
   toolsEl.classList.remove('on');
@@ -1789,7 +2305,7 @@ const startPractice = kind => {
   G.open = Object.keys(IMPL_GOOD); Object.keys(IMPL_TWIN).forEach(x => { G.eng[x] = true; });
   G.thT = 0; thWx = 0; applyTheme(true);
   G.card = Object.assign(bigCard(kind, tw), { max: 1e9 });
-  hide(menuEl); hide(bookEl); hide(overEl); hide(pauseEl); hide(shopEl); hide($('pracDone'));
+  hide(menuEl); hide(bookEl); hide(overEl); hide(pauseEl); hideShop(); hide($('pracDone'));
   app.classList.add('playing', 'prac');
   hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
   toolsEl.classList.remove('on');
@@ -2233,10 +2749,11 @@ const trap = p => {
   if (p && p.alarm) { pop(t('popAlarmReset'), 'roast'); spawnChallenge(false, G.kind); }
 };
 
-const useTool = id => {
+/* auto: otomatik joker ayarı açıkken oyun kendisi kullandı (V0.9.2): "akıllı hamle" puanı yok, yalnızca elle kullanım ödüllenir. */
+const useTool = (id, auto) => {
   if (G.mode !== 'play') return;
   const s = save.tools[id];
-  if (!s) return;
+  if (!s || !isEq(id)) return;
   if (s.n <= 0) { toast(t('toolEmpty')); return; }
   s.n--; persist();
   const e = TOOL[id].eff(s.l);
@@ -2245,18 +2762,20 @@ const useTool = id => {
   else if (id === 'kalkan') G.glove += e;
   else if (id === 'kum') { G.slow = Math.max(G.slow, e); G.slowMul = 0.65; }
   const smart = G.adv === id;
-  pop(toolDesc(id, e), 'perfect');
-  if (smart) { G.adv = null; G.advT = 0; G.score += 25; G.scorePulse = 1; pop(t('smartMove'), 'hype'); }
-  G.usedAny = true; save.seen.jokerUse = (save.seen.jokerUse | 0) + 1;
+  pop((auto ? t('autoTag') + ' · ' : '') + toolDesc(id, e), 'perfect');
+  if (smart) { G.adv = null; G.advT = 0; if (!auto) { G.score += 25; G.scorePulse = 1; pop(t('smartMove'), 'hype'); } }
+  G.usedAny = true; if (!auto) save.seen.jokerUse = (save.seen.jokerUse | 0) + 1;
   Snd.tool(); Platform.haptic('medium');
   updateTools(); updateHud();
   const bb = toolsEl.querySelector('.tool[data-tool="' + id + '"]');
   if (bb) { bb.classList.remove('bump'); void bb.offsetWidth; bb.classList.add('bump'); }
-  Platform.track('tool_use', { id, level: s.l, smart });
+  Platform.track('tool_use', { id, level: s.l, smart, auto: !!auto });
 };
-/* Akıllı joker: işe yarayacağı an parlar ve büyür; aynı anda yalnızca biri önerilir. */
+/* Akıllı joker: işe yarayacağı an parlar ve büyür; aynı anda yalnızca biri önerilir. Otomatik joker ayarı (save.autoJ) açıksa parladıktan AUTO_AT sn sonra kendiliğinden kullanılır;
+   o sürede oyuncu kendisi dokunabilir (akıllı hamle puanı onda). Ayar kapalıyken jokerleri yalnızca oyuncu kullanır. */
+const AUTO_AT = 0.7;
 const adviceFor = () => {
-  const have = id => save.tools[id].n > 0 && (G.advCool[id] || 0) <= G.clock;
+  const have = id => isEq(id) && save.tools[id].n > 0 && (G.advCool[id] || 0) <= G.clock;
   const hellNew = G.ph === 'hell' && G.hellAge < 3 && hellK(G.L) >= 0.2;
   if (have('kron') && G.time <= 2.5) return 'kron';
   if (have('kalkan') && G.glove <= 0 && (G.missRun >= 2 || hellNew)) return 'kalkan';
@@ -2268,6 +2787,7 @@ const updateAdvice = dt => {
   if (G.adv) {
     G.advT += dt;
     if (adviceFor() !== G.adv || G.advT > 6) { G.advCool[G.adv] = G.clock + (G.advT > 6 ? 12 : 4); G.adv = null; G.advT = 0; }
+    else if (save.autoOwn && save.autoJ && G.advT >= AUTO_AT) useTool(G.adv, true);
   }
   if (!G.adv) {
     const a = adviceFor();
@@ -2331,7 +2851,7 @@ const showOver = () => {
   countUp($('ovScore'), G.score, 600);
   const gold = G.newBest && G.score > 0 && G.n >= 10;
   $('ovScore').classList.toggle('gold', gold);
-  if (gold && G.score >= CFG.recMin) spawnConf(70, { x0: 20, x1: view.w - 20, y0: -10, vx: 50, vy0: 70, vy1: 60, delay: 0.1, spread: 1.0, life: 3 });
+  if (gold && G.score >= CFG.recMin) spawnConf(150, { x0: 10, x1: view.w - 10, y0: -14, vx: 50, vy0: 70, vy1: 70, delay: 0.1, spread: 1.2, life: 3.2 });
   const d = $('ovDelta');
   d.hidden = G.score === 0;
   if (G.newBest && G.score > 0) { d.textContent = t('newBest'); d.className = 'delta win rise' + (gold ? ' gold' : ''); }
@@ -2339,7 +2859,7 @@ const showOver = () => {
   else { d.textContent = t('toBest', { n: Math.max(1, bestNow() - G.score) }); d.className = 'delta rise'; }
   const nm = $('ovNear');
   if (G.nearMsg) { nm.textContent = G.nearMsg; nm.hidden = false; } else { nm.hidden = true; }
-  const jn = $('ovJoker'), spare = TOOL_IDS.filter(id => save.tools[id].n > 0);
+  const jn = $('ovJoker'), spare = equipped().filter(id => save.tools[id].n > 0);
   if (!G.usedAny && spare.length && G.n >= 8) {
     const id = G.lastAdv && save.tools[G.lastAdv].n > 0 ? G.lastAdv : spare[0];
     jn.textContent = t('unusedJ', { t: t('tool_' + id) }); jn.hidden = false;
@@ -2392,57 +2912,578 @@ const pause = () => {
 /* Devam edince 3-2-1 geri sayım; sayaçlar (süre, seviye, cennet/cehennem) sayım bitene kadar donuk kalır. */
 const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'count'; G.count = 3; Snd.ui(); };
 
-/* ---------- alet çantası ---------- */
-const pipsHtml = l => '<span class="pips" aria-hidden="true">' + [1, 2, 3].map(i => '<i class="' + (i <= l ? 'on' : '') + '"></i>').join('') + '</span>';
-const renderShop = () => {
-  $('shopCoins').textContent = String(save.coins);
-  $('shopList').innerHTML = TOOL_IDS.map(id => {
-    const s = save.tools[id], T = TOOL[id];
-    const maxed = s.l >= 3, upCost = T.up[s.l];
-    const eff = T.eff(s.l);
-    return '<div class="trow" data-id="' + id + '">' +
-      '<div class="ti"><svg viewBox="0 0 24 24" aria-hidden="true">' + TOOL_ICON[id] + '</svg></div>' +
-      '<div class="nm"><span>' + t('tool_' + id) + '</span><span class="stock">' + t('stock') + ' ' + s.n + '</span></div>' +
-      '<div class="ds"><span>' + toolDesc(id, eff) + '</span>' + pipsHtml(s.l) + '</div>' +
-      '<div class="ac">' +
-        '<button class="btn" type="button" data-act="buy" aria-disabled="' + (save.coins < T.price) + '">' + t('buy') + ' · ' + T.price + '</button>' +
-        '<button class="btn" type="button" data-act="up" aria-disabled="' + (maxed || save.coins < upCost) + '">' + (maxed ? t('maxed') : t('upgrade') + ' · ' + upCost) + '</button>' +
-      '</div></div>';
-  }).join('');
-  $('shopAdT').textContent = t('shopAd', { n: CFG.adCoins });
+/* ---------- mağaza: akşam çarşısı (V0.9.2) ----------
+   Seçilen tasarım "Çarşı + halka ikonları": akşam sokağında dükkân dükkân gezilir, içeri girilir, ürünler kağıt fişle alınır.
+   Sahne 296 × 604'lük sabit bir tasarım alanında çizilir ve ekrana oranlanarak sığdırılır (fitStore); ekran uzunsa fazlalık sokağa dağıtılır (--ex).
+   Her halka ikonu oyunun kendi halkasıdır: ibre döner, joker ortada durur, açık seviye yayı kadar dolar. */
+const SGL = {
+  kron: '<circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3h4M12 3v3.5"/>',
+  kalkan: '<path d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3z"/>',
+  steto: '<path d="M6 3v5a5 5 0 0 0 10 0V3M11 13v2.5a4 4 0 0 0 8 0V14"/><circle cx="19" cy="12" r="2"/>',
+  kum: '<path d="M7 3h10M7 21h10M8 3c0 5 4 5 4 9s-4 4-4 9M16 3c0 5-4 5-4 9s4 4 4 9"/>',
+  bolt: '<path d="M13 3L5.5 13.5H11L10 21l7.5-10.5H12z"/>',
+  heart: '<path d="M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z"/>',
+  lock: '<rect x="5.5" y="11" width="13" height="9" rx="2.5"/><path d="M8.5 11V8.2a3.5 3.5 0 0 1 7 0V11"/>',
+  bag: '<path d="M5.2 8.5h13.6l1 11.5H4.2z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/>',
+  star: '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7l1-5.9L3.5 9.7l5.9-.8z"/>',
+  look: '<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.9-1 1.5-2-.4-1.1.3-2.3 1.5-2.3H17a3.5 3.5 0 0 0 3.5-3.5C20.5 7.5 16.8 3.5 12 3.5z"/><circle cx="8" cy="11" r="1"/><circle cx="12" cy="7.8" r="1"/><circle cx="16" cy="10" r="1"/>',
+  gift: '<rect x="4" y="9.5" width="16" height="10.5" rx="2"/><path d="M4 13.5h16M12 9.5V20M12 9.5C10 9.5 8.5 8.5 8.5 7.2S10 5 12 7.5C14 5 15.5 5.9 15.5 7.2S14 9.5 12 9.5z"/>',
+  gear: '<path d="M4 7h8.5M17 7h3M4 17h3M11.5 17H20"/><circle cx="14.7" cy="7" r="2.3"/><circle cx="9.3" cy="17" r="2.3"/>',
+  snd: '<path d="M4 9.5v5h3.6L12.5 19V5L7.6 9.5H4z"/><path d="M16 9a4.2 4.2 0 0 1 0 6M18.6 6.4a8 8 0 0 1 0 11.2"/>',
+  vib: '<rect x="8" y="3.5" width="8" height="17" rx="2.2"/><path d="M4.9 8.5v7M2.7 10.5v3M19.1 8.5v7M21.3 10.5v3"/>',
+  play: '<path d="M8.5 5.5v13l10.5-6.5z"/>',
+  chl: '<path d="M14.5 5l-7 7 7 7"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  spark: '<path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/><path d="M18.5 15.5l.7 2.1 2.1.7-2.1.7-.7 2.1-.7-2.1-2.1-.7 2.1-.7z"/>',
+  globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 3.8 5.2 3.8 8.5s-1.2 6.1-3.8 8.5c-2.6-2.4-3.8-5.2-3.8-8.5s1.2-6.1 3.8-8.5z"/>'
 };
+const SCOL = {
+  kron: ['#FFD2AE', '#FF9A5C', '#E4601F'], kalkan: ['#FFB7CB', '#F0567E', '#B3264F'], steto: ['#BDB1FF', '#7B65EE', '#4A34B6'], kum: ['#CFD9FF', '#8FA3F5', '#5166C8'],
+  bolt: ['#FFEAA3', '#F4B63F', '#C77B0C'], heart: ['#A6F2C8', '#3FCB8A', '#14855A'], bag: ['#C9BFFF', '#8E7CF2', '#5440C9'], star: ['#FFEAA3', '#F4B63F', '#C77B0C'],
+  look: ['#FFC4DA', '#F57AA5', '#B8306A'], gift: ['#A6F2C8', '#3FCB8A', '#14855A'], lock: ['#8A83B5', '#5E5792', '#3B3568']
+};
+const STH = {
+  alet: { w: ['#3A2E92', '#231A66'], iw: ['#5A49BE', '#2B2170'], ac: '#9A8BF5', gl: ['#F6F2FF', '#C2B7FF', '#7B66EE'], tr: ['#C7BDFF', '#7B66EE'] },
+  yet: { w: ['#6E3A8E', '#431F5E'], iw: ['#8348A8', '#3F2060'], ac: '#FFC24A', gl: ['#FFF8D6', '#FFD456', '#EE9A12'], tr: ['#FFE08A', '#F0A020'] },
+  gor: { w: ['#8E3F6A', '#58224E'], iw: ['#A24E80', '#522150'], ac: '#FF7AA3', gl: ['#FFE7EF', '#FFA6C2', '#E8456E'], tr: ['#FFC0D4', '#E8456E'] },
+  hed: { w: ['#2B53A0', '#1B3673'], iw: ['#3466B6', '#1B3674'], ac: '#4ADBA5', gl: ['#F0FFF6', '#9AF0CC', '#25AD7C'], tr: ['#9CF0C9', '#25AD7C'] }
+};
+const SHOPS = [
+  { id: 'alet', ic: 'bag', acc: 'kron' },
+  { id: 'yet', ic: 'star', acc: 'bolt' },
+  { id: 'gor', ic: 'look', acc: 'look', soon: 1 },
+  { id: 'hed', ic: 'gift', acc: 'heart' }
+];
+const SHOP_STEP = 232;
+const sFmt = n => Number(n).toLocaleString(LANG === 'tr' ? 'tr-TR' : 'en-US');
+let sUid = 0;
+const sGlyph = (k, sz, col, sw) => '<svg width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke="' + (col || 'currentColor') + '" stroke-width="' + (sw || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + SGL[k] + '</svg>';
+const sMedal = (k, o) => {
+  o = o || {};
+  const s = o.s || 56, lock = o.lock, c = SCOL[lock ? 'lock' : k], id = 'md' + (++sUid), g = lock ? 'lock' : k;
+  const rim = o.rim === 'gold' ? '<circle cx="32" cy="32" r="31" fill="none" stroke="#FFE08A" stroke-width="2"/>' : '';
+  return '<svg class="md" width="' + s + '" height="' + s + '" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="' + id + '" cx="34%" cy="26%" r="84%"><stop offset="0" stop-color="' + c[0] + '"/><stop offset=".5" stop-color="' + c[1] + '"/><stop offset="1" stop-color="' + c[2] + '"/></radialGradient></defs>' +
+    '<circle cx="32" cy="32" r="30" fill="' + c[2] + '" opacity=".55"/><circle cx="32" cy="32" r="28" fill="url(#' + id + ')"/>' + rim +
+    '<ellipse cx="24" cy="16.5" rx="12.5" ry="6" fill="#fff" opacity=".3" transform="rotate(-26 24 16.5)"/>' +
+    '<g transform="translate(14.4 15) scale(1.5)" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + SGL[g] + '</g></svg>';
+};
+const sCoin = s => '<svg width="' + s + '" height="' + s + '" viewBox="0 0 20 20" aria-hidden="true"><defs><radialGradient id="cn' + (++sUid) + '" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#FFF0B3"/><stop offset=".55" stop-color="#F4B63F"/><stop offset="1" stop-color="#C77B0C"/></radialGradient></defs><circle cx="10" cy="10" r="9" fill="url(#cn' + sUid + ')"/><circle cx="10" cy="10" r="5.6" fill="none" stroke="#C77B0C" stroke-width="1.3" opacity=".7"/></svg>';
+/* Halka ikonu: kadran, çentikler, açık seviye yayı (f) ya da sabit yay (a0-a1), dönen ibre ve ortada joker. */
+const sRing = o => {
+  const s = o.s || 96, a = o.a || ['#B7ABFF', '#6D58E0'], id = 're' + (++sUid), r = 50, sw = o.sw || 13, ms = o.ms || Math.round(s * 0.4);
+  const P = an => [(76 + r * Math.sin(an)).toFixed(1), (76 - r * Math.cos(an)).toFixed(1)];
+  let tk = '', arc = '', ctr = '', i;
+  if (o.tk) {
+    for (i = 0; i < 36; i++) {
+      const q = i / 36 * 6.2832, l = i % 3 === 0 ? 5 : 3;
+      tk += '<line x1="' + (76 + 66 * Math.sin(q)).toFixed(1) + '" y1="' + (76 - 66 * Math.cos(q)).toFixed(1) + '" x2="' + (76 + (66 - l) * Math.sin(q)).toFixed(1) + '" y2="' + (76 - (66 - l) * Math.cos(q)).toFixed(1) + '" stroke="rgba(255,255,255,' + (i % 3 === 0 ? 0.45 : 0.22) + ')" stroke-width="1.5" stroke-linecap="round"/>';
+    }
+  }
+  if (o.lock) arc = '<circle cx="76" cy="76" r="50" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="4" stroke-dasharray="2 7" stroke-linecap="round"/>';
+  else if (o.f === undefined) {
+    const A = P(o.a0 === undefined ? 0.7 : o.a0), B = P(o.a1 === undefined ? 1.5 : o.a1);
+    arc = '<path d="M' + A[0] + ' ' + A[1] + ' A50 50 0 0 1 ' + B[0] + ' ' + B[1] + '" fill="none" stroke="url(#' + id + ')" stroke-width="' + sw + '" stroke-linecap="round"/>';
+  } else if (o.f >= 0.999) arc = '<circle cx="76" cy="76" r="50" fill="none" stroke="url(#' + id + ')" stroke-width="' + sw + '"/>';
+  else if (o.f > 0) {
+    const E = P(o.f * 6.2832);
+    arc = '<path d="M76 26 A50 50 0 ' + (o.f > 0.5 ? 1 : 0) + ' 1 ' + E[0] + ' ' + E[1] + '" fill="none" stroke="url(#' + id + ')" stroke-width="' + sw + '" stroke-linecap="round"/>';
+  }
+  if (o.m) ctr = '<div class="emc" style="width:' + ms + 'px;height:' + ms + 'px;margin:-' + (ms / 2) + 'px 0 0 -' + (ms / 2) + 'px">' + (o.g ? sGlyph(o.m, Math.round(ms * 0.86), '#fff', 2.2) : sMedal(o.m, { s: ms, lock: o.mlock, rim: o.rim })) + '</div>';
+  const ptr = (o.ptr === 0 || o.lock) ? '' : '<i class="ptw" style="animation-duration:' + (o.sp || 8) + 's;animation-delay:-' + (o.dl || 0).toFixed(1) + 's"><svg viewBox="0 0 152 152" aria-hidden="true"><path d="M76 76V36" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="76" cy="29" r="8" fill="#fff"/><circle cx="76" cy="29" r="3" fill="' + a[1] + '"/></svg></i>';
+  return '<div class="rem' + (o.cls ? ' ' + o.cls : '') + '" style="width:' + s + 'px;height:' + s + 'px;--nc:' + a[1] + '"><svg viewBox="0 0 152 152" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + a[0] + '"/><stop offset="1" stop-color="' + a[1] + '"/></linearGradient><radialGradient id="' + id + 'b" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="' + a[1] + '" stop-opacity=".38"/><stop offset="1" stop-color="#17104A" stop-opacity="0"/></radialGradient></defs>' +
+    '<circle cx="76" cy="76" r="70" fill="#17104A" fill-opacity=".92" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/><circle cx="76" cy="76" r="70" fill="url(#' + id + 'b)"/>' + tk +
+    '<circle cx="76" cy="76" r="50" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="' + sw + '"/>' + arc + '</svg>' + ptr + ctr + '</div>';
+};
+/* halka renkleri: dükkân temasından ve jokerin kendi renginden */
+const ringOfShop = id => [STH[id].gl[1], STH[id].gl[2]];
+const ringOfKey = k => { const m = k === 'gor' ? 'look' : (k.indexOf('slot') === 0 ? 'bag' : k), c = SCOL[m] || SCOL.bag; return [c[0], c[1]]; };
+
+/* ---------- sokak sahnesi ---------- */
+const sRand = seed => { let s = seed; return () => { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; };
+const sSkyline = (w, h, seed, col, lit) => {
+  const r = sRand(seed), rr = sRand(seed + 7);
+  let x = -6, s = '', wd = '', q;
+  while (x < w) {
+    const bw = 24 + ((r() * 34) | 0), bh = h * (0.3 + r() * 0.5), tp = r(), y = h - bh;
+    s += '<rect x="' + x + '" y="' + y.toFixed(1) + '" width="' + bw + '" height="' + (bh + 2).toFixed(1) + '" rx="3"/>';
+    if (tp < 0.3) s += '<circle cx="' + (x + bw / 2) + '" cy="' + y.toFixed(1) + '" r="' + (bw * 0.38).toFixed(1) + '"/><rect x="' + (x + bw / 2 - 1) + '" y="' + (y - bw * 0.38 - 9).toFixed(1) + '" width="2" height="10"/>';
+    else if (tp < 0.5) s += '<rect x="' + (x + bw * 0.4).toFixed(1) + '" y="' + (y - 28).toFixed(1) + '" width="6" height="30"/><path d="M' + (x + bw * 0.4 - 2).toFixed(1) + ' ' + (y - 28).toFixed(1) + 'L' + (x + bw * 0.4 + 3).toFixed(1) + ' ' + (y - 40).toFixed(1) + 'L' + (x + bw * 0.4 + 8).toFixed(1) + ' ' + (y - 28).toFixed(1) + 'Z"/>';
+    else if (tp < 0.65) s += '<path d="M' + x + ' ' + y.toFixed(1) + 'L' + (x + bw / 2) + ' ' + (y - 12).toFixed(1) + 'L' + (x + bw) + ' ' + y.toFixed(1) + 'Z"/>';
+    x += bw + ((r() * 8) | 0);
+  }
+  if (lit) for (q = 0; q < 30; q++) wd += '<rect x="' + ((rr() * w) | 0) + '" y="' + ((h * 0.76 + rr() * h * 0.2) | 0) + '" width="3" height="4" rx="1" fill="#FFE2A0" opacity="' + (0.35 + rr() * 0.45).toFixed(2) + '"/>';
+  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" fill="' + col + '" aria-hidden="true">' + s + wd + '</svg>';
+};
+const sLights = W => {
+  /* Ampullerin halesi 3 ayrı SVG katmanındadır ve katman olarak yanıp söner (SVG içinde animasyon her karede çizimi yeniler, katman opaklığı yenilemez). */
+  const cols = ['#FFE08A', '#FF9DBE', '#9CF0C9', '#B7ABFF', '#FFB48C'], seg = 116, y0 = 8, sag = 15, halos = ['', '', ''];
+  let p = '', b = '', i = 0;
+  for (let x = -10; x < W; x += seg) {
+    const x2 = x + seg, mx = (x + x2) / 2, cy = y0 + sag * 2;
+    p += 'M' + x + ' ' + y0 + 'Q' + mx + ' ' + cy + ' ' + x2 + ' ' + y0;
+    for (let k = 1; k < 6; k++) {
+      const tt = k / 6, u = 1 - tt, bx = u * u * x + 2 * u * tt * mx + tt * tt * x2, by = u * u * y0 + 2 * u * tt * cy + tt * tt * y0, c = cols[i % 5];
+      halos[i % 3] += '<circle cx="' + bx.toFixed(1) + '" cy="' + (by + 4).toFixed(1) + '" r="8" fill="' + c + '" opacity=".34"/>';
+      b += '<circle cx="' + bx.toFixed(1) + '" cy="' + (by + 4).toFixed(1) + '" r="3" fill="' + c + '"/>'; i++;
+    }
+  }
+  const svg = (cls, inner) => '<svg class="lts ' + cls + '" width="' + W + '" height="50" viewBox="0 0 ' + W + ' 50" aria-hidden="true">' + inner + '</svg>';
+  return halos.map((h, q) => svg('lg lg' + q, h)).join('') + svg('', '<path d="' + p + '" fill="none" stroke="#1d1450" stroke-width="1.4"/>' + b);
+};
+const sAwning = ac => {
+  const n = 8, tw = 196 / n, bw = 232 / n, id = 'aw' + (++sUid);
+  let p = '';
+  for (let i = 0; i < n; i++) {
+    const tx0 = 18 + i * tw, tx1 = tx0 + tw, bx0 = i * bw, bx1 = bx0 + bw, col = i % 2 ? '#FFF1DD' : ac;
+    const d = 'M' + tx0.toFixed(1) + ' 0L' + tx1.toFixed(1) + ' 0L' + bx1.toFixed(1) + ' 34A' + (bw / 2).toFixed(1) + ' ' + (bw / 2).toFixed(1) + ' 0 0 1 ' + bx0.toFixed(1) + ' 34Z';
+    p += '<path d="' + d + '" fill="' + col + '"/><path d="' + d + '" fill="url(#' + id + ')"/>';
+  }
+  return '<svg class="awn" viewBox="0 0 232 52" width="232" height="52" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".3"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".16"/></linearGradient></defs>' + p + '</svg>';
+};
+const sBalloon = (c, cls, h) => {
+  h = h || 64;
+  return '<svg class="bln ' + cls + '" width="26" height="' + h + '" viewBox="0 0 26 ' + h + '" aria-hidden="true"><path d="M13 27Q9 ' + Math.round(27 + (h - 27) * 0.45) + ' 14 ' + (h - 2) + '" stroke="#fff" stroke-width="1.2" fill="none" opacity=".8"/><ellipse cx="13" cy="14" rx="11" ry="13" fill="' + c + '"/><ellipse cx="9" cy="9" rx="3" ry="4.5" fill="#fff" opacity=".45"/></svg>';
+};
+const sCat = () => {
+  const sv = inner => '<svg width="36" height="34" viewBox="0 0 36 34" aria-hidden="true">' + inner + '</svg>';
+  return '<div class="cat">' + sv('<ellipse cx="17" cy="26" rx="10" ry="8" fill="#120C38"/><circle cx="17" cy="13" r="8" fill="#120C38"/><path d="M10.5 9L11.5 1.5L16.5 6.2Z M23.5 9L22.5 1.5L17.5 6.2Z" fill="#120C38"/>') +
+    '<i class="tlw">' + sv('<path d="M26 31C34 31 35 22 30 18" fill="none" stroke="#120C38" stroke-width="3.2" stroke-linecap="round"/>') + '</i>' +
+    '<i class="eyw">' + sv('<ellipse cx="13.8" cy="13" rx="1.7" ry="2" fill="#FFE08A"/><ellipse cx="20.2" cy="13" rx="1.7" ry="2" fill="#FFE08A"/>') + '</i></div>';
+};
+const sFireflies = () => {
+  const r = sRand(21);
+  let s = '';
+  for (let i = 0; i < 6; i++) s += '<i style="left:' + (10 + ((r() * (SS.sw - 26)) | 0)) + 'px;top:' + (330 + ((r() * 150) | 0)) + 'px;animation-delay:-' + (r() * 9).toFixed(1) + 's;animation-duration:' + (7 + r() * 5).toFixed(1) + 's"></i>';
+  return '<div class="ffs">' + s + '</div>';
+};
+const sStars = () => {
+  const r = sRand(5), g = ['', '', ''];
+  for (let i = 0; i < 21; i++) g[i % 3] += '<i style="left:' + ((r() * SS.sw) | 0) + 'px;top:' + ((r() * 210) | 0) + 'px"></i>';
+  return '<div class="stars">' + g.map((x, q) => '<div class="sg sg' + q + '">' + x + '</div>').join('') + '</div>';
+};
+const sBunting = () => {
+  const cols = ['#FFE08A', '#FF9DBE', '#9CF0C9', '#B7ABFF', '#FFB48C'], W = Math.round(SS.sw);
+  let f = '';
+  for (let i = 0; i < 11; i++) {
+    const tt = (i + 0.5) / 11, x = -4 + tt * (W + 8), y = 4 + Math.sin(tt * Math.PI) * 14;
+    f += '<path class="fg" d="M' + (x - 9).toFixed(1) + ' ' + y.toFixed(1) + 'L' + (x + 9).toFixed(1) + ' ' + y.toFixed(1) + 'L' + x.toFixed(1) + ' ' + (y + 22).toFixed(1) + 'Z" fill="' + cols[i % 5] + '" style="animation-delay:-' + (i * 0.27).toFixed(2) + 's"/>';
+  }
+  return '<svg class="bnt" width="' + W + '" height="48" viewBox="0 0 ' + W + ' 48" aria-hidden="true"><path d="M-4 4Q' + (W / 2) + ' 32 ' + (W + 4) + ' 4" fill="none" stroke="#1d1450" stroke-width="1.4"/>' + f + '</svg>';
+};
+const sConfetti = () => {
+  const cols = ['#FFE08A', '#FF9DBE', '#9CF0C9', '#B7ABFF', '#FFB48C', '#fff'], r = sRand(9);
+  let s = '';
+  for (let i = 0; i < 16; i++) s += '<i style="left:' + ((r() * (SS.sw - 16)) | 0) + 'px;background:' + cols[i % 6] + ';animation-delay:-' + (r() * 5).toFixed(2) + 's;animation-duration:' + (4 + r() * 3).toFixed(1) + 's"></i>';
+  return '<div class="cf">' + s + '</div>';
+};
+const sGiftSvg = () => '<svg class="gbx" width="168" height="168" viewBox="0 0 168 168" aria-hidden="true"><defs><linearGradient id="gb1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7CF0C0"/><stop offset="1" stop-color="#16955F"/></linearGradient><linearGradient id="gb2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C4FFE6"/><stop offset="1" stop-color="#3FCB8A"/></linearGradient><linearGradient id="gr1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFEDA8"/><stop offset=".5" stop-color="#FFD052"/><stop offset="1" stop-color="#E8961A"/></linearGradient></defs>' +
+  '<ellipse cx="84" cy="150" rx="66" ry="8" fill="#000" opacity=".28"/><rect x="22" y="72" width="124" height="76" rx="10" fill="url(#gb1)"/><rect x="14" y="54" width="140" height="28" rx="9" fill="url(#gb2)"/><rect x="73" y="54" width="22" height="94" fill="url(#gr1)"/>' +
+  '<path d="M84 54C68 26 34 30 42 50C47 62 70 60 84 54Z" fill="url(#gr1)"/><path d="M84 54C100 26 134 30 126 50C121 62 98 60 84 54Z" fill="url(#gr1)"/><path d="M84 54C74 40 56 38 52 48" fill="none" stroke="#E8961A" stroke-width="2" opacity=".6"/><path d="M84 54C94 40 112 38 116 48" fill="none" stroke="#E8961A" stroke-width="2" opacity=".6"/><circle cx="84" cy="54" r="10" fill="#F4B63F"/><circle cx="81" cy="51" r="3.5" fill="#fff" opacity=".6"/>' +
+  '<ellipse cx="40" cy="104" rx="7" ry="22" fill="#fff" opacity=".2"/></svg>';
+
+/* ---------- mağaza: ekranlar ve işleyiş ---------- */
+const SS = { shop: 'alet', idx: 0, view: 'hub', k: 1, sw: 296, sh: 604, drag: null, timers: [], tick: 0, quick: false };
 let shopFrom = 'menu';
-const openShop = from => {
+const stg = $('stg'), stHub = $('stHub'), stShop = $('stShop'), stSheet = $('stSheet'), stScrim = $('stScrim'), stToastEl = $('stToast');
+const sName = k => k === 'gor' ? t('st_n_gor') : (k.indexOf('slot') === 0 ? t('st_slotN', { n: k.slice(4) }) : (k === 'bolt' ? t('st_auto') : (k === 'heart' ? t('st_life') : t('tool_' + k))));
+const waitText = ms => {
+  let h = Math.floor(ms / 3600000), m = Math.ceil((ms % 3600000) / 60000);
+  if (m >= 60) { h++; m = 0; }
+  return h > 0 ? (m ? t('st_waitHM', { h, m }) : t('st_waitH', { h })) : t('st_waitM', { m: Math.max(1, m) });
+};
+const shopProgress = id => id === 'alet' ? [ownCount() + save.slots - 1, 7] : (id === 'yet' ? [save.autoOwn ? 1 : 0, 2] : [0, 1]);
+const sCoinChip = () => '<div class="cc"><span style="display:grid">' + sCoin(18) + '</span><b>' + sFmt(save.coins) + '</b><i data-a="open" data-s="hed" role="button" aria-label="' + t('st_n_hed') + '">+</i></div>';
+
+/* sokak: dört dükkân yan yana, altta halka simgeli dock */
+const heroHtml = (id, i) => {
+  const a = ringOfShop(id), sh = SHOPS[i];
+  if (id === 'gor') return '<div class="gl"></div><div class="slat"><span class="pd2">' + sRing({ s: 64, a, lock: 1, m: 'lock', g: 1, ms: 26 }) + '</span></div>';
+  return '<i class="nglow"></i>' + sRing({ s: 140, a, tk: 1, a0: 0.7 + i * 0.9, a1: 1.5 + i * 0.9, m: sh.ic, ms: 60, sp: 7, dl: i * 2, cls: 'hr' }) + '<i class="tw t1"></i><i class="tw t2"></i><i class="tw t3"></i>';
+};
+const plaqueHtml = sh => {
+  if (sh.id === 'hed') {
+    const g = giftState();
+    return g.wait > 0 ? '<small>' + t('st_giftNew') + '</small><b>' + waitText(g.wait) + '</b>' : '<small>' + t('st_giftNext') + '</small><b>+' + g.next + ' coin</b>';
+  }
+  if (sh.soon) return '<small>' + t('st_verySoon') + '</small><b>' + t('st_workshop') + '</b>';
+  const p = shopProgress(sh.id);
+  return '<small>' + t('st_onShelf') + '</small><b>' + t('st_openN', { n: p[0], m: p[1] }) + '</b><span class="bar"><i style="width:' + Math.round(p[0] / p[1] * 100) + '%"></i></span>';
+};
+const facadeHtml = (sh, i) => {
+  const th = STH[sh.id], soon = !!sh.soon;
+  const stl = '--w1:' + th.w[0] + ';--w2:' + th.w[1] + ';--ac:' + th.ac + ';--g1:' + th.gl[0] + ';--g2:' + th.gl[1] + ';--g3:' + th.gl[2] + ';--t1:' + th.tr[0] + ';--t2:' + th.tr[1];
+  return '<div class="fc" data-a="open" data-s="' + sh.id + '" data-i="' + i + '" role="button" aria-label="' + t('st_n_' + sh.id) + '" style="' + stl + '"><div class="wall"></div><div class="cor"></div>' +
+    '<div class="sign">' + sRing({ s: 38, a: ringOfShop(sh.id), m: sh.ic, g: 1, ms: 19, sp: 6, sw: 15 }) + '<b>' + t('st_n_' + sh.id) + '</b></div><i class="lmp" style="left:20px"></i><i class="lmp" style="right:20px"></i>' +
+    sAwning(th.ac) + '<div class="win">' + heroHtml(sh.id, i) + '</div>' + (soon ? '<div class="ribbon">' + t('st_soon') + '</div>' : '') +
+    '<div class="door' + (soon ? ' cl' : '') + '"><i class="leaf"></i><i class="kn"></i><b class="sg">' + t(soon ? 'st_signSoon' : 'st_signOpen') + '</b></div>' +
+    '<div class="plq">' + plaqueHtml(sh) + '</div><i class="curb"></i><div class="pool"></div>' + (sh.id === 'alet' ? sCat() : '') + '</div>';
+};
+const hubHtml = () => {
+  const sw = SS.sw, pad = (sw - 220) / 2, W = Math.round(pad * 2 + SHOPS.length * 220 + (SHOPS.length - 1) * 12);
+  return '<div class="sky"></div>' + sStars() + '<div class="moon"></div>' +
+    '<div class="sk skf" id="stSkF">' + sSkyline(Math.ceil(sw + 130), 118, 11, 'rgba(160,130,240,.5)', 0) + '</div>' +
+    '<div class="sk skn" id="stSkN">' + sSkyline(Math.ceil(sw + 230), 112, 29, 'rgba(88,66,186,.9)', 1) + '</div><div class="ground"></div>' +
+    '<div class="hd"><button class="rb" type="button" data-a="close" aria-label="' + t('close') + '">' + sGlyph('chl', 18, 'currentColor', 2.4) + '</button><div class="tt"><h4>' + t('st_title') + '</h4><small>' + t('st_sub') + '</small></div>' + sCoinChip() + '</div>' +
+    '<div class="car" id="stCar"><div class="strip">' + sLights(W) + SHOPS.map(facadeHtml).join('') + '</div></div>' + sFireflies() +
+    '<button class="cta" type="button" id="stCta" data-a="gosel"></button>' +
+    '<div class="dock" id="stDock">' + SHOPS.map((s, i) => '<div class="dk" data-a="dot" data-i="' + i + '" role="button" aria-label="' + t('st_n_' + s.id) + '">' + sRing({ s: 32, a: ringOfShop(s.id), m: s.ic, g: 1, ms: 15, sp: 5, dl: i * 1.3, sw: 15 }) + '<small>' + t('st_s_' + s.id) + '</small></div>').join('') + '</div>';
+};
+const syncHub = () => {
+  const car = $('stCar');
+  if (!car) return;
+  const sl = car.scrollLeft, i = Math.max(0, Math.min(SHOPS.length - 1, Math.round(sl / SHOP_STEP))), f = $('stSkF'), n = $('stSkN'), d = $('stDock').children;
+  SS.idx = i;
+  if (f) f.style.transform = 'translateX(' + (-sl * 0.12).toFixed(1) + 'px)';
+  if (n) n.style.transform = 'translateX(' + (-sl * 0.3).toFixed(1) + 'px)';
+  for (let q = 0; q < d.length; q++) d[q].className = 'dk' + (q === i ? ' on' : '');
+  /* ekranda görünmeyen cepheler animasyonu durdurur (hafif kalsın) */
+  stHub.querySelectorAll('.fc').forEach((f, q) => f.classList.toggle('far', Math.abs(sl / SHOP_STEP - q) > 1.3));
+  const sh = SHOPS[i], cta = $('stCta'), g = sh.id === 'hed' ? giftState() : null, quiet = sh.soon || (g && g.wait > 0);
+  cta.textContent = t(sh.soon ? 'st_ctaLook' : (sh.id === 'hed' ? (g.wait > 0 ? 'st_ctaLook' : 'st_ctaGift') : 'st_ctaEnter'));
+  cta.className = 'cta' + (quiet ? ' soon' : '');
+};
+const renderHub = keep => {
+  const car = $('stCar'), at = car ? car.scrollLeft : SS.idx * SHOP_STEP;
+  stHub.innerHTML = hubHtml();
+  const c2 = $('stCar');
+  c2.style.scrollBehavior = 'auto'; c2.scrollLeft = keep === false ? SS.idx * SHOP_STEP : at; c2.style.scrollBehavior = '';
+  c2.addEventListener('scroll', syncHub);
+  syncHub();
+};
+
+/* dükkân içleri */
+const pouchHtml = i => {
+  const f = i < save.slots, j = save.equip[i], g = nextGoal(), nx = g && g.k === 'slot' + (i + 1) ? ' nx' : '', lab = '<small>' + t('st_slotN', { n: i + 1 }) + '</small>';
+  if (f && j) { const c = SCOL[j], n = save.tools[j].n; return '<div class="pch" data-a="slot" data-i="' + i + '" role="button" style="--p1:' + c[1] + ';--p2:' + c[2] + '"><i class="rg"></i><div class="bd"><span class="mm">' + sMedal(j, { s: 36 }) + '</span>' + lab + '</div><div class="fl"></div><b class="cn' + (n <= 0 ? ' z' : '') + '">×' + n + '</b></div>'; }
+  if (f) return '<div class="pch e" data-a="slot" data-i="' + i + '" role="button"><i class="rg"></i><div class="bd">' + lab + '</div><div class="fl">' + sGlyph('plus', 16, 'currentColor', 2.4) + '</div></div>';
+  return '<div class="pch l' + nx + '" data-a="slot" data-i="' + i + '" role="button"><i class="rg"></i><div class="bd"><span class="pr">' + sCoin(12) + sFmt(SLOT_PRICE[i + 1]) + '</span>' + lab + '</div><div class="fl">' + sGlyph('lock', 15, '#fff', 2.2) + '</div></div>';
+};
+const itemHtml = k => {
+  const own = save.own[k], s = save.tools[k], eq = isEq(k), g = nextGoal(), nx = g && g.k === k;
+  return '<div class="itm' + (own ? '' : ' lk') + (nx ? ' nx' : '') + '" data-a="item" data-k="' + k + '" role="button" style="--c:' + SCOL[k][1] + '"><i class="gw"></i><span class="pc">' + sRing({ s: 86, a: ringOfKey(k), f: own ? s.l / 3 : 0, lock: !own, m: k, ms: 44, mlock: !own, sp: 9, dl: k.length * 1.7, sw: 14 }) + '</span>' +
+    (own ? '' : '<i class="case"></i>') + (eq ? '<span class="ck">' + sGlyph('check', 13, 'currentColor', 3.2) + '</span>' : '') + (nx ? '<span class="nxt">' + t('st_next') + '</span>' : '') +
+    '<div class="tg2"><h6>' + t('tool_' + k) + '</h6>' + (own ? '<span>' + t('st_stock', { n: s.n, l: s.l }) + '</span>' : '<span class="g">' + sCoin(12) + sFmt(JK_PRICE[k]) + '</span>') + '</div></div>';
+};
+const shelfHtml = (a, b) => '<div class="shl"><div class="pl"></div><div class="shr">' + itemHtml(a) + itemHtml(b) + '</div></div>';
+const domeHtml = k => {
+  if (k === 'heart') return '<div class="dm cv" data-a="item" data-k="heart" role="button"><div class="cloth"></div><div class="rbn">' + t('st_soonCaps') + '</div><i class="knob"></i><div class="ped"></div><div class="tg2" style="width:116px;margin-left:-58px"><h6>' + t('st_life') + '</h6><span class="g" style="color:#B3264F;font-family:Nunito,system-ui,sans-serif;font-size:11px">' + t('st_soon') + '</span></div></div>';
+  return '<div class="dm" data-a="item" data-k="bolt" role="button" style="--c:' + SCOL.bolt[1] + '"><i class="gg"></i><div class="gls"></div><i class="knob"></i><span class="gem">' + sRing({ s: 106, a: ringOfKey('bolt'), tk: 1, a0: 0.4, a1: 2.4, m: 'bolt', ms: 52, rim: 'gold', sp: 7 }) + '</span><div class="ped"></div>' +
+    '<div class="tg2" style="width:116px;margin-left:-58px"><h6>' + t('st_auto') + '</h6>' + (save.autoOwn ? '<span><b class="tgm' + (save.autoJ ? ' on' : '') + '"></b>' + t(save.autoJ ? 'st_on' : 'st_off') + '</span>' : '<span class="g">' + sCoin(12) + sFmt(AUTO_PRICE) + '</span>') + '</div></div>';
+};
+const lookArt = (kind, v) => {
+  const id = 'pv' + (++sUid);
+  if (kind === 'ibre') { const c = ['#FFFFFF', '#FFD76A', '#7CF0E6'][v], tt = ['#8E7CF2', '#F4B63F', '#2FD0C3'][v]; return '<svg width="46" height="46" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="19" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="7"/><path d="M27 8 A19 19 0 0 1 43 17" fill="none" stroke="' + tt + '" stroke-width="7" stroke-linecap="round" opacity=".7"/><path d="M27 27L38 12" stroke="' + c + '" stroke-width="2.5" stroke-linecap="round"/><circle cx="39" cy="10.5" r="5.5" fill="' + c + '"/>' + (v === 1 ? '<path d="M44 6l1.5 3 3 1.5-3 1.5L44 15l-1.5-3-3-1.5 3-1.5z" fill="#FFE08A"/>' : '') + '</svg>'; }
+  if (kind === 'halka') { const g = [['#B7ABFF', '#6D58E0'], ['#FFC08A', '#F0567E'], ['#FFE08A', '#E59A10']][v]; return '<svg width="46" height="46" viewBox="0 0 54 54" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + g[0] + '"/><stop offset="1" stop-color="' + g[1] + '"/></linearGradient></defs><circle cx="27" cy="27" r="19" fill="none" stroke="url(#' + id + ')" stroke-width="9"/><circle cx="27" cy="27" r="19" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-dasharray="2 5" transform="rotate(20 27 27)"/></svg>'; }
+  const cs = [['#8E7CF2', '#FFA473', '#F4B63F', '#E8456E'], ['#FFE08A', '#fff', '#FFD76A', '#B7ABFF'], ['#FF8FB1', '#E8456E', '#FFC0D4', '#FF6B8E']][v], pts = [[10, 12, 20], [34, 8, -30], [22, 28, 50], [42, 30, -10], [12, 40, 70], [32, 44, 15]];
+  let sp = '';
+  pts.forEach((p, i) => {
+    const c = cs[i % 4];
+    sp += v === 2 && i % 2 === 0 ? '<path d="M' + (p[0] + 3) + ' ' + (p[1] + 6) + 'c-4-3-5-5-5-7a2.5 2.5 0 0 1 5-.8 2.5 2.5 0 0 1 5 .8c0 2-1 4-5 7z" fill="' + c + '" transform="rotate(' + p[2] + ' ' + (p[0] + 3) + ' ' + (p[1] + 3) + ')"/>' : (v === 1 && i % 2 === 1 ? '<path d="M' + (p[0] + 3) + ' ' + p[1] + 'l1.2 2.8 2.8 1.2-2.8 1.2-1.2 2.8-1.2-2.8-2.8-1.2 2.8-1.2z" fill="' + c + '"/>' : '<rect x="' + p[0] + '" y="' + p[1] + '" width="9" height="5" rx="1.4" fill="' + c + '" transform="rotate(' + p[2] + ' ' + (p[0] + 4) + ' ' + (p[1] + 2) + ')"/>');
+  });
+  return '<svg width="46" height="46" viewBox="0 0 54 54" aria-hidden="true">' + sp + '</svg>';
+};
+const giftBtnHtml = () => {
+  const g = giftState();
+  return g.wait > 0 ? '<button class="sbt off" type="button" id="stGiftBtn" data-a="giftwait">' + sGlyph('lock', 17, 'currentColor', 2.4) + t('st_giftWait', { w: waitText(g.wait) }) + '</button>'
+    : '<button class="sbt gd" type="button" id="stGiftBtn" data-a="ad">' + sGlyph('play', 18, 'currentColor', 2.4) + t('st_giftBtn', { n: g.next }) + '</button>';
+};
+const giftLadderHtml = () => {
+  const g = giftState();
+  let h = '';
+  for (let i = 0; i < GIFT_STEP.length; i++) {
+    const done = i < g.n || g.wait > 0, cur = !done && i === g.n;
+    h += '<span class="' + (done ? 'dn' : (cur ? 'cu' : '')) + '">' + (done ? sGlyph('check', 11, 'currentColor', 3.4) : '') + GIFT_STEP[i] + '</span>';
+  }
+  return h;
+};
+const shopHtml = id => {
+  let h = '<div class="room"><div class="wallp"></div>' + (id === 'alet' || id === 'gor' ? '' : '<div class="flr"></div>') + (id === 'yet' ? '<i class="beam" style="left:-6px"></i><i class="beam" style="right:-6px"></i>' : '') + '</div>';
+  h += '<div class="hd"><button class="rb" type="button" data-a="back" aria-label="' + t('st_back') + '">' + sGlyph('chl', 18, 'currentColor', 2.4) + '</button><div class="hs"><b>' + t('st_n_' + id) + '</b></div>' + sCoinChip() + '</div>';
+  if (id === 'alet') {
+    h += '<div class="body"><div class="lab">' + t('st_belt') + '<em>' + t('st_slotsOf', { n: save.slots }) + '</em></div><div class="blt"><div class="strap"></div><div class="pchs">' + [0, 1, 2, 3].map(pouchHtml).join('') + '</div></div>' +
+      '<div class="lab" style="margin-top:8px">' + t('st_shelves') + '<em>' + t('st_jokersOpen', { n: ownCount() }) + '</em></div>' + shelfHtml('kron', 'kalkan') + shelfHtml('steto', 'kum') + '<div class="note">' + t('st_beltNote') + '</div></div>';
+  } else if (id === 'yet') {
+    h += '<div class="body"><div class="lab">' + t('st_perm') + '<em>' + t('st_openN', { n: save.autoOwn ? 1 : 0, m: 2 }) + '</em></div><div class="domes">' + domeHtml('bolt') + domeHtml('heart') + '</div><div class="ctr"></div><div class="more"><small>' + t('st_moreSoon') + '</small><div><i>?</i><i>?</i><i>?</i></div></div></div>';
+  } else if (id === 'gor') {
+    const rows = [[t('st_lkNeedle'), 'ibre', [t('st_lkClassic'), t('st_lkSpark'), t('st_lkNeon')]], [t('st_lkRing'), 'halka', [t('st_lkLilac'), t('st_lkSunset'), t('st_lkGold')]], [t('st_lkConf'), 'konf', [t('st_lkClassic'), t('st_lkStar'), t('st_lkHeart')]]];
+    h += '<div class="soonb">' + sGlyph('spark', 14, 'currentColor', 2.2) + ' ' + t('st_openSoon') + '</div><div class="body" style="top:96px"><div class="gal">';
+    rows.forEach(r => {
+      h += '<div class="lab">' + r[0] + '<em>' + t('st_soon') + '</em></div><div class="frs">' + r[2].map((n, v) => '<div class="frm" data-a="item" data-k="gor" role="button"><div class="mat">' + lookArt(r[1], v) + '<h6>' + n + '</h6><span class="pr">' + sCoin(10) + sFmt(1500 + v * 1000) + '</span></div></div>').join('') + '</div>';
+    });
+    h += '</div></div>';
+  } else {
+    const g = giftState();
+    h += sBunting() + sConfetti() + '<div class="gf"><div class="tbl">' + sRing({ s: 200, a: ['#9AF0CC', '#25AD7C'], tk: 1, a0: 0.5, a1: 1.9, sp: 12, cls: 'big' }) + sBalloon('#FF8FB1', 'b1', 150) + sBalloon('#FFD76A', 'b2', 150) + sGiftSvg() + '<i class="slab"></i></div><h3>' + t('st_giftBox') + '</h3><p id="stGiftP">' + (g.wait > 0 ? t('st_giftDone') : t('st_giftText', { n: g.next })) + '</p><div class="lad" id="stGiftLad">' + giftLadderHtml() + '</div><div id="stGiftWrap">' + giftBtnHtml() + '</div></div>';
+  }
+  return h;
+};
+const fillShop = () => {
+  const th = STH[SS.shop];
+  stShop.style.cssText = '--w1:' + th.iw[0] + ';--w2:' + th.iw[1] + ';--ac:' + th.ac;
+  stShop.innerHTML = shopHtml(SS.shop);
+};
+
+/* kağıt fiş: ürün ayrıntısı ve satın alma */
+const accFor = k => k === 'gor' ? '#FFC4DA' : (k.indexOf('slot') === 0 ? '#C9BFFF' : (SCOL[k] ? SCOL[k][0] : '#C9BFFF'));
+const medalFor = k => {
+  const sl = k.indexOf('slot') === 0, isJ = TOOL_IDS.indexOf(k) >= 0, lock = (isJ && !save.own[k]) || (sl && +k.slice(4) > save.slots);
+  const o = { s: 124, a: ringOfKey(k), tk: 1, lock, m: k === 'gor' ? 'look' : (sl ? 'bag' : k), ms: 56, mlock: lock, rim: k === 'bolt' ? 'gold' : '', sp: 7 };
+  if (!lock && isJ) o.f = save.tools[k].l / 3; else if (!lock) { o.a0 = 0.6; o.a1 = 2.2; }
+  return sRing(o);
+};
+const sheetBase = (k, kind, desc, stats, acts, fine) => '<div class="spot" style="--a:' + accFor(k) + '">' + medalFor(k) + '</div><h3>' + sName(k) + '</h3><span class="kind">' + kind + '</span><p>' + desc + '</p><div class="stats">' + stats + '</div><div class="acts">' + acts + '</div>' + (fine ? '<small class="fine">' + fine + '</small>' : '');
+const stat = x => '<span class="pill">' + x + '</span>';
+const sbtn = (cls, label, attrs, coin) => '<button class="sbt ' + cls + '" type="button" ' + (attrs || '') + '>' + (coin ? sCoin(18) : '') + label + '</button>';
+const goldBtn = (label, price, attrs) => save.coins >= price ? sbtn('gd', label + ' · ' + sFmt(price), attrs, 1) : sbtn('off', t('st_short', { n: sFmt(price - save.coins) }), 'data-a="poor"', 1);
+const openSheet = h => { stSheet.innerHTML = h; stSheet.classList.add('on'); stScrim.classList.add('on'); };
+const closeSheet = () => { stSheet.classList.remove('on'); stScrim.classList.remove('on'); SS.quick = false; };
+const itemSheet = k => {
+  let h;
+  if (TOOL_IDS.indexOf(k) >= 0) {
+    const s = save.tools[k], eff = t('ts_' + k, { n: TOOL[k].eff(s.l) });
+    if (save.own[k]) {
+      const sp = stockPrice(k), up = upPrice(k), full = s.n >= STOCK_MAX, max = s.l >= 3;
+      const b1 = full ? sbtn('off', t('st_full', { n: STOCK_MAX }), 'data-a="none"') : sbtn(save.coins >= sp ? 'p' : 'off', t('st_plus', { p: sFmt(sp) }), save.coins >= sp ? 'data-a="plus" data-k="' + k + '"' : 'data-a="poor"', 1);
+      const b2 = max ? sbtn('off', t('maxed'), 'data-a="none"') : sbtn(save.coins >= up ? 's' : 'off', t('st_up', { p: sFmt(up) }), save.coins >= up ? 'data-a="upg" data-k="' + k + '"' : 'data-a="poor"');
+      h = sheetBase(k, t('st_kindJoker'), t('st_dd_' + k), stat(eff) + stat(t('st_pStock', { n: s.n })) + stat(t('st_pLevel', { l: s.l })), b1 + b2, max ? '' : t('st_upNote'));
+    } else h = sheetBase(k, t('st_kindJokerLocked'), t('st_dd_' + k), stat(t('ts_' + k, { n: TOOL[k].eff(1) })), goldBtn(t('st_open'), JK_PRICE[k], 'data-a="unl" data-k="' + k + '"'));
+  } else if (k.indexOf('slot') === 0) {
+    const n = +k.slice(4);
+    if (n === save.slots + 1) h = sheetBase(k, t('st_kindSlot'), t('st_dd_slot'), stat(t('st_slotsOf', { n })), goldBtn(t('st_openSlot'), SLOT_PRICE[n], 'data-a="slotbuy" data-n="' + n + '"'));
+    else h = sheetBase(k, t('st_kindSlot'), t('st_dd_slotLocked', { n: n - 1 }), stat(t('st_slotsOf', { n })), sbtn('off', t('st_locked'), 'data-a="none"'));
+  } else if (k === 'bolt') {
+    h = sheetBase(k, t('st_kindSkill'), t('st_dd_auto'), stat(t('st_autoP1')) + stat(t('st_autoP2')),
+      save.autoOwn ? '<div class="row" style="margin:0"><div class="ri">' + sGlyph('bolt', 18) + '</div><b>' + t('st_autoUse') + '<small>' + t(save.autoJ ? 'st_on' : 'st_off') + '</small></b><span class="tg' + (save.autoJ ? ' on' : '') + '" data-a="auto" role="switch" aria-checked="' + (save.autoJ ? 'true' : 'false') + '"></span></div>'
+        : goldBtn(t('st_open'), AUTO_PRICE, 'data-a="unlA"'));
+  } else if (k === 'heart') {
+    h = sheetBase(k, t('st_kindSkill'), t('st_dd_life'), stat(t('st_lifeP')) + '<span class="pill soon">' + t('st_soon') + '</span>', sbtn('off', t('st_soonPrice', { p: sFmt(LIFE_PRICE) }), 'data-a="none"'));
+  } else h = sheetBase('gor', t('st_kindLook'), t('st_dd_look'), stat(t('st_lookP')) + '<span class="pill soon">' + t('st_soon') + '</span>', sbtn('off', t('st_soon'), 'data-a="none"'));
+  openSheet(h);
+};
+const chooser = i => {
+  const own = TOOL_IDS.filter(j => save.own[j]);
+  openSheet('<h3 style="font-size:20px;margin-top:4px">' + t('st_pickT', { n: i + 1 }) + '</h3><p style="margin-top:5px;border:0;padding:0">' + t('st_pickSub') + '</p><div style="width:100%;margin-top:6px">' +
+    own.map(j => {
+      const at = save.equip.indexOf(j), sel = save.equip[i] === j;
+      return '<div class="row pick' + (sel ? ' sel' : '') + '" data-a="eq" data-j="' + j + '" data-i="' + i + '" role="button">' + sRing({ s: 42, a: ringOfKey(j), m: j, g: 1, ms: 19, sp: 6 }) + '<b>' + t('tool_' + j) + '<small>' + t('ts_' + j, { n: TOOL[j].eff(save.tools[j].l) }) + ' · ' + t('st_pStock', { n: save.tools[j].n }) + (at >= 0 && at < save.slots && !sel ? ' · ' + t('st_inSlot', { n: at + 1 }) : '') + '</small></b><span class="ckb">' + sGlyph('check', 13, 'currentColor', 3) + '</span></div>';
+    }).join('') + (save.equip[i] ? '<div class="row pick" data-a="eq" data-j="" data-i="' + i + '" role="button"><div class="ri">' + sGlyph('x', 16) + '</div><b>' + t('st_none') + '</b></div>' : '') + '</div>');
+};
+
+/* ufak yardımcılar: bildirim, coin sayacı, parıltı, zamanlayıcılar */
+let stToastT = 0;
+const stToast = msg => { stToastEl.textContent = msg; stToastEl.classList.add('on'); clearTimeout(stToastT); stToastT = setTimeout(() => stToastEl.classList.remove('on'), 1700); };
+const stCoins = (from, to) => {
+  const t0 = performance.now();
+  const f = n => {
+    const p = Math.min(1, (n - t0) / 600), v = Math.round(from + (to - from) * p);
+    stg.querySelectorAll('.cc b').forEach(e => { e.textContent = sFmt(v); });
+    if (p < 1) requestAnimationFrame(f);
+  };
+  requestAnimationFrame(f);
+};
+const stBurst = cols => {
+  if (RM) return;
+  const x = SS.sw / 2, y = SS.sh * 0.5;
+  for (let i = 0; i < 20; i++) {
+    const e = document.createElement('i'), an = Math.random() * 6.28, d = 40 + Math.random() * 70;
+    e.className = 'sp';
+    e.style.cssText = 'left:' + x + 'px;top:' + y + 'px;background:' + cols[i % cols.length] + ';--dx:' + (Math.cos(an) * d).toFixed(0) + 'px;--dy:' + (Math.sin(an) * d - 26).toFixed(0) + 'px';
+    stg.appendChild(e); setTimeout(() => e.remove(), 1000);
+  }
+};
+const stLater = (fn, ms) => { SS.timers.push(setTimeout(fn, ms)); };
+const showView = v => {
+  SS.view = v;
+  stHub.classList.toggle('on', v === 'hub'); stShop.classList.toggle('on', v === 'shop');
+};
+const shopGo = id => {
+  closeSheet(); SS.shop = id; SS.idx = Math.max(0, SHOPS.findIndex(s => s.id === id));
+  fillShop(); showView('shop');
+};
+const enterShop = id => {
+  closeSheet();
+  const f = stHub.querySelector('.fc[data-s="' + id + '"]');
+  if (SS.view !== 'hub' || !f || RM) { shopGo(id); return; }
+  f.classList.add('sel'); stHub.classList.add('zoom'); Snd.ui();
+  stLater(() => shopGo(id), 480);
+  stLater(() => { stHub.classList.remove('zoom'); f.classList.remove('sel'); }, 1000);
+};
+/* satın alma sonrası: kayıt, menü, açık dükkân ve fiş yenilenir */
+const stAfter = o => {
+  persist(); refreshStats();
+  renderHub();
+  if (SS.view === 'shop') fillShop();
+  if (o.sheet) itemSheet(o.k); else closeSheet();
+  if (o.fx) stBurst(['#FFE08A', '#B7ABFF', '#FF9DBE', '#9CF0C9', '#fff']);
+  if (o.msg) stToast(o.msg);
+};
+const stBuy = fn => { const from = save.coins, ok = fn(); if (ok) stCoins(from, save.coins); else stToast(t('coinShort')); return ok; };
+const stClick = ev => {
+  const el = ev.target.closest && ev.target.closest('[data-a]');
+  if (!el || !stg.contains(el)) return;
+  const a = el.getAttribute('data-a'), g = n => el.getAttribute('data-' + n), car = $('stCar');
+  Snd.unlock();
+  if (a === 'close') closeShop();
+  else if (a === 'back') { closeSheet(); renderHub(); showView('hub'); Snd.ui(); }
+  else if (a === 'open') {
+    const i = g('i');
+    if (i !== null && +i !== SS.idx && car && car.contains(el)) { car.scrollTo({ left: +i * SHOP_STEP, behavior: RM ? 'auto' : 'smooth' }); return; }
+    enterShop(g('s'));
+  } else if (a === 'gosel') enterShop(SHOPS[SS.idx].id);
+  else if (a === 'dot') car.scrollTo({ left: SHOP_STEP * +g('i'), behavior: RM ? 'auto' : 'smooth' });
+  else if (a === 'item') { itemSheet(g('k')); Snd.ui(); }
+  else if (a === 'slot') { const q = +g('i'); if (q < save.slots) chooser(q); else itemSheet('slot' + (q + 1)); Snd.ui(); }
+  else if (a === 'poor') { stToast(t('coinShort')); Platform.haptic('light'); }
+  else if (a === 'unl') {
+    const k = g('k');
+    if (stBuy(() => unlockJoker(k))) { stAfter({ k, msg: t(isEq(k) ? 'st_unlockedEq' : 'st_unlocked', { n: t('tool_' + k) }), fx: 1 }); Snd.fanfare(); Platform.haptic('medium'); Platform.track('shop', { act: 'unlock', id: k }); }
+  } else if (a === 'slotbuy') {
+    const n = +g('n');
+    if (stBuy(() => buySlot(n))) { stAfter({ msg: t('st_slotOpened', { n }), fx: 1 }); Snd.fanfare(); Platform.haptic('medium'); Platform.track('shop', { act: 'slot', n }); }
+  } else if (a === 'plus') {
+    const k = g('k');
+    if (stBuy(() => buyStock(k))) { stAfter({ k, sheet: 1, msg: t('st_plus1', { n: t('tool_' + k) }) }); Snd.tool(); Platform.haptic('light'); Platform.track('shop', { act: 'stock', id: k }); }
+  } else if (a === 'upg') {
+    const k = g('k');
+    if (stBuy(() => buyUpgrade(k))) { stAfter({ k, sheet: 1, msg: t('st_upped', { n: t('tool_' + k) }), fx: 1 }); Snd.fanfare(); Platform.haptic('medium'); Platform.track('shop', { act: 'upgrade', id: k }); }
+  } else if (a === 'unlA') {
+    if (stBuy(buyAuto)) { stAfter({ k: 'bolt', sheet: 1, msg: t('st_autoOpened'), fx: 1 }); Snd.fanfare(); Platform.haptic('medium'); Platform.track('shop', { act: 'auto' }); }
+  } else if (a === 'auto') {
+    save.autoJ = !save.autoJ; stAfter({ k: 'bolt', sheet: 1 }); Snd.ui();
+  } else if (a === 'eq') {
+    /* menüdeki yuvadan gelindiyse (quick) seçim bitince menüye dönülür */
+    const j = g('j'), i = +g('i'), quick = SS.quick, msg = j ? t('st_equipped', { n: t('tool_' + j) }) : t('st_slotCleared');
+    setEquip(i, j); Snd.tool();
+    if (quick) { closeShop(); toast(msg); } else stAfter({ msg, fx: !!j });
+  } else if (a === 'giftwait') stToast(t('st_giftWaitToast', { w: waitText(giftState().wait) }));
+  else if (a === 'ad') {
+    const gs = giftState();
+    if (gs.wait > 0) { stToast(t('st_giftWaitToast', { w: waitText(gs.wait) })); return; }
+    Platform.rewardedAd((ok, why) => {
+      if (ok) {
+        const from = save.coins, c = giftClaim();
+        if (c) { refreshStats(); renderHub(); if (SS.view === 'shop') fillShop(); stCoins(from, save.coins); stBurst(['#FFE08A', '#9CF0C9', '#FF9DBE', '#B7ABFF', '#fff']); stToast(t('gotCoins', { n: c })); Snd.fanfare(); Platform.track('shop', { act: 'gift', n: c }); }
+      } else if (why !== 'closed') stToast(t('adFail'));
+    });
+  }
+};
+stg.addEventListener('click', stClick);
+stScrim.addEventListener('click', () => { closeSheet(); Snd.ui(); });
+/* fareyle sürükleme (dokunmatikte tarayıcı kendi kaydırır) */
+stg.addEventListener('pointerdown', e => {
+  const car = $('stCar');
+  if (e.pointerType === 'touch' || !car || !car.contains(e.target)) return;
+  SS.drag = { x: e.clientX, s: car.scrollLeft, m: 0 };
+  car.style.scrollBehavior = 'auto'; car.style.scrollSnapType = 'none';
+});
+stg.addEventListener('pointermove', e => {
+  if (!SS.drag) return;
+  const car = $('stCar'), dx = (e.clientX - SS.drag.x) / SS.k;
+  SS.drag.m = Math.max(SS.drag.m, Math.abs(dx)); car.scrollLeft = SS.drag.s - dx;
+});
+window.addEventListener('pointerup', () => {
+  if (!SS.drag) return;
+  const car = $('stCar'), moved = SS.drag.m > 6;
+  SS.drag = null; car.style.scrollSnapType = ''; car.style.scrollBehavior = '';
+  car.scrollTo({ left: Math.max(0, Math.min(SHOPS.length - 1, Math.round(car.scrollLeft / SHOP_STEP))) * SHOP_STEP, behavior: 'smooth' });
+  if (moved) stg.addEventListener('click', ev => ev.stopPropagation(), { capture: true, once: true });
+});
+
+/* Hediye bekleme süresi açıkken dakikada bir yazılar tazelenir. */
+const stTick = () => {
+  if (!shopEl.classList.contains('on')) { clearInterval(SS.tick); SS.tick = 0; return; }
+  const f = stHub.querySelector('.fc[data-s="hed"] .plq');
+  if (f) f.innerHTML = plaqueHtml(SHOPS[3]);
+  syncHub();
+  if (SS.view === 'shop' && SS.shop === 'hed' && $('stGiftWrap')) {
+    const g = giftState();
+    $('stGiftWrap').innerHTML = giftBtnHtml(); $('stGiftLad').innerHTML = giftLadderHtml();
+    $('stGiftP').textContent = g.wait > 0 ? t('st_giftDone') : t('st_giftText', { n: g.next });
+  }
+};
+/* Sahne 296 × 604'lük tasarım alanında çizilir; ekrana oranlanır, uzun ekranda fazlalık --ex olarak sokağa dağıtılır. */
+const fitStore = () => {
+  const W = shopEl.clientWidth, H = shopEl.clientHeight;
+  if (!W || !H) return;
+  const k = Math.min(W / 296, H / 604), sw = W / k, sh = H / k, s = stg.style;
+  const changed = Math.abs(sw - SS.sw) > 0.5;
+  SS.k = k; SS.sw = sw; SS.sh = sh;
+  s.width = sw.toFixed(1) + 'px'; s.height = sh.toFixed(1) + 'px'; s.transform = 'scale(' + k.toFixed(4) + ')';
+  s.setProperty('--sw', sw.toFixed(1) + 'px'); s.setProperty('--ex', Math.max(0, sh - 604).toFixed(1) + 'px');
+  return changed;
+};
+/* opt.shop: doğrudan o dükkâna gir; opt.sheet: ürün fişini aç ('slot2', 'kum' ...); opt.chooser: yuvaya joker seçtir */
+const openShop = (from, opt) => {
+  opt = opt || {};
   shopFrom = from;
   if (from === 'over') hide(overEl);
   if (from === 'menu') hide(menuEl);
-  renderShop(); show(shopEl);
+  show(shopEl); app.classList.add('shopping'); fitStore(); closeSheet();
+  SS.idx = opt.shop ? Math.max(0, SHOPS.findIndex(s => s.id === opt.shop)) : SS.idx;
+  renderHub(false);
+  if (opt.shop) { shopGo(opt.shop); if (opt.sheet) itemSheet(opt.sheet); else if (opt.chooser !== undefined) { chooser(opt.chooser); SS.quick = true; } }
+  else { fillShop(); showView('hub'); }
+  clearInterval(SS.tick); SS.tick = setInterval(stTick, 20000);
   Snd.ui();
 };
 const closeShop = () => {
-  hide(shopEl);
+  clearInterval(SS.tick); SS.tick = 0; SS.timers.forEach(clearTimeout); SS.timers = [];
+  closeSheet(); stHub.classList.remove('zoom');
+  hide(shopEl); app.classList.remove('shopping');
   if (shopFrom === 'over') show(overEl); else show(menuEl);
   refreshStats();
   requestAnimationFrame(() => relayout(false));
   Snd.ui();
 };
-$('shopList').addEventListener('click', e => {
-  const b = e.target.closest && e.target.closest('button[data-act]');
+/* Android geri tuşu: önce fiş, sonra dükkân içi, sonra mağaza. */
+const storeBack = () => {
+  if (stSheet.classList.contains('on')) { closeSheet(); return; }
+  if (SS.view === 'shop') { renderHub(); showView('hub'); return; }
+  closeShop();
+};
+
+/* ---------- ayarlar (V0.9.2): ses, titreşim, otomatik joker, dil; menüdeki çanta satırı ---------- */
+const settingsEl = $('settings');
+const setIcon = k => '<span class="si">' + sGlyph(k, 20, 'currentColor', 2.2) + '</span>';
+const renderSettings = () => {
+  const sw = (key, ic, name, sub, on) => '<button class="srow" type="button" role="switch" aria-checked="' + (on ? 'true' : 'false') + '" data-set="' + key + '">' + setIcon(ic) + '<b>' + name + (sub ? '<small>' + sub + '</small>' : '') + '</b><i class="sw"></i></button>';
+  let h = sw('snd', 'snd', t('setSnd'), '', save.snd) + sw('vib', 'vib', t('setVib'), '', save.vib);
+  h += save.autoOwn ? sw('auto', 'bolt', t('st_auto'), t(save.autoJ ? 'st_on' : 'st_off'), save.autoJ)
+    : '<button class="srow lock" type="button" data-set="autoLock">' + setIcon('bolt') + '<b>' + t('st_auto') + '<small>' + t('setAutoLock') + '</small></b><span class="pl2">' + sGlyph('lock', 13, 'currentColor', 2.4) + '</span></button>';
+  h += '<div class="srow">' + setIcon('globe') + '<b>' + t('setLang') + '<small>' + t('setLangSub') + '</small></b><span class="pl2">' + (LANG === 'tr' ? 'Türkçe' : 'English') + '</span></div>';
+  $('setRows').innerHTML = h;
+  $('setVer').textContent = t('title') + ' · ' + VERSION;
+};
+const openSettings = () => { renderSettings(); show(settingsEl); Snd.ui(); };
+const closeSettings = () => { hide(settingsEl); Snd.ui(); };
+$('setRows').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-set]');
   if (!b) return;
-  const id = b.closest('.trow').getAttribute('data-id'), s = save.tools[id], T = TOOL[id];
   Snd.unlock();
-  if (b.getAttribute('data-act') === 'buy') {
-    if (save.coins < T.price) { toast(t('coinShort')); return; }
-    save.coins -= T.price; s.n++;
-  } else {
-    if (s.l >= 3) return;
-    const cost = T.up[s.l];
-    if (save.coins < cost) { toast(t('coinShort')); return; }
-    save.coins -= cost; s.l++;
-  }
-  persist(); refreshStats(); renderShop(); Snd.tool();
-  Platform.track('shop', { id, act: b.getAttribute('data-act') });
+  const k = b.getAttribute('data-set');
+  if (k === 'snd') { save.snd = !save.snd; persist(); renderSettings(); Snd.ui(); }
+  else if (k === 'vib') { save.vib = !save.vib; persist(); renderSettings(); Snd.ui(); Platform.haptic('medium'); }
+  else if (k === 'auto') { save.autoJ = !save.autoJ; persist(); renderSettings(); Snd.ui(); }
+  else if (k === 'autoLock') { hide(settingsEl); if (G.mode === 'menu') openShop('menu', { shop: 'yet' }); }
 });
+$('setClose').addEventListener('click', closeSettings);
+
+/* menüdeki çanta satırı: dört yuva (dolu / boş / kilitli) ve Mağaza bağlantısı */
+const renderBagRow = () => {
+  let h = '';
+  for (let i = 0; i < 4; i++) {
+    const id = save.equip[i], lab = t('st_slotN', { n: i + 1 });
+    if (i >= save.slots) h += '<button class="sl lk' + (i === save.slots ? ' new' : '') + '" type="button" data-slot="' + i + '" aria-label="' + lab + '">' + sGlyph('lock', 18, 'currentColor', 2.2) + '</button>';
+    else if (id) h += '<button class="sl' + (save.tools[id].n <= 0 ? ' zero' : '') + '" type="button" data-slot="' + i + '" aria-label="' + t('tool_' + id) + ' ×' + save.tools[id].n + '">' + sGlyph(id, 22, 'currentColor', 2.2) + '<i>' + save.tools[id].n + '</i></button>';
+    else h += '<button class="sl em" type="button" data-slot="' + i + '" aria-label="' + lab + '">' + sGlyph('plus', 18, 'currentColor', 2.2) + '</button>';
+  }
+  $('menuJk').innerHTML = h;
+  $('bagCap').textContent = t('st_bagCap', { n: save.slots });
+  $('bagShop').textContent = t('st_bagShop');
+  $('bagBtn').classList.toggle('gdot', shopDot());
+};
 
 let lastScoreTxt = '', lastScoreK = '', lastCombo = '', lastFx = '', lastLvl = '', lastSect = '', lastLife = false, lastAdvDock = '';
 const updateHud = () => {
@@ -2489,11 +3530,12 @@ const updateDock = () => {
   const a = G.mode === 'play' ? (G.adv || '') : '';
   if (a === lastAdvDock) return;
   lastAdvDock = a;
-  toolsEl.querySelectorAll('.tool').forEach(b => b.classList.toggle('adv', b.getAttribute('data-tool') === a));
+  const auto = save.autoOwn && save.autoJ;
+  toolsEl.querySelectorAll('.tool').forEach(b => { const on = b.getAttribute('data-tool') === a; b.classList.toggle('adv', on); b.classList.toggle('auto', on && auto); });
   const lbl = $('advLbl');
   if (a) {
     const sv = save.tools[a], e = TOOL[a].eff(sv.l), b = toolsEl.querySelector('.tool[data-tool="' + a + '"]');
-    lbl.textContent = t('tool_' + a) + ' ' + toolShort(a, e) + ((save.seen.jokerUse | 0) < 3 ? ' · ' + t('advNow') : '');
+    lbl.textContent = (auto ? t('autoTag') + ' · ' : '') + t('tool_' + a) + ' ' + toolShort(a, e) + (!auto && (save.seen.jokerUse | 0) < 3 ? ' · ' + t('advNow') : '');
     lbl.classList.add('on');
     const lw = lbl.offsetWidth, cxl = b.offsetLeft + b.offsetWidth / 2;
     lbl.style.left = clamp(cxl, lw / 2 + 8, view.w - lw / 2 - 8) + 'px';
@@ -2637,7 +3679,7 @@ const update = raw => {
   if (G.recPill) {
     const rp = G.recPill;
     if (rp.wait != null) { if ((!G.banner && !G.card && G.mode === 'play') || (rp.wait += raw) > 5) rp.wait = null; }
-    else if (G.mode === 'play' || G.mode === 'dead') { rp.t += raw; if (rp.t > 2.2) G.recPill = null; }
+    else if (G.mode === 'play' || G.mode === 'dead') { rp.t += raw; if (rp.t > 2.8) G.recPill = null; }
   }
   /* ikinci şans: 5 sn içinde karar; dükkân açıkken ya da reklam oynarken sayaç durur */
   if (G.mode === 'over' && contLeft > 0 && !contEl.hidden && !shopEl.classList.contains('on')) {
@@ -3503,7 +4545,7 @@ const drawConf = c => {
   for (const p of G.conf) {
     const u = p.age;
     if (u < 0 || u > p.life) continue;
-    const x = p.x + p.vx * u + Math.sin(u * 3 + p.sw) * 9, y = p.y + p.vy * u + 150 * u * u, al = u > p.life * 0.7 ? 1 - (u - p.life * 0.7) / (p.life * 0.3) : 1;
+    const x = p.x + p.vx * u + Math.sin(u * 3 + p.sw) * 9, y = p.y + p.vy * u + 120 * u * u, al = u > p.life * 0.7 ? 1 - (u - p.life * 0.7) / (p.life * 0.3) : 1;
     c.save(); c.translate(x, y); c.rotate(p.rot + p.vr * u); c.globalAlpha = al; c.fillStyle = p.ci === 2 ? GOLD : P[CONF_COLS[p.ci]]; c.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); c.restore();
   }
 };
@@ -3519,8 +4561,8 @@ const drawConfTop = () => {
 const drawRecPill = c => {
   const r = G.recPill;
   if (!r || r.wait != null || G.mode === 'intro') return;
-  const u = r.t, al = u < 0.15 ? u / 0.15 : (u > 1.8 ? Math.max(0, 1 - (u - 1.8) / 0.4) : 1), y = (view.hudB || 0) + 30 + 10 * (1 - easeOut(Math.min(1, u / 0.3)));
-  c.save(); c.globalAlpha = al; pill(c, t('recPill'), view.w / 2, y, GOLD, GOLD_INK, 17, true); c.restore();
+  const u = r.t, al = u < 0.15 ? u / 0.15 : (u > 2.2 ? Math.max(0, 1 - (u - 2.2) / 0.6) : 1), y = (view.hudB || 0) + 32 + 10 * (1 - easeOut(Math.min(1, u / 0.3)));
+  c.save(); c.globalAlpha = al; pill(c, t('recPill'), view.w / 2, y, GOLD, GOLD_INK, 20, true); c.restore();
 };
 /* Spot ışığı yardımcıları (gösteri): her halkada pinlerin kapladığı açı aralıkları ([başlangıç, uzunluk], rad); çakışanlar ve yuvarlak uçları birbirine değenler (gaps: halka başına en çok boşluk) birleştirilir. */
 const spotSpans = (pins, gaps) => {
@@ -3821,7 +4863,7 @@ const render = () => {
 };
 
 /* ---------- giriş ---------- */
-const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on') || bookEl.classList.contains('on') || $('swap').classList.contains('on');
+const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on') || bookEl.classList.contains('on') || $('swap').classList.contains('on') || settingsEl.classList.contains('on');
 app.addEventListener('pointerup', () => { if (G.mode === 'play') release(); });
 app.addEventListener('pointercancel', () => { if (G.mode === 'play') release(); });
 app.addEventListener('pointerdown', e => {
@@ -3920,7 +4962,15 @@ $('pracEnd').addEventListener('click', () => { Snd.unlock(); Snd.ui(); endPracti
 $('pdAgain').addEventListener('click', () => { Snd.unlock(); if (G.practice) startPractice(G.practice.kind); });
 $('pdBack').addEventListener('click', () => { Snd.unlock(); Snd.ui(); endPractice(true); });
 $('bookClose').addEventListener('click', closeBook);
-$('menuJk').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
+$('menuJk').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('button[data-slot]');
+  if (!b || G.mode !== 'menu') return;
+  Snd.unlock();
+  const i = +b.getAttribute('data-slot');
+  if (i < save.slots) openShop('menu', { shop: 'alet', chooser: i }); else openShop('menu', { shop: 'alet', sheet: 'slot' + (i + 1) });
+});
+$('bagShop').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
+$('setBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openSettings(); });
 $('pauseMenuBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); persistRun(); goMenu(); });
 $('againBtn').addEventListener('click', () => { Snd.unlock(); start(G.startL); });
 campEl.addEventListener('click', () => { Snd.unlock(); start(save.camp); });
@@ -3928,16 +4978,6 @@ $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu();
 $('resumeBtn').addEventListener('click', resume);
 $('bagBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
 $('bagBtn2').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'over') openShop('over'); });
-$('shopClose').addEventListener('click', closeShop);
-$('shopAd').addEventListener('click', () => {
-  Snd.unlock();
-  Platform.rewardedAd((ok, why) => {
-    if (ok) { save.coins += CFG.adCoins; persist(); refreshStats(); renderShop(); toast(t('gotCoins', { n: CFG.adCoins })); Snd.fanfare(); }
-    else if (why !== 'closed') toast(t('adFail'));
-  });
-});
-$('sndBtn').addEventListener('click', () => { Snd.unlock(); save.snd = !save.snd; persist(); refreshSound(); Snd.ui(); });
-$('vibBtn').addEventListener('click', () => { Snd.unlock(); save.vib = !save.vib; persist(); refreshVib(); Snd.ui(); Platform.haptic('medium'); });
 $('adBtn').addEventListener('click', () => {
   if (G.mode !== 'over') return;
   Snd.unlock(); G.mode = 'ad'; hide(overEl);
@@ -3952,7 +4992,7 @@ $('coinBtn').addEventListener('click', () => {
 });
 
 /* ---------- açılış ---------- */
-applyI18n(); refreshSound(); refreshVib(); refreshLevel(); refreshStats();
+applyI18n(); refreshLevel(); refreshStats();
 resize();
 if (window.ResizeObserver) new ResizeObserver(resize).observe(app); else window.addEventListener('resize', resize);
 if (document.fonts && document.fonts.load) {
@@ -3975,9 +5015,10 @@ if (AppP) {
     AppP.addListener('backButton', () => {
       if (adEl.classList.contains('on')) return;
       if ($('swap').classList.contains('on')) { hide($('swap')); return; }
+      if (settingsEl.classList.contains('on')) { closeSettings(); return; }
       if (G.practice) endPractice(true);
       else if (bookEl.classList.contains('on')) closeBook();
-      else if (shopEl.classList.contains('on')) closeShop();
+      else if (shopEl.classList.contains('on')) storeBack();
       else if (G.mode === 'intro') closeIntro(true);
       else if (G.mode === 'play' || G.mode === 'count') pause();
       else if (G.mode === 'pause') resume();
@@ -3992,7 +5033,7 @@ let last = 0;
 const frame = ts => {
   if (!last) last = ts;
   const raw = Math.min(0.05, (ts - last) / 1000); last = ts;
-  try { update(raw); render(); } catch (e) {
+  try { update(raw); if (!shopEl.classList.contains('on')) render(); } catch (e) {
     if (!frame.failed) { frame.failed = true; try { console.error('[kp] kare hatası', e && e.stack ? e.stack : e); } catch (x) {} }
   }
   requestAnimationFrame(frame);
