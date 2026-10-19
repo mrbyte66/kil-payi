@@ -27,7 +27,7 @@ const keys = { tr: keysOf(STR.tr), en: keysOf(STR.en) };
 const rawValue = (lang, key) => { const m = STR[lang].match(new RegExp('(?:^|[\\s,{])' + key + ":\\s*(?:'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\")")); return m ? (m[1] !== undefined ? m[1] : m[2]) : null; };
 
 const goods = objKeys('IMPL_GOOD').filter(k => k !== 'tek'), twins = objKeys('IMPL_TWIN');
-const introBlock = between('const INTRO = {', '/* bir sahneyi verilen merkez');
+const introBlock = between('const INTRO = {', '/* Gösteri çizimi');
 const scenes = {};
 for (const m of introBlock.matchAll(/^  (\w+): \{ dur: [\d.]+, capT: (?:n => )?\[([^\]]*)\]/gm)) scenes[m[1]] = m[2].split(',').length;
 
@@ -41,7 +41,7 @@ for (const kd of [...goods, ...twins]) {
   }
 }
 for (const kd of Object.keys(scenes)) if (![...goods, ...twins].includes(kd)) problems.push(kd + ': INTRO sahnesi var ama IMPL_GOOD/IMPL_TWIN içinde yok');
-for (const lang of ['tr', 'en']) for (const key of ['introTag', 'introTagTw', 'introHint', 'introResume']) if (!keys[lang].has(key)) problems.push(lang + ' ' + key + ' yok');
+for (const lang of ['tr', 'en']) for (const key of ['introGo']) if (!keys[lang].has(key)) problems.push(lang + ' ' + key + ' yok');
 
 if (problems.length) { console.log('HATA: kilit metinleri / tanıtım sahneleri eksik:\n - ' + problems.join('\n - ')); process.exit(1); }
 console.log('kilit metinleri ve tanıtım sahneleri tamam: ' + goods.length + ' kilit, ' + twins.length + ' engel, ' + Object.keys(scenes).length + ' sahne');
