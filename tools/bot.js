@@ -10,7 +10,9 @@
    Altına yalnızca beceriye bağlı bir olasılıkla uzanır (ince hedef riskli).
    Beceri düzeyleri: yeni 0,12 sn, orta 0,08 sn, iyi 0,05 sn, usta 0,03 sn, pro 0,02 sn (standart sapma; pro = "refleksi çok iyi"). Her oyunda sapma log-normal sallanır
    (insanın günlük formu) ve her dokunuşta küçük bir dikkat kaybı olasılığı vardır (sapma 3 katına çıkar).
-   Sonuç: ölüm anındaki yolculuk süresi (medyan, sn), medyan seviye, "L>=k" oranları ve ölüm anındaki kilit türü dağılımı. */
+   Sonuç: ölüm anındaki yolculuk süresi (medyan, sn), medyan seviye, koşu başına kazanılan coin (ortalama ve medyan), "L>=k" oranları ve ölüm anındaki kilit türü dağılımı.
+   Başsız Chrome ile hızlı toplu ölçüm: DEBUG=1 derlemesinde www/ içine bot.js'i koyup sayfanın sonuna kendi iş betiğini ekleyen bir sayfa hazırla, sonra
+   "Google Chrome" --headless=new --dump-dom <adres> ile çalıştır (yüzlerce oyun birkaç saniye sürer; tarayıcı panelindeki araç süresine takılmaz). */
 (() => {
   const k = window.__kp, G = k.G;
   const TAU = Math.PI * 2, nrm = a => ((a % TAU) + TAU) % TAU, ad = (a, b) => { const d = nrm(a - b); return d > Math.PI ? TAU - d : d; };
@@ -25,7 +27,7 @@
     return ahead / (base * (ring ? 1 : k.ptrFactor()));
   };
   /* tür başına istatistik: tur sayısı, toplam süre, dokunuş, vuruş (zorluk dengesi için) */
-  window.__stats = {}; window.__hell = {};
+  window.__stats = {}; window.__hell = {}; window.__chalLog = [];  /* window.__logChal = true ise her turun başındaki süre ve hedef yarı genişliği (rad) burada toplanır */
   const hstat = L => window.__hell[L] || (window.__hell[L] = { enter: 0, pass: 0 });
   const stat = kd => window.__stats[kd] || (window.__stats[kd] = { ch: 0, dur: 0, taps: 0, hits: 0, pen: 0 });
   window.runBot = (sigmaT, trapAvoid, startL = 1, tmax = 1500, dt = 1 / 60, opt = {}) => {
@@ -43,7 +45,11 @@
         else if (prevPh === 'hell') hstat(prevL).pass++;
         prevPh = G.ph; prevL = G.L;
       }
-      if (G.chal !== curChal) { if (curChal) { const sx = stat(curChal.kind); sx.ch++; sx.dur += curChal.t; } curChal = G.chal; }
+      if (G.chal !== curChal) {
+        if (curChal) { const sx = stat(curChal.kind); sx.ch++; sx.dur += curChal.t; }
+        curChal = G.chal;
+        if (window.__logChal) window.__chalLog.push({ L: G.L, ph: G.ph, time: G.time, hw: G.hw, kind: G.kind });
+      }
       if (G.mode !== 'play') break;
       /* tut-bırak: basılıyken bırakma anını bekle */
       if (G.holding) {
@@ -109,7 +115,7 @@
       else if (G.n === n0 && G.time <= t0) miss++;
       best._armed = false; best._aim = aimE();
     }
-    return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss, kind: G.kind, chal: G.chal && G.chal.tw ? G.chal.tw : '', alive: G.mode === 'play', time: G.time };
+    return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss, kind: G.kind, chal: G.chal && G.chal.tw ? G.chal.tw : '', alive: G.mode === 'play', time: G.time, coins: G.gain || 0 };
   };
   const SKILLS = [['yeni', 0.12, 0.5], ['orta', 0.08, 0.75], ['iyi', 0.05, 0.9], ['usta', 0.03, 0.95], ['pro', 0.02, 1]];
   window.kindStats = () => Object.keys(window.__stats).sort().map(kd => { const x = window.__stats[kd]; return kd + ': ' + x.ch + ' tur, ' + (x.dur / Math.max(1, x.ch)).toFixed(2) + ' sn/tur, vuruş %' + Math.round(100 * x.hits / Math.max(1, x.taps)) + ' (' + x.taps + ' dokunuş)'; });
@@ -132,7 +138,7 @@
   };
   window.hellLine = (sg, av, n = 100, t0 = 6, Ls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) => Ls.map(L => window.hellTest(L, sg, av, n, t0)).join('  ');
   window.bulk = (levels = ['normal'], n = 40, skills = SKILLS, ups = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]) => {
-    window.__stats = {}; window.__hell = {};
+    window.__stats = {}; window.__hell = {}; k.save.run = null;
     const out = {};
     for (const lvl of levels) {
       k.setLevel(lvl);
@@ -140,7 +146,8 @@
         const rs = []; for (let i = 0; i < n; i++) rs.push(window.runBot(sg, av));
         const js = rs.map(r => r.jt).sort((a, b) => a - b), ls = rs.map(r => r.L).sort((a, b) => a - b);
         const kinds = {}; rs.forEach(r => { kinds[r.kind] = (kinds[r.kind] || 0) + 1; });
-        out[lvl + '/' + name] = 'medyan ' + Math.round(js[n >> 1]) + ' sn, seviye ' + ls[n >> 1] + ' | ' +
+        const cs = rs.map(r => r.coins).sort((a, b) => a - b), cm = Math.round(cs.reduce((x, y) => x + y, 0) / n);
+        out[lvl + '/' + name] = 'medyan ' + Math.round(js[n >> 1]) + ' sn, seviye ' + ls[n >> 1] + ', coin ort. ' + cm + ' (medyan ' + cs[n >> 1] + ') | ' +
           ups.map(u => 'S' + u + ' %' + Math.round(100 * rs.filter(r => r.L >= u).length / n)).join(' ') + ' | ölüm: ' +
           Object.keys(kinds).sort((a, b) => kinds[b] - kinds[a]).map(x => x + ':' + kinds[x]).join(' ') +
           ' | cehennemde ölen %' + Math.round(100 * rs.filter(r => r.ph === 'hell').length / n) + ' | cehennemi geçme: ' + window.hellStats();
