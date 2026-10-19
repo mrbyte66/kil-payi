@@ -1,7 +1,8 @@
 /* Kilit metinleri ve tanıtım sahneleri denetimi: node tools/check-strings.mjs
    Yeni bir kilit ya da engel eklenince şunlar tamam mı bakar (Türkçe ve İngilizce):
    - IMPL_GOOD / IMPL_TWIN içindeki her tür için k_ (ad) ve rule_ (kural) satırı; engel ikizleri için warn_ (uyarı) satırı,
-   - her tür için INTRO sahnesi (ilk görüşte tanıtım) ve ic_<tür> açıklama satırı; açıklama sayısı sahnenin capT sayısıyla aynı olmalı.
+   - her tür için INTRO sahnesi (ilk görüşte tanıtım) ve ic_<tür> açıklama satırı; açıklama sayısı sahnenin capT sayısıyla aynı olmalı,
+   - (V0.9.2) iki dilin metin anahtarları aynı mı; kodda t('anahtar') ve data-i18n ile kullanılan her anahtar iki dilde tanımlı mı.
    Eksik varsa listeler ve 1 ile çıkar (tools/release.sh çalıştırır, eksik metinle sürüm çıkmasın). */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -43,5 +44,16 @@ for (const kd of [...goods, ...twins]) {
 for (const kd of Object.keys(scenes)) if (![...goods, ...twins].includes(kd)) problems.push(kd + ': INTRO sahnesi var ama IMPL_GOOD/IMPL_TWIN içinde yok');
 for (const lang of ['tr', 'en']) for (const key of ['introGo']) if (!keys[lang].has(key)) problems.push(lang + ' ' + key + ' yok');
 
+/* Genel denetim (V0.9.2): iki dilin anahtarları aynı olmalı; kodda t('anahtar') ya da data-i18n="anahtar" ile geçen her anahtar iki dilde de bulunmalı. */
+for (const k of keys.tr) if (!keys.en.has(k)) problems.push('en satırı yok: ' + k);
+for (const k of keys.en) if (!keys.tr.has(k)) problems.push('tr satırı yok: ' + k);
+const used = new Set();
+for (const m of src.matchAll(/\bt\('([A-Za-z_]\w*)'\s*[,)]/g)) used.add(m[1]);
+for (const m of src.matchAll(/data-i18n="([A-Za-z_]\w*)"/g)) used.add(m[1]);
+for (const k of used) for (const lang of ['tr', 'en']) if (!keys[lang].has(k)) problems.push(lang + ' ' + k + ' kullanılıyor ama tanımlı değil');
+
+/* t('önek_' + id) biçiminde kurulan metin aileleri: her üyesi iki dilde de olmalı. */
+const FAMILIES = { st_n_: ['alet', 'yet', 'gor', 'hed'], st_s_: ['alet', 'yet', 'gor', 'hed'], st_dd_: ['kron', 'kalkan', 'steto', 'kum'], ts_: ['kron', 'kalkan', 'steto', 'kum'], tool_: ['kron', 'kalkan', 'steto', 'kum'], d_: ['kron', 'kalkan', 'steto', 'kum'], lv_: ['rahat', 'normal', 'usta', 'cehennem'], lvHint_: ['rahat', 'normal', 'usta', 'cehennem'] };
+for (const [pre, ids] of Object.entries(FAMILIES)) for (const id of ids) for (const lang of ['tr', 'en']) if (!keys[lang].has(pre + id)) problems.push(lang + ' ' + pre + id + ' yok');
 if (problems.length) { console.log('HATA: kilit metinleri / tanıtım sahneleri eksik:\n - ' + problems.join('\n - ')); process.exit(1); }
-console.log('kilit metinleri ve tanıtım sahneleri tamam: ' + goods.length + ' kilit, ' + twins.length + ' engel, ' + Object.keys(scenes).length + ' sahne');
+console.log('kilit metinleri ve tanıtım sahneleri tamam: ' + goods.length + ' kilit, ' + twins.length + ' engel, ' + Object.keys(scenes).length + ' sahne; ' + keys.tr.size + ' metin anahtarı iki dilde de var, ' + used.size + ' kullanım denetlendi');
