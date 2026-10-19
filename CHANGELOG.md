@@ -3,6 +3,29 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.9.0 — Süre ortada, yeni kilit ipucu, rekor kutlaması, ikinci şans, yeni ekonomi (2026-10-19)
+
+- **Süre artık çemberin ortasında, puan üstte** (kullanıcı isteği: "süre ile puanı yer değiştirsek"; 3 tasarım gösterildi, **Sıvı seviyesi** seçildi). Halkanın içi bir kap gibidir: süre azaldıkça sıvı alçalır, ortada kalan süre yazar.
+  2,5 sn'nin altında sıvı sarıya, 1 sn'nin altında kırmızıya döner ve altta "Son 1 sn: ×3" yazar. **Son saniyede dalga, şişme ya da titreşim yoktur** (kullanıcı: "hata yapmaya meyilli olduğu anda ekstra bir şeyle kafasını bulandırmayalım"); dış halkanın nabzı da kalktı, yerine sabit ince bir halka geldi.
+  Üstte puan büyük yazılır (dokunuşta hafifçe zıplar), "En iyi" kapsülü sağdadır, altındaki çubuk **rekora yaklaşmayı** gösterir (rekor kırılınca altın ve dolu olur), kombo çipi ("×3 · 12") çubuğun yanında, can çipi yanında durur. Eski süre çubuğu ve sağdaki süre yazısı kalktı.
+- **Yeni kilit ipucu: Spot ışığı** (kullanıcı: "bomba örnekti, her bölüm için olmalı"; 5 tasarım gösterildi). Her kilit ve engel, ilk üç görünüşünde: ekran kısa süre kararır, yalnızca o turun pinleri aydınlık kalır (beyaz çerçeveli), **ibre yavaşlar** (×0,4, yaklaşık 1,3 sn).
+  İbre, ✓/✕ işaretleri ve süre karartmanın üstünde kalır; dokunuş ipucunu hemen kapatır. 14 kilidin ve 11 engelin hepsinde çalışır (çift halkada her halkanın pini ayrı aydınlanır). Dene modunda ve oyunun ilk turunda çıkmaz; oyunun üstüne pencere açılmaz.
+- **Yeni kilit, açıldıktan hemen sonraki turda gelir** (kullanıcı seçimi: 0 tur). Eskiden açıldıktan ortalama 1,4-3,1 tur sonra çıkıyordu (en çok 5), botla ölçüm: şimdi hep 0. Ayar `CFG.newAfter` (tur sayısı).
+- **Hedef boyu süreye ve kademeye göre, "Keskin" eğri** (kullanıcı isteği: "8. saniyede dar, 1. saniyede geniş; Cehennem başlangıçta çok dar; adil bir alt ve üst sınır"). Her kademenin kendi iki ucu var: süre doluyken en dar, bitmek üzereyken en geniş
+  (Rahat ×0,95 → ×2,6, Normal ×0,52 → ×2,0, Usta ×0,45 → ×1,8, Cehennem ×0,36 → ×1,5; aradaki geçiş eskisiyle aynı biçimde). Hedefin yarı genişliği hiçbir zaman 4,3°'nin (toplam 8,6°) altına inmez, üst sınırı kademeye göre 46° (Rahat, Normal), 34° (Usta), 20° (Cehennem).
+  Seviye 7-10'da hedefin ortalama toplam genişliği (çubuk 8 sn → 2 sn): Rahat 33° → 70°, Normal 20° → 52°, Usta 17° → 42°; Cehennem 4-6. seviyelerde 12° → 37°, 7-10. seviyelerde 10° → 31° (çubuk doluyken neredeyse imkânsız dar, süre azalınca geniş kurtarma payı).
+- **Cehennem'de süre erimesi 1,25 → 0,9.** Hedefler bu kadar daralınca eski süre baskısıyla Cehennem aşılmaz olurdu (pro bot %4 bitiriyordu); hedef "refleksi çok iyi olanların bir kısmı geçsin" olduğu için dar hedef + daha yavaş erime dengesi seçildi.
+  Rahat'ın hedef çarpanı 1,2 → 0,95, Normal 1 → 1,03, Usta 0,9 → 1 oldu (yeni eğriyle eski zorluk düzeyini korumak için botla ayarlandı).
+- **Ekonomi: çabuk zenginleşme yok** (kullanıcı seçimi: B "Düzenli oyun"). Koşunun bütün coin kaynakları (puan, kıl payı, altın/kasa/sabır, seviye ödülleri, +100 bitiriş ödülü) artık kademe çarpanıyla çarpılır: **Rahat ×0,12, Normal ×0,3, Usta ×0,54, Cehennem ×0,75**
+  (eskiden yalnızca puan kısmı ×0,7 / ×1 / ×1,4 / ×2 idi, seviye ödülleri çarpansızdı). Alet yükseltme fiyatları ×1,5 oldu (135 / 330, kalkan 180 / 390). Botla ölçülen koşu başına kazanç: Rahat'ta orta oyuncu 71 (eskiden 480), Normal'de orta oyuncu 102 (eskiden 341),
+  Usta'da iyi oyuncu 235 (eskiden 521), Cehennem'de usta oyuncu 402 (eskiden 784). Alet çantasını tamamen doldurmak Normal'de orta oyuncu için yaklaşık 20 koşu (eskiden 4-5). Dakikada kazanç (bot, yukarıdaki oyuncu düzeyleri): Rahat 12, Normal 26, Usta 61, Cehennem 143 coin; yani kolay modda az, zor modda ve Cehennem'de çok. Reklamla +20 coin aynı kaldı.
+- **İkinci şans: geri sayımlı kart, 3 hak** (kullanıcı seçimi: "Geri sayımlı"). Oyun bitince kartta 5 saniyelik geri sayım halkası, "Reklam izle" ve coin düğmeleri vardır; karar verilmezse blok yumuşakça kapanır. Bir koşuda en çok **3 hak**: fiyat 25 → 50 → 100 coin (her hakta iki katı), **reklam yalnızca ilk iki hakta**;
+  üçüncü hak yalnızca coinle. Her hak +4 sn ve kısa bir yavaşlatma verir. Dükkân açıkken ya da reklam oynarken sayaç durur. Kısa ekranda (640 px altı) başlık gizlenir, kart taşmaz.
+- **Rekor kutlaması: konfeti yağmuru** (kullanıcı seçimi). Oyun sırasında rekor ilk kez geçilince halkanın arkasında konfeti yağar, üstte altın "Yeni rekor!" kapsülü çıkar, "En iyi" kapsülü altın olur ve skorla birlikte yükselir; kamera, süre ve oyun akışı bozulmaz.
+  Oyun sonunda yeni rekorda başlık, puan ve "Yeni rekor" rozeti altın olur, kartın önünde konfeti patlar. Önceki rekor 25'in altındaysa oyun içi kutlama çıkmaz (ilk oyunlarda sürekli kutlanmasın). "Hareketi azalt" açıksa konfeti yoktur.
+- Botla ölçüldü (10. seviyeye ulaşma; n = 300): Normal yeni %5, orta %33, iyi %76; Rahat yeni %36, orta %77; Usta iyi %24, usta %86; Cehennem pro bot %39 ulaşıyor, %23 bitiriyor (usta bot %2, iyi bot %0). V0.8.0 ölçümüyle (Normal yeni %5, orta %37, iyi %79; Rahat yeni %31, orta %76; Usta iyi %31, usta %86; Cehennem pro %24) aynı düzeyde.
+  Ölçümler artık **başsız Chrome ile** yapılıyor (yüzlerce oyun birkaç saniyede); `tools/bot.js` koşu başına coini ve (`window.__logChal` ile) her turun başındaki süre ve hedef genişliğini de verir.
+
 ## V0.8.0 — İlk görüşte tanıtım, Cehennem çemberi, altın sırası (2026-10-17)
 
 - **Yeni kilit ya da engel ilk kez geldiğinde oyun birkaç saniye durur, küçük bir animasyon onu tanıtır** (öğreticiyi aramana gerek kalmaz). Üstteki yeni-kilit kartı uzar, içinde kilit baştan sona oynanır

@@ -1,6 +1,6 @@
 {
   "name": "kil-payi",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "description": "Kıl payı: Android refleks oyunu",
   "scripts": {

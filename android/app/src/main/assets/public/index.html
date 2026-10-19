@@ -11,7 +11,7 @@
   --ink:#29233F;--ink-2:#615A7C;--ink-3:#8F87AB;
   --lilac:#8E7CF2;--lilac-soft:#DCD5FB;--btn:#6D58E0;--on-btn:#FFFFFF;
   --peach:#FFA473;--peach-deep:#FF7D43;--peach-soft:#FFD9C5;
-  --rose:#FF5C84;--rose-soft:#FFD2DC;--life:#27B27A;
+  --rose:#FF5C84;--rose-soft:#FFD2DC;--life:#27B27A;--gold:#F4B63F;--gold-ink:#9A6B00;
   --blob-1:#E2DBFB;--blob-2:#EBDDF9;
   --glass:rgba(255,255,255,.64);--glass-edge:rgba(255,255,255,.85);--scrim:rgba(41,35,63,.18);
   --shadow-s:0 1px 2px rgba(41,35,63,.06),0 6px 16px rgba(41,35,63,.08);
@@ -28,7 +28,7 @@
   --ink:#F4F1FF;--ink-2:#BBB4DC;--ink-3:#8780AE;
   --lilac:#AA9CFF;--lilac-soft:#3B327A;--btn:#BBAEFF;--on-btn:#1B1644;
   --peach:#FFB088;--peach-deep:#FF9560;--peach-soft:#6B4148;
-  --rose:#FF7C9E;--rose-soft:#5C2D49;--life:#3BD99B;
+  --rose:#FF7C9E;--rose-soft:#5C2D49;--life:#3BD99B;--gold:#F4B63F;--gold-ink:#F7CF6B;
   --blob-1:#2B2463;--blob-2:#382A6C;
   --glass:rgba(38,32,77,.62);--glass-edge:rgba(255,255,255,.16);--scrim:rgba(7,5,22,.5);
   --shadow-s:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.28);
@@ -39,7 +39,7 @@
   --ink:#F4F1FF;--ink-2:#BBB4DC;--ink-3:#8780AE;
   --lilac:#AA9CFF;--lilac-soft:#3B327A;--btn:#BBAEFF;--on-btn:#1B1644;
   --peach:#FFB088;--peach-deep:#FF9560;--peach-soft:#6B4148;
-  --rose:#FF7C9E;--rose-soft:#5C2D49;--life:#3BD99B;
+  --rose:#FF7C9E;--rose-soft:#5C2D49;--life:#3BD99B;--gold:#F4B63F;--gold-ink:#F7CF6B;
   --blob-1:#2B2463;--blob-2:#382A6C;
   --glass:rgba(38,32,77,.62);--glass-edge:rgba(255,255,255,.16);--scrim:rgba(7,5,22,.5);
   --shadow-s:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.28);
@@ -53,6 +53,8 @@ body{margin:0;display:flex;justify-content:center;background:var(--bg);color:var
 #app{position:relative;width:100%;max-width:460px;height:100%;overflow:hidden;background:var(--bg)}
 @media (min-width:600px){body{align-items:center;background:var(--bg-2)}#app{height:min(100%,860px);border-radius:var(--r-l);box-shadow:var(--shadow-m)}}
 #cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+#cv2{position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none}
+#cv2.on{display:block}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 svg.ic{width:20px;height:20px;flex:none;display:block}
 svg.ic .f{fill:currentColor}
@@ -70,14 +72,17 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
 .hud{position:absolute;left:0;right:0;top:0;padding:18px 20px 0;display:flex;flex-direction:column;gap:10px;pointer-events:none;opacity:0;transform:translateY(-10px);transition:opacity var(--dur-base) var(--ease),transform var(--dur-slow) var(--ease)}
 .hud.on{opacity:1;transform:none}
-.gauge-row{display:flex;align-items:center;gap:12px}
-.gauge{position:relative;flex:1;height:30px;border-radius:var(--r-pill);background:var(--track);overflow:hidden}
-.fill{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:var(--r-pill);background:var(--lilac)}
-.gauge.warn .fill{background:var(--peach)}
-.gauge.crit .fill{background:var(--rose)}
-.notch{position:absolute;top:7px;bottom:7px;width:3px;margin-left:-1px;border-radius:2px;background:var(--rose)}
-.tleft{min-width:52px;text-align:right;font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);font-variant-numeric:tabular-nums;color:var(--ink)}
-.hud-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+/* V0.9.0: süre çemberin ortasına (sıvı seviyesi) taşındı; üstte puan, altında rekora yaklaşma çubuğu var. */
+.score-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.score{display:flex;align-items:baseline;gap:6px;min-width:0;transform-origin:left bottom}
+.score b{font-family:var(--font-display);font-weight:700;font-size:2.5rem;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.score span{font-weight:800;font-size:var(--fs-14);color:var(--ink-2)}
+.score-row .chip{align-self:center;flex:none}
+.gauge-row{display:flex;align-items:center;gap:8px;min-height:26px}
+.gauge{position:relative;flex:1;height:10px;border-radius:var(--r-pill);background:var(--track);overflow:hidden}
+.fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:var(--r-pill);background:var(--lilac);transition:width .3s var(--ease)}
+.fill.gold{background:var(--gold)}
+.chip.combo{min-height:26px;padding:0 10px;flex:none}
 .hud-row2{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-height:24px}
 .lvl{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
 .lprog{display:block;width:100%;height:3px;border-radius:2px;background:var(--track);overflow:hidden}
@@ -92,9 +97,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .life.on{display:inline-flex}
 .life.pop{animation:lifepop .6s var(--ease)}
 @keyframes lifepop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
-.zone{font-weight:800;font-size:var(--fs-12);color:var(--ink-2);transition:color var(--dur-fast);white-space:nowrap}
-.zone.hot{color:var(--rose)}
-.fx{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1;min-width:0}
+.fx{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:1;min-width:0}
 
 .chip{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 14px;border-radius:var(--r-pill);background:var(--surface);color:var(--ink-2);font-weight:800;font-size:var(--fs-14);box-shadow:var(--shadow-s)}
 .chip b{font-family:var(--font-display);font-weight:600;font-size:var(--fs-16);color:var(--ink);font-variant-numeric:tabular-nums}
@@ -181,7 +184,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .bcap{margin:0;width:100%;color:var(--ink-3);font-weight:700;font-size:var(--fs-12);text-align:left}
 .bcnt{font-weight:800;font-size:var(--fs-12);color:var(--ink-2);white-space:nowrap}
 .prac-bar{display:none;align-items:center;justify-content:space-between;gap:10px}
-#app.prac .gauge-row,#app.prac .hud-row,#app.prac .hud-row2{display:none}
+#app.prac .score-row,#app.prac .gauge-row,#app.prac .hud-row2{display:none}
 #app.prac .prac-bar{display:flex}
 .prac-bar .btn{pointer-events:auto;min-height:40px;padding:0 16px;font-size:var(--fs-14);background:var(--surface);box-shadow:var(--shadow-s);color:var(--ink)}
 .pdots{display:flex;gap:8px}
@@ -201,13 +204,29 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .delta{margin:0;font-weight:800;font-size:var(--fs-16);color:var(--ink-2)}
 .delta.win{color:var(--btn)}
 .near-msg{margin:0;padding:7px 14px;border-radius:var(--r-pill);background:var(--rose-soft);color:var(--ink);font-weight:800;font-size:var(--fs-14)}
-.cont{width:100%;padding:14px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);display:flex;flex-direction:column;gap:12px;text-align:left}
+.cont{width:100%;max-height:320px;overflow:hidden;padding:14px;border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow-s);display:flex;flex-direction:column;gap:12px;text-align:left;transition:max-height .38s ease,padding .38s ease,margin .38s ease,opacity .3s ease,transform .3s ease}
 .cont-head{display:flex;flex-direction:column;gap:2px}
 .cont-head b{font-family:var(--font-display);font-weight:600;font-size:var(--fs-20)}
 .cont-head span{color:var(--ink-2);font-weight:700;font-size:var(--fs-14)}
 .cont-actions{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
 .cont-actions .btn{min-height:52px;padding:0 12px;font-size:var(--fs-16);white-space:nowrap;background:var(--bg);box-shadow:none}
 .cont-actions .btn.ad{background:var(--btn);color:var(--on-btn)}
+.cont-actions.one{grid-template-columns:1fr}
+.cont-actions .btn .lbl{display:none}
+.cont-actions.one #coinBtn{background:var(--btn);color:var(--on-btn)}
+.cont-actions.one #coinBtn .lbl{display:inline;margin-right:4px}
+.cont.fade{opacity:0;transform:scale(.97);pointer-events:none;max-height:0;padding-top:0;padding-bottom:0;margin-top:-12px}
+@media (max-height:700px){.cont-head{display:none}.cd{width:48px;height:48px;margin:0}.cd svg{width:48px;height:48px}.cd .pl{inset:9px}.cd .pl svg{width:14px;height:14px}.cont{padding:12px;gap:10px}}
+.cont-head{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:2px 8px;text-align:center}
+.cd{position:relative;width:64px;height:64px;align-self:center;margin:-2px 0}
+.cd svg{position:absolute;inset:0;width:64px;height:64px}
+.cd .pl{position:absolute;inset:11px;border-radius:50%;background:var(--btn);display:grid;place-items:center}
+.cd .pl svg{position:static;width:16px;height:16px}
+.eyebrow.mood.gold{color:var(--gold-ink)}
+.big-score.gold{color:var(--gold-ink)}
+.delta.win.gold{padding:6px 18px;border-radius:var(--r-pill);background:var(--gold);color:#5A3C00}
+#hudBest.gold{background:var(--gold);color:#5A3C00}
+#hudBest.gold b{color:#5A3C00}
 .row2{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:var(--r-pill);background:var(--surface);box-shadow:var(--shadow-s);width:min(100%,372px)}
 .seg button{appearance:none;border:0;cursor:pointer;min-height:40px;padding:0 4px;border-radius:var(--r-pill);background:transparent;color:var(--ink-2);font-family:var(--font-display);font-weight:600;font-size:var(--fs-14);line-height:1;white-space:nowrap;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
@@ -260,18 +279,18 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
   <canvas id="cv" role="img" aria-label="Oyun alanı: kronometre kadranında dönen ibre ve şeftali renkli hedef bölge"></canvas>
 
   <div class="hud" id="hud" aria-hidden="true">
-    <div class="gauge-row">
-      <div class="gauge"><div class="fill" id="fill"></div><span class="notch" id="notch"></span></div>
-      <span class="life" id="life" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="lifeTag">Can</span></span>
-      <span class="tleft" id="tleft">6,0</span>
-    </div>
-    <div class="hud-row">
-      <span class="zone" id="zone"></span>
-      <span class="fx" id="fx"></span>
+    <div class="score-row">
+      <div class="score" id="scoreBox"><b id="hudScore">0</b><span data-i18n="score">puan</span></div>
       <span class="chip sm" id="hudBest"></span>
+    </div>
+    <div class="gauge-row">
+      <div class="gauge"><div class="fill" id="fill"></div></div>
+      <span class="chip sm combo" id="hudCombo" hidden></span>
+      <span class="life" id="life" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="lifeTag">Can</span></span>
     </div>
     <div class="hud-row2">
       <div class="lvl"><span class="chip sm" id="lvlChip"></span><i class="lprog"><b id="lprog"></b></i></div>
+      <span class="fx" id="fx"></span>
       <span class="sect x" id="sect"></span>
     </div>
     <div class="prac-bar">
@@ -334,9 +353,10 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
       <div class="stat-row rise" style="--i:4" id="ovStats"></div>
       <div class="cont rise" style="--i:5" id="cont">
         <div class="cont-head"><b data-i18n="contTitle">İkinci şans</b><span id="contSub"></span></div>
-        <div class="cont-actions">
+        <div class="cd" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="var(--track)" stroke-width="5"/><circle id="cdArc" cx="32" cy="32" r="28" fill="none" stroke="var(--btn)" stroke-width="5" stroke-linecap="round" stroke-dasharray="176" transform="rotate(-90 32 32)"/></svg><i class="pl"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="var(--on-btn)"/></svg></i></div>
+        <div class="cont-actions" id="contActs">
           <button class="btn ad" id="adBtn" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="f" d="M8 5.5v13l11-6.5z"/></svg><span data-i18n="watchAd">Reklam izle</span></button>
-          <button class="btn" id="coinBtn" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><span id="coinCost">25</span></button>
+          <button class="btn" id="coinBtn" type="button"><span class="lbl" data-i18n="resume">Devam et</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><span id="coinCost">25</span></button>
         </div>
       </div>
       <button class="btn primary big rise" style="--i:6" id="againBtn" type="button" data-i18n="again">Tekrar dene</button>
@@ -403,6 +423,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
     </div>
   </section>
 
+  <canvas id="cv2" aria-hidden="true"></canvas>
   <div class="toast" id="toast" role="status"></div>
   <div class="sr" id="live" aria-live="polite"></div>
 </div>
@@ -427,8 +448,8 @@ const CFG = {
   hitGain: 0.95, perfectBonus: 0.08, reliefGain: 0.2, nearGain: 1.5, nearAt: 1.0, missCost: 0.8, trapCost: 1.3,
   perfectFrac: 0.32, grace: 0.05,
   spawnMin: 1.0, spawnMax: 2.2,
-  contTime: 4, contCoins: 25, contSlow: 3, contSlowMul: 0.7,
-  coinDiv: 4, nearCoin: 2, adSeconds: 3, tutHits: 5, adCoins: 20
+  contTime: 4, contCoins: 25, contAds: 2, contMax: 3, contWait: 5, contSlow: 3, contSlowMul: 0.7,
+  coinDiv: 4, nearCoin: 2, adSeconds: 3, tutHits: 5, adCoins: 20, recMin: 25, newAfter: 0
 };
 /* Zorluk dalgalı: taban yavaşça yükselir, her dalga (period vuruş) önce yükselir sonra gevşer.
    adapt: oyuncu iyi oynadıkça yükselir, hata yaptıkça düşer. mercy: hatadan sonra kısa süre nefes verir. */
@@ -452,16 +473,17 @@ const KIND = {
   iki:   { min: 38, w: 0.4, gain: 0.65, hwMul: 1.25, omMul: 0.82 }
 };
 /* Seviyeler: hw = hedef genişliği, om = ibre hızı, gain = vuruş başına süre, miss ve trap = ıska ve tuzak bedeli çarpanı,
-   kind = kilit eşiği çarpanı, startT = başlangıç süresi, coin = coin kazancı çarpanı.
+   kind = kilit eşiği çarpanı, startT = başlangıç süresi, coin = coin kazancı çarpanı (V0.9.0: koşunun tüm coin kaynaklarına uygulanır; Rahat az, Cehennem çok),
+   wide = [8 sn, 0 sn] süre çubuğundaki hedef genişliği çarpanı (dolu çubukta dar, bitmek üzereyken geniş; aradaki eğri WIDE_TAB biçimindedir), hwCap = hedefin yarı genişliği üst sınırı (rad).
    hell = cehennem bölümleri: 'none' (hiç yok: Rahat ve Normal), 'phases' (her seviyenin sonunda açılıp kapanır: Usta), 'always' (baştan sona: Cehennem).
    Yalnızca Cehennem kademesinde: drain = süre erime çarpanı, twins = engel ikizi olasılığının alt sınırı (ikizler kilitle birlikte açılır),
    hellScale = cehennem gücü çarpanı. */
 const LEVELS = ['rahat', 'normal', 'usta', 'cehennem'];
 const LEVEL = {
-  rahat:  { hw: 1.2,  om: 0.9,  gain: 1.15, miss: 0.7,  trap: 0.7,  kind: 1.4, startT: 7,   coin: 0.7, hell: 'none' },
-  normal: { hw: 1,    om: 1,    gain: 1,    miss: 1,   trap: 1,    kind: 1,   startT: 6,   coin: 1, hell: 'none' },
-  usta:   { hw: 0.9,  om: 1.1,  gain: 0.8,  miss: 1.4,  trap: 1.25, kind: 0.6, startT: 5.5, coin: 1.4, hell: 'phases' },
-  cehennem: { hw: 0.82, om: 1.18, gain: 1,  miss: 1.5,  trap: 1.5,  kind: 0.5, startT: 5.5, coin: 2, drain: 1.25, twins: 0.85, hell: 'always', hellScale: 0.64 }
+  rahat:  { hw: 0.95, om: 0.9,  gain: 1.15, miss: 0.7,  trap: 0.7,  kind: 1.4, startT: 7,   coin: 0.12, wide: [0.95, 2.6], hwCap: 0.8, hell: 'none' },
+  normal: { hw: 1.03, om: 1,    gain: 1,    miss: 1,   trap: 1,    kind: 1,   startT: 6,   coin: 0.3, wide: [0.52, 2.0], hwCap: 0.8, hell: 'none' },
+  usta:   { hw: 1,    om: 1.1,  gain: 0.8,  miss: 1.4,  trap: 1.25, kind: 0.6, startT: 5.5, coin: 0.54, wide: [0.45, 1.8], hwCap: 0.6, hell: 'phases' },
+  cehennem: { hw: 0.82, om: 1.18, gain: 1,  miss: 1.5,  trap: 1.5,  kind: 0.5, startT: 5.5, coin: 0.75, wide: [0.36, 1.5], hwCap: 0.35, drain: 0.9, twins: 0.85, hell: 'always', hellScale: 0.64 }
 };
 /* Seri (kombo): ardışık vuruşlar puan çarpanı kazandırır, ıska seriyi sıfırlar. tiers: çarpanın arttığı seri sayıları. */
 const COMBO = { tiers: [5, 10, 20, 35] };
@@ -630,21 +652,26 @@ const PRAC_TWIN = { cift: 'tuzak', kayan: 'kayanT', nefes: 'diken', altin: 'lane
    Alt tarafı (4 sn ve altı) eskisiyle aynı: kurtarma cömertliği değişmesin (denge bot ölçümüyle korundu).
    Daraltma (×1'in altı) ilk üç seviyede yavaş yavaş tam güce çıkar (1. seviyede %60). */
 const WIDE_TAB = [1.8, 1.62, 1.42, 1.25, 1.12, 1.02, 0.94, 0.80, 0.62];
-const wideAt = (tm, L) => {
+/* V0.9.0: eğrinin biçimi WIDE_TAB'dan, uçları kademeden gelir: kademenin wide = [8 sn çarpanı, 0 sn çarpanı] değerleri arasında aynı biçimde geçilir. */
+const wideAt = (tm, L, tier) => {
   const x = Math.min(WIDE_TAB.length - 1, Math.max(0, tm / CFG.maxTime * (WIDE_TAB.length - 1))), i = Math.min(WIDE_TAB.length - 2, Math.floor(x)), f = x - i;
-  let v = WIDE_TAB[i] * (1 - f) + WIDE_TAB[i + 1] * f;
+  const tb = WIDE_TAB[i] * (1 - f) + WIDE_TAB[i + 1] * f, n = (tb - WIDE_TAB[WIDE_TAB.length - 1]) / (WIDE_TAB[0] - WIDE_TAB[WIDE_TAB.length - 1]);
+  const w = tier && tier.wide ? tier.wide : [WIDE_TAB[WIDE_TAB.length - 1], WIDE_TAB[0]];
+  let v = w[0] + (w[1] - w[0]) * n;
   if (v < 1) v = 1 - (1 - v) * (0.6 + 0.4 * Math.min(1, Math.max(0, ((L || 10) - 1) / 3)));
   return v;
 };
+/* Hedefin yarı genişliği bunun altına inmez (rad ≈ 5°): en dar Cehennem hedefi bile parmakla vurulabilir kalır. */
+const HW_FLOOR = 0.075;
 /*TUNE-END*/
 
 /* ---------- aletler: etki gücü seviyeyle artar ---------- */
 const TOOL_IDS = ['steto', 'kron', 'kalkan', 'kum'];
 const TOOL = {
-  steto:  { price: 30, up: [0, 90, 220], eff: l => 8 + 2 * l },
-  kron:   { price: 30, up: [0, 90, 220], eff: l => 3 + l },
-  kalkan: { price: 40, up: [0, 120, 260], eff: l => (l >= 3 ? 3 : 2) },
-  kum:    { price: 30, up: [0, 90, 220], eff: l => 4 + l }
+  steto:  { price: 30, up: [0, 135, 330], eff: l => 8 + 2 * l },
+  kron:   { price: 30, up: [0, 135, 330], eff: l => 3 + l },
+  kalkan: { price: 40, up: [0, 180, 390], eff: l => (l >= 3 ? 3 : 2) },
+  kum:    { price: 30, up: [0, 135, 330], eff: l => 4 + l }
 };
 const TOOL_ICON = {
   steto: '<path class="s" d="M6 3v5a5 5 0 0 0 10 0V3M11 13v2.5a4 4 0 0 0 8 0V14"/><circle class="s" cx="19" cy="12" r="2"/>',
@@ -730,6 +757,7 @@ const STR = {
     popHoldOk: 'Tam bırakış', popFire: 'Ateşten geçtin ×2', popRed: 'Kırmızı!', popAlarmReset: 'Alarm! Tur sıfırlandı', popSide: 'Yan hedef', hintHold: 'Basılı tut',
     fxVortex: 'Girdap {n} sn', fxLock: 'Kilit {n}', curukRelock: 'Yeniden kilitlendi',
     introTag: 'YENİ KİLİT', introTagTw: 'YENİ ENGEL', introHint: 'geçmek için dokun', introResume: 'Kaldığın yerden devam',
+    recPill: 'Yeni rekor!', contNth: '{n}. hak', contLast: 'Son hak',
     ic_cift: 'İbre iki hedeften geçer|Her birine ayrı dokun', ic_kayan: 'Hedef sağa sola kayar|İbre içindeyken dokun', ic_nefes: 'Hedef daralıp genişler|Açıkken dokun',
     ic_altin: 'Önce hedefi vur|Altın açılır|Altına dokun: ×3', ic_sabir: 'Her geçişte bir nokta yanar|Kilit açıldı!|Şimdi vur: ×3',
     ic_kasa: 'Üç hedef art arda|Üçünü de aç: ödül', ic_ritim: 'Küçük hedefler art arda|Hepsini tutturursan ödül',
@@ -817,6 +845,7 @@ const STR = {
     popHoldOk: 'Clean release', popFire: 'Through the fire ×2', popRed: 'Red!', popAlarmReset: 'Alarm! Round reset', popSide: 'Side target', hintHold: 'Press and hold',
     fxVortex: 'Whirlpool {n} s', fxLock: 'Lock {n}', curukRelock: 'Locked again',
     introTag: 'NEW LOCK', introTagTw: 'NEW OBSTACLE', introHint: 'tap to skip', introResume: 'Back to the game',
+    recPill: 'New record!', contNth: 'Chance {n}', contLast: 'Last chance',
     ic_cift: 'The pointer crosses two targets|Tap each one separately', ic_kayan: 'The target slides side to side|Tap while the pointer is inside', ic_nefes: 'The target shrinks and grows|Tap while it is open',
     ic_altin: 'Hit the target first|The gold unlocks|Tap the gold: ×3', ic_sabir: 'Each pass lights a dot|Unlocked!|Now hit it: ×3',
     ic_kasa: 'Three targets in a row|Open all three: reward', ic_ritim: 'Small targets in a row|Hit them all for a reward',
@@ -887,7 +916,7 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.8.0';
+const VERSION = 'V0.9.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, tut: false, lvl: 'normal',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -1126,11 +1155,12 @@ const Platform = {
 };
 
 /* ---------- arayüz yardımcıları ---------- */
-const app = $('app'), cv = $('cv'), ctx = cv.getContext('2d');
-const hudEl = $('hud'), fillEl = $('fill'), tleftEl = $('tleft'), zoneEl = $('zone'), hudBestEl = $('hudBest'), fxEl = $('fx'), toolsEl = $('tools');
+const app = $('app'), cv = $('cv'), ctx = cv.getContext('2d'), cv2 = $('cv2'), ctx2 = cv2.getContext('2d');
+const hudEl = $('hud'), fillEl = $('fill'), scoreEl = $('hudScore'), scoreBox = $('scoreBox'), comboEl = $('hudCombo'), hudBestEl = $('hudBest'), fxEl = $('fx'), toolsEl = $('tools');
 const menuEl = $('menu'), overEl = $('over'), pauseEl = $('pause'), adEl = $('ad'), shopEl = $('shop'), bookEl = $('book'), toastEl = $('toast');
 const gaugeEl = fillEl.parentNode;
 const lvlChipEl = $('lvlChip'), lprogEl = $('lprog'), sectEl = $('sect'), lifeEl = $('life'), campEl = $('campBtn');
+const contEl = $('cont'), cdArc = $('cdArc'), contActsEl = $('contActs');
 const show = el => { el.classList.add('on'); el.removeAttribute('aria-hidden'); };
 const hide = el => { el.classList.remove('on'); el.setAttribute('aria-hidden', 'true'); };
 let toastTimer = 0;
@@ -1151,8 +1181,6 @@ const applyI18n = () => {
   document.documentElement.lang = LANG;
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
   cv.setAttribute('aria-label', t('play_aria'));
-  zoneEl.textContent = t('zone');
-  $('notch').style.left = (CFG.nearAt / CFG.maxTime * 100).toFixed(2) + '%';
   $('bagBtn').setAttribute('aria-label', t('bag'));
   $('lvlSeg').setAttribute('aria-label', t('level'));
   toolsEl.setAttribute('aria-label', t('bag'));
@@ -1217,13 +1245,20 @@ const refreshMenu = () => {
   $('menuJk').innerHTML = TOOL_IDS.map(id => '<span class="mj' + (save.tools[id].n <= 0 ? ' zero' : '') + '" data-tool="' + id + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + TOOL_ICON[id] + '</svg><em>' + save.tools[id].n + '</em></span>').join('');
   $('bookBtn').classList.toggle('dot', bookNew());
 };
+/* "En iyi" etiketi: oyun içinde rekor geçilince altın olur ve skorla birlikte yükselir (V0.9.0). */
+let bestHtml = '';
+const paintBest = () => {
+  const gold = !!G.recDone, h = t('best') + ' <b>' + (gold ? Math.max(bestNow(), G.score) : bestNow()) + '</b>';
+  if (h === bestHtml && hudBestEl.classList.contains('gold') === gold) return;
+  bestHtml = h; hudBestEl.innerHTML = h; hudBestEl.classList.toggle('gold', gold);
+};
 const refreshStats = () => {
   $('coinN').textContent = String(save.coins);
   $('shopCoins').textContent = String(save.coins);
   $('menuBest').textContent = String(bestNow());
   $('menuLvlChip').hidden = save.bestL < 1;
   $('menuBestL').textContent = String(Math.min(save.bestL, 10));
-  hudBestEl.innerHTML = t('best') + ' <b>' + bestNow() + '</b>';
+  paintBest();
   refreshMenu();
   updateTools();
 };
@@ -1245,9 +1280,10 @@ const G = {
   jt: 0, L: 1, ph: 'normal', phLeft: 20, lvStart: 0, open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
   campRun: false, startL: 1, banner: null, count: 0, thT: 0, thDirty: false, ec: 0, em: [],
   life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
-  pendingNew: '', pendingTw: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0,
+  pendingNew: '', pendingTw: '', pendingN: 0, firstOfKind: false, card: null, lab: null, cue: null, saveT: 0, hellAge: 0,
   chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0,
-  intro: null, introQ: [], introK: 0, introLast: null
+  intro: null, introQ: [], introK: 0, introLast: null,
+  contN: 0, best0: 0, recDone: false, conf: [], recPill: null, tvis: 0
 };
 const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100, hudB: 0, dockTop: 0, cardB: 0, ik: 0 };
 /* Tanıtım kartının boyu (px): normal kart 98 / 60, tanıtım sırasında uzar */
@@ -1309,13 +1345,13 @@ const fireEvent = (e, silent) => {
     let isNew = false, newG = false, newT = false;
     if (IMPL_GOOD[e.good] && G.open.indexOf(e.good) < 0) { G.open.push(e.good); isNew = true; newG = true; }
     if (tw && !G.eng[tw]) { G.eng[tw] = true; isNew = true; newT = true; }
-    if (isNew && e.good !== 'tek') { card = bigCard(e.good, tw); if (!silent) { G.pendingNew = e.good; G.pendingTw = ''; G.pendingT = 0; } }
+    if (isNew && e.good !== 'tek') { card = bigCard(e.good, tw); if (!silent) { G.pendingNew = e.good; G.pendingTw = ''; G.pendingN = 0; } }
     if (!silent) { if (newG) queueIntro(e.good); if (newT) queueIntro(tw); }
   } else if (e.twin) {
     const tw = e.twin, g = GOOD_OF[tw];
     if (IMPL_TWIN[tw] && !G.eng[tw] && G.open.indexOf(g) >= 0) {
       G.eng[tw] = true; card = twinCard(tw);
-      if (!silent) { G.pendingNew = g; G.pendingTw = tw; G.pendingT = 0; queueIntro(tw); }
+      if (!silent) { G.pendingNew = g; G.pendingTw = tw; G.pendingN = 0; queueIntro(tw); }
     }
   } else if (e.combo) {
     G.comboOn = true; card = lineCard(t('evCombo'), 'combo');
@@ -1339,7 +1375,7 @@ const giftTool = () => {
   pop(t('rwTool', { t: t('tool_' + id) }), 'hype');
 };
 const rewardHell = L => {
-  const c = 2 * (5 + 2 * Math.min(L, 10));
+  const c = Math.max(1, Math.round(2 * (5 + 2 * Math.min(L, 10)) * LV().coin));
   save.coins += c; G.time = Math.min(CFG.maxTime, G.time + JOURNEY.phase.hell.bonusT);
   pop(t('rwHell', { n: c }), 'hype');
   if (L % JOURNEY.giftEvery === 0) giftTool();
@@ -1347,7 +1383,7 @@ const rewardHell = L => {
 };
 const levelUp = () => {
   save.camp = Math.max(save.camp, G.L); save.bestL = Math.max(save.bestL, G.L);
-  if (G.L === 11) { save.coins += 100; persist(); refreshStats(); banner(t('done'), t('doneSub')); }
+  if (G.L === 11) { save.coins += Math.max(1, Math.round(100 * LV().coin)); persist(); refreshStats(); banner(t('done'), t('doneSub')); }
   else banner(t('bnLevel', { n: G.L }), '');
   persist(); Snd.level(); Platform.haptic('medium');
   Platform.track('journey_level', { level: G.L, score: G.score });
@@ -1498,20 +1534,21 @@ const spawnChallenge = (first, force) => {
     mix = G.mixes[(Math.random() * G.mixes.length) | 0];
     if (mix[1] === 'tuzak' && pm.twin === 0) mix = null;
   }
-  G.firstOfKind = false;
+  G.firstOfKind = false; G.cue = null;
   if (PR) { PR.spawns++; forceTw = PR.spawns > 1 ? (PRAC_TWIN[PR.kind] || '') : ''; }
   let kind;
   if (first || can) kind = 'tek';
   else if (force) kind = force;
-  else if (G.pendingNew && G.pendingT >= 2) { kind = G.pendingNew; forceTw = G.pendingTw; G.pendingNew = ''; G.pendingTw = ''; G.firstOfKind = true; }
+  else if (G.pendingNew && G.pendingN >= CFG.newAfter) { kind = G.pendingNew; forceTw = G.pendingTw; G.pendingNew = ''; G.pendingTw = ''; G.firstOfKind = true; }
   else if (mix) kind = mix[0];
   else kind = pickJ(G.open.filter(k => k !== G.pendingNew), plan.relief, G.lastKind, Math.random(), G.ph);
+  if (G.pendingNew && !first && !can && !force) G.pendingN++;
   const prevKind = G.kind;
   const km = JKIND[kind] || JKIND.tek;
   G.kind = kind; G.lastKind = kind; G.gainMul = km.gain * lv.gain;
   G.I = plan.I; G.relief = plan.relief;
   G.omega = plan.omega * km.omMul * lv.om * pm.omM;
-  let hw = Math.min(0.8, plan.hw * km.hwMul * lv.hw * pm.hwM * (PR ? 1 : wideAt(G.time, G.L)));
+  let hw = Math.min(lv.hwCap || 0.8, Math.max(HW_FLOOR, plan.hw * km.hwMul * lv.hw * pm.hwM * (PR ? 1 : wideAt(G.time, G.L, lv))));
   if (can) hw = Math.min(0.8, hw * 1.15);
   const star = G.stars[kind] | 0, sIx = Math.min(2, star);
   G.chal = { kind, t: 0, star, tw: '' };
@@ -1604,6 +1641,7 @@ const spawnChallenge = (first, force) => {
     if (!PR) { queueIntro(kind); if (G.chal.tw) queueIntro(G.chal.tw); }
     const sk = PR ? 1 : (kind !== 'tek' ? noteSeen(kind) : 99), st = PR ? 1 : (G.chal.tw ? noteSeen(G.chal.tw) : 99);
     G.lab = makeLabels(kind, pins, sk, st);
+    if (!PR && (sk <= 3 || st <= 3)) G.cue = { t: 0, end: 0, pins };
   }
 };
 
@@ -1620,6 +1658,22 @@ const burst = (x, y, n, cols, speed) => {
     const a = rnd(0, TAU), s = rnd(speed * 0.35, speed);
     G.parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: rnd(0.45, 0.85), r: rnd(2.5, 5.5), c: cols[(Math.random() * cols.length) | 0] });
   }
+};
+/* Rekor kutlaması (V0.9.0): oyun sırasında rekor ilk kez geçilince halkanın arkasında konfeti yağar ve üstte altın bir kapsül çıkar; kamera, süre ve oyun akışı bozulmaz.
+   Oyun sonunda yeni rekorda kartın arkasında konfeti patlar. */
+const GOLD_INK = '#5A3C00', CONF_COLS = ['lilac', 'peach', 'gold', 'rose', 'lilac-soft', 'peach-deep'];
+const spawnConf = (n, o) => {
+  if (RM) return;
+  for (let i = 0; i < n; i++) {
+    G.conf.push({ x: o.x0 + (o.x1 - o.x0) * Math.random(), y: o.y0 + (Math.random() - 0.5) * 16, vx: (Math.random() - 0.5) * o.vx, vy: o.vy0 + Math.random() * o.vy1, rot: Math.random() * TAU, vr: (Math.random() - 0.5) * 10,
+      w: 5 + Math.random() * 5, h: 3 + Math.random() * 4, ci: (Math.random() * CONF_COLS.length) | 0, age: -(o.delay + Math.random() * o.spread), life: o.life, sw: Math.random() * TAU });
+  }
+};
+const celebrateRecord = () => {
+  G.recDone = true; G.recPill = { t: 0, wait: 0 };
+  spawnConf(84, { x0: 8, x1: view.w - 8, y0: -10, vx: 40, vy0: 60, vy1: 80, delay: 0, spread: 0.9, life: 2.8 });
+  Snd.fanfare(); Platform.haptic('medium');
+  Platform.track('record_run', { score: G.score, was: G.best0 });
 };
 /* En fazla iki balon: en yeni halkaya yakın durur, eskisi bir basamak yukarı çıkar. */
 const pop = (txt, kind) => {
@@ -1664,11 +1718,12 @@ const resize = () => {
   view.w = b.width; view.h = b.height; view.dpr = Math.min(3, window.devicePixelRatio || 1);
   cv.width = Math.max(1, Math.round(view.w * view.dpr));
   cv.height = Math.max(1, Math.round(view.h * view.dpr));
+  cv2.width = cv.width; cv2.height = cv.height;
   relayout(true);
 };
 
 /* Oyun kaydı: uygulamadan çıkınca (kapansa bile) kaldığı yerden devam edebilmek için. */
-const RUN_KEYS = ['jt', 'L', 'ph', 'time', 'score', 'n', 'combo', 'maxCombo', 'near', 'raw', 'perf', 'missRun', 'adapt', 'mercy', 'open', 'eng', 'stars', 'mixes', 'comboOn', 'evi', 'glove', 'boostT', 'slow', 'slowMul', 'narrow', 'coinsJ', 'life', 'lifeLevel', 'campRun', 'startL', 'coinsGiven', 'continued', 'runCounted', 'waveSeen', 'dir'];
+const RUN_KEYS = ['jt', 'L', 'ph', 'time', 'score', 'n', 'combo', 'maxCombo', 'near', 'raw', 'perf', 'missRun', 'adapt', 'mercy', 'open', 'eng', 'stars', 'mixes', 'comboOn', 'evi', 'glove', 'boostT', 'slow', 'slowMul', 'narrow', 'coinsJ', 'life', 'lifeLevel', 'campRun', 'startL', 'coinsGiven', 'continued', 'runCounted', 'waveSeen', 'dir', 'contN'];
 const snapRun = () => { const o = { v: 2, lvl: save.lvl }; RUN_KEYS.forEach(k => { o[k] = G[k]; }); return JSON.parse(JSON.stringify(o)); };
 const persistRun = () => { if (!G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause' || G.mode === 'intro')) { save.run = snapRun(); persist(); } };
 
@@ -1683,19 +1738,22 @@ const runState = L0 => ({
     jt: jStart(L0), L: L0, ph: 'normal', phLeft: jNormal(L0), lvStart: jStart(L0), open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
     campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: 0, thDirty: false, em: [],
     life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
-    pendingNew: '', pendingTw: '', pendingT: 0, firstOfKind: false, card: null, lab: null, saveT: 0, hellAge: 0,
+    pendingNew: '', pendingTw: '', pendingN: 0, firstOfKind: false, card: null, lab: null, cue: null, saveT: 0, hellAge: 0,
     chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0,
-    intro: null, introQ: [], introK: 0, introLast: null
+    intro: null, introQ: [], introK: 0, introLast: null,
+    contN: 0, best0: 0, recDone: false, conf: [], recPill: null, tvis: LV().startT
 });
 
 const start = (fromL, snap) => {
   const L0 = fromL || 1;
   Snd.ui();
   Object.assign(G, runState(L0));
+  G.best0 = bestNow();
   if (snap) {
     RUN_KEYS.forEach(k => { if (snap[k] !== undefined) G[k] = snap[k]; });
     const pi = jPhaseAt(G.jt);
     G.L = pi.L; G.ph = tierPh(pi.ph); G.lvStart = pi.start; G.phLeft = pi.left; G.thT = G.ph === 'hell' ? 1 : 0;
+    G.recDone = G.score > G.best0;
   } else {
     /* Önceki seviyelerin olayları sessizce uygulanır; bu seviyenin başındaki yeni kilit ise kartıyla, normal ilerleyişteki gibi ilk karede gelir. */
     save.run = null; persist(); G.jt = jStart(L0) - 0.001; applyEvents(true); G.jt = jStart(L0);
@@ -1710,7 +1768,7 @@ const start = (fromL, snap) => {
   app.classList.add('playing');
   hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
   toolsEl.classList.add('on');
-  relayout(false);
+  updateHud(); relayout(false);   /* önce HUD güncellenir: önceki oyundan kalan joker çipleri halkanın boyunu etkilemesin */
   updateTools(); updateHud();
   Platform.track('run_start', { run: save.runs + 1, level: L0, resume: !!snap });
 };
@@ -1976,6 +2034,7 @@ const etaTo = (target, dir, ring) => {
 /* Dokunuş: hangi ibre hedefindeyse onu vurur. İki halkada ikisi birden hedefteyse hedefine daha yakın olan sayılır. */
 const tap = () => {
   if (G.mode !== 'play' || G.lock > 0) return;
+  if (G.cue && !G.cue.end) G.cue.end = 0.001;
   if (G.firstOfKind && G.card && G.card.wait) G.card.max = Math.min(G.card.max, G.card.t + 1.2);
   if (G.holding) return;
   /* tut-bırak: dokunuş basmaktır; yayın başında değilse ıska */
@@ -2236,9 +2295,11 @@ const updateAdvice = dt => {
   }
 };
 
+/* Bir koşunun coin kazancı: ham puan, kıl payı ve yolculuk coinleri birlikte kademe çarpanıyla çarpılır (V0.9.0). */
+const runCoins = (raw, near, coinsJ, lv) => Math.max(0, Math.round((Math.floor((raw || 0) / CFG.coinDiv) + (near || 0) * CFG.nearCoin + Math.floor(coinsJ || 0)) * lv.coin));
 const die = () => {
   if (G.mode !== 'play') return;
-  G.mode = 'dead'; G.deadT = 0.6;
+  G.mode = 'dead'; G.deadT = 0.6; G.cue = null;
   toolsEl.classList.remove('on');
   const w = G.omega * (G.slow > 0 ? CFG.contSlowMul : 1);
   /* ışınlanma pininde ibre kapıya varmadan ya da kapıdayken "hedefe şu kadar kala" demek yanıltır */
@@ -2257,7 +2318,7 @@ const die = () => {
     if (save.lvl === 'normal') save.high = G.n >= 60 ? save.high + 1 : 0;
     if (save.lvl === 'usta') save.highU = G.n >= 60 ? save.highU + 1 : 0;
   }
-  const total = Math.max(0, Math.round((Math.floor(G.raw / CFG.coinDiv) + G.near * CFG.nearCoin) * LV().coin) + Math.floor(G.coinsJ));
+  const total = runCoins(G.raw, G.near, G.coinsJ, LV());
   G.gain = total - G.coinsGiven; G.coinsGiven = total; save.coins += G.gain;
   if (!save.tut && G.n >= CFG.tutHits) save.tut = true;
   persist(); refreshStats();
@@ -2266,7 +2327,7 @@ const die = () => {
 
 /* Oyun sonu başlığı: rekor ve uzun oyunda övgü, çok kısa oyunda laf, aksi halde düz "Süre bitti". */
 const overMood = () => {
-  if (G.newBest && G.n >= 10) return ['good', pickLine('overGood')];
+  if (G.newBest && G.n >= 10) return ['gold', pickLine('overGood')];
   if (G.n >= 40) return ['good', pickLine('overGreat')];
   if (G.n < 5) return ['bad', pickLine('overBad')];
   return ['', t('over')];
@@ -2288,9 +2349,12 @@ const showOver = () => {
     tipEl.setAttribute('data-to', to); tipEl.hidden = false;
   } else tipEl.hidden = true;
   countUp($('ovScore'), G.score, 600);
+  const gold = G.newBest && G.score > 0 && G.n >= 10;
+  $('ovScore').classList.toggle('gold', gold);
+  if (gold && G.score >= CFG.recMin) spawnConf(70, { x0: 20, x1: view.w - 20, y0: -10, vx: 50, vy0: 70, vy1: 60, delay: 0.1, spread: 1.0, life: 3 });
   const d = $('ovDelta');
   d.hidden = G.score === 0;
-  if (G.newBest && G.score > 0) { d.textContent = t('newBest'); d.className = 'delta win rise'; }
+  if (G.newBest && G.score > 0) { d.textContent = t('newBest'); d.className = 'delta win rise' + (gold ? ' gold' : ''); }
   else if (G.campRun) { d.textContent = t('campRun'); d.className = 'delta rise'; d.hidden = false; }
   else { d.textContent = t('toBest', { n: Math.max(1, bestNow() - G.score) }); d.className = 'delta rise'; }
   const nm = $('ovNear');
@@ -2308,17 +2372,19 @@ const showOver = () => {
   if (G.gain > 0) chips.push('<span class="chip sm">' + coinIcon + '<b>+' + G.gain + '</b></span>');
   const st = $('ovStats');
   st.innerHTML = chips.join(''); st.hidden = chips.length === 0;
-  const canCont = !G.continued && G.n >= 3;
-  $('cont').hidden = !canCont;
-  $('contSub').textContent = t('contSub', { s: CFG.contTime });
-  $('coinCost').textContent = String(CFG.contCoins);
-  $('coinBtn').setAttribute('aria-disabled', save.coins < CFG.contCoins ? 'true' : 'false');
+  const canCont = G.contN < CFG.contMax && G.n >= 3, cost = contCost(G.contN), adOk = G.contN < CFG.contAds;
+  contEl.hidden = !canCont; contEl.classList.remove('fade');
+  $('contSub').textContent = '+' + CFG.contTime + ' ' + SN + (G.contN >= CFG.contMax - 1 ? ' · ' + t('contLast') : (G.contN >= 1 ? ' · ' + t('contNth', { n: G.contN + 1 }) : ''));
+  $('coinCost').textContent = String(cost);
+  $('coinBtn').setAttribute('aria-disabled', save.coins < cost ? 'true' : 'false');
+  $('adBtn').hidden = !adOk; contActsEl.classList.toggle('one', !adOk);
+  contLeft = canCont ? CFG.contWait + 0.4 : 0; setCd();
   $('live').textContent = t('overSr', { n: G.score });
   show(overEl);
 };
 
 const doContinue = () => {
-  G.mode = 'play'; G.continued = true; G.time = CFG.contTime; G.slow = CFG.contSlow; G.slowMul = CFG.contSlowMul;
+  G.mode = 'play'; G.continued = true; G.contN++; G.time = CFG.contTime; G.slow = CFG.contSlow; G.slowMul = CFG.contSlowMul;
   G.combo = 0; G.tscale = 1; G.tsT = 0; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
   const g0 = primaryPin();
   if (G.kind === 'isin') {
@@ -2398,16 +2464,21 @@ $('shopList').addEventListener('click', e => {
   Platform.track('shop', { id, act: b.getAttribute('data-act') });
 });
 
-let lastT = '', lastFx = '', lastLvl = '', lastSect = '', lastLife = false, lastAdvDock = '';
+let lastScoreTxt = '', lastScoreK = '', lastCombo = '', lastFx = '', lastLvl = '', lastSect = '', lastLife = false, lastAdvDock = '';
 const updateHud = () => {
-  const f = clamp(G.time / CFG.maxTime, 0, 1);
-  fillEl.style.width = (f * 100).toFixed(1) + '%';
-  const s = f1(Math.max(0, G.time));
-  if (s !== lastT) { lastT = s; tleftEl.textContent = s; }
-  const crit = G.time < CFG.nearAt, warn = !crit && G.time < 2.5;
-  gaugeEl.classList.toggle('crit', crit);
-  gaugeEl.classList.toggle('warn', warn);
-  zoneEl.classList.toggle('hot', crit && G.mode === 'play');
+  paintBest();
+  /* V0.9.0: puan üstte (dokunuşta hafifçe zıplar), altındaki çubuk rekora yaklaşmayı gösterir (rekor kırılınca altın ve dolu), kombo çipi çubuğun yanında */
+  const st = String(G.score);
+  if (st !== lastScoreTxt) { lastScoreTxt = st; scoreEl.textContent = st; }
+  const mult = G.comboOn ? comboMult(G.combo) : 1, pk = G.scorePulse > 0.004 ? (1 + (0.2 + 0.04 * mult) * 0.6 * G.scorePulse).toFixed(3) : '';
+  if (pk !== lastScoreK) { lastScoreK = pk; scoreBox.style.transform = pk ? 'scale(' + pk + ')' : ''; }
+  const bst = G.recDone ? G.score : bestNow(), f = bst > 0 ? clamp(G.score / bst, 0, 1) : 0;
+  fillEl.style.width = (f * 100).toFixed(1) + '%'; fillEl.classList.toggle('gold', !!G.recDone);
+  const ck = mult >= 2 ? mult + '·' + G.combo : '';
+  if (ck !== lastCombo) {
+    lastCombo = ck; comboEl.hidden = !ck;
+    if (ck) { const col = tierCol(mult); comboEl.textContent = '×' + mult + ' · ' + G.combo; comboEl.style.background = col; comboEl.style.color = onColor(col); }
+  }
   const fx = [];
   if (G.boostT > 0) fx.push(t('fxSteto', { n: Math.ceil(G.boostT) }));
   if (G.glove > 0) fx.push(t('fxShield', { n: G.glove }));
@@ -2483,6 +2554,9 @@ const hellFx = raw => {
     if (HX.s <= 0.003 && Math.abs(HX.r - Math.round(HX.r / TAU) * TAU) < 0.002 && Math.abs(HX.tr - Math.round(HX.tr / q) * q) < 0.002) { HX.r = 0; HX.tr = 0; HX.v = 0; }
   }
 };
+let contLeft = 0;
+const setCd = () => { cdArc.style.strokeDashoffset = (176 * (1 - Math.max(0, Math.min(1, contLeft / CFG.contWait)))).toFixed(1); };
+const contCost = n => CFG.contCoins * Math.pow(2, n);
 const update = raw => {
   G.clock += raw;
   const k = Math.min(1, raw * 9);
@@ -2495,7 +2569,7 @@ const update = raw => {
   if (G.mode === 'play' && G.introQ.length && !G.holding && !G.practice) startIntro();
   hellFx(raw);
   if (G.tsT > 0) { G.tsT -= raw; if (G.tsT <= 0) G.tscale = 1; }
-  const dt = raw * G.tscale;
+  const dt = raw * G.tscale * cueRate();
 
   if (G.mode === 'menu') {
     G.ang = norm(G.ang + 1.0 * dt);
@@ -2519,7 +2593,6 @@ const update = raw => {
       if (G.ph === 'hell') G.hellAge += dt;
       /* can fırsatı: çift seviyelerin ortasında, canın yoksa bir sonraki hedef yeşil "+" olur */
       if (G.ph === 'normal' && G.L % 2 === 0 && G.lifeLevel !== G.L && G.jt - pi.start >= 0.55 * jNormal(G.L)) { G.lifeLevel = G.L; if (!G.life) G.lifeDue = true; }
-      if (G.pendingNew) G.pendingT += dt;
     }
     const pm = PR ? JOURNEY.phase.normal : phaseMod(G.ph, G.L);
     G.ang = norm(G.ang + G.dir * G.omega * sl * ptrFactor() * dt);
@@ -2539,6 +2612,8 @@ const update = raw => {
       if (G.time < CFG.nearAt) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
       if (G.time <= 0) { G.time = 0; lethal(); }
     }
+    if (!PR && !G.recDone && !G.campRun && G.best0 >= CFG.recMin && G.score > G.best0) celebrateRecord();
+    stepCue(raw);
     updateHud(); updateDock();
   } else if (G.mode === 'intro') {
     /* tanıtım: oyun donuk (süre, ibre, hedefler); kart uzar, animasyon döner, dokunuşla ya da kendiliğinden kapanır, sonra kısa bir "devam" payı */
@@ -2567,6 +2642,7 @@ const update = raw => {
   G.shake = Math.max(0, G.shake - raw);
   G.flash = Math.max(0, G.flash - raw);
   G.scorePulse = Math.max(0, G.scorePulse - raw * 5);
+  G.tvis += (G.time - G.tvis) * Math.min(1, raw * 12);
   G.Ivis += (G.I - G.Ivis) * Math.min(1, raw * 3);
   const decay = Math.exp(-3.2 * raw);
   for (const p of G.parts) { p.life += raw; p.x += p.vx * raw; p.y += p.vy * raw; p.vx *= decay; p.vy = p.vy * decay + 140 * raw; }
@@ -2579,6 +2655,18 @@ const update = raw => {
   G.fxs = G.fxs.filter(f => f.t < f.max);
   for (const p of G.pops) p.t += raw;
   G.pops = G.pops.filter(p => p.t < p.max);
+  if (G.conf.length) { for (const p of G.conf) p.age += raw; G.conf = G.conf.filter(p => p.age < p.life); }
+  if (G.recPill) {
+    const rp = G.recPill;
+    if (rp.wait != null) { if ((!G.banner && !G.card && G.mode === 'play') || (rp.wait += raw) > 5) rp.wait = null; }
+    else if (G.mode === 'play' || G.mode === 'dead') { rp.t += raw; if (rp.t > 2.2) G.recPill = null; }
+  }
+  /* ikinci şans: 5 sn içinde karar; dükkân açıkken ya da reklam oynarken sayaç durur */
+  if (G.mode === 'over' && contLeft > 0 && !contEl.hidden && !shopEl.classList.contains('on')) {
+    contLeft -= raw;
+    if (contLeft <= 0) { contLeft = 0; contEl.classList.add('fade'); setTimeout(() => { contEl.hidden = true; contEl.classList.remove('fade'); }, 420); }
+    setCd();
+  }
 };
 
 /* ---------- çizim ---------- */
@@ -3433,7 +3521,106 @@ const drawIntroPill = c => {
   c.restore();
 };
 
+/* Rekor kutlamasının çizimi: konfeti ekranın arkasında (halkanın altında), altın kapsül en üstte. */
+const drawConf = c => {
+  for (const p of G.conf) {
+    const u = p.age;
+    if (u < 0 || u > p.life) continue;
+    const x = p.x + p.vx * u + Math.sin(u * 3 + p.sw) * 9, y = p.y + p.vy * u + 150 * u * u, al = u > p.life * 0.7 ? 1 - (u - p.life * 0.7) / (p.life * 0.3) : 1;
+    c.save(); c.translate(x, y); c.rotate(p.rot + p.vr * u); c.globalAlpha = al; c.fillStyle = p.ci === 2 ? GOLD : P[CONF_COLS[p.ci]]; c.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); c.restore();
+  }
+};
+/* Oyun sonu ekranında konfeti, kartın önündeki saydam katmana çizilir (kartın arkasında kalıp görünmez olmasın). */
+let cv2On = false;
+const drawConfTop = () => {
+  const want = G.mode === 'over' && G.conf.length > 0;
+  if (want) {
+    if (!cv2On) { cv2On = true; cv2.classList.add('on'); }
+    ctx2.setTransform(view.dpr, 0, 0, view.dpr, 0, 0); ctx2.clearRect(0, 0, view.w, view.h); drawConf(ctx2);
+  } else if (cv2On) { cv2On = false; ctx2.setTransform(1, 0, 0, 1, 0, 0); ctx2.clearRect(0, 0, cv2.width, cv2.height); cv2.classList.remove('on'); }
+};
+const drawRecPill = c => {
+  const r = G.recPill;
+  if (!r || r.wait != null || G.mode === 'intro') return;
+  const u = r.t, al = u < 0.15 ? u / 0.15 : (u > 1.8 ? Math.max(0, 1 - (u - 1.8) / 0.4) : 1), y = (view.hudB || 0) + 30 + 10 * (1 - easeOut(Math.min(1, u / 0.3)));
+  c.save(); c.globalAlpha = al; pill(c, t('recPill'), view.w / 2, y, GOLD, GOLD_INK, 17, true); c.restore();
+};
 /* Nesne işaretleri: halkanın dışında küçük ✓ (vur) ve ✕ (dokunma); hedefin üstüne yazı konmaz. Yer yoksa halkanın iç kenarına yaslanır. */
+/* Yeni kilit ipucu (V0.9.0, "Spot ışığı", kullanıcı seçimi): bir kilidin ya da engelin ilk üç görünüşünde (makeLabels ile aynı ölçüt) ekran kısa süre kararır,
+   yalnızca o turun pinleri aydınlık kalır (beyaz çerçeveli) ve ibre yavaşlar. İbre, ✓/✕ işaretleri ve puan karartmanın üstünde kalır. Dokunuş ipucunu hemen kapatır.
+   Zaman çizelgesi (sn): 0,2-0,5 kararır, 1,6-1,9 açılır; ibre 0,2-0,35 arasında ×0,4'e iner, 1,25-1,55 arasında normale döner. */
+const CUE = { in0: 0.2, in1: 0.5, out0: 1.6, out1: 1.9, slow: 0.4, s0: 0.2, s1: 0.35, s2: 1.25, s3: 1.55, fade: 0.2 };
+const cueAlpha = cu => {
+  if (!cu) return 0;
+  const u = cu.t;
+  let a = u < CUE.in0 ? 0 : (u < CUE.in1 ? (u - CUE.in0) / (CUE.in1 - CUE.in0) : (u < CUE.out0 ? 1 : Math.max(0, 1 - (u - CUE.out0) / (CUE.out1 - CUE.out0))));
+  if (cu.end > 0) a = Math.min(a, Math.max(0, 1 - cu.end / CUE.fade));
+  return a;
+};
+const cueRate = () => {
+  const cu = G.cue;
+  if (!cu || G.mode !== 'play') return 1;
+  const u = cu.t;
+  let r = u < CUE.s0 ? 1 : (u < CUE.s1 ? 1 + (CUE.slow - 1) * (u - CUE.s0) / (CUE.s1 - CUE.s0) : (u < CUE.s2 ? CUE.slow : (u < CUE.s3 ? CUE.slow + (1 - CUE.slow) * (u - CUE.s2) / (CUE.s3 - CUE.s2) : 1)));
+  if (cu.end > 0) r += (1 - r) * Math.min(1, cu.end / 0.15);
+  return r;
+};
+const stepCue = raw => {
+  const cu = G.cue;
+  if (!cu) return;
+  cu.t += raw;
+  if (cu.end > 0) cu.end += raw;
+  if (cu.t > CUE.out1 || cu.end > CUE.fade) G.cue = null;
+};
+/* Aydınlık yaylar: her halkada pinlerin kapladığı açı aralıkları ([başlangıç, uzunluk], rad); çakışanlar birleştirilir. */
+const cueSpans = pins => {
+  const lists = [[], []], pad = 0.1;
+  for (const p of pins) {
+    let s0, w;
+    if (p.kind === 'hold') { const d = p.dirH || 1; s0 = d > 0 ? p.c0 - p.hw : p.c0 - p.len - p.rw; w = p.len + p.hw + p.rw; }
+    else { const half = Math.max(0.2, p.hw + 0.08); s0 = pinCenter(p) - half; w = 2 * half; }
+    lists[p.ring ? 1 : 0].push({ s: norm(s0 - pad), w: Math.min(TAU - 0.4, w + 2 * pad) });
+  }
+  return lists.map(list => {
+    list.sort((a, b) => a.s - b.s);
+    const m = [];
+    for (const iv of list) {
+      const last = m[m.length - 1];
+      if (last && iv.s <= last.s + last.w) last.w = Math.max(last.w, iv.s + iv.w - last.s);
+      else m.push({ s: iv.s, w: iv.w });
+    }
+    if (m.length > 1) {
+      const a = m[m.length - 1], b = m[0];
+      if (a.s + a.w >= b.s + TAU) { a.w = Math.max(a.w, b.s + TAU + b.w - a.s); m.shift(); }
+    }
+    return m;
+  });
+};
+/* Yuvarlak uçlu halka dilimi (yay üstünde, kalınlık 2·th) alt yolu: delik açmak ve çerçeve çizmek için. */
+const sectorPath = (c, cx, cy, r, th, s0, w) => {
+  const t0 = s0 - HALF, t1 = s0 + w - HALF, ro = r + th, ri = Math.max(1, r - th);
+  c.moveTo(cx + Math.cos(t0) * ro, cy + Math.sin(t0) * ro);
+  c.arc(cx, cy, ro, t0, t1);
+  c.arc(cx + Math.cos(t1) * r, cy + Math.sin(t1) * r, th, t1, t1 + Math.PI);
+  c.arc(cx, cy, ri, t1, t0, true);
+  c.arc(cx + Math.cos(t0) * r, cy + Math.sin(t0) * r, th, t0 + Math.PI, t0 + 2 * Math.PI);
+  c.closePath();
+};
+const drawCue = (c, cx, cy, R, RW, R2, RW2) => {
+  const cu = G.cue, va = cueAlpha(cu);
+  if (va <= 0.003) return;
+  const spans = cueSpans(cu.pins), rr = [[R, RW / 2 + 11], [R2, RW2 / 2 + 9]];
+  const light = onColor(P.bg) === '#29233F';
+  c.save();
+  c.beginPath(); c.rect(-view.w, -view.h, view.w * 3, view.h * 3);
+  spans.forEach((list, i) => list.forEach(sp => sectorPath(c, cx, cy, rr[i][0], rr[i][1], sp.s, sp.w)));
+  c.fillStyle = light ? 'rgba(41,35,63,' + (0.62 * va).toFixed(3) + ')' : 'rgba(0,0,0,' + (0.58 * va).toFixed(3) + ')';
+  c.fill('evenodd');
+  c.beginPath();
+  spans.forEach((list, i) => list.forEach(sp => sectorPath(c, cx, cy, rr[i][0], rr[i][1], sp.s, sp.w)));
+  c.globalAlpha = va; c.strokeStyle = '#FFFFFF'; c.lineWidth = 2.5; c.stroke();
+  c.restore();
+};
 const drawLabels = (c, cx, cy, R, RW) => {
   const lb = G.lab;
   if (!lb || lb.pins !== G.pins || G.mode !== 'play') return;
@@ -3530,6 +3717,44 @@ const drawFxs = (c) => {
   }
 };
 
+/* Süre ortada (V0.9.0, "Sıvı seviyesi", kullanıcı seçimi): halkanın içi bir kap; süre azaldıkça sıvı alçalır, ortada kalan süre yazar.
+   2,5 sn altında sarıya, 1 sn altında kırmızıya döner (kısa geçişle). Son saniyede dalga, şişme ya da titreşim YOKTUR: kullanıcı "hata yapmaya meyilli olduğu anda ekstra bir şeyle kafasını bulandırma" dedi.
+   part 0: gövde (halkanın iç yüzü, ibrenin altında), part 1: yazı (hep dik, en üstte). */
+const mixCol = (a, b, k) => { const x = parseCol(a), y = parseCol(b); return toCss([x[0] + (y[0] - x[0]) * k, x[1] + (y[1] - x[1]) * k, x[2] + (y[2] - x[2]) * k, 1]); };
+const drawTimeVessel = (c, cx, cy, R, RW, R2, RW2, two, mult, part) => {
+  const rin = two ? R2 - RW2 / 2 : R - RW / 2, rv = Math.max(12, rin - Math.max(4, R * 0.05));
+  const tl = Math.max(0, G.time), lv = clamp(G.tvis / CFG.maxTime, 0, 1), light = onColor(P.bg) === '#29233F';
+  const kw = clamp((2.5 - tl) / 0.12, 0, 1), kc = clamp((CFG.nearAt - tl) / 0.12, 0, 1);   /* sarıya ve kırmızıya hızlı geçiş: uzun karışım çamurlu bir ara renk veriyordu */
+  const amp = RM || tl < CFG.nearAt ? 0 : rv * 0.035, top = cy + rv - (2 * rv + 3 * amp) * lv;
+  if (part === 0) {
+    const liq = mixCol(mixCol(mixCol(P.lilac, P.surface, 0.45), '#F4C24A', kw), P.rose, kc);
+    const rim = mixCol(mult >= 2 ? tierCol(mult) : mixCol(P.lilac, P.surface, 0.65), P.rose, kc);
+    c.save();
+    c.beginPath(); c.arc(cx, cy, rv, 0, TAU); c.fillStyle = P.surface; c.fill(); c.clip();
+    const k1 = 4.4 / rv, k2 = 8 / rv;
+    c.beginPath(); c.moveTo(cx - rv - 2, cy + rv + 2);
+    for (let x = cx - rv - 2; x <= cx + rv + 2; x += 4) { const u = x - cx; c.lineTo(x, top + Math.sin(u * k1 + G.clock * 3) * amp + Math.sin(u * k2 - G.clock * 2.1) * amp * 0.5); }
+    c.lineTo(cx + rv + 2, cy + rv + 2); c.closePath(); c.fillStyle = liq; c.fill();
+    c.restore();
+    c.beginPath(); c.arc(cx, cy, rv, 0, TAU); c.lineWidth = 3; c.strokeStyle = rim; c.stroke();
+    return;
+  }
+  if (G.mode === 'count') return;
+  const num = mixCol(mixCol(P.ink, light ? '#B8851C' : '#F4C24A', kw), P.rose, kc);
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  const txt = f1(tl), sz = Math.round(rv * 0.8);
+  c.font = '600 ' + sz + 'px ' + FD;
+  const w = c.measureText(txt).width;
+  if (w > rv * 1.7) c.font = '600 ' + Math.max(10, Math.floor(sz * rv * 1.7 / w)) + 'px ' + FD;
+  c.fillStyle = num; c.fillText(txt, cx, cy - rv * 0.06);
+  const hot = tl < 1.2 && G.mode === 'play', lab = hot ? t('zone') : SN, ly = cy + rv * 0.52;
+  let fs = Math.max(11, Math.round(rv * 0.17));
+  c.font = '800 ' + fs + 'px ' + FB;
+  const lw = c.measureText(lab).width;
+  if (lw > rv * 1.7) { fs = Math.max(9, Math.floor(fs * rv * 1.7 / lw)); c.font = '800 ' + fs + 'px ' + FB; }
+  c.fillStyle = hot ? P.rose : (ly > top ? P.ink : P['ink-2']); c.fillText(lab, cx, ly);
+};
+
 const render = () => {
   const c = ctx, cx = view.cx, cy = view.cy, R = view.r * HX.b, RW = Math.max(14, R * 0.2);
   const two = G.mode !== 'menu' && G.kind === 'iki';
@@ -3537,6 +3762,7 @@ const render = () => {
   c.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
   c.clearRect(0, 0, view.w, view.h);
   drawEnv(c);
+  if (G.mode !== 'over') drawConf(c);
   c.save();
   if (G.shake > 0) { const m = Math.min(9, G.shake * 20); c.translate((Math.random() - 0.5) * m, (Math.random() - 0.5) * m); }
 
@@ -3556,6 +3782,13 @@ const render = () => {
   c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
   c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
   if (two) { c.lineWidth = RW2; c.beginPath(); c.arc(cx, cy, R2, 0, TAU); c.stroke(); }
+  const mult = (G.mode === 'play' || G.mode === 'dead' || G.mode === 'count' || G.mode === 'intro') && G.comboOn ? comboMult(G.combo) : 1;
+  if (mult >= 2) {
+    c.globalAlpha = Math.min(0.4, 0.07 + 0.03 * mult + 0.12 * G.scorePulse); c.fillStyle = tierCol(mult);
+    c.beginPath(); c.arc(cx, cy, two ? R2 - RW2 / 2 - 4 : R - RW / 2 - 4, 0, TAU); c.fill();
+    c.globalAlpha = 1;
+  }
+  if (G.mode !== 'menu' && !G.practice) drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 0);
   if (HX.s > 0.003) {
     /* hipnoz sarmalı: halkanın içinde üç kol, kendi hızıyla ters döner */
     const lim = two ? 0.46 : 0.62;
@@ -3568,17 +3801,11 @@ const render = () => {
     c.restore(); c.globalAlpha = 1;
   }
   drawTrackFx(c, cx, cy, R, RW, R2, RW2, two);
-  const mult = (G.mode === 'play' || G.mode === 'dead' || G.mode === 'count' || G.mode === 'intro') && G.comboOn ? comboMult(G.combo) : 1;
-  if (mult >= 2) {
-    c.globalAlpha = Math.min(0.4, 0.07 + 0.03 * mult + 0.12 * G.scorePulse); c.fillStyle = tierCol(mult);
-    c.beginPath(); c.arc(cx, cy, two ? R2 - RW2 / 2 - 4 : R - RW / 2 - 4, 0, TAU); c.fill();
-    c.globalAlpha = 1;
-  }
 
+  /* son saniye (V0.9.0): sabit ince halka; nabız ve dalga yok, kullanıcı o anda ekstra hareketle kafa karıştırılmasın istedi */
   if (G.mode === 'play' && G.time < CFG.nearAt) {
-    const b = 0.5 + 0.5 * Math.sin(G.clock * 16);
-    c.globalAlpha = 0.35 + 0.4 * b; c.strokeStyle = P.rose; c.lineWidth = 3;
-    c.beginPath(); c.arc(cx, cy, R + RW / 2 + 3 + 3 * b, 0, TAU); c.stroke();
+    c.globalAlpha = 0.55; c.strokeStyle = P.rose; c.lineWidth = 3;
+    c.beginPath(); c.arc(cx, cy, R + RW / 2 + 4.5, 0, TAU); c.stroke();
     c.globalAlpha = 1;
   }
 
@@ -3592,6 +3819,7 @@ const render = () => {
       if (p.kind === 'gate') gi++;
     }
   }
+  if (G.cue && G.cue.pins === G.pins && G.mode !== 'menu') drawCue(c, cx, cy, R, RW, R2, RW2);
 
   const trail = mult >= 2 ? tierCol(mult) : P.lilac;
   const psc = ptrScale();
@@ -3633,22 +3861,7 @@ const render = () => {
     c.fillText(t('best'), cx, cy + R * 0.36);
   } else {
     if (G.practice) drawPracCenter(c, cx, cy, R, two);
-    const sc = 1 + (0.2 + 0.04 * mult) * G.scorePulse;
-    const txt = String(G.score);
-    const cover = G.mode === 'count' ? 1 : 0;
-    c.globalAlpha = G.practice ? 0 : 1 - 0.88 * cover;
-    c.save(); c.translate(cx, cy - (two ? 0 : R * 0.04)); c.scale(sc, sc);
-    c.fillStyle = P.ink; fitFont(txt, big, R * (two ? 0.95 : 1.5));
-    c.fillText(txt, 0, 0);
-    c.restore();
-    if (G.practice) {
-    } else if (mult >= 2) {
-      const col = tierCol(mult);
-      pill(c, '×' + mult + ' · ' + G.combo, cx, cy + R * (two ? 0.3 : 0.4), col, onColor(col), Math.max(11, Math.round(R * (two ? 0.1 : 0.12))));
-    } else if (!two) {
-      c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
-      c.fillText(t('score'), cx, cy + R * 0.36);
-    }
+    else drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 1);
     c.globalAlpha = 1;
     if (two && G.lockLeft > 0 && (G.mode === 'play' || G.mode === 'intro')) drawLockTimer(c, cx, cy, R);
     if (G.mode === 'count' && G.count > 0) drawCount(c, cx, cy, R);
@@ -3659,6 +3872,7 @@ const render = () => {
   if (G.introK > 0.001) { c.globalAlpha = 0.55 * easeOut(clamp(G.introK, 0, 1)); c.fillStyle = P.bg; c.fillRect(-20, -20, view.w + 40, view.h + 40); c.globalAlpha = 1; }
   drawCard(c);
   drawIntroPill(c);
+  drawRecPill(c);
   /* puan balonları halkanın iç bölgesinde, ibre halkasının üstüne binmez: en yeni skorun üstünde, eskisi altında */
   G.pops.forEach((p, i) => {
     const k = p.t / p.max, slot = G.pops.length - 1 - i;
@@ -3690,6 +3904,7 @@ const render = () => {
     c.fillRect(0, 0, view.w, view.h);
     c.globalAlpha = 1;
   }
+  drawConfTop();
 };
 
 /* ---------- giriş ---------- */
@@ -3736,7 +3951,7 @@ window.addEventListener('pagehide', () => persistRun());
 /* Yarım kalan oyundaki henüz coine çevrilmemiş kazanç (oyun bitince verilecek olan). */
 const runPending = r => {
   const lv = LEVEL[r.lvl] || LEVEL.normal;
-  return Math.max(0, Math.round((Math.floor((r.raw || 0) / CFG.coinDiv) + (r.near || 0) * CFG.nearCoin) * lv.coin) + Math.floor(r.coinsJ || 0) - (r.coinsGiven || 0));
+  return Math.max(0, runCoins(r.raw, r.near, r.coinsJ, lv) - (r.coinsGiven || 0));
 };
 const doSetLevel = l => {
   save.lvl = l; persist(); refreshLevel(); refreshStats();
@@ -3812,13 +4027,14 @@ $('sndBtn').addEventListener('click', () => { Snd.unlock(); save.snd = !save.snd
 $('adBtn').addEventListener('click', () => {
   if (G.mode !== 'over') return;
   Snd.unlock(); G.mode = 'ad'; hide(overEl);
-  Platform.rewardedAd((ok, why) => { if (ok) doContinue(); else { G.mode = 'over'; show(overEl); if (why !== 'closed') toast(t('adFail')); } });
+  Platform.rewardedAd((ok, why) => { if (ok) doContinue(); else { G.mode = 'over'; show(overEl); contLeft = CFG.contWait; setCd(); if (why !== 'closed') toast(t('adFail')); } });
 });
 $('coinBtn').addEventListener('click', () => {
   if (G.mode !== 'over') return;
   Snd.unlock();
-  if (save.coins < CFG.contCoins) { toast(t('notEnough')); return; }
-  save.coins -= CFG.contCoins; persist(); refreshStats(); doContinue();
+  const cost = contCost(G.contN);
+  if (save.coins < cost) { toast(t(G.contN < CFG.contAds ? 'notEnough' : 'coinShort')); return; }
+  save.coins -= cost; persist(); refreshStats(); doContinue();
 });
 
 /* ---------- açılış ---------- */

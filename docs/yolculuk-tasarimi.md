@@ -1,7 +1,7 @@
-# Yolculuk tasarımı (V0.8.0, onaylı 2026-10-17)
+# Yolculuk tasarımı (V0.9.0, onaylı 2026-10-17; V0.9.0 eklemeleri 2026-10-19)
 
 Bu belge oyunun güncel yolculuk tasarımıdır. V0.4.0'daki ilk tasarımdan (cennet bölümü, 15 dakikalık yolculuk) sonra kullanıcı geri bildirimiyle
-yedi kez değişti (V0.4.1 tempo, V0.5.0 çeşitlilik, V0.5.1 cehennem ve düzeltmeler, V0.6.0 Dene ve Cehennem zorluğu, V0.6.1 süreye göre hedef, kademeye göre cehennem, jokerler, V0.7.0 ışınlanma pimi, V0.8.0 ilk görüşte tanıtım, Cehennem çemberi, altın sırası, belirgin hedef boyu); değişiklik nedenleri `CHANGELOG.md` içinde. Kilit fikirlerinin tam listesi (yapılanlar ve
+sekiz kez değişti (V0.4.1 tempo, V0.5.0 çeşitlilik, V0.5.1 cehennem ve düzeltmeler, V0.6.0 Dene ve Cehennem zorluğu, V0.6.1 süreye göre hedef, kademeye göre cehennem, jokerler, V0.7.0 ışınlanma pimi, V0.8.0 ilk görüşte tanıtım, Cehennem çemberi, altın sırası, belirgin hedef boyu, V0.9.0 süre ortada, yeni kilit ipucu, rekor kutlaması, ikinci şans, yeni ekonomi); değişiklik nedenleri `CHANGELOG.md` içinde. Kilit fikirlerinin tam listesi (yapılanlar ve
 yapılmayanlar, Kolay/Orta/Zor grupları) `docs/kilit-katalogu.md` içinde. Hikaye/harita yok.
 
 ## Fikir
@@ -32,7 +32,7 @@ Cehennem geçilince: +2 sn, coin (2 × (5 + 2 × seviye)), her 3 seviyede bir ra
 
 Sabır pimi, çürük kilit, trafik ışığı, bomba pim ve ışınlanma pimi (V0.7.0) ilk plandaki yedi çifte ek olarak yapıldı (kullanıcı onayıyla); trafik, bomba ve ışınlanma engel ikizi olmadan seviyenin
 sonlarına konuldular. Zamanlar `JOURNEY`, olaylar `JEV` (TUNE bloğu); yapılmamış kilitlerin olayları atlanır (`IMPL_GOOD`/`IMPL_TWIN`).
-Her yeni kilit, kartı çıktıktan 2 sn sonra ve ibreden uzak doğar; ilk hedefi vurulana ya da ıskalanana kadar kart ekranda kalır (en çok 8 sn).
+Her yeni kilit, olaydan sonraki ilk turda (V0.9.0, `CFG.newAfter` = 0 tur; eskiden 2 sn, ortalama 1,4-3,1 tur sonra) ve ibreden uzak doğar; ilk hedefi vurulana ya da ıskalanana kadar kart ekranda kalır (en çok 8 sn).
 
 ## Cehennem
 
@@ -65,6 +65,21 @@ Her vuruşta +1 coin; cehennem bitince +2 sn. Adlar (`hellTier`, açılışta ç
   Hedef (kullanıcı isteği): "harbi cehennem; yalnızca refleksi çok iyi oyuncuların yarısı geçebilmeli". Botla: pro bot %25, usta bot %5, iyi bot %0 bitiriyor (ölçüm sonda). Yalnızca çarpanlarla (V0.6.0, cehennem bölümü hep açılıp kapanıyordu,
   yalnızca tema kırmızıydı) pro bot %35, usta bot %18 bitiriyordu ve kullanıcı "kolay" dedi; bu yüzden en iyi bot için de belirgin biçimde sertleştirildi. Hedef genişliği çarpanı ana kaldıraçtır (×0,94'te pro %60, ×0,90'da %33, ×0,80'de %12-20).
   Her kademenin rekoru ayrıdır; Normal'de iki uzun oyun sonra Usta, Usta'da iki uzun oyun sonra Cehennem önerisi çıkar; Cehennem'de üç kısa oyun sonra Usta önerisi.
+- **Hedef boyu kademeye göre (V0.9.0, "Keskin"; kullanıcı seçimi):** `LEVEL[kademe].wide = [8 sn çarpanı, 0 sn çarpanı]` (Rahat 0,95 → 2,6; Normal 0,52 → 2,0; Usta 0,45 → 1,8; Cehennem 0,36 → 1,5); `wideAt(süre, seviye, kademe)` bu iki ucu `WIDE_TAB` biçimiyle (üst saniyeler dik, alt saniyeler yumuşak) birleştirir.
+  Bir hedefin yarı genişliği `HW_FLOOR` (0,075 rad ≈ 4,3°) ile kademenin `hwCap` değeri (Rahat/Normal 0,8, Usta 0,6, Cehennem 0,35 rad) arasında kırpılır (adil alt ve üst sınır). Kademe çarpanları botla yeniden ayarlandı: `hw` Rahat 0,95, Normal 1,03, Usta 1,0, Cehennem 0,82; Cehennem `drain` 1,25 → 0,9
+  (hedef çok daralınca eski süre baskısı Cehennem'i aşılmaz yapıyordu: pro bot %4 bitiriyordu, şimdi %23). Ölçülen ortalama hedef toplam genişliği (derece, 'tek' kilit, çubuk 8 sn → 2 sn): Normal 7-10. seviye 20° → 52°, Rahat 33° → 70°, Usta 17° → 42°, Cehennem 4-6. seviye 12° → 37°, 7-10. seviye 10° → 31°.
+  Ayar yaparken `tools/bot.js` içinde `window.__logChal = true` açıp `__chalLog` (tur başına süre ve hedef genişliği) okunur; kademeler yeniden ölçülür (aşağıda "V0.9.0 ölçümü"). Hep aynı ayarla ölçmek yanıltır: süre azalan oyuncu için tablo çok cömerttir.
+- **Ekonomi (V0.9.0, kullanıcı seçimi B "Düzenli oyun"):** bütün coin kaynakları `LEVEL[kademe].coin` ile çarpılır (`runCoins`: ham puan/4 + 2 × kıl payı + yolculuk coinleri; seviye ödülü `rewardHell` ve +100 bitiriş ödülü de). Çarpanlar: Rahat 0,12, Normal 0,3, Usta 0,54, Cehennem 0,75; alet yükseltme fiyatları ×1,5 (`TOOL.up`: 135/330, kalkan 180/390). Koşu başına kazanç (bot):
+  Rahat orta 71, Normal orta ~100, Usta iyi ~215-235, Cehennem usta ~400 (eskiden 480 / 341 / 521 / 784); dakikada Rahat ~12, Normal ~26, Usta ~61, Cehennem ~143. Alet çantasının tamamı Normal'de orta oyuncu için ~20 koşu (eskiden 4-5). Reklamla +20 coin (`CFG.adCoins`) aynı. Seviye ödülleri artık kademe çarpanından muaf değil (eskiden muaftı, asıl para oradan geliyordu).
+- **İkinci şans (V0.9.0, "Geri sayımlı"):** ölünce (`G.n >= 3`) kartta 5 sn'lik geri sayım halkası (`contLeft`, `CFG.contWait`), "Reklam izle" ve coin düğmesi. Bir koşuda en çok `CFG.contMax` = 3 hak (`G.contN`, `RUN_KEYS`'te kayıtlı), fiyat `contCost(n)` = 25 × 2ⁿ (25 / 50 / 100), reklam yalnızca ilk `CFG.contAds` = 2 hakta; her hak +4 sn ve 3 sn yavaşlatma (`doContinue`).
+  Sayaç dükkân açıkken ya da reklam oynarken durur; süre dolunca blok solarak kapanır (`.cont.fade`, yükseklik yumuşakça 0'a iner, kart sıçramaz). Kısa ekranda (≤700 px) başlık gizlenir. Üçüncü hakta yalnızca coin düğmesi görünür ("Devam et · 100").
+- **Rekor kutlaması (V0.9.0, "Konfeti yağmuru"):** oyun içinde `G.score > G.best0` (oyun başındaki rekor, en az `CFG.recMin` = 25; kamp ve Dene hariç) ilk kez olunca `celebrateRecord`: halkanın arkasında konfeti (`G.conf`, ana tuvalde), üstte altın "Yeni rekor!" kapsülü (`G.recPill`; seviye şeridi ya da kart açıksa bekler), HUD'da altın "En iyi" çipi (`paintBest`) ve altın çubuk.
+  Oyun sonunda yeni rekorda (`G.newBest`, ≥10 vuruş) başlık, puan ve rozet altın olur, konfeti ikinci saydam tuvalde (`#cv2`) kartın önünde patlar. `RM` açıksa konfeti yok.
+- **Yeni kilit ipucu: Spot ışığı (V0.9.0):** `spawnChallenge`, bir kilidin ya da engelin ilk üç görünüşünde (`save.seen`; `makeLabels` ile aynı ölçüt; Dene ve oyunun ilk turu hariç) `G.cue = { t, end, pins }` kurar. `drawCue` pinlerden sonra, ibreden önce çizer: tuvali karartır (`rgba(41,35,63,.62)`, koyu temada siyah),
+  her halkada pinlerin kapladığı yayları (`cueSpans`, çakışanlar birleşir) yuvarlak uçlu delik olarak açar ve beyaz çerçeveler (`sectorPath`). Zaman çizelgesi `CUE`: 0,2-0,5 sn kararır, 1,6-1,9 sn açılır; ibre `cueRate()` ile 0,2-0,35 sn'de ×0,4'e iner, 1,25-1,55 sn'de normale döner (`update` içinde `dt` ile çarpılır);
+  dokunuş (`tap`) ipucunu 0,2 sn'de söndürür, `die` siler. Yeni kilit olaydan sonraki ilk turda gelir (`CFG.newAfter` = 0; `G.pendingN`). Kullanıcı seçimi: 5 tasarımdan "Spot ışığı", gecikme 0 tur.
+- **Süre ortada (V0.9.0, "Sıvı seviyesi"):** halkanın içi bir kap (`drawTimeVessel`: gövde ibrenin altında, yazı en üstte ve hep dik). Sıvı seviyesi `G.tvis` (süreye yumuşak yaklaşır), 2,5 sn'de sarıya, 1 sn'de kırmızıya geçer (0,12 sn'lik kısa geçiş; uzun karışım mor ile sarı arasında çamurlu bir ara renk veriyordu); **son saniyede dalga, şişme, titreşim ve dış halka nabzı yoktur** (kullanıcı isteği: "hata yapmaya meyilli olduğu anda kafasını bulandırmayalım").
+  1,2 sn altında altta "Son 1 sn: ×3" yazar. Çift halkada kap iç halkaya sığar; geri sayımda (3-2-1) yazı gizlenir. HUD: üstte puan (dokunuşta zıplar), sağda "En iyi", altında rekora yaklaşma çubuğu (`score / best`, rekor kırılınca altın) + kombo çipi + can çipi, sonra seviye çipi ile joker etki çipleri (üç ve fazlası ikinci satıra sarar). Dene'de kap yok (noktalar).
 - Sonsuz modda zorluk hızlanır; Sarkaç, Sis ve Renk kilitleri sonraki sürümlere (sonsuz mod havuzuna) bırakıldı.
 
 ## Adil oyun kuralları (bütün kilitlere uygulanır)
@@ -104,13 +119,13 @@ güçlendirir (`STAR_KINDS`; ışınlanma pimi dahil). Seviye 7'nin ★ olayı %
 
 ## Ekran ve yardımcılar
 
-- **HUD:** süre çubuğu, "Seviye N" ve altında ince ilerleme çizgisi (cehennemde kızıl), cehennem rozeti. Toplam seviye ve noktalı yol yok.
+- **HUD (V0.9.0):** üstte puan ve "En iyi" kapsülü, altında rekora yaklaşma çubuğu (yanında kombo ve can çipleri), sonra "Seviye N" ve altında ince ilerleme çizgisi (cehennemde kızıl), sağda joker etki çipleri, Usta'da cehennem rozeti. Süre HUD'da değil, halkanın ortasındaki kaptadır (aşağıda). Toplam seviye ve noktalı yol yok.
 - **Yeni kilit kartı** (üst kart, V0.5.0'da büyüdü): HUD'un altında; yeni kilitte hareketli mini simge + ad (22 punto) + kural (şeftali nokta) + uyarı (gül
   noktası); ilk hedef vurulana ya da ıskalanana kadar kalır (en çok 8 sn). ★/karışım/seri gibi küçük haberler tek satır, 4 sn.
   **Nesne işareti:** yeni kilidin ilk karşılaşmalarında hedefin ve tuzağın dışında küçük ✓ (vur) ve ✕ (dokunma) rozeti; halkanın üstüne yazı konmaz
   (görüşü kapatıyordu). Menüde **Kilit defteri** (V0.6.0): 14 kilidin hepsi görünür; görülenler tam açıklamalıdır, görülmeyenler adı ve açılacağı seviyeyle ("Sıradaki · Seviye 4" kesikli çerçeveli, sonrakiler "Seviye N") soluk gösterilir; başlıkta "N / 14 açıldı".
   Her satırda **Dene** düğmesi vardır (açılmamış kilitler için de).
-- **İlk görüşte tanıtım (V0.8.0):** yeni kilit ya da engel ilk kez geldiğinde `G.mode = 'intro'` olur: oyun donar (süre, ibre, hedefler, `pendingT`), üstteki kart `INTRO_H` boyuna uzar (`G.introK` 0-1; `relayout` halkayı aşağı kaydırıp küçültür),
+- **İlk görüşte tanıtım (V0.8.0):** yeni kilit ya da engel ilk kez geldiğinde `G.mode = 'intro'` olur: oyun donar (süre, ibre, hedefler), üstteki kart `INTRO_H` boyuna uzar (`G.introK` 0-1; `relayout` halkayı aşağı kaydırıp küçültür),
   oyun alanı hafifçe silinir (`P.bg` %55), joker sırası soluklaşır (`.tools.dim`), kartın solunda `INTRO[tür]` sahnesi döner (sanal yarıçap 70'lik halka; `drawPin` ve `drawPointer` sahte pinlerle çağrılır, `withIntroState` `G.pt`, `G.tun`, `G.ang` gibi alanları geçici ayarlar),
   sağda etiket (YENİ KİLİT / YENİ ENGEL), ad, anlık açıklama (`ic_<tür>`, `|` ile ayrılmış, sahnenin `capT` zamanlarına göre), kural ve uyarı; altta ilerleme çizgisi. `introWanted(tür)`: sahnesi var, `save.intro[tür]` yok, `save.seen[tür]` sıfır, Dene değil.
   Sıraya girme: `fireEvent` (olay anı; iyi kilit ve ikiz art arda) ve `spawnChallenge` (olay kartı olmadan gelen kilit için yedek, ör. sessiz başlangıç ya da yarıda kalan tanıtım). Kapanış: dokunuş (ilk 1,2 sn yok sayılır, `skipIntro`), 4-5,5 sn sonra kendiliğinden, geri tuşu (`closeIntro(true)` hepsini geçer);
@@ -128,7 +143,7 @@ güçlendirir (`STAR_KINDS`; ışınlanma pimi dahil). Seviye 7'nin ★ olayı %
   Yanlış basmayı önleyen şey yerleşimdir, gecikme değil: `relayout()` halka ile joker etiketi arasında en az `gapMin` boşluk bırakır (70 px, kısa ekranda 54 px; yaklaşık parmak ucu boyu), dockun altında 24/14 px pay vardır, halka bu boşluğa göre küçülür;
   o boşluğa yapılan dokunuşlar oyuna gider. Ölçülen boşluklar (halkanın alt kenarı ile joker üstü / etiket hariç saf boşluk): 320×568 ≈ 94/60 px, 360×640 ≈ 94/60, 360×740 ≈ 118/84, 412×915 ≈ 186/152.
   Etkiler `TOOL` tablosunda (seviyeyle artar). Yeni oyuncuda her jokerden 2 var; her 3 seviyede bir hediye.
-- **Can (yedek):** yeşil "+" hedefi; çift seviyelerin normal bölümünün %55'inden sonra, canın yoksa bir sonraki hedef olur. En fazla 1; süre çubuğunun
+- **Can (yedek):** yeşil "+" hedefi; çift seviyelerin normal bölümünün %55'inden sonra, canın yoksa bir sonraki hedef olur. En fazla 1; rekor çubuğunun
   yanında yeşil "+ Can" kapsülü. Süre bitince kendiliğinden devreye girer: +3 sn, kısa yavaş ibre.
 - **Devam etme:** oyun her 5 sn'de ve çıkarken kaydedilir (`save.run`; V0.6.1'den beri `lvl` ile hangi kademeye ait olduğu da yazılır); uygulama kapansa bile menüde "Devam et" ("Normal · Seviye 5 · 4.200 puan"), dokununca 3-2-1.
   Yarım kalan oyun kendi kademesinde sürer: açılışta kademe seçici `save.run.lvl`'ye eşitlenir (eski kayıtta `lvl` yoksa seçili kademe alınır). Yarım kalan oyun varken başka kademe seçilirse `#swap` penceresi çıkar
@@ -165,9 +180,11 @@ güçlendirir (`STAR_KINDS`; ışınlanma pimi dahil). Seviye 7'nin ★ olayı %
 7. **V0.7.0: TAMAM.** Işınlanma pimi (kullanıcı isteği, canlı denemeyle onaylandı; "Hızlı" çıkış 0,15-0,50 sn): `G.tun` (tünel: `t`, `d` rastgele süre, `to` çıkış açısı), `ptrFactor()` tünelde 0 döner (ibre açısı donar), `tickPortal` kapıdan geçişi yakalar (`enterPortal`/`exitPortal`), kapılar `kind: 'portal'` pinleri (`portal: 'in'|'out'`),
    ibrenin çizimi `ptrScale()` ile küçülüp büyür. `die()` ve `doContinue()` tünel durumunu bilir (ikinci şansta ibre çıkış kapısından başlar). Bot: tünelde ya da önce kapıya varacaksa hedefi bekler (`tools/bot.js`).
 8. **V0.8.0: TAMAM.** İlk görüşte tanıtım (25 tür; üst kart uzar, içinde animasyon; `G.mode = 'intro'`), Cehennem çemberi (nefes, bütün çember ters döner, sarmal; `HX`), altın pim ana hedeften sonra açılır (`wait`/`gone`), süreye göre hedef boyu üst iki saniyede belirgin (`WIDE_TAB`).
-9. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için.
+9. **V0.9.0: TAMAM.** Süre çemberin ortasında (sıvı seviyesi, `drawTimeVessel`), puan üstte ve rekora yaklaşma çubuğu; yeni kilit ipucu "Spot ışığı" (`G.cue`) ve yeni kilit 0 tur sonra; hedef boyu kademeye göre "Keskin" (`wide`, `hwCap`, `HW_FLOOR`) ve kademeler botla yeniden ayarlandı; ekonomi B (`runCoins`, `LEVEL.coin`);
+   ikinci şans: geri sayımlı kart, 3 hak (25/50/100), reklam ilk iki hakta; rekor kutlaması: konfeti yağmuru (oyun içi ve oyun sonu).
+10. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için.
    Kullanıcının oyun sonrası geri bildirimine göre sıra belirlenir.
-10. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
+11. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
    paket adının kesinleşmesi.
 
 Sonsuz mod şimdilik yalnızca 10. seviye sonrası otomatik devam ("Yolculuk tamamlandı", +100 coin); yoğunluk ve cehennem gücü her seviyede artar.
@@ -221,3 +238,24 @@ Cehennem ayarı denemeleri (hedef çarpanı, ibre, ceza, süre erimesi, `hellSca
 Usta usta bot %78 (n = 18); Cehennem pro bot ulaşma %37, bitirme %27 (n = 30). V0.6.1/V0.7.0 ölçümleriyle (Normal yeni %3, orta %38-40, iyi %77-83; Usta usta %70; Cehennem pro bitirme %25) hata payı (±10) içinde aynı.
 Normal orta botun en çok öldüğü kilitler: nefes, trafik, tut-bırak, kasa (n = 24); iyi botta nefes %36 (n = 50). `node tools/sim.mjs 1500` (eski model) hatasız çalıştı.
 Altın pim bu sürümde botla ayrıca doğrulandı: bot altın açılınca yalnızca beceriye bağlı olasılıkla uzanır (`goldP`), kapalıyken ya da kaybolmuşken dokunmaz.
+
+**V0.9.0 ölçümü** (hedef boyu kademeye göre "Keskin", ekonomi B, yeni kilit 0 tur, Spot ışığı; başsız Chrome, n = 300; 10. seviyeye ulaşma / 11'e varma, koşu başına coin). Eski V0.8.0 aynı yöntemle (n = 100) ölçülüp karşılaştırıldı.
+
+| Mod · oyuncu | S10 eski → yeni | S11 yeni | coin/koşu eski → yeni |
+|---|---|---|---|
+| Normal · yeni (0,12) | %5 → %5 | %2 | 151 → 49 |
+| Normal · orta (0,08) | %37 → %33 | %15 | 341 → 102 |
+| Normal · iyi (0,05) | %79 → %76 | %58 | 628 → 184 |
+| Rahat · yeni | %31 → %36 | %15 | 274 → 38 |
+| Rahat · orta | %76 → %77 | %51 | 480 → 71 |
+| Usta · iyi | %31 → %24 | %8 | 521 → 235 |
+| Usta · usta | %86 → %86 | %64 | 918 → 449 |
+| Cehennem · iyi | %0 → %0 | %0 | 369 → 191 |
+| Cehennem · usta | %15 → %9 | %2 | 784 → 402 |
+| Cehennem · pro | %37 → %39 | %23 (eski %24) | 1181 → 663 |
+
+Zorluk düzeyi V0.8.0 ile aynı, hedef Cehennem'de pro botun yaklaşık %25'i bitirmesi (şimdi %23), usta botun %5'e yakın olması (%2). Yeni eğri güçlü oyuncuya sert (çubuk doluyken en dar), zayıf oyuncuya cömert; bu yüzden Rahat için `hw` 1,2 → 0,95, Cehennem için `hw` 0,82 + `drain` 0,9 (ilk deneme: `hw` 0,82 ve `drain` 1,25 ile pro bot %4'ü bitiriyordu).
+Yeni kilidin açıldıktan sonraki ilk görünüşü: eski 1,4-3,1 tur (en çok 5), yeni 0 tur. Spot ışığı yalnızca ilk üç görünüşte çıktığı ve ibreyi yalnızca 1,3 sn yavaşlattığı için botlarda fark yaratmadı.
+**Başsız ölçüm yöntemi:** `DEBUG=1 ./build.sh`, `www/` içine `tools/bot.js` ve sayfanın sonuna iş betiği (`?job=` ile gelen kodu çalıştırıp sonucu `<pre id="botres">` içine yazan küçük bir betik) koyan bir test sayfası, sonra
+`"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --user-data-dir=<geçici> --dump-dom <adres>`; yüzlerce oyun birkaç saniye sürer, 10 işi paralel çalıştırmak mümkündür. `--virtual-time-budget` bayrağı bazı işleri kilitledi, kullanma;
+Chrome'un çıktısını boru yerine dosyaya yaz (crashpad süreci boruyu açık tutabilir). Çok yetenekli botla Normal/Rahat'ta oyunlar sonsuz modda 700 sn'ye uzar (n = 300 iş 400 sn'den uzun sürebilir): n'yi azalt ya da süre sınırını (`tmax`) düşür.
