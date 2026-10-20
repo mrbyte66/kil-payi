@@ -17,7 +17,7 @@ const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/M
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 export const launch = async (o = {}) => {
-  const { width = 390, height = 844, dpr = 2, dark = false, reduceMotion = false, lang = '', seed = '', flags = [], gpu = false } = o;
+  const { width = 390, height = 844, dpr = 2, dark = false, reduceMotion = false, lang = '', seed = '', flags = [], gpu = false } = o;   // o.warm: mağaza ısınmasını (WARM) açık bırakır; varsayılan kapalı, testler beklenmedik DOM değişimi görmesin
   const prof = mkdtempSync(join(tmpdir(), 'kp-cdp-'));
   const port = 9300 + Math.floor(Math.random() * 600);
   const proc = spawn(CHROME, ['--headless=new', ...(gpu ? [] : ['--disable-gpu']), '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=' + port, '--user-data-dir=' + prof, '--window-size=' + Math.max(width, 520) + ',' + (height + 120), '--allow-file-access-from-files', '--autoplay-policy=no-user-gesture-required', ...flags, 'about:blank'], { stdio: 'ignore' });
@@ -45,7 +45,7 @@ export const launch = async (o = {}) => {
   await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: reduceMotion ? 'reduce' : 'no-preference' }, { name: 'prefers-color-scheme', value: dark ? 'dark' : 'light' }] });
   if (lang) await send('Emulation.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36', acceptLanguage: lang, platform: 'Android' });
   const langScript = lang ? 'Object.defineProperty(navigator,"language",{get:function(){return ' + JSON.stringify(lang) + '}});Object.defineProperty(navigator,"languages",{get:function(){return [' + JSON.stringify(lang) + ']}});' : '';
-  await send('Page.addScriptToEvaluateOnNewDocument', { source: 'try{' + langScript + seed + '}catch(e){}' });
+  await send('Page.addScriptToEvaluateOnNewDocument', { source: 'try{' + (o.warm ? '' : 'window.NO_WARM=true;') + langScript + seed + '}catch(e){}' });
   const api = {
     logs,
     send,
