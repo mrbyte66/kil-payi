@@ -110,7 +110,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
 .scr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:20px 20px 24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--dur-fast) var(--ease),visibility 0s linear var(--dur-fast)}
 .scr.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity var(--dur-base) var(--ease),visibility 0s}
-.scr.on .rise{animation:rise var(--dur-slow) var(--ease) both;animation-delay:calc(var(--i,0)*90ms + 80ms)}
+.scr.on .rise{animation:rise var(--dur-slow) var(--ease) backwards;animation-delay:calc(var(--i,0)*90ms + 80ms)}
 @keyframes rise{from{opacity:.5;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
 
 .menu-head{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -192,7 +192,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
 .scr.dim{background:var(--scrim);justify-content:center}
 .card{width:min(100%,380px);padding:26px 20px 20px;border-radius:var(--r-l);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-.scr.on .card{animation:card-in var(--dur-slow) var(--ease) both}
+.scr.on .card{animation:card-in var(--dur-slow) var(--ease) backwards}
 @keyframes card-in{from{opacity:0;transform:translateY(28px) scale(.95)}to{opacity:1;transform:none}}
 .glass{background:var(--glass);border:1px solid var(--glass-edge);box-shadow:var(--shadow-m);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass{background:var(--surface)}}
@@ -623,7 +623,11 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop .sbt{white-space:nowrap;padding:0 8px}
 /* hafifletme: sahne dışı animasyonlar durur, tuval ve arka plan mağaza açıkken çizilmez */
 #app.shopping .amb{display:none}
-#shop .fc.far *,#shop .fc.far *::after{animation-play-state:paused!important}
+/* performans (V0.9.5): yalnızca odaktaki cephe ve dock'ta seçili simge hareketlidir; ötekilerde animasyon hiç yoktur (katman ve her karedeki iş azalır) */
+#shop .fc.far *,#shop .fc.far *::before,#shop .fc.far *::after{animation:none!important}
+#shop .dock .dk:not(.on) *,#shop .dock .dk:not(.on) *::before,#shop .dock .dk:not(.on) *::after{animation:none!important}
+/* görünmeyen görünüm (sokak ya da dükkân içi) hareket etmez: eski dükkân içi, sokakta kaydırırken boşuna dönüp duruyordu */
+#shop .vw:not(.on) *,#shop .vw:not(.on) *::before,#shop .vw:not(.on) *::after{animation:none!important}
 #shop .lts.lg{animation:aGl2 2.6s ease-in-out infinite}
 #shop .lts.lg1{animation-delay:-.87s}
 #shop .lts.lg2{animation-delay:-1.73s}
@@ -674,9 +678,9 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 /* V0.9.4: sahne sol-üst köşeden değil ekranın ortasından yakınlaşır (translate telafisi; --vw ve --vh ekranın boyudur) ve daha belirgindir */
 @keyframes stIn{from{transform:translate(calc(var(--vw,0px) * -.07),calc(var(--vh,0px) * -.07)) scale(calc(var(--k,1) * 1.14))}to{transform:scale(var(--k,1))}}
 @keyframes stOut{from{transform:scale(var(--k,1))}to{transform:translate(calc(var(--vw,0px) * .035),calc(var(--vh,0px) * .035)) scale(calc(var(--k,1) * .93))}}
-#shop.on{animation:stFade .38s ease-out both}
+#shop.on{animation:stFade .38s ease-out backwards}
 #shop.leaving{animation:stFadeOut .36s ease-in both}
-#shop.on .stg{animation:stIn .85s cubic-bezier(.16,1,.3,1) both}
+#shop.on .stg{animation:stIn .85s cubic-bezier(.16,1,.3,1) backwards}
 #shop.leaving .stg{animation:stOut .36s cubic-bezier(.45,0,.8,.5) both;pointer-events:none}
 /* mağaza ilk açılırken (opening sınıfı ~1,5 sn): başlık yukarıdan iner, cepheler sırayla yükselir, buton zıplayarak gelir, alt şerit aşağıdan çıkar */
 @keyframes stDrop{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:none}}
@@ -688,13 +692,14 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop.opening .hub .cta{animation:stCtaIn .6s cubic-bezier(.2,.9,.3,1) .46s backwards}
 #shop.opening .hub .dock{animation:stUp .6s cubic-bezier(.2,.8,.2,1) .28s backwards}
 /* dükkâna girerken kapıdan ışık yayılır, oda ışığın altında belirir, ışık sönerek odayı açar */
-#shop .bloom{position:absolute;inset:0;z-index:15;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 56%,rgba(255,250,232,1) 0,rgba(255,226,168,.92) 26%,rgba(255,196,120,.55) 52%,rgba(255,190,120,0) 82%);transition:opacity .26s ease-in}
+#shop .bloom{display:none;position:absolute;inset:0;z-index:15;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 56%,rgba(255,250,232,1) 0,rgba(255,226,168,.92) 26%,rgba(255,196,120,.55) 52%,rgba(255,190,120,0) 82%);transition:opacity .26s ease-in}
+#shop .bloom.rdy{display:block}
 #shop .bloom.on{opacity:1}
 #shop .bloom.out{transition:opacity .55s ease-out}
 @keyframes hubIn{from{opacity:0;transform:scale(1.12)}to{opacity:1;transform:none}}
-#shop .vw.hub.ent{animation:hubIn .75s cubic-bezier(.22,.61,.36,1) both}
+#shop .vw.hub.ent{animation:hubIn .75s cubic-bezier(.22,.61,.36,1) backwards}
 @keyframes stRise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
-#shop .rs{animation:stRise .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--d,0) * 70ms + 140ms)}
+#shop .rs{animation:stRise .55s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--d,0) * 70ms + 140ms)}
 @keyframes stPop{0%{transform:scale(.84)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
 #shop .itm.pop,#shop .pch.pop,#shop .dm.pop,#shop .lad span.pop{animation:stPop .7s cubic-bezier(.2,.9,.3,1.2)}
 /* hareketli büyük katmanlar önceden katman olur: ölçek animasyonu her karede yeniden çizim istemez (yavaş cihazlarda takılmayı azaltır) */
@@ -1405,7 +1410,7 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.9.4';
+const VERSION = 'V0.9.5';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -3382,19 +3387,38 @@ const hubHtml = () => {
     '<button class="cta" type="button" id="stCta" data-a="gosel"></button>' +
     '<div class="dock" id="stDock">' + SHOPS.map((s, i) => '<div class="dk" data-a="dot" data-i="' + i + '" role="button" aria-label="' + t('st_n_' + s.id) + '">' + sRing({ s: 32, a: ringOfShop(s.id), m: s.ic, g: 1, ms: 15, sp: 5, dl: i * 1.3, sw: 15 }) + '<small>' + t('st_s_' + s.id) + '</small></div>').join('') + '</div>';
 };
-const syncHub = () => {
+/* Kaydırma (V0.9.5, kullanıcı: "dükkânları kaydırırken çok kasıyor"): eski işleyici her scroll olayında buton yazısını, dock sınıflarını ve cephe sınıflarını yeniden yazıyordu;
+   kaydırma başına ~50 yerleşim ve boyama çıkıyor, her biri 130 katmanlı ağacı yeniden kurduruyordu. Şimdi: olay kare başına en çok bir kez işlenir (rAF); her karede yalnızca iki gökyüzü
+   katmanının dönüşümü yazılır (bileşen özelliği: boyama ve yerleşim yok); dock ve buton yalnızca dükkân (yuvarlanmış sıra) değişince güncellenir; hangi cephenin hareketli olacağı
+   (yalnızca odaktaki) kaydırma durunca (140 ms) seçilir, yani kaydırırken hiçbir animasyon başlamaz ya da durmaz. */
+const hubFocus = i => {
+  const d = $('stDock').children, sh = SHOPS[i], cta = $('stCta'), g = sh.id === 'hed' ? giftState() : null, quiet = sh.soon || (g && g.wait > 0);
+  for (let q = 0; q < d.length; q++) d[q].classList.toggle('on', q === i);
+  const lab = t(sh.soon ? 'st_ctaLook' : (sh.id === 'hed' ? (g.wait > 0 ? 'st_ctaLook' : 'st_ctaGift') : 'st_ctaEnter')), cls = 'cta' + (quiet ? ' soon' : '');
+  if (cta.textContent !== lab) cta.textContent = lab;
+  if (cta.className !== cls) cta.className = cls;
+};
+const hubSettle = () => { stHub.querySelectorAll('.fc').forEach((f, q) => f.classList.toggle('far', q !== SS.idx)); };
+/* Gökyüzü paralaksı (iki silüet farklı hızda kayar): ScrollTimeline ile bileşen iş parçacığında çalışır, kaydırırken ana iş parçacığına hiç dokunmaz.
+   Eskiden her karede style.transform yazılıyordu; bu her karede iki büyük katmanı yeniden boyatıp raster ettiriyordu (ölçüm: kaydırma başına ~190 boyama). ScrollTimeline yoksa (eski WebView) silüet sabit kalır. */
+const hubParallax = () => {
+  if (typeof ScrollTimeline === 'undefined') return;
+  try {
+    const car = $('stCar'), max = Math.max(1, car.scrollWidth - car.clientWidth), tl = new ScrollTimeline({ source: car, axis: 'x' });
+    [['stSkF', 0.12], ['stSkN', 0.3]].forEach(([id, k]) => { const e = $(id); if (e) e.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-max * k).toFixed(1) + 'px)' }], { timeline: tl, fill: 'both', easing: 'linear' }); });
+  } catch (e) { /* desteklenmiyor: sabit */ }
+};
+const hubApply = force => {
   const car = $('stCar');
   if (!car) return;
-  const sl = car.scrollLeft, i = Math.max(0, Math.min(SHOPS.length - 1, Math.round(sl / SHOP_STEP))), f = $('stSkF'), n = $('stSkN'), d = $('stDock').children;
-  SS.idx = i;
-  if (f) f.style.transform = 'translateX(' + (-sl * 0.12).toFixed(1) + 'px)';
-  if (n) n.style.transform = 'translateX(' + (-sl * 0.3).toFixed(1) + 'px)';
-  for (let q = 0; q < d.length; q++) d[q].className = 'dk' + (q === i ? ' on' : '');
-  /* ekranda görünmeyen cepheler animasyonu durdurur (hafif kalsın) */
-  stHub.querySelectorAll('.fc').forEach((f, q) => f.classList.toggle('far', Math.abs(sl / SHOP_STEP - q) > 1.3));
-  const sh = SHOPS[i], cta = $('stCta'), g = sh.id === 'hed' ? giftState() : null, quiet = sh.soon || (g && g.wait > 0);
-  cta.textContent = t(sh.soon ? 'st_ctaLook' : (sh.id === 'hed' ? (g.wait > 0 ? 'st_ctaLook' : 'st_ctaGift') : 'st_ctaEnter'));
-  cta.className = 'cta' + (quiet ? ' soon' : '');
+  const i = Math.max(0, Math.min(SHOPS.length - 1, Math.round(car.scrollLeft / SHOP_STEP)));
+  if (force || i !== SS.idx) { SS.idx = i; hubFocus(i); }
+  clearTimeout(SS.settleT); SS.settleT = setTimeout(hubSettle, 140);
+};
+const syncHub = force => {
+  if (force === true) { cancelAnimationFrame(SS.syncRaf); SS.syncRaf = 0; hubApply(true); return; }
+  if (SS.syncRaf) return;
+  SS.syncRaf = requestAnimationFrame(() => { SS.syncRaf = 0; hubApply(false); });
 };
 const renderHub = keep => {
   const car = $('stCar'), at = car ? car.scrollLeft : SS.idx * SHOP_STEP;
@@ -3403,8 +3427,8 @@ const renderHub = keep => {
   const c2 = $('stCar');
   c2.style.scrollBehavior = 'auto'; c2.scrollLeft = keep === false ? SS.idx * SHOP_STEP : at; c2.style.scrollBehavior = '';
   stHub.querySelectorAll('.fc').forEach((f, q) => f.style.setProperty('--o', Math.abs(q - SS.idx)));
-  c2.addEventListener('scroll', syncHub);
-  syncHub();
+  c2.addEventListener('scroll', syncHub, { passive: true });
+  syncHub(true); hubSettle(); hubParallax();
 };
 
 /* dükkân içleri */
@@ -3567,6 +3591,8 @@ const showView = v => {
   const was = SS.view;
   SS.view = v;
   stHub.classList.toggle('on', v === 'hub'); stShop.classList.toggle('on', v === 'shop');
+  /* sokağa dönünce vitrin, az önce içinde olunan dükkânı gösterir (dükkândan dükkâna geçilmiş olabilir); dock, buton ve odaktaki cephe buna göre tazelenir */
+  if (v === 'hub') { const car = $('stCar'); if (car && Math.abs(car.scrollLeft - SS.idx * SHOP_STEP) > 4) { car.style.scrollBehavior = 'auto'; car.scrollLeft = SS.idx * SHOP_STEP; car.style.scrollBehavior = ''; } syncHub(true); hubSettle(); }
   if (v === 'hub' && was === 'shop' && !RM) { stHub.classList.remove('ent'); void stHub.offsetWidth; stHub.classList.add('ent'); stLater(() => stHub.classList.remove('ent'), 800); }
 };
 const shopGo = id => {
@@ -3579,10 +3605,10 @@ const enterShop = id => {
   if (SS.view !== 'hub' || !f || RM) { shopGo(id); return; }
   stBusy(950); shopEl.classList.remove('opening');
   f.classList.add('sel'); stHub.classList.add('zoom'); Snd.ui();
-  stLater(() => stBloom.classList.add('on'), 250);
+  stLater(() => { stBloom.classList.add('rdy'); void stBloom.offsetWidth; stBloom.classList.add('on'); }, 250);
   stLater(() => shopGo(id), 520);
   stLater(() => { stBloom.classList.add('out'); stBloom.classList.remove('on'); }, 560);
-  stLater(() => { stHub.classList.remove('zoom'); f.classList.remove('sel'); stBloom.classList.remove('out'); }, 1150);
+  stLater(() => { stHub.classList.remove('zoom'); f.classList.remove('sel'); stBloom.classList.remove('out', 'rdy'); }, 1150);
 };
 /* dükkânlar arası: sokaktaysan önce o cepheye kaydırır sonra girer; bir dükkânın içindeysen oda yumuşakça değişir */
 const swapShop = id => {
@@ -3698,7 +3724,7 @@ const stTick = () => {
   if (stDay() !== SS.day) renderHub();
   const f = stHub.querySelector('.fc[data-s="hed"] .plq');
   if (f) f.innerHTML = plaqueHtml(SHOPS[3]);
-  syncHub();
+  syncHub(true);
   if (SS.view === 'shop' && SS.shop === 'hed' && $('stGiftWrap')) {
     const g = giftState();
     $('stGiftWrap').innerHTML = giftBtnHtml(); $('stGiftLad').innerHTML = giftLadderHtml(); $('stGiftRing').innerHTML = giftRingHtml(); $('stGiftRst').innerHTML = giftRstHtml();
@@ -3722,7 +3748,7 @@ const openShop = (from, opt) => {
   opt = opt || {};
   shopFrom = from; SS.closing = false; SS.busy = false; SS.open = true;
   SS.timers.forEach(clearTimeout); SS.timers = [];
-  shopEl.classList.remove('leaving'); stBloom.classList.remove('on', 'out');
+  shopEl.classList.remove('leaving'); stBloom.classList.remove('on', 'out', 'rdy');
   show(shopEl); app.classList.add('shopping'); fitStore(); closeSheet();
   if (!RM) { shopEl.classList.add('opening'); stLater(() => shopEl.classList.remove('opening'), 1600); }
   SS.bagPrev = bagKeys(); SS.menuPop = []; SS.pop = [];
@@ -3739,7 +3765,7 @@ const closeShop = () => {
   if (SS.closing) return;
   SS.closing = true; SS.open = false;
   clearInterval(SS.tick); SS.tick = 0; SS.timers.forEach(clearTimeout); SS.timers = [];
-  closeSheet(); stHub.classList.remove('zoom'); shopEl.classList.remove('opening'); stBloom.classList.remove('on', 'out');
+  closeSheet(); stHub.classList.remove('zoom'); shopEl.classList.remove('opening'); stBloom.classList.remove('on', 'out', 'rdy');
   app.classList.remove('shopping');
   if (shopFrom === 'over') show(overEl); else show(menuEl);
   refreshStats(); SS.menuPop = [];
