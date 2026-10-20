@@ -114,7 +114,7 @@ S.autoJ=false;G.adv='kron';G.advT=0.71;kn=S.tools.kron.n;G.time=1.5;G.advCool={}
 const SCENE = HEAD + `
 K.G.mode='menu';K.SS.force='day';K.openShop('menu');await sleep(700);
 T('gündüz: sahne gündüz sınıfı',$('stHub').classList.contains('day')&&K.SS.day===true);
-T('gündüz: güneş ve bulut var, ay ve yıldız yok',!!document.querySelector('#stHub .sun')&&document.querySelectorAll('#stHub .cld').length>=3&&!document.querySelector('#stHub .moon')&&!document.querySelector('#stHub .stars'));
+T('gündüz: güneş, dükkânların önünde bulut şeridi, gölge şeridi ve kuş sürüsü var, ay ve yıldız yok',!!document.querySelector('#stHub .sun')&&document.querySelectorAll('#stHub .skyfx .cl').length>=8&&document.querySelectorAll('#stHub .skyfx .csh').length>=8&&document.querySelectorAll('#stHub .skyfx .bd').length===3&&!document.querySelector('#stHub .moon')&&!document.querySelector('#stHub .stars'));
 T('gündüz: ışık parlamaları ve ateş böcekleri yok',!document.querySelector('#stHub .ffs')&&getComputedStyle(document.querySelector('#stHub .lts.lg')).display==='none');
 K.SS.force='night';K.renderHub();
 T('akşam: ay, yıldızlar, iki kayan yıldız, ateş böcekleri',!!document.querySelector('#stHub .moon')&&!!document.querySelector('#stHub .stars')&&document.querySelectorAll('#stHub .shoot').length===2&&!!document.querySelector('#stHub .ffs')&&!$('stHub').classList.contains('day'));
@@ -153,9 +153,28 @@ await sleep(900);
 var hubInf=function(){return document.getAnimations().filter(function(a){var e=a.effect&&a.effect.target;return e&&e.closest&&e.closest('#stHub')&&a.playState==='running'&&a.effect.getComputedTiming().iterations===Infinity}).length};
 var farOnes=[].slice.call(document.querySelectorAll('#stHub .fc.far')).length;
 T('performans: yalnızca odaktaki cephe hareketli (3 cephe sakin)',farOnes===3&&hubInf()>0&&hubInf()<45,[farOnes,hubInf()]);
-var ctaNode=$('stCta').firstChild;$('stCar').scrollLeft+=60;await sleep(300);
-T('performans: aynı dükkânda kaydırınca buton yeniden yazılmaz (yerleşim ve boyama yok)',$('stCta').firstChild===ctaNode&&K.SS.idx===1,K.SS.idx);
-T('sokağa dönünce vitrin içinde olunan dükkânı gösterir (Yetenekler)',Math.abs($('stCar').scrollLeft-232)<70&&document.querySelectorAll('#stDock .dk')[1].classList.contains('on'),[$('stCar').scrollLeft]);
+T('sokağa dönünce vitrin içinde olunan dükkânı gösterir (Yetenekler)',Math.abs(K.SS.pos-232)<1&&document.querySelectorAll('#stDock .dk')[1].classList.contains('on'),[K.SS.pos]);
+var car=$('stCar'),rc=car.getBoundingClientRect(),X0=rc.left+rc.width*0.6,Y0=rc.top+rc.height*0.4;
+var pe=function(ty,x){return new PointerEvent(ty,{pointerId:7,pointerType:'touch',isPrimary:true,clientX:x,clientY:Y0,bubbles:true,cancelable:true})};
+var down=function(){car.dispatchEvent(pe('pointerdown',X0))},mv=function(dx){window.dispatchEvent(pe('pointermove',X0+dx))},up=function(dx){window.dispatchEvent(pe('pointerup',X0+dx))};
+var inf=function(){return document.getAnimations().filter(function(a){var e=a.effect&&a.effect.target;return e&&e.closest&&e.closest('#stHub')&&!e.closest('.skyfx')&&a.effect.getComputedTiming().iterations===Infinity&&a.playState==='running'}).length};
+down();await sleep(120);mv(-20);await sleep(120);mv(-80);await sleep(30);
+var want=232+80/K.SS.k;
+T('kaydırma: şerit parmağı birebir izler (konum = 232 + 80/k)',Math.abs(K.SS.pos-want)<2,[K.SS.pos,want]);
+T('performans: sürüklerken (mv) süs animasyonları kalkar',$('stHub').classList.contains('mv')&&inf()===0,[$('stHub').className,inf()]);
+up(-80);await sleep(700);
+T('kaydırma: küçük ve yavaş sürükleme aynı dükkânda kalır ve konum oturur',K.SS.idx===1&&Math.abs(K.SS.pos-232)<1,[K.SS.idx,K.SS.pos]);
+T('performans: kaydırma durunca (mv kalkar) animasyonlar geri gelir',!$('stHub').classList.contains('mv')&&inf()>0,[$('stHub').className,inf()]);
+var muts=0,mo=new MutationObserver(function(m){muts+=m.length});mo.observe($('stCta'),{childList:true,characterData:true,subtree:true,attributes:true});
+down();await sleep(15);mv(-300);await sleep(15);mv(-700);await sleep(15);mv(-1200);up(-1200);
+click('#stHub .fc[data-s="hed"]');T('kaydırma: sürükleme bittikten hemen sonra gelen tıklama dükkâna girmez',K.SS.view==='hub');
+await sleep(900);mo.disconnect();
+T('kaydırma: çok hızlı ve çok uzun fırlatma tek hamlede yalnızca BİR dükkân ilerler (Yetenekler → Görünüm)',K.SS.idx===2&&Math.abs(K.SS.pos-464)<1,[K.SS.idx,K.SS.pos]);
+T('performans: kaydırırken buton yalnızca dükkân değişince yazılır, her karede değil (≤ 8 kayıt)',muts<=8,muts);
+down();await sleep(20);mv(300);await sleep(20);mv(800);up(800);await sleep(800);
+T('kaydırma: ters yönde fırlatma bir dükkân geri gelir (Görünüm → Yetenekler)',K.SS.idx===1&&Math.abs(K.SS.pos-232)<1,[K.SS.idx,K.SS.pos]);
+K.pagerTo(0,0);down();await sleep(20);mv(500);await sleep(20);mv(900);up(900);await sleep(700);
+T('kaydırma: ilk dükkânda sağa fırlatınca taşmaz (uçta yaylanıp geri oturur)',K.SS.idx===0&&Math.abs(K.SS.pos)<1,[K.SS.idx,K.SS.pos]);
 K.closeShop();T('çıkış: mağaza solarak kapanır (leaving)',$('shop').classList.contains('leaving')&&getComputedStyle($('shop')).animationName.indexOf('stFadeOut')>=0,getComputedStyle($('shop')).animationName);
 await sleep(120);var o2=+getComputedStyle($('shop')).opacity;T('çıkış yarıdayken mağaza yarı saydam',o2>0&&o2<1,o2);
 await sleep(500);T('çıkış bitti',!$('shop').classList.contains('on')&&$('menu').classList.contains('on'));
@@ -214,7 +233,8 @@ const MIG = [
   ['v092_hediye', { v: 3, coins: 10, gift: { n: 5, t: Date.now() + 5 * 3600000 } }, "S.gift.n===0&&S.gift.t0===0&&S.gift.t===undefined"],
   ['bozuk', { v: 3, own: { kron: 0, kum: 1 }, slots: 99, equip: 'x', tools: { steto: { n: -4, l: 9 }, kron: { n: 'a', l: 0 } }, autoOwn: false, autoJ: true, gift: { n: 9, t0: 0 }, lang: 'xx', music: 'abc' },
     "S.slots===4&&S.own.kum===1&&S.own.kron===0&&Array.isArray(S.equip)&&S.equip.length===4&&K.isEq('kum')&&S.tools.steto.n===0&&S.tools.steto.l===3&&S.tools.kron.l===1&&S.autoJ===false&&S.gift.n===0&&S.lang===''&&S.music===true"],
-  ['anim_kapali', { v: 3, anim: false, coins: 5 }, "S.anim===false&&K.getRM()===true&&document.documentElement.classList.contains('calm')"],
+  ['anim_kapali', { v: 3, anim: false, animV: 1, coins: 5 }, "S.anim===false&&K.getRM()===true&&document.documentElement.classList.contains('calm')"],
+  ['anim_eski_kapali', { v: 3, anim: false, coins: 5 }, "S.anim===true&&S.animV===1&&K.getRM()===false&&!document.documentElement.classList.contains('calm')"],
   ['otomatik_yok', { v: 3, own: { kron: 1 }, slots: 1, equip: ['kron', 'kum', '', ''], autoOwn: false, autoJ: true }, "S.autoJ===false&&K.equipped().join()==='kron'&&S.equip[1]===''"]
 ];
 

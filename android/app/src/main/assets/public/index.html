@@ -257,7 +257,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 html.calm .amb i,html.calm .breathe{animation:none}html.calm .scr.on .rise,html.calm .scr.on .card{animation-duration:1ms;animation-delay:0s}html.calm .btn,html.calm .icon-btn,html.calm .hud,html.calm .tools,html.calm .tool{transition:none}
 #shop .vw{position:absolute;inset:0;transition:opacity .4s,transform .5s cubic-bezier(.2,.9,.25,1);opacity:0;pointer-events:none;transform:scale(1.05)}
 #shop .vw.on{opacity:1;pointer-events:auto;transform:none}
-#shop .hd{position:absolute;left:14px;right:14px;top:16px;display:flex;align-items:center;gap:8px;height:44px;z-index:7}
+#shop .hd{position:absolute;left:14px;right:14px;top:16px;display:flex;align-items:center;gap:8px;height:44px;z-index:9}
 #shop .hd .tt{flex:1;min-width:0}
 #shop .hd h4{margin:0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:26px;line-height:1;color:#fff;letter-spacing:-.01em;text-shadow:0 2px 10px rgba(20,10,80,.55)}
 #shop .hd small{display:block;font-size:12px;font-weight:700;color:#E3DBFF;margin-top:3px;text-shadow:0 1px 6px rgba(20,10,80,.6)}
@@ -272,18 +272,18 @@ html.calm .amb i,html.calm .breathe{animation:none}html.calm .scr.on .rise,html.
 #shop .moon{position:absolute;right:40px;top:76px;width:30px;height:30px;border-radius:50%;box-shadow:inset -9px -3px 0 0 #FFF0C2;filter:drop-shadow(0 0 10px rgba(255,236,170,.8));transform:rotate(-18deg)}
 #shop .stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.7;animation:aTw 3.2s ease-in-out infinite}
 @keyframes aTw{50%{opacity:.1;transform:scale(.5)}}
-#shop .sk{position:absolute;left:0;will-change:transform}
+#shop .sk{position:absolute;left:0}
 #shop .skf{top:calc(var(--hz) - 122px);height:118px}
 #shop .skn{top:calc(var(--hz) - 96px);height:112px}
 #shop .ground{position:absolute;left:0;right:0;top:var(--hz);bottom:0;background:linear-gradient(180deg,#3A2B92 0%,#241A6C 100%)}
 #shop .ground::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 30px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 20px);-webkit-mask-image:linear-gradient(180deg,#000,transparent);mask-image:linear-gradient(180deg,#000,transparent)}
-#shop .car{position:absolute;left:0;right:0;top:calc(78px + var(--cy));height:420px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;cursor:grab}
+#shop .car{position:absolute;left:0;right:0;top:calc(78px + var(--cy));height:420px;overflow:hidden;cursor:grab;touch-action:pan-y}
 #shop .car::-webkit-scrollbar{display:none}
-#shop .strip{position:relative;display:flex;gap:12px;padding:0 calc((var(--sw) - 220px) / 2);height:100%;width:max-content}
+#shop .strip{position:relative;display:flex;gap:12px;padding:0 calc((var(--sw) - 220px) / 2);height:100%;width:max-content;will-change:transform}
 #shop .lts{position:absolute;left:0;top:6px;pointer-events:none;z-index:4}
 #shop .lts .bg{animation:aGl 2.6s ease-in-out infinite}
 @keyframes aGl{50%{opacity:.12}}
-#shop .fc{flex:none;width:220px;height:346px;margin-top:30px;position:relative;scroll-snap-align:center;transition:transform .55s cubic-bezier(.45,.05,.3,1),opacity .35s;cursor:pointer}
+#shop .fc{flex:none;width:220px;height:346px;margin-top:30px;position:relative;transition:transform .55s cubic-bezier(.45,.05,.3,1),opacity .35s;cursor:pointer}
 #shop .fc .wall{position:absolute;inset:0;border-radius:20px 20px 4px 4px;background:linear-gradient(180deg,var(--w1),var(--w2));box-shadow:inset 0 0 0 2px rgba(255,255,255,.14),0 26px 44px -12px rgba(8,4,40,.7)}
 #shop .fc .wall::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,rgba(255,255,255,.2),rgba(255,255,255,0)) left/13px 100% no-repeat,linear-gradient(270deg,rgba(255,255,255,.2),rgba(255,255,255,0)) right/13px 100% no-repeat,radial-gradient(ellipse at 50% 14%,rgba(255,226,160,.38),rgba(255,226,160,0) 58%)}
 #shop .fc .wall::before{content:"";position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 2px,transparent 2px 16px),repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 2px,transparent 2px 22px)}
@@ -342,12 +342,12 @@ html.calm .amb i,html.calm .breathe{animation:none}html.calm .scr.on .rise,html.
 @keyframes aBlink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
 #shop .fc .ribbon{position:absolute;top:96px;right:-12px;background:linear-gradient(90deg,#FF9DBE,#E8456E);color:#fff;font-weight:800;font-size:11px;padding:4px 12px;border-radius:6px 0 0 6px;z-index:7;box-shadow:0 6px 10px rgba(80,10,40,.5)}
 #shop .fc .ribbon::after{content:"";position:absolute;right:0;bottom:-6px;border-style:solid;border-width:6px 12px 0 0;border-color:#9E2A52 transparent transparent}
-#shop .cta{position:absolute;left:50%;top:calc(474px + var(--cy));margin-left:-84px;width:168px;height:44px;border-radius:999px;border:0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:17px;color:#2B2166;background:linear-gradient(135deg,#FFE9A8,#F4B63F);box-shadow:0 12px 24px -6px rgba(244,166,42,.8),inset 0 1px 0 rgba(255,255,255,.7);cursor:pointer;overflow:hidden;z-index:6}
+#shop .cta{position:absolute;left:50%;top:calc(474px + var(--cy));margin-left:-84px;width:168px;height:44px;border-radius:999px;border:0;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:17px;color:#2B2166;background:linear-gradient(135deg,#FFE9A8,#F4B63F);box-shadow:0 12px 24px -6px rgba(244,166,42,.8),inset 0 1px 0 rgba(255,255,255,.7);cursor:pointer;overflow:hidden;z-index:9}
 #shop .cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.7),rgba(255,255,255,0));transform:skewX(-18deg);animation:aSh 3.6s ease-in-out infinite}
 @keyframes aSh{0%,55%{left:-60%}100%{left:130%}}
 #shop .cta.soon{background:rgba(255,255,255,.14);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.3)}
 #shop .cta.soon::after{display:none}
-#shop .dock{position:absolute;left:14px;right:14px;bottom:12px;height:58px;border-radius:22px;background:rgba(18,10,68,.62);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:6}
+#shop .dock{position:absolute;left:14px;right:14px;bottom:12px;height:58px;border-radius:22px;background:rgba(18,10,68,.62);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:9}
 #shop .dock .dk{width:56px;height:46px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:background .25s,transform .25s;position:relative}
 #shop .dock .dk .md{transition:transform .25s}
 #shop .dock .dk small{font-size:11px;font-weight:800;color:#CFC6F5;line-height:1}
@@ -625,6 +625,9 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop .dock .dk:not(.on) *,#shop .dock .dk:not(.on) *::before,#shop .dock .dk:not(.on) *::after{animation:none!important}
 /* görünmeyen görünüm (sokak ya da dükkân içi) hareket etmez: eski dükkân içi, sokakta kaydırırken boşuna dönüp duruyordu */
 #shop .vw:not(.on) *,#shop .vw:not(.on) *::before,#shop .vw:not(.on) *::after{animation:none!important}
+/* kaydırırken (V0.9.7): hareketli süsler kalkar (gerçek telefonda kaydırma bu yüzden görünmüyordu: her karede 80+ katman çiziliyordu); bulut ve kuşlar yerinde kalır (paused) */
+#stHub.mv :not(.skyfx,.skyfx *),#stHub.mv :not(.skyfx,.skyfx *)::before,#stHub.mv :not(.skyfx,.skyfx *)::after{animation:none!important}
+#stHub.mv .skyfx,#stHub.mv .skyfx *{animation-play-state:paused!important}
 #shop .lts.lg{animation:aGl2 2.6s ease-in-out infinite}
 #shop .lts.lg1{animation-delay:-.87s}
 #shop .lts.lg2{animation-delay:-1.73s}
@@ -658,12 +661,18 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop .sun{position:absolute;right:34px;top:70px;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 38% 36%,#FFFDE8,#FFE680 55%,#FFC83D)}
 #shop .sun::before{content:"";position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(circle,rgba(255,238,160,.75),rgba(255,238,160,0) 65%);animation:aSunGlow 6s ease-in-out infinite}
 @keyframes aSunGlow{50%{transform:scale(1.18);opacity:.7}}
-#shop .cld{position:absolute;left:-120px;pointer-events:none;animation:cldMove 90s linear infinite}
-@keyframes cldMove{from{transform:translateX(0)}to{transform:translateX(calc(var(--sw,296px) + 150px))}}
-#shop .brw{position:absolute;left:-30px;pointer-events:none;animation:brdFly 46s linear infinite}
-@keyframes brdFly{from{transform:translateX(0)}to{transform:translateX(calc(var(--sw,296px) + 80px))}}
-#shop .brd{display:block;animation:brdBob 2.4s ease-in-out infinite}
-@keyframes brdBob{50%{transform:translateY(-6px)}}
+/* gündüz gökyüzü efektleri (V0.9.7): dükkânların ÖNÜNDE (başlık ve alt şeridin altında) bulut şeridi, aynı hızda giden bulut gölgeleri ve kuş sürüsü; her biri tek öğe olarak hareket eder */
+#shop .skyfx{position:absolute;left:0;right:0;top:0;height:calc(var(--hz) + 150px);overflow:hidden;pointer-events:none;z-index:8}
+#shop .skyfx .tr{position:absolute;left:0;top:0;height:100%;animation:skyDrift 84s linear infinite}
+@keyframes skyDrift{to{transform:translateX(-50%)}}
+#shop .skyfx .cl{position:absolute;opacity:.92}
+#shop .skyfx .cl svg{display:block}
+#shop .skyfx .csh{position:absolute;border-radius:50%;background:radial-gradient(ellipse at 50% 50%,rgba(26,18,96,.4) 0,rgba(26,18,96,.24) 46%,rgba(26,18,96,0) 72%)}
+#shop .skyfx .csh.g{background:radial-gradient(ellipse at 50% 50%,rgba(40,30,130,.45) 0,rgba(40,30,130,.26) 46%,rgba(40,30,130,0) 72%)}
+#shop .skyfx .flk{position:absolute;left:0;top:96px;width:90px;height:60px;animation:skyFly 40s linear infinite}
+@keyframes skyFly{from{transform:translateX(-100px)}to{transform:translateX(calc(var(--sw,296px) + 40px))}}
+#shop .skyfx .bd{position:absolute;display:block;transform-origin:50% 85%;animation:skyFlap .46s ease-in-out infinite alternate}
+@keyframes skyFlap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
 /* kayan yıldız: ince bir iz, 6-7 saniyede bir kısa çizer */
 #shop .shoot{position:absolute;width:84px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff);opacity:0;pointer-events:none;animation:aShoot 19s linear infinite}
 #shop .shoot::after{content:"";position:absolute;right:-2px;top:-2px;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 10px 3px rgba(255,255,255,.85)}
@@ -702,7 +711,6 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 /* hareketli büyük katmanlar önceden katman olur: ölçek animasyonu her karede yeniden çizim istemez (yavaş cihazlarda takılmayı azaltır) */
 #shop .stg{will-change:transform}
 #shop .vw{will-change:transform,opacity}
-#shop .fc{will-change:transform}
 #shop .shopv.swap{opacity:0!important;transform:translateX(-18px) scale(.985)!important;transition:opacity .2s,transform .2s}
 </style>
 
@@ -1407,9 +1415,9 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.9.6';
+const VERSION = 'V0.9.7';
 const save = {
-  coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, autoJ: false, tut: false, lvl: 'normal', lang: '',
+  coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
   tools: { steto: { n: 0, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } },
   /* Mağaza (V0.9.2): açık jokerler, açık yuva sayısı, yuvalardaki jokerler, Otomatik joker yeteneği, Hediye (reklam) basamağı ve bekleme bitişi */
@@ -1442,6 +1450,8 @@ if (save.run) { if (LEVELS.indexOf(save.run.lvl) < 0) save.run.lvl = save.lvl; e
 if (!save.tips || typeof save.tips !== 'object') save.tips = {};
 if (save.lang !== 'tr' && save.lang !== 'en') save.lang = '';
 save.music = save.music !== false;
+/* V0.9.7: kullanıcı "animasyonlar varsayılan olarak açık gelsin" dedi: önceki sürümlerde denerken kapatılmış olabilir, güncellemede bir kez açılır (sonra seçimi korunur) */
+if (save.animV !== 1) { save.anim = true; save.animV = 1; }
 save.anim = save.anim !== false; applyMotion();
 save.low = save.low | 0; save.high = save.high | 0; save.highU = save.highU | 0;
 save.camp = Math.max(1, save.camp | 0); save.bestL = save.bestL | 0;
@@ -3030,7 +3040,7 @@ const updateAdvice = dt => {
 const runCoins = (raw, near, coinsJ, lv) => Math.max(0, Math.round((Math.floor((raw || 0) / CFG.coinDiv) + (near || 0) * CFG.nearCoin + Math.floor(coinsJ || 0)) * lv.coin));
 const die = () => {
   if (G.mode !== 'play') return;
-  G.mode = 'dead'; G.deadT = RM ? 0.6 : 0.85; G.tail = null;
+  G.mode = 'dead'; G.deadT = RM ? 0.6 : 0.85 * BURN.slow; G.tail = null;
   startBurn();
   toolsEl.classList.remove('on');
   const w = G.omega * (G.slow > 0 ? CFG.contSlowMul : 1);
@@ -3304,14 +3314,22 @@ const stDay = () => {
   const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
   return h >= 6.5 && h < 18;
 };
-const sCloudSvg = (w, h) => '<svg width="' + w + '" height="' + h + '" viewBox="0 0 100 44" aria-hidden="true"><g fill="#fff"><circle cx="27" cy="29" r="13"/><circle cx="46" cy="20" r="18"/><circle cx="68" cy="27" r="14"/><circle cx="82" cy="32" r="9"/><rect x="14" y="30" width="76" height="12" rx="6"/></g></svg>';
-const sClouds = () => {
-  const r = sRand(17), cl = [[96, 96, 74], [78, 150, 96], [112, 205, 118], [70, 120, 62]];
-  return cl.map((c, i) => '<div class="cld" style="top:' + c[1] + 'px;opacity:' + (0.78 + r() * 0.2).toFixed(2) + ';animation-duration:' + (c[2] + 20) + 's;animation-delay:-' + (r() * c[2]).toFixed(1) + 's">' + sCloudSvg(c[0], Math.round(c[0] * 0.44)) + '</div>').join('');
+/* Gündüz gökyüzü efektleri (V0.9.7, kullanıcı: "bulutlar çok belli olmuyor, dükkânın üstünde olsun, kuşlar, gölge efekti da olabilir"): dükkânların önünde tek bir efekt kümesi.
+   Bulut şeridi ve gölge şeridi aynı hızda kayar (gölgeler cephelere düşer), her şerit yarısı kendini tekrar eden iki parçadır (kesintisiz döngü); kuş sürüsü soldan sağa geçer. */
+const sCloud = w => {
+  const h = Math.round(w * 0.46);
+  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 100 46" aria-hidden="true"><g fill="#D3E2F6"><circle cx="25" cy="34" r="12"/><circle cx="48" cy="29" r="17"/><circle cx="71" cy="34" r="12"/><rect x="14" y="33" width="68" height="11" rx="5.5"/></g>' +
+    '<g fill="#fff"><circle cx="25" cy="30" r="12"/><circle cx="48" cy="22" r="17"/><circle cx="70" cy="29" r="13"/><circle cx="84" cy="33" r="8"/><rect x="12" y="30" width="74" height="12" rx="6"/></g></svg>';
 };
-const sBirds = () => {
-  const bird = '<svg class="brd" width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><path d="M1 8Q6 0 11 6Q16 0 21 8" fill="none" stroke="#3B3C8F" stroke-width="1.8" stroke-linecap="round"/></svg>';
-  return '<div class="brw" style="top:128px;animation-duration:46s;animation-delay:-8s">' + bird + '</div><div class="brw" style="top:168px;animation-duration:58s;animation-delay:-31s;transform:scale(.8)">' + bird + '</div>';
+const skyFx = () => {
+  const W = Math.round(SS.sw) + 240, r = sRand(23);
+  const cl = [[0.02, 40, 140], [0.28, 58, 170], [0.52, 34, 120], [0.76, 62, 150]].map((c, i) => ({ x: Math.round(c[0] * W), y: c[1], w: c[2], sy: 236 + i * 28 + Math.round(r() * 12), gy: 470 + (i % 2) * 38 }));
+  const part = off => cl.map(c => '<div class="cl" style="left:' + (c.x + off) + 'px;top:' + c.y + 'px">' + sCloud(c.w) + '</div>').join('');
+  const shd = off => cl.map(c => '<i class="csh" style="left:' + (c.x + off - 40) + 'px;top:' + c.sy + 'px;width:' + Math.round(c.w * 1.3) + 'px;height:' + Math.round(c.w * 0.6) + 'px"></i>' +
+    '<i class="csh g" style="left:' + (c.x + off - 60) + 'px;top:' + c.gy + 'px;width:' + Math.round(c.w * 1.6) + 'px;height:' + Math.round(c.w * 0.5) + 'px"></i>').join('');
+  const bird = (x, y, d) => '<svg class="bd" style="left:' + x + 'px;top:' + y + 'px;animation-delay:-' + d + 's" width="34" height="15" viewBox="0 0 34 15" aria-hidden="true"><path d="M1 12Q9 0 17 9Q25 0 33 12" fill="none" stroke="#2C2D78" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return '<div class="skyfx"><div class="tr" style="width:' + (2 * W) + 'px">' + shd(0) + shd(W) + '</div><div class="tr" style="width:' + (2 * W) + 'px">' + part(0) + part(W) + '</div>' +
+    '<div class="flk" style="animation-delay:-9s">' + bird(0, 14, 0) + bird(40, 0, 0.18) + bird(26, 34, 0.31) + '</div></div>';
 };
 /* Kayan yıldız: iki ayrı iz, ayrı süre ve konumla; çoğu zaman görünmez, arada bir çizer. */
 const sShoot = () => {
@@ -3339,7 +3357,7 @@ const sGiftSvg = () => '<svg class="gbx" width="168" height="168" viewBox="0 0 1
   '<ellipse cx="40" cy="104" rx="7" ry="22" fill="#fff" opacity=".2"/></svg>';
 
 /* ---------- mağaza: ekranlar ve işleyiş ---------- */
-const SS = { shop: 'alet', idx: 0, view: 'hub', k: 1, sw: 296, sh: 604, drag: null, timers: [], tick: 0, quick: false, busy: false, closing: false, open: false, stagger: false, pop: [], menuPop: [], bagPrev: null, day: false, force: '' };
+const SS = { shop: 'alet', idx: 0, pos: 0, view: 'hub', k: 1, sw: 296, sh: 604, anim: null, noClick: 0, timers: [], tick: 0, quick: false, busy: false, closing: false, open: false, stagger: false, pop: [], menuPop: [], bagPrev: null, day: false, force: '' };
 let shopFrom = 'menu';
 const stg = $('stg'), stHub = $('stHub'), stShop = $('stShop'), stBloom = $('stBloom'), stSheet = $('stSheet'), stScrim = $('stScrim'), stToastEl = $('stToast');
 const sName = k => k === 'gor' ? t('st_n_gor') : (k.indexOf('slot') === 0 ? t('st_slotN', { n: k.slice(4) }) : (k === 'bolt' ? t('st_auto') : (k === 'heart' ? t('st_life') : t('tool_' + k))));
@@ -3378,18 +3396,18 @@ const facadeHtml = (sh, i) => {
 const hubHtml = () => {
   const day = stDay(), sw = SS.sw, pad = (sw - 220) / 2, W = Math.round(pad * 2 + SHOPS.length * 220 + (SHOPS.length - 1) * 12);
   SS.day = day;
-  return '<div class="sky"></div>' + (day ? '<div class="sun"></div>' + sClouds() + sBirds() : sStars() + '<div class="moon"></div>' + sShoot()) +
+  return '<div class="sky"></div>' + (day ? '<div class="sun"></div>' : sStars() + '<div class="moon"></div>' + sShoot()) +
     '<div class="sk skf" id="stSkF">' + sSkyline(Math.ceil(sw + 130), 118, 11, day ? 'rgba(222,234,255,.75)' : 'rgba(160,130,240,.5)', 0) + '</div>' +
     '<div class="sk skn" id="stSkN">' + sSkyline(Math.ceil(sw + 230), 112, 29, day ? 'rgba(118,130,224,.95)' : 'rgba(88,66,186,.9)', day ? 0 : 1) + '</div><div class="ground"></div>' +
     '<div class="hd"><button class="rb" type="button" data-a="close" aria-label="' + t('close') + '">' + sGlyph('chl', 18, 'currentColor', 2.4) + '</button><div class="tt"><h4>' + t('st_title') + '</h4><small>' + t('st_sub') + '</small></div>' + sCoinChip() + '</div>' +
-    '<div class="car" id="stCar"><div class="strip">' + sLights(W) + SHOPS.map(facadeHtml).join('') + '</div></div>' + (day ? '' : sFireflies()) +
+    '<div class="car" id="stCar"><div class="strip" id="stStrip">' + sLights(W) + SHOPS.map(facadeHtml).join('') + '</div></div>' + (day ? skyFx() : sFireflies()) +
     '<button class="cta" type="button" id="stCta" data-a="gosel"></button>' +
     '<div class="dock" id="stDock">' + SHOPS.map((s, i) => '<div class="dk" data-a="dot" data-i="' + i + '" role="button" aria-label="' + t('st_n_' + s.id) + '">' + sRing({ s: 32, a: ringOfShop(s.id), m: s.ic, g: 1, ms: 15, sp: 5, dl: i * 1.3, sw: 15 }) + '<small>' + t('st_s_' + s.id) + '</small></div>').join('') + '</div>';
 };
-/* Kaydırma (V0.9.5, kullanıcı: "dükkânları kaydırırken çok kasıyor"): eski işleyici her scroll olayında buton yazısını, dock sınıflarını ve cephe sınıflarını yeniden yazıyordu;
-   kaydırma başına ~50 yerleşim ve boyama çıkıyor, her biri 130 katmanlı ağacı yeniden kurduruyordu. Şimdi: olay kare başına en çok bir kez işlenir (rAF); her karede yalnızca iki gökyüzü
-   katmanının dönüşümü yazılır (bileşen özelliği: boyama ve yerleşim yok); dock ve buton yalnızca dükkân (yuvarlanmış sıra) değişince güncellenir; hangi cephenin hareketli olacağı
-   (yalnızca odaktaki) kaydırma durunca (140 ms) seçilir, yani kaydırırken hiçbir animasyon başlamaz ya da durmaz. */
+/* Vitrin sayfalayıcısı (V0.9.7). V0.9.5'te kaydırma işleyicisini hafifletmiştik; kullanıcı yine de "ekranda elimle kaydırırken hiçbir şey göremiyorum, tek hamlede Hediye'deyim, kısayoldan kayarak gidiyor" dedi.
+   Emülatörde (WebView 155) yerel kaydırma çalışıyordu, yani sorun yerel kaydırma + snap + fling zincirine ve cihaza bağlıydı: bu zincir yerine kendi sayfalayıcımız var.
+   Parmak şeridi birebir izler (transform), bırakınca EN ÇOK BİR dükkân ilerler ve ~0,3-0,45 sn'lik animasyonla oturur (sistemin animasyon ayarına ve WebView'in fling davranışına bağlı değil).
+   Kaydırırken süs animasyonları kalkar (mv: aynı anda çizilen katman azalır), durunca (140 ms) geri gelir ve odaktaki cephe seçilir. Sayfa konumu SS.pos (tasarım px, dükkân adımı SHOP_STEP). */
 const hubFocus = i => {
   const d = $('stDock').children, sh = SHOPS[i], cta = $('stCta'), g = sh.id === 'hed' ? giftState() : null, quiet = sh.soon || (g && g.wait > 0);
   for (let q = 0; q < d.length; q++) d[q].classList.toggle('on', q === i);
@@ -3397,37 +3415,41 @@ const hubFocus = i => {
   if (cta.textContent !== lab) cta.textContent = lab;
   if (cta.className !== cls) cta.className = cls;
 };
-const hubSettle = () => { stHub.querySelectorAll('.fc').forEach((f, q) => f.classList.toggle('far', q !== SS.idx)); };
-/* Gökyüzü paralaksı (iki silüet farklı hızda kayar): ScrollTimeline ile bileşen iş parçacığında çalışır, kaydırırken ana iş parçacığına hiç dokunmaz.
-   Eskiden her karede style.transform yazılıyordu; bu her karede iki büyük katmanı yeniden boyatıp raster ettiriyordu (ölçüm: kaydırma başına ~190 boyama). ScrollTimeline yoksa (eski WebView) silüet sabit kalır. */
-const hubParallax = () => {
-  if (typeof ScrollTimeline === 'undefined') return;
-  try {
-    const car = $('stCar'), max = Math.max(1, car.scrollWidth - car.clientWidth), tl = new ScrollTimeline({ source: car, axis: 'x' });
-    [['stSkF', 0.12], ['stSkN', 0.3]].forEach(([id, k]) => { const e = $(id); if (e) e.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-max * k).toFixed(1) + 'px)' }], { timeline: tl, fill: 'both', easing: 'linear' }); });
-  } catch (e) { /* desteklenmiyor: sabit */ }
+const hubSettle = () => { SS.mv = 0; stHub.classList.remove('mv'); stHub.querySelectorAll('.fc').forEach((f, q) => f.classList.toggle('far', q !== SS.idx)); };
+const hubMove = () => { if (!SS.mv) { SS.mv = 1; stHub.classList.add('mv'); } clearTimeout(SS.settleT); };
+const hubRest = () => { clearTimeout(SS.settleT); SS.settleT = setTimeout(hubSettle, 140); };
+const syncHub = () => { if ($('stDock')) hubFocus(SS.idx); };
+const setPos = (p, soft) => {
+  const mx = (SHOPS.length - 1) * SHOP_STEP;
+  p = soft ? (p < 0 ? p * 0.35 : (p > mx ? mx + (p - mx) * 0.35 : p)) : clamp(p, 0, mx);
+  SS.pos = p;
+  const st = $('stStrip');
+  if (st) st.style.transform = 'translate3d(' + (-p).toFixed(2) + 'px,0,0)';
+  const i = clamp(Math.round(p / SHOP_STEP), 0, SHOPS.length - 1);
+  if (i !== SS.idx) { SS.idx = i; if ($('stDock')) hubFocus(i); }
 };
-const hubApply = force => {
-  const car = $('stCar');
-  if (!car) return;
-  const i = Math.max(0, Math.min(SHOPS.length - 1, Math.round(car.scrollLeft / SHOP_STEP)));
-  if (force || i !== SS.idx) { SS.idx = i; hubFocus(i); }
-  clearTimeout(SS.settleT); SS.settleT = setTimeout(hubSettle, 140);
-};
-const syncHub = force => {
-  if (force === true) { cancelAnimationFrame(SS.syncRaf); SS.syncRaf = 0; hubApply(true); return; }
-  if (SS.syncRaf) return;
-  SS.syncRaf = requestAnimationFrame(() => { SS.syncRaf = 0; hubApply(false); });
+const pagerStop = () => { if (SS.anim) { cancelAnimationFrame(SS.anim.raf); SS.anim = null; } };
+const pagerTo = (i, ms) => {
+  i = clamp(i, 0, SHOPS.length - 1); pagerStop();
+  const from = SS.pos, to = i * SHOP_STEP, d = Math.abs(to - from);
+  if (d < 0.5 || RM || ms === 0) { setPos(to); hubRest(); return; }
+  hubMove();
+  const dur = ms || clamp(180 + d * 0.9, 240, 460), t0 = performance.now(), a = SS.anim = { raf: 0 };
+  const step = now => {
+    const f = Math.min(1, (now - t0) / dur);
+    setPos(from + (to - from) * easeOut(f));
+    if (f < 1) a.raf = requestAnimationFrame(step); else { SS.anim = null; hubRest(); }
+  };
+  a.raf = requestAnimationFrame(step);
 };
 const renderHub = keep => {
-  const car = $('stCar'), at = car ? car.scrollLeft : SS.idx * SHOP_STEP;
+  const at = SS.pos;
+  pagerStop();
   stHub.innerHTML = hubHtml();
   stHub.classList.toggle('day', SS.day);
-  const c2 = $('stCar');
-  c2.style.scrollBehavior = 'auto'; c2.scrollLeft = keep === false ? SS.idx * SHOP_STEP : at; c2.style.scrollBehavior = '';
+  setPos(keep === false ? SS.idx * SHOP_STEP : at);
   stHub.querySelectorAll('.fc').forEach((f, q) => f.style.setProperty('--o', Math.abs(q - SS.idx)));
-  c2.addEventListener('scroll', syncHub, { passive: true });
-  syncHub(true); hubSettle(); hubParallax();
+  hubFocus(SS.idx); hubSettle();
 };
 
 /* dükkân içleri */
@@ -3591,7 +3613,7 @@ const showView = v => {
   SS.view = v;
   stHub.classList.toggle('on', v === 'hub'); stShop.classList.toggle('on', v === 'shop');
   /* sokağa dönünce vitrin, az önce içinde olunan dükkânı gösterir (dükkândan dükkâna geçilmiş olabilir); dock, buton ve odaktaki cephe buna göre tazelenir */
-  if (v === 'hub') { const car = $('stCar'); if (car && Math.abs(car.scrollLeft - SS.idx * SHOP_STEP) > 4) { car.style.scrollBehavior = 'auto'; car.scrollLeft = SS.idx * SHOP_STEP; car.style.scrollBehavior = ''; } syncHub(true); hubSettle(); }
+  if (v === 'hub') { if (Math.abs(SS.pos - SS.idx * SHOP_STEP) > 4) setPos(SS.idx * SHOP_STEP); syncHub(); hubSettle(); }
   if (v === 'hub' && was === 'shop' && !RM) { stHub.classList.remove('ent'); void stHub.offsetWidth; stHub.classList.add('ent'); stLater(() => stHub.classList.remove('ent'), 800); }
 };
 const shopGo = id => {
@@ -3618,10 +3640,10 @@ const swapShop = id => {
 const goShop = id => {
   closeSheet();
   if (SS.view === 'hub') {
-    const i = SHOPS.findIndex(s => s.id === id), car = $('stCar');
-    if (car && !RM && Math.abs(car.scrollLeft - i * SHOP_STEP) > 12) {
+    const i = SHOPS.findIndex(s => s.id === id);
+    if (!RM && Math.abs(SS.pos - i * SHOP_STEP) > 12) {
       stBusy(1100);
-      car.scrollTo({ left: i * SHOP_STEP, behavior: 'smooth' });
+      pagerTo(i);
       stLater(() => enterShop(id), 430);
     } else enterShop(id);
   } else if (SS.shop !== id) swapShop(id);
@@ -3645,6 +3667,7 @@ const stAfter = o => {
 };
 const stBuy = fn => { const from = save.coins, ok = fn(); if (ok) stCoins(from, save.coins); else stToast(t('coinShort')); return ok; };
 const stClick = ev => {
+  if (performance.now() < SS.noClick) return;
   const el = ev.target.closest && ev.target.closest('[data-a]');
   if (!el || !stg.contains(el)) return;
   const a = el.getAttribute('data-a'), g = n => el.getAttribute('data-' + n), car = $('stCar');
@@ -3654,10 +3677,10 @@ const stClick = ev => {
   else if (a === 'open') {
     if (SS.busy) return;
     const i = g('i');
-    if (i !== null && +i !== SS.idx && car && car.contains(el)) { car.scrollTo({ left: +i * SHOP_STEP, behavior: RM ? 'auto' : 'smooth' }); return; }
+    if (i !== null && +i !== SS.idx && car && car.contains(el)) { pagerTo(+i); return; }
     goShop(g('s'));
   } else if (a === 'gosel') { if (!SS.busy) enterShop(SHOPS[SS.idx].id); }
-  else if (a === 'dot') car.scrollTo({ left: SHOP_STEP * +g('i'), behavior: RM ? 'auto' : 'smooth' });
+  else if (a === 'dot') pagerTo(+g('i'));
   else if (a === 'item') { itemSheet(g('k')); Snd.ui(); }
   else if (a === 'slot') { const q = +g('i'); if (q < save.slots) chooser(q); else itemSheet('slot' + (q + 1)); Snd.ui(); }
   else if (a === 'poor') { stToast(t('coinShort')); Platform.haptic('light'); }
@@ -3697,25 +3720,42 @@ const stClick = ev => {
 };
 stg.addEventListener('click', stClick);
 stScrim.addEventListener('click', () => { closeSheet(); Snd.ui(); });
-/* fareyle sürükleme (dokunmatikte tarayıcı kendi kaydırır) */
+/* parmak ve fare sürükleme (V0.9.7): şeridi birebir izler; bırakınca en çok bir dükkân ilerler. Dikey hareket tarayıcıya bırakılır (touch-action: pan-y). */
+let drag = null;
 stg.addEventListener('pointerdown', e => {
   const car = $('stCar');
-  if (e.pointerType === 'touch' || !car || !car.contains(e.target)) return;
-  SS.drag = { x: e.clientX, s: car.scrollLeft, m: 0 };
-  car.style.scrollBehavior = 'auto'; car.style.scrollSnapType = 'none';
+  if (!car || !car.contains(e.target) || SS.view !== 'hub' || SS.busy || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  pagerStop();
+  drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, p0: SS.pos, i0: SS.idx, moved: false, s: [[e.timeStamp, e.clientX]] };
 });
-stg.addEventListener('pointermove', e => {
-  if (!SS.drag) return;
-  const car = $('stCar'), dx = (e.clientX - SS.drag.x) / SS.k;
-  SS.drag.m = Math.max(SS.drag.m, Math.abs(dx)); car.scrollLeft = SS.drag.s - dx;
+window.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x0;
+  if (!drag.moved) {
+    if (Math.abs(dx) < 8) return;
+    if (Math.abs(e.clientY - drag.y0) > Math.abs(dx)) { drag = null; return; }
+    drag.moved = true; hubMove();
+    try { stg.setPointerCapture(e.pointerId); } catch (x) { /* yapay olay: yakalama yok */ }
+  }
+  setPos(drag.p0 - dx / SS.k, true);
+  drag.s.push([e.timeStamp, e.clientX]); if (drag.s.length > 8) drag.s.shift();
 });
-window.addEventListener('pointerup', () => {
-  if (!SS.drag) return;
-  const car = $('stCar'), moved = SS.drag.m > 6;
-  SS.drag = null; car.style.scrollSnapType = ''; car.style.scrollBehavior = '';
-  car.scrollTo({ left: Math.max(0, Math.min(SHOPS.length - 1, Math.round(car.scrollLeft / SHOP_STEP))) * SHOP_STEP, behavior: 'smooth' });
-  if (moved) stg.addEventListener('click', ev => ev.stopPropagation(), { capture: true, once: true });
-});
+const dragEnd = e => {
+  if (!drag || (e && e.pointerId !== drag.id)) return;
+  const d = drag; drag = null;
+  if (!d.moved) return;
+  SS.noClick = performance.now() + 350;
+  const a = d.s[0], b = d.s[d.s.length - 1], v = (b[1] - a[1]) / Math.max(1, b[0] - a[0]) / SS.k;   /* parmağın hızı, tasarım px/ms (içerik ters gider) */
+  pagerTo(clamp(Math.round((SS.pos - v * 120) / SHOP_STEP), d.i0 - 1, d.i0 + 1));
+};
+window.addEventListener('pointerup', dragEnd);
+window.addEventListener('pointercancel', dragEnd);
+let wheelT = 0;
+stg.addEventListener('wheel', e => {
+  const car = $('stCar');
+  if (!car || !car.contains(e.target) || SS.view !== 'hub' || SS.busy || Math.abs(e.deltaX) <= Math.abs(e.deltaY) || performance.now() < wheelT) return;
+  wheelT = performance.now() + 420; e.preventDefault(); pagerTo(SS.idx + (e.deltaX > 0 ? 1 : -1));
+}, { passive: false });
 
 /* Hediye bekleme süresi açıkken dakikada bir yazılar tazelenir. */
 const stTick = () => {
@@ -3897,7 +3937,8 @@ const envStep = raw => {
 /* Oyuncu yanınca (her kademede; Animasyonlar kapalıysa yok) çember yanıp küle döner (kullanıcı seçimi "B. Kül ve kor"): 0,45 sn çember turuncu-kırmızı alevlenir, sonra çember kaybolur;
    8 çember parçası yavaşça dağılıp düşer, ~150 kor yukarı sürüklenir ve közden küle solar. Parçacıklar ölüm anındaki çemberin yerinden ve boyundan doğar (ekran koordinatı).
    İkinci şansta (doContinue) kor temizlenir, çember ortadan dışa doğru yeniden belirir (G.reform). Yalnızca görüntü. */
-const BURN = { flame: 0.45, life: 3.2 };
+const BURN_SLOW = 1.7;   /* V0.9.7: kullanıcı "ölme animasyonu biraz yavaş geçsin, sonuç ekranı hemen geliyor" dedi: bütün zaman çizelgesi 1,7 kat yavaş */
+const BURN = { slow: BURN_SLOW, flame: 0.45 * BURN_SLOW, life: 3.2 * BURN_SLOW };
 const EMBER_COL = ['#FFD27A', '#FF8A3D', '#E8452C'];
 const startBurn = () => {
   G.burn = null;
@@ -3922,16 +3963,16 @@ const burnStep = raw => {
   if (b.t > BURN.life) G.burn = null;
 };
 const drawBurn = (c, cx, cy, b, R, RW) => {
-  const te = b.t, k = b.k;
+  const te = b.t / BURN.slow, k = b.k;   /* te: tasarım zamanı (alev 0,45 sn, parçalar ve kor buna göre), gerçek süre BURN.slow kat uzar */
   c.save();
-  if (te < BURN.flame) {
-    const f = te / BURN.flame;
+  if (te < 0.45) {
+    const f = te / 0.45;
     c.lineWidth = RW * (1 - 0.5 * f); c.strokeStyle = Math.random() < 0.5 ? EMBER_COL[1] : EMBER_COL[2]; c.globalAlpha = 0.9 - 0.3 * f;
     c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke(); c.globalAlpha = 1;
   }
   c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
   for (const p of b.ch) {
-    const tau = te - BURN.flame;
+    const tau = te - 0.45;
     if (tau < 0) continue;
     const al = clamp(1 - (tau - 0.7) / 1, 0, 1);
     if (al <= 0) continue;
