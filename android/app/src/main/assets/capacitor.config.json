@@ -1,5 +1,11 @@
 {
 	"appId": "com.mrbyte66.kilpayi",
 	"appName": "Kıl payı",
-	"webDir": "www"
+	"webDir": "www",
+	"plugins": {
+		"LocalNotifications": {
+			"smallIcon": "ic_stat_kilpayi",
+			"iconColor": "#6D58E0"
+		}
+	}
 }
