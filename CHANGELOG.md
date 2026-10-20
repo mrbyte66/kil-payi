@@ -3,6 +3,12 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.9.13 — Paket adı kesinleşti: com.mrbytestudio.kilpayi (2026-10-21)
+
+- **Uygulamanın paket adı `com.mrbytestudio.kilpayi` oldu** (kullanıcı onayı; yeni Play Console hesabı "mrbyte studio"). Geçici ad `com.mrbyte66.kilpayi` idi; Play'e ilk yüklemeden sonra paket adı değiştirilemediği için şimdi kesinleştirildi. Oyun, görünüm ve ayarlar V0.9.12 ile aynıdır.
+- **Önemli:** bu paket adı eskisinden FARKLI bir uygulamadır. Telefona kurunca eski "Kıl payı" yanında ikinci bir uygulama olarak durur; kayıtlar (puanlar, coin, jokerler) ve kapalı test sayacı bu uygulamada sıfırdan başlar. Eski uygulamayı silebilirsin.
+- Teknik: `capacitor.config.ts`, `android/app/build.gradle` (`namespace`, `applicationId`), `strings.xml`, `MainActivity.java` (klasörüyle) güncellendi; temiz derleme ve emülatörde bildirim akışı yeni paket adıyla denendi.
+
 ## V0.9.12 — Cehennem'de akıcılık, yumuşak ibre hızı, yakın vuruşta sarsıntı ve yavaş çekim yok (2026-10-21)
 
 - **Cehennem'e geçerken ve Cehennem boyunca kasma giderildi** (kullanıcı: "Usta'da Cehennem'e geçerken 44 fps hissi, telefon kasıyor"). Neden bulundu ve ölçüldü: Cehennem arka planındaki iki ekran boyu görsel (alttan yükselen ateş parıltısı ve kenarları karartan vinyet) her karede yeniden çiziliyordu. Artık tek bir sabit katmandır, bir kez çizilir. İşlemci 3 kat yavaşlatılmış denemede Cehennem'de kare süresi **22,3 ms → 16,7 ms (yaklaşık 45 → 60 fps)**, geçişteki yavaş kare sayısı 30+ → 0. Çatlaklar ve kor aynen duruyor, görünüm değişmedi.
