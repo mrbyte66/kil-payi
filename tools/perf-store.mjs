@@ -9,8 +9,9 @@ import { launch } from './cdp.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const b = await launch({ width: 390, height: 844, dpr: 2, lang: 'tr-TR', gpu: process.env.GPU === '1', seed: 'document.documentElement.setAttribute("data-theme","light");' });
 await b.goto('file://' + join(root, 'www', 'index.html'));
-await b.eval('(function(){var S=__kp.save;S.coins=2300;S.own={kron:1,kalkan:1,steto:0,kum:0};S.slots=2;S.equip=["kron","kalkan","",""];__kp.persist();__kp.refreshStats();__kp.SS.force="night";__kp.openShop("menu");return 1})()');
+await b.eval('(function(){var S=__kp.save;S.coins=2300;S.own={kron:1,kalkan:1,steto:0,kum:0};S.slots=2;S.equip=["kron","kalkan","",""];__kp.persist();__kp.refreshStats();__kp.SS.force="'+(process.env.DAY==='1'?'day':'night')+'";__kp.openShop("menu");return 1})()');
 await b.sleep(2600);
+if (process.env.HIDE) await b.eval('document.querySelectorAll(' + JSON.stringify(process.env.HIDE) + ').forEach(function(e){e.style.visibility="hidden"});1');   // deney: bu öğeler çizilmeseydi yük ne olurdu
 
 let cur = [];
 b.on('Tracing.dataCollected', p => cur.push(...p.value));
@@ -47,8 +48,11 @@ const swipes = async () => {
 };
 const scroll = () => trace(swipes);
 let layers = null; b.on('LayerTree.layerTreeDidChange', p => { if (p.layers) layers = p.layers; });
-await b.send('LayerTree.enable'); await b.eval('document.getElementById("stCar").scrollLeft+=1;1'); await b.sleep(700);
-if (layers) { const dc = layers.filter(l => l.drawsContent && !l.invisible); console.log('katman:', layers.length, 'çizen:', dc.length, 'toplam alan (MP, dpr2):', dc.reduce((t, l) => t + l.width * l.height * 4 / 1e6, 0).toFixed(1), '(ekran 1.3)'); }
+await b.send('LayerTree.enable'); await b.eval('document.getElementById("stg").style.outline="0";1'); await b.sleep(700);
+const lay = async tag => { layers = null; await b.eval('document.getElementById("stg").style.outline="0";1'); await b.sleep(800); if (layers) { const dc = layers.filter(l => l.drawsContent && !l.invisible); console.log(tag.padEnd(14) + 'katman:', layers.length, 'çizen:', dc.length, 'toplam alan (MP, dpr2):', dc.reduce((t, l) => t + l.width * l.height * 4 / 1e6, 0).toFixed(1), '(ekran 1.3)'); } };
+await lay('durgun:');
+await b.eval('document.getElementById("stHub").classList.add("mv");1'); await lay('kaydırırken:');
+await b.eval('document.getElementById("stHub").classList.remove("mv");1'); await b.sleep(300);
 const names = JSON.parse(await b.eval('JSON.stringify(document.getAnimations().reduce(function(o,a){var n=a.animationName||"(geçiş)";o[n]=(o[n]||0)+1;return o},{}))'));
 console.log('sokaktaki animasyonlar (ad: adet):', Object.entries(names).sort((x, y) => y[1] - x[1]).map(([k, v]) => k + ':' + v).join(' '));
 const GROUPS = {
@@ -62,6 +66,7 @@ const GROUPS = {
 };
 const row = (n, i, s) => console.log((n + ':').padEnd(26) + `boşta: ana ${i.busy.toFixed(0)}% derleyici ${i.comp.toFixed(0)}% gpu ${i.gpu.toFixed(0)}% | kaydırma: ana ${s.busy.toFixed(0)}% derleyici ${s.comp.toFixed(0)}% gpu ${s.gpu.toFixed(0)}% boyama ${s.paint.toFixed(0)}/sn kare ${s.frames} >24ms:${s.over24}`);
 for (const [n, g] of Object.entries(GROUPS)) {
+  if (process.env.ONLY && n !== 'hepsi açık') continue;
   const pz = g === null ? 'true' : `function(a){return ${JSON.stringify(g)}.indexOf(a.animationName)>=0}`;
   await b.eval(`document.getAnimations().forEach(function(a){if((${pz.startsWith('function') ? pz : 'function(){return true}'})(a))a.pause()});1`);
   const i = await idle(), s = await scroll();

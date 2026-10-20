@@ -192,9 +192,10 @@ güçlendirir (`STAR_KINDS`; ışınlanma pimi dahil). Seviye 7'nin ★ olayı %
 13. **V0.9.4: TAMAM.** Animasyonlar artık telefonun "animasyonları kaldır" ayarına bakmaz (kullanıcının telefonunda açıktı; V0.9.3'ün geçişleri ve V0.9.2'nin konfetisi bu yüzden görünmedi); Ayarlar'da Animasyonlar anahtarı (`save.anim`, varsayılan açık), mağaza açılışında parçaların sırayla girmesi, dükkâna girişte kapı ışığı, daha güçlü yakınlaşma; `tools/anim-frames.mjs` (geçişleri kare kare çıkarır). Ayrıntı `CHANGELOG.md`.
 14. **V0.9.5: TAMAM.** Mağazada dükkânları kaydırırken kasma giderildi: kaydırma işleyicisi hafifledi, paralaks `ScrollTimeline`, animasyon bütçesi (odaktaki dükkân + seçili simge), `fill: both` kalktı; araç `tools/perf-store.mjs`. Sıradaki: Cehennem çemberi değişiklikleri (spiral kalkar, sıvı dönmez, dönüş programı, parçalanma) kullanıcı onayıyla.
 15. **V0.9.6: TAMAM.** Oyuncu yanınca "Kül ve kor" (her kademede), Cehennem çemberi dönüş programı (Seviye 1-2 durağan, 3-5 tek yönlü, 6-10 yumuşak yön değişimi), spiral kalktı, sıvı dönmez; `tools/hell-test.mjs`.
-16. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için.
+16. **V0.9.7: TAMAM.** Vitrin kendi sayfalayıcısıyla (parmak izler, en çok bir dükkân), kaydırırken süs animasyonları kalkar, gündüz gökyüzü efektleri (önde bulutlar, gölgeler, kuşlar), ölme animasyonu 1,7 kat yavaş, Animasyonlar varsayılan açık.
+17. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için.
    Kullanıcının oyun sonrası geri bildirimine göre sıra belirlenir.
-17. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
+18. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
    paket adının kesinleşmesi.
 
 Sonsuz mod şimdilik yalnızca 10. seviye sonrası otomatik devam ("Yolculuk tamamlandı", +100 coin); yoğunluk ve cehennem gücü her seviyede artar.
