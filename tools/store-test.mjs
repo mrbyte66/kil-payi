@@ -6,6 +6,7 @@
    - eski ve bozuk kayıtların geçişi,
    - ekran akışı: sokak, dükkân, fiş, satın alma, seçici, geri tuşu, geçiş animasyonları, ayarlar, oyun içi joker sırası, otomatik joker,
    - dil seçimi (sistem dili, Türkçe, English; kalıcı), menü müziğinin ne zaman çaldığı, gündüz ve akşam sahnesi, Türkçe harflerin yazı tipi,
+   - V0.9.10: geri tuşu giriş animasyonu sürerken de ilk dokunuşta çalışır, doğrudan girilen dükkândan geri menüye döner, oyun içi "128 / 180" hedef rozeti ve duraklat düğmesi,
    - V0.9.9: mağaza ısınması (görünmez, dokunuşu engellemez, bitince eski durum, girişte/pencerede bırakılır) ve kayan cepheye dokunuş yedeği.
    Chrome yolu CHROME ortam değişkeniyle verilebilir. Hata varsa 1 ile çıkar. */
 import { execFileSync } from 'node:child_process';
@@ -291,6 +292,73 @@ var t0=Date.now();while(!K.WARM.done&&Date.now()-t0<20000)await sleep(150);
 var sh=$('shop'),SS=K.SS;
 T('animasyonlar kapalıyken de ısınma bitti ve temiz',K.getRM()===true&&K.WARM.done===true&&K.WARM.on===false&&!sh.classList.contains('warm')&&SS.idx===0&&SS.view==='hub'&&SS.shop==='alet'&&$('stHub').innerHTML==='',[K.getRM(),K.WARM.done,sh.className]);
 `+TAIL;
+/* geri (V0.9.10): giriş animasyonu sürerken (busy) geri ilk dokunuşta çalışmalı; doğrudan girilen dükkândan geri menüye döner */
+const BACKT = HEAD + `
+var SS=K.SS;
+K.openShop('menu');await sleep(700);
+click('#stCta');await sleep(700);
+T('oda göründü, giriş animasyonu sürüyor (busy)',SS.view==='shop'&&SS.busy===true,[SS.view,SS.busy]);
+click('#stShop [data-a=back]');await sleep(60);
+T('geri ilk dokunuşta sokağa döner (busy engellemez)',SS.view==='hub'&&SS.busy===false,[SS.view,SS.busy]);
+await sleep(1300);
+T('hemen geri sonrası sokak temiz (yakınlaşma, seçili cephe, ışık kalmadı)',!$('stHub').classList.contains('zoom')&&!document.querySelector('#stHub .fc.sel')&&!$('stBloom').classList.contains('rdy')&&!$('stShop').classList.contains('swap'));
+click('#stHub [data-a=close]');
+T('sokakta çıkış tek dokunuşta',SS.closing===true&&SS.open===false);
+await sleep(600);
+K.openShop('menu');await sleep(500);click('#stCta');await sleep(700);
+T('Android geri: oda göründü, busy sürüyor',SS.view==='shop'&&SS.busy===true);
+K.storeBack();T('Android geri ilk basışta sokağa döner',SS.view==='hub'&&SS.busy===false,[SS.view,SS.busy]);
+K.storeBack();T('Android geri sokakta mağazadan çıkarır',SS.open===false);
+await sleep(600);
+K.openShop('menu');await sleep(500);click('#stCta');await sleep(1300);
+click('#stShop .cc [data-a=open][data-s=hed]');await sleep(80);
+T('oda değişimi başladı',$('stShop').classList.contains('swap')&&SS.busy===true);
+click('#stShop [data-a=back]');await sleep(700);
+T('değişim sürerken geri: sokakta kalır, Hediye odası kendiliğinden açılmaz',SS.view==='hub'&&SS.shop==='alet'&&!$('stShop').classList.contains('swap'),[SS.view,SS.shop]);
+K.closeShop();await sleep(600);
+K.openShop('menu',{shop:'alet',chooser:0});await sleep(600);
+T('doğrudan giriş: dükkândayız, seçici fişi açık',SS.view==='shop'&&SS.direct===true&&$('stSheet').classList.contains('on'));
+K.storeBack();T('geri 1: fiş kapanır',!$('stSheet').classList.contains('on')&&SS.open===true&&SS.view==='shop');
+K.storeBack();T('geri 2: doğrudan menüye döner (sokaktan geçmez)',SS.open===false&&SS.closing===true);
+await sleep(600);
+K.openShop('menu',{shop:'yet'});await sleep(600);
+click('#stShop [data-a=back]');T('ekrandaki geri düğmesi de doğrudan menüye döner',SS.open===false&&SS.closing===true);
+await sleep(600);
+K.openShop('menu');await sleep(300);
+T('normal giriş: doğrudan değil, geri sokağa döner',SS.direct===false);
+`+TAIL;
+/* oyun içi HUD (V0.9.10): "128 / 180" hedef rozeti ve sağ üst duraklat düğmesi */
+const HUDT = HEAD + `
+Object.keys(K.INTRO).forEach(function(k){S.seen[k]=1});S.bests.normal=180;S.lvl='normal';K.persist();
+K.start();await sleep(900);
+var pb=$('pauseBtn'),r=pb.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+T('duraklat düğmesi oyun ekranında görünür ve dokunuşu alır',pb.offsetParent!==null&&r.width>=36&&(h===pb||pb.contains(h)),[r.width,h&&h.id]);
+T('duraklat düğmesi sağ üst köşede (sağ kenara 20 px)',Math.abs(document.documentElement.clientWidth-r.right-20)<3&&r.top<40,[r.right,r.top]);
+T('duraklat düğmesi etiketi (TR)',pb.getAttribute('aria-label')==='Duraklat',pb.getAttribute('aria-label'));
+G.mode='play';G.score=128;K.updateHud();
+var bw=$('hudBest');
+T('hedef rozeti: 128 / 180, "Rekor" ya da "En iyi" yazısı yok',!bw.hidden&&$('hudGoal').textContent==='180'&&$('hudScore').textContent==='128'&&!/Rekor|En iyi/.test($('hud').textContent),[$('hud').textContent]);
+T('hedef çerçeveli (kenarlık var)',parseFloat(getComputedStyle($('hudGoal')).borderTopWidth)>=1.5);
+G.recDone=true;G.score=190;K.updateHud();
+T('rekor geçilince rozet altın olur, tik alır, hedef sayısı kalır',bw.classList.contains('gold')&&!!$('hudGoal').querySelector('svg')&&$('hudGoal').textContent==='180');
+G.recDone=false;S.bests.normal=0;K.updateHud();
+T('rekor yokken hedef rozeti görünmez',bw.hidden===true);
+S.bests.normal=180;G.mode='play';K.updateHud();
+var sc0=G.score;pb.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:350,clientY:38,pointerId:5}));
+T('düğmeye basış oyun dokunuşu sayılmaz (puan değişmedi, mod oyunda)',G.score===sc0&&G.mode==='play',[G.score,sc0,G.mode]);
+pb.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+T('düğmeye dokununca oyun duraklar, kart açılır',G.mode==='pause'&&$('pause').classList.contains('on'),[G.mode]);
+pb.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+T('duraklamışken düğme işlem yapmaz',G.mode==='pause');
+K.resume();await sleep(100);T('devam edince geri sayım başlar',G.mode==='count',G.mode);
+pb.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+T('geri sayımda da duraklatılabilir',G.mode==='pause',G.mode);
+K.setLang('en');T('duraklat düğmesi etiketi (EN)',pb.getAttribute('aria-label')==='Pause',pb.getAttribute('aria-label'));K.setLang('tr');
+$('pauseMenuBtn').click();await sleep(300);
+T('menüye dönünce düğme görünmez (HUD kapalı)',G.mode==='menu'&&!$('hud').classList.contains('on'));
+K.startPractice(Object.keys(K.IMPL_GOOD)[0]);await sleep(500);
+T('Dene modunda duraklat düğmesi yok',G.practice&&$('pauseBtn').offsetParent===null,[!!G.practice]);
+`+TAIL;
 /* dokunuş yedeği (V0.9.9): basış bir öğede, bırakış başka öğede olursa tarayıcı click'i ortak üst öğeye verir; eylem basılan öğeye gitmeli */
 const TAPFB = HEAD + `
 K.openShop('menu');await sleep(900);
@@ -333,6 +401,7 @@ await run('dil', LANG);
 await run('animasyon', ANIM, { reduceMotion: true });
 await run('yazı tipi', FONT);
 await run('dokunuş yedeği', TAPFB);
+await run('geri tuşu', BACKT);
 await run('ısınma', WARMT, { warm: true });
 await run('ısınma: girişte bırakma', WARM2, { warm: true });
 await run('ısınma: pencerede bırakma', WARM3, { warm: true });
@@ -341,6 +410,11 @@ for (const [name, save, cond] of MIG) {
   const seed = save === null ? '' : 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify(save)) + ');';
   const post = `(async()=>{var K=window.__kp,S=K.save,ok=false,err='';try{ok=!!(${cond})}catch(e){err=String(e)}return ok?'1 tamam, 0 hata':'0 tamam, 1 hata HATA '+err+' '+JSON.stringify({slots:S.slots,own:S.own,equip:S.equip,auto:[S.autoOwn,S.autoJ],gift:S.gift,lang:S.lang,music:S.music})})()`;
   await run('kayıt: ' + name, post, { seed });
+}
+if (!process.env.ONLY || 'HUD'.indexOf(process.env.ONLY) >= 0) {   // DEBUG=1'de pause() kapalıdır (bot durmasın); duraklat düğmesi için DEBUG=2 derlemesi, sonra DEBUG=1'e dönülür
+  execFileSync('sh', ['-c', 'DEBUG=2 ./build.sh'], { cwd: root, stdio: 'ignore' });
+  await run('HUD', HUDT);
+  execFileSync('sh', ['-c', 'DEBUG=1 ./build.sh'], { cwd: root, stdio: 'ignore' });
 }
 console.log(bad ? '\nHATA: ' + bad + ' grup başarısız' : '\nmağaza testleri tamam');
 process.exit(bad ? 1 : 0);
