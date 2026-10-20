@@ -196,9 +196,10 @@ güçlendirir (`STAR_KINDS`; ışınlanma pimi dahil). Seviye 7'nin ★ olayı %
 17. **V0.9.8: TAMAM.** 120 Hz isteği (`MainActivity`), kaydırma animasyonu bileşende, gökyüzü dükkânların arkasında ve yavaş, fiş ön rasterı, ölme animasyonu +0,5 sn, Ayarlar tanılama satırı.
 18. **V0.9.9: TAMAM.** Mağazada ilk girişin kasması: menü boşta kalınca mağazanın görünmez ısınması (`WARM`, `warmStore`: açılış, giriş yakınlaşması, dört oda, fiş, seçici, kaydırma, çıkış, cam kartlar), kayan cepheye dokunuşta eylemin kaybolmaması (`stDown`), açılışta boşuna oda kurulmaması. Ölçüm aracı `tools/cold-gpu.mjs`.
 19. **V0.9.10: TAMAM.** Geri tuşu ilk dokunuşta çalışır (`leaveRoom`, `stFinishEnter`, `SS.direct`), oyun içi Duraklat düğmesi (sağ üst, `#pauseBtn`) ve "128 / 180" hedef rozeti (`#hudBest`, `paintBest`; "Rekor" çipi ve "puan" yazısı kalktı).
-20. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için.
+20. **V0.9.11: TAMAM.** Kapalı test bildirimleri (`@capacitor/local-notifications`; 17 gün, 09:00 ve 16:30, kurulumdan 1 dk sonra bilgilendirme, o gün girildiyse ikincisi iptal, dokununca "Gün n/17" kartı `#testInfo`, kapatma anahtarı yok) ve Hz tanılama satırının kaldırılması. Test bitince (kapalı test sonrası) bloğu kaldırmak için `testSync` bloğu, `#testInfo`, `save.test`, `nt*`/`test*` metinleri ve eklenti silinir.
+21. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için.
    Kullanıcının oyun sonrası geri bildirimine göre sıra belirlenir.
-21. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
+22. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
    paket adının kesinleşmesi.
 
 Sonsuz mod şimdilik yalnızca 10. seviye sonrası otomatik devam ("Yolculuk tamamlandı", +100 coin); yoğunluk ve cehennem gücü her seviyede artar.

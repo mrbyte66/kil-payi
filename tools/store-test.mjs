@@ -6,6 +6,7 @@
    - eski ve bozuk kayıtların geçişi,
    - ekran akışı: sokak, dükkân, fiş, satın alma, seçici, geri tuşu, geçiş animasyonları, ayarlar, oyun içi joker sırası, otomatik joker,
    - dil seçimi (sistem dili, Türkçe, English; kalıcı), menü müziğinin ne zaman çaldığı, gündüz ve akşam sahnesi, Türkçe harflerin yazı tipi,
+   - V0.9.11: kapalı test bildirimleri (sahte eklentiyle: izin, kanal, planlama, tarih mantığı, tıklayınca kart, Ayarlar'da anahtar yok),
    - V0.9.10: geri tuşu giriş animasyonu sürerken de ilk dokunuşta çalışır, doğrudan girilen dükkândan geri menüye döner, oyun içi "128 / 180" hedef rozeti ve duraklat düğmesi,
    - V0.9.9: mağaza ısınması (görünmez, dokunuşu engellemez, bitince eski durum, girişte/pencerede bırakılır) ve kayan cepheye dokunuş yedeği.
    Chrome yolu CHROME ortam değişkeniyle verilebilir. Hata varsa 1 ile çıkar. */
@@ -359,6 +360,77 @@ T('menüye dönünce düğme görünmez (HUD kapalı)',G.mode==='menu'&&!$('hud'
 K.startPractice(Object.keys(K.IMPL_GOOD)[0]);await sleep(500);
 T('Dene modunda duraklat düğmesi yok',G.practice&&$('pauseBtn').offsetParent===null,[!!G.practice]);
 `+TAIL;
+/* kapalı test bildirimleri (V0.9.11): sahte bildirim eklentisi (alarm kurar, izin sorar, tıklanır) ve tarih mantığı */
+const FAKECAP = `(function(){var calls=[],lst={},perm={display:'prompt',reqResult:'granted'};
+window.__ln={calls:calls,lst:lst,perm:perm,fire:function(){(lst.localNotificationActionPerformed||[]).forEach(function(f){f({actionId:'tap',notification:{id:1,extra:{}}})})}};
+var LN={checkPermissions:function(){calls.push(['check']);return Promise.resolve({display:perm.display})},
+requestPermissions:function(){calls.push(['request']);perm.display=perm.reqResult;return Promise.resolve({display:perm.display})},
+createChannel:function(o){calls.push(['channel',o]);return Promise.resolve()},
+cancel:function(o){calls.push(['cancel',o]);return Promise.resolve()},
+schedule:function(o){calls.push(['schedule',o]);return Promise.resolve({notifications:o.notifications.map(function(n){return {id:n.id}})})},
+addListener:function(n,f){(lst[n]=lst[n]||[]).push(f);return Promise.resolve({remove:function(){}})}};
+var any=new Proxy({},{get:function(_,k){return k==='then'?undefined:function(){return Promise.resolve({})}}});
+window.Capacitor={isNativePlatform:function(){return true},registerPlugin:function(n){return n==='LocalNotifications'?LN:any}};})();`;
+const NOTIT = HEAD + `
+var LN=window.__ln;
+await sleep(2300);
+var sch=LN.calls.filter(function(c){return c[0]==='schedule'}),ns=sch.length?sch[0][1].notifications:[];
+T('açılışta bildirim izni istendi (menüdeyken)',LN.calls.some(function(c){return c[0]==='request'}));
+T('kanal: yüksek önem (ekranın üstünde belirir), kimlik test',LN.calls.some(function(c){return c[0]==='channel'&&c[1].importance===4&&c[1].id==='test'}));
+T('bildirimler planlandı (bilgilendirme + 17 gün × 2, bugünün geçenleri ve ikincisi hariç)',sch.length===1&&ns.length>=32&&ns.length<=35,ns.length);
+T('tam zamanlı alarm yok (sistem ayar ekranı açılmasın)',ns.every(function(n){return n.isExactNotification===false}));
+T('hepsi test kanalında, uyku modunda da çalışır',ns.every(function(n){return n.channelId==='test'&&n.schedule.allowWhileIdle===true}));
+var info=ns.filter(function(n){return n.id===1})[0];
+T('izin verildikten 1 dk sonra bilgilendirme bildirimi',!!info&&Math.abs(new Date(info.schedule.at).getTime()-S.test.infoAt)<50&&S.test.infoAt>Date.now()+50000&&S.test.infoAt<Date.now()+62000&&/17 gün/.test(info.body)&&/Kapalı test/.test(info.title),info&&[info.schedule.at,info.title,info.body]);
+T('bildirimler kısa (gövde en çok 64 karakter) ve başlıkta gün sayacı var',ns.every(function(n){return n.body.length<=64})&&ns.filter(function(n){return n.id>1}).every(function(n){return /Gün \\d+\\/17/.test(n.title)}),ns.map(function(n){return n.body.length}).join());
+var cn=LN.calls.filter(function(c){return c[0]==='cancel'});
+T('bugünün ikinci bildirimi iptal listesinde (bugün girildi)',cn.length===1&&cn[0][1].notifications.some(function(x){return x.id===201}),cn.length&&cn[0][1].notifications.length);
+T('kayıtta başlangıç günü ve saati var',/^\\d{4}-\\d{2}-\\d{2}$/.test(S.test.d0)&&S.test.t0>0&&Math.abs(S.test.t0-Date.now())<20000);
+// tarih mantığı (saf işlev): kuruluma göre hangi bildirimler planlanır
+function mk(y,m,d,h,mi){return new Date(y,m-1,d,h,mi,0)}
+function ids(p){return p.items.map(function(x){return x.id})}
+function between(a,lo,hi){return a.filter(function(i){return i>=lo&&i<=hi}).length}
+var keep=S.test;
+S.test={d0:'2026-10-21',t0:mk(2026,10,21,8,0).getTime(),infoAt:mk(2026,10,21,8,1).getTime()};
+var a=ids(K.testPlan(mk(2026,10,21,8,0),true));
+T('08:00 kurulum: bilgilendirme + 1. gün 09:00; 16:30 yok (bugün girildi); 2-17. günler ikişer',a.indexOf(1)>=0&&a.indexOf(101)>=0&&a.indexOf(201)<0&&between(a,102,117)===16&&between(a,202,217)===16,a);
+var a2=ids(K.testPlan(mk(2026,10,21,8,0),false));
+T('girilmediyse (açık değilse) 1. günün ikinci bildirimi de planlanır',a2.indexOf(201)>=0);
+S.test={d0:'2026-10-21',t0:mk(2026,10,21,20,0).getTime(),infoAt:mk(2026,10,21,20,1).getTime()};
+a=ids(K.testPlan(mk(2026,10,21,20,0),true));
+T('20:00 kurulum: bugünün ikisi de geçmiş; bilgilendirme + 2-17. günler ikişer',a.indexOf(1)>=0&&a.indexOf(101)<0&&a.indexOf(201)<0&&between(a,102,117)===16&&between(a,202,217)===16&&a.length===33,a.length);
+var pl=K.testPlan(mk(2026,10,21,20,0),true).items;
+var m1=pl.filter(function(x){return x.id===102})[0],m2=pl.filter(function(x){return x.id===202})[0];
+T('sabah 09:00 ve akşam 16:30, ertesi gün',m1.at.getDate()===22&&m1.at.getHours()===9&&m1.at.getMinutes()===0&&m2.at.getDate()===22&&m2.at.getHours()===16&&m2.at.getMinutes()===30,[String(m1.at),String(m2.at)]);
+S.test={d0:'2026-10-21',t0:mk(2026,10,21,8,0).getTime()-86400000*9,infoAt:0};
+a=ids(K.testPlan(mk(2026,10,30,10,0),true));
+T('10. gün 10:00 (girildi): bugünün ikisi de yok; 11-17. günler ikişer',K.testDay(mk(2026,10,30,10,0))===10&&a.indexOf(110)<0&&a.indexOf(210)<0&&between(a,111,117)===7&&between(a,211,217)===7&&a.indexOf(1)<0,[K.testDay(mk(2026,10,30,10,0)),a.length]);
+S.test={d0:'2026-10-21',t0:1};
+var d17=K.testPlan(mk(2026,11,6,17,0),true);
+T('17. gün 17:00: plan boş, test bitmedi',K.testDay(mk(2026,11,6,17,0))===17&&d17.items.length===0&&d17.over===false,[K.testDay(mk(2026,11,6,17,0)),d17.items.length]);
+var d18=K.testPlan(mk(2026,11,7,9,0),true);
+T('18. gün: test bitti, plan boş',d18.over===true&&d18.items.length===0&&K.testDay(mk(2026,11,7,9,0))===18);
+T('gün sayacı yaz saati geçişinde de doğru (Mart 2027)',(function(){S.test={d0:'2027-03-25',t0:1};return K.testDay(mk(2027,3,28,12,0))===4&&K.testDay(mk(2027,3,29,0,5))===5})());
+S.test=keep;
+// bildirime dokunma
+LN.fire();
+var ti=$('testInfo');
+T('bildirime dokununca menüde Gün 1/17 kartı açılır',ti.classList.contains('on')&&$('tiDay').textContent==='Gün 1/17'&&$('tiDots').children.length===17&&$('tiDots').children[0].className==='now'&&/teşekkür/i.test($('tiMsg').textContent),[ti.className,$('tiDay').textContent]);
+T('kart açıkken oyun dokunuşu başlatmaz, mod menü',G.mode==='menu');
+$('tiClose').click();T('Kapat kartı kapatır',!ti.classList.contains('on'));
+LN.fire();$('tiPlay').click();await sleep(200);T('Oyna kartı kapatıp oyunu başlatır',!ti.classList.contains('on')&&G.mode!=='menu',G.mode);
+LN.fire();T('oyundayken bildirime dokunma: kart değil kısa satır (oyun bölünmez)',!ti.classList.contains('on')&&/Gün 1\\/17/.test($('toast').textContent),[$('toast').textContent]);
+K.setLang('en');var it={id:101,kind:'day',day:1,slot:0,at:new Date()};
+T('İngilizce bildirim metni',/Day 1\\/17/.test(K.testNotif(it).title)&&/morning|record|Thank|round/i.test(K.testNotif(it).body),K.testNotif(it));
+K.setLang('tr');
+// izin reddedilirse hiçbir şey planlanmaz, sonra yeniden denenir
+LN.calls.length=0;LN.perm.display='prompt';LN.perm.reqResult='denied';
+K.G.mode='menu';await K.testSync();
+T('izin yoksa planlama yapılmaz (sessizce)',!LN.calls.some(function(c){return c[0]==='schedule'}));
+LN.perm.reqResult='granted';await K.testSync();
+T('izin verilince bir sonraki açılışta planlanır',LN.calls.some(function(c){return c[0]==='schedule'}));
+T('Ayarlar\\'da bildirim anahtarı yok (kapatılamaz)',!document.querySelector('#setRows [data-set*=noti],#setRows [data-set*=bildirim]')&&!/bildirim|notification/i.test($('setRows').textContent)||(K.openSettings(),!/bildirim|notification/i.test($('setRows').textContent)));
+`+TAIL;
 /* dokunuş yedeği (V0.9.9): basış bir öğede, bırakış başka öğede olursa tarayıcı click'i ortak üst öğeye verir; eylem basılan öğeye gitmeli */
 const TAPFB = HEAD + `
 K.openShop('menu');await sleep(900);
@@ -402,6 +474,7 @@ await run('animasyon', ANIM, { reduceMotion: true });
 await run('yazı tipi', FONT);
 await run('dokunuş yedeği', TAPFB);
 await run('geri tuşu', BACKT);
+await run('bildirimler', NOTIT, { seed: FAKECAP });
 await run('ısınma', WARMT, { warm: true });
 await run('ısınma: girişte bırakma', WARM2, { warm: true });
 await run('ısınma: pencerede bırakma', WARM3, { warm: true });
