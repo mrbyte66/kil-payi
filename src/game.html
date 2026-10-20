@@ -68,6 +68,9 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .amb i{position:absolute;display:block;border-radius:50%;will-change:transform}
 .amb i:nth-child(1){width:70%;aspect-ratio:1;left:-24%;top:-10%;background:var(--blob-1);animation:drift-a 24s ease-in-out infinite alternate}
 .amb i:nth-child(2){width:54%;aspect-ratio:1;right:-18%;top:38%;background:var(--blob-2);animation:drift-b 28s ease-in-out infinite alternate}
+.hfx{position:absolute;inset:0;pointer-events:none;opacity:0;visibility:hidden;background:radial-gradient(circle at 50% 50%,rgba(0,0,0,0) var(--vr0,175px),rgba(0,0,0,.4) var(--vr1,675px)),linear-gradient(to top,rgba(255,80,30,.5),rgba(255,80,30,0) 65%);transition:opacity 1.3s cubic-bezier(.2,.7,.3,1),visibility 0s linear 1.3s}
+#app.hellfx .hfx{opacity:1;visibility:visible;transition:opacity 1.3s cubic-bezier(.2,.7,.3,1),visibility 0s}
+html.calm .hfx{transition:none}
 .amb i:nth-child(3){width:62%;aspect-ratio:1;left:6%;bottom:-24%;background:var(--blob-1);animation:drift-c 32s ease-in-out infinite alternate}
 @keyframes drift-a{to{transform:translate3d(14%,10%,0) scale(1.1)}}
 @keyframes drift-b{to{transform:translate3d(-16%,-8%,0) scale(.92)}}
@@ -757,6 +760,7 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 
 <div id="app">
   <div class="amb" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="hfx" id="hfx" aria-hidden="true"></div>
   <canvas id="cv" role="img" aria-label="Oyun alanı: kronometre kadranında dönen ibre ve şeftali renkli hedef bölge"></canvas>
 
   <div class="hud" id="hud" aria-hidden="true">
@@ -1478,7 +1482,7 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.9.11';
+const VERSION = 'V0.9.12';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -1682,11 +1686,11 @@ const toCss = a => {
 };
 const TH_X = {}, BASE = {};
 TH_KEYS.forEach(k => { TH_X[k] = parseCol(THEME_X[k]); });
-let thWx = 0, thLast = -1;
+let thWx = 0, thLast = -1, hfxOn = false;
 const applyTheme = force => {
-  /* geçiş sürerken en çok ~%1,5'lik adımlarla güncelle (her güncelleme tüm sayfanın stilini yeniden hesaplatır); bitiş değeri her zaman uygulanır */
+  /* geçiş sürerken en çok ~%3,5'lik adımlarla güncelle (V0.9.12: %1,5 idi; Cehennem'e girişte ~65 tam sayfa stil hesabı yerine ~28) (her güncelleme tüm sayfanın stilini yeniden hesaplatır); bitiş değeri her zaman uygulanır */
   const d = Math.abs(thWx - thLast);
-  if (!force && (d < 0.002 || (thWx !== G.thT && d < 0.015))) return;
+  if (!force && (d < 0.002 || (thWx !== G.thT && d < 0.035))) return;
   thLast = thWx;
   const root = document.documentElement, off = thWx < 0.002;
   TH_KEYS.forEach(k => {
@@ -2093,7 +2097,7 @@ const MENU_PINS = [{ kind: 'gate', ring: 0, c0: 1.0, amp: 0, f: 0, ph: 0, hw: 0.
 const G = {
   mode: 'menu', clock: 0, pt: 0,
   time: 0, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0,
-  ang: 0.4, dir: 1, omega: DIFF.omegaMin, ang2: 0, dir2: -1, omega2: 2, slow: 0, slowMul: 0.7,
+  ang: 0.4, dir: 1, omega: DIFF.omegaMin, vel: NaN, vel2: NaN, ang2: 0, dir2: -1, omega2: 2, slow: 0, slowMul: 0.7,
   kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, gateT: 1,
   ta: 1.0, hw: 0.45,
   adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false,
@@ -2527,6 +2531,7 @@ const resize = () => {
   cv.width = Math.max(1, Math.round(view.w * view.dpr));
   cv.height = Math.max(1, Math.round(view.h * view.dpr));
   cv2.width = cv.width; cv2.height = cv.height;
+  { const hf = $('hfx').style; hf.setProperty('--vr0', Math.round(Math.min(view.w, view.h) * 0.45) + 'px'); hf.setProperty('--vr1', Math.round(Math.max(view.w, view.h) * 0.8) + 'px'); }
   relayout(true);
   if (shopEl.classList.contains('on') && fitStore()) { renderHub(); if (SS.view === 'shop') fillShop(); }
 };
@@ -2538,7 +2543,7 @@ const persistRun = () => { if (!G.practice && (G.mode === 'play' || G.mode === '
 
 /* Yeni oyunun başlangıç durumu; Dene modu da aynısından yola çıkar. */
 const runState = L0 => ({
-    mode: 'play', time: LV().startT, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, slow: 0, slowMul: CFG.contSlowMul, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
+    mode: 'play', time: LV().startT, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0, dir: 1, vel: NaN, vel2: NaN, slow: 0, slowMul: CFG.contSlowMul, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
     continued: false, runCounted: false, coinsGiven: 0, gain: 0, shake: 0, flash: 0, tscale: 1, tsT: 0,
     revT: 0, beep: 0, scorePulse: 0, parts: [], pops: [], rips: [], nearMsg: '',
     adapt: 0, mercy: 0, I: 0, Ivis: 0, relief: false, pt: 0,
@@ -2820,21 +2825,22 @@ const tideF = a => {
   const w = MECH.tideW, v = MECH.tideV[Math.min(2, G.stars.gelgit | 0)], s = clamp(1 - angd(a, G.tideC) / w, 0, 1);
   return MECH.tideBase + v * s * s * (3 - 2 * s);
 };
-const ptrFactor = () => {
-  if (G.tun) return 0;
-  let f = 1;
-  if (G.kind === 'gelgit' && G.tideC != null) f *= tideF(G.ang);
-  if (G.vort > 0) f *= MECH.vortexMul;
-  if (G.lockLeft > 0) f *= MECH.lockMul;
-  return f;
-};
+/* Ibre hızı (V0.9.12): kullanıcı "altını vurunca mı ne aniden hızlanıyor oyun, hızlanma soft olmalı; dönen çubuk bazen saçmalıyor" dedi. Hız her turda yeniden kurulur (tür çarpanı, seviye, Cehennem),
+   Kum saati, girdap ve kilit çarpanları ve ters yön olayı bir anda değişirdi. Artık olaylı çarpanlar (hız, kum saati, girdap, kilit, yön) birinci derece gecikmeyle (VEL_TAU) yumuşar: G.vel işaretli hızdır.
+   Gelgit sürekli bir çarpandır (açıya bağlı), gecikmeden geçmez ve etaTo ile aynen hesaplanır. Işınlanmada (G.tun) ibre durur, çıkınca eski hızla sürer. */
+const VEL_TAU = 0.11;
+const ptrTide = () => (G.kind === 'gelgit' && G.tideC != null ? tideF(G.ang) : 1);
+const ptrBoost = () => (G.vort > 0 ? MECH.vortexMul : 1) * (G.lockLeft > 0 ? MECH.lockMul : 1);
+const ptrFactor = () => (G.tun ? 0 : ptrTide() * ptrBoost());
 /* Verilen açıya ibrenin ne kadar sürede varacağı (sn); gelgit ve girdap hızlanmaları hesaba katılır. Bot ve ipuçları için. */
 const etaTo = (target, dir, ring) => {
   let a = ring ? G.ang2 : G.ang, t0 = 0, dd = dir == null ? (ring ? G.dir2 : G.dir) : dir;
-  const om = (ring ? G.omega2 : G.omega) * (G.slow > 0 ? G.slowMul : 1), need = norm((target - a) * dd);
-  let done = 0;
+  const vt = (ring ? G.omega2 : G.omega) * (G.slow > 0 ? G.slowMul : 1) * (ring ? 1 : ptrBoost()), need = norm((target - a) * dd), kv = 1 - Math.exp(-0.01 / VEL_TAU);
+  let v = (ring ? G.vel2 : G.vel) * dd, done = 0;   /* şimdiki hız (gidilecek yönde işaretli); ibre hedef hıza VEL_TAU ile yaklaşır */
+  if (v !== v) v = vt;
   while (done < need && t0 < 12) {
-    const f = !ring && G.kind === 'gelgit' && G.tideC != null ? tideF(a) : 1, step = om * f * (G.vort > 0 ? MECH.vortexMul : 1) * 0.01;
+    v += (vt - v) * kv;
+    const f = !ring && G.kind === 'gelgit' && G.tideC != null ? tideF(a) : 1, step = v * f * 0.01;
     done += step; a = norm(a + dd * step); t0 += 0.01;
   }
   return t0;
@@ -2946,8 +2952,8 @@ const hit = (d, pin) => {
   burst(p.x, p.y, near ? 26 : (perfect ? 18 : 11) + (tag ? 10 : 0), cols, near ? 260 : 190);
   G.rips.push({ x: p.x, y: p.y, t: 0, max: near ? 0.7 : 0.5, r0: 10, r1: near ? 90 : 56, c: near ? P.rose : (tag === 'gold' || tag === 'lock' ? GOLD : P.peach) });
   if (near) {
-    pop(t('near'), 'near'); shake(0.35); flash('rose', 0.22);
-    if (!RM) { G.tscale = 0.3; G.tsT = 0.14; }
+    /* V0.9.12: yakın vuruşta (son saniye) ekran sarsıntısı ve zamanı 0,3'e düşürüp bir anda 1'e döndüren "vuruş durması" kalktı (kullanıcı: "son saniyelerde vurunca ekran sarsılıyor, oyun aniden hızlanıyor, ibre saçmalıyor"; son saniyede kafa karıştırma). Geri bildirim: parçacık, halka, yazı, ses, titreşim ve gül rengi parlama. */
+    pop(t('near'), 'near'); flash('rose', 0.22);
     Snd.near(); Platform.haptic('heavy');
   } else {
     const chain = G.chal.ritim ? G.chal.chain * 2 : G.combo - 1;
@@ -3207,6 +3213,7 @@ const doContinue = () => {
   } else if (g0) G.ang = norm((g0.kind === 'hold' ? g0.c0 : pinCenter(g0)) - G.dir * 1.3);
   const g1 = G.pins.find(p => p.kind === 'gate' && !p.done && p.ring === 1);
   if (g1) G.ang2 = norm(pinCenter(g1) - G.dir2 * 1.3);
+  G.vel = NaN; G.vel2 = NaN;   /* ibre yeni yerinden hedef hızla başlar */
   G.gateT = 0;
   hide(overEl);
   toolsEl.classList.add('on');
@@ -3924,7 +3931,7 @@ const closeShop = () => {
   if (shopFrom === 'over') show(overEl); else show(menuEl);
   refreshStats(); SS.menuPop = [];
   shopEl.classList.add('leaving');
-  stLater(() => { hideShop(); shopEl.classList.remove('leaving'); SS.closing = false; relayout(false); }, RM ? 0 : 340);
+  stLater(() => { hideShop(); shopEl.classList.remove('leaving'); SS.closing = false; stHub.innerHTML = ''; stShop.innerHTML = ''; stSheet.innerHTML = ''; relayout(false); }, RM ? 0 : 340);   /* V0.9.12: kapalı mağazanın 1200+ öğesi oyunda her tema geçişinde stil hesabını ağırlaştırıyordu */
   Snd.ui();
 };
 /* Android geri tuşu: önce fiş, sonra dükkân içi, sonra mağaza. */
@@ -4231,8 +4238,18 @@ const update = raw => {
       if (G.ph === 'normal' && G.L % 2 === 0 && G.lifeLevel !== G.L && G.jt - pi.start >= 0.55 * jNormal(G.L)) { G.lifeLevel = G.L; if (!G.life) G.lifeDue = true; }
     }
     const pm = PR ? JOURNEY.phase.normal : phaseMod(G.ph, G.L);
-    G.ang = norm(G.ang + G.dir * G.omega * sl * ptrFactor() * dt);
-    if (G.kind === 'iki' && G.lockLeft <= 0) G.ang2 = norm(G.ang2 + G.dir2 * G.omega2 * sl * dt);
+    if (!G.tun) {
+      const vt = G.dir * G.omega * sl * ptrBoost();
+      if (G.vel !== G.vel) G.vel = vt;
+      G.vel += (vt - G.vel) * (1 - Math.exp(-dt / VEL_TAU));
+      G.ang = norm(G.ang + G.vel * ptrTide() * dt);
+    }
+    if (G.kind === 'iki' && G.lockLeft <= 0) {
+      const vt2 = G.dir2 * G.omega2 * sl;
+      if (G.vel2 !== G.vel2) G.vel2 = vt2;
+      G.vel2 += (vt2 - G.vel2) * (1 - Math.exp(-dt / VEL_TAU));
+      G.ang2 = norm(G.ang2 + G.vel2 * dt);
+    }
     updateChal(dt);
     if (PR) G.time = CFG.maxTime; else G.time -= dt * pm.drain * (LV().drain || 1);
     if (G.slow > 0) G.slow -= raw;
@@ -4272,6 +4289,7 @@ const update = raw => {
   thWx += (G.thT - thWx) * kT;
   if (Math.abs(thWx - G.thT) < 0.004) thWx = G.thT;
   applyTheme();
+  { const on = G.thT > 0.5; if (on !== hfxOn) { hfxOn = on; app.classList.toggle('hellfx', on); } }
   if (G.thDirty && thWx === G.thT) { G.thDirty = false; onPalette(); }
   G.ec += raw;
   envStep(raw);
@@ -4641,16 +4659,11 @@ const buildCracks = () => {
   }
 };
 const drawEnv = c => {
-  const w = view.w, h = view.h, T = G.ec;
+  const T = G.ec;
   if (thWx > 0.01) {
+    /* V0.9.12: ateş parıltısı ve kenar karartması (ekran boyu iki degrade) artık DOM katmanıdır (#hfx): canvas'ta her karede yeniden çizilmeleri Cehennem'de kareyi 22 ms'ye çıkarıyordu (≈45 fps), katman bir kez çizilir. Çatlaklar ve kor canvas'ta kalır. */
     c.save(); c.globalAlpha = thWx;
     const pulse = 0.85 + 0.15 * Math.sin(T * 1.7);
-    const g = c.createLinearGradient(0, h, 0, h * 0.35);
-    g.addColorStop(0, 'rgba(255,80,30,' + (0.5 * pulse).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,80,30,0)');
-    c.fillStyle = g; c.fillRect(0, h * 0.35, w, h * 0.65);
-    const vg = c.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.45, w / 2, h / 2, Math.max(w, h) * 0.8);
-    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.4)');
-    c.fillStyle = vg; c.fillRect(0, 0, w, h);
     if (crackKey !== view.w + 'x' + view.h) buildCracks();
     c.lineJoin = 'round'; c.lineCap = 'round';
     for (const pts of cracks) {
