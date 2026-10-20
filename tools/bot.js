@@ -23,7 +23,7 @@
     const a = ring ? G.ang2 : G.ang, dir = ring ? G.dir2 : G.dir;
     const base = (ring ? G.omega2 : G.omega) * (G.slow > 0 ? G.slowMul : 1);
     const ahead = sgn(c - a, dir);
-    if (!ring && G.kind === 'gelgit' && G.tideC != null && ahead > 0) return k.etaTo(c, dir, 0);
+    if (ahead > 0) return k.etaTo(c, dir, ring ? 1 : 0);   /* V0.9.12: ibre hızı yumuşar (gecikme); etaTo bunu bilir */
     return ahead / (base * (ring ? 1 : k.ptrFactor()));
   };
   /* tür başına istatistik: tur sayısı, toplam süre, dokunuş, vuruş (zorluk dengesi için) */

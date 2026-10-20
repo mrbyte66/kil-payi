@@ -3,6 +3,15 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.9.12 — Cehennem'de akıcılık, yumuşak ibre hızı, yakın vuruşta sarsıntı ve yavaş çekim yok (2026-10-21)
+
+- **Cehennem'e geçerken ve Cehennem boyunca kasma giderildi** (kullanıcı: "Usta'da Cehennem'e geçerken 44 fps hissi, telefon kasıyor"). Neden bulundu ve ölçüldü: Cehennem arka planındaki iki ekran boyu görsel (alttan yükselen ateş parıltısı ve kenarları karartan vinyet) her karede yeniden çiziliyordu. Artık tek bir sabit katmandır, bir kez çizilir. İşlemci 3 kat yavaşlatılmış denemede Cehennem'de kare süresi **22,3 ms → 16,7 ms (yaklaşık 45 → 60 fps)**, geçişteki yavaş kare sayısı 30+ → 0. Çatlaklar ve kor aynen duruyor, görünüm değişmedi.
+- Tema geçişi daha az yük bindiriyor: renk geçişi tam sayfa stil hesabını ~65 yerine ~28 kez yaptırıyor; ayrıca mağaza kapanınca 1200+ öğelik içeriği boşaltılıyor (oyun sırasında her tema geçişini ağırlaştırıyordu).
+- **Son saniyedeki "yakın vuruşta" ekran sarsıntısı ve yavaş çekim kalktı** (kullanıcı: "son saniyelerde vurunca ekran sarsılıyor, oyun aniden hızlanıyor, çubuk saçmalıyor"). Eskiden yakın vuruşta ekran sarsılıyor ve zaman 0,14 sn boyunca 0,3 hıza düşüp bir anda normale dönüyordu (bu "aniden hızlanma"ydı). Parçacık, halka, yazı, ses, titreşim ve gül rengi parlama duruyor.
+- **İbre hızı artık yumuşak değişir** (kullanıcı: "hızlanma soft olmalı"): her turda yeniden kurulan hız, Kum saati, girdap, kilit çarpanı ve ters yön eskiden bir anda değişiyordu; şimdi ~0,3 sn'de yumuşakça yaklaşıyor. Işınlanmada ibre yine anında durur ve çıkınca eski hızla sürer; gelgit hızı değişmedi.
+- Zorluk dengesi korundu (bot karşılaştırması, her biri 150 oyun, V0.9.11'e karşı): Normal orta bot 10. seviyeye ulaşma %34 → %35, Usta usta bot %81 → %86; yalnızca Cehennem'de pro botta küçük bir sertleşme (%50 → %42).
+- Testler: `node tools/store-test.mjs` yeni "oyun hissi" grubu (yakın vuruşta sarsıntı ve yavaş çekim yok, hız artışı, yön değişimi, kum saati, ışınlanma, Cehennem parıltısı katmanı, tema adımları, mağaza DOM'u), yeni `node tools/bot-run.mjs` (bot ile zorluk ölçümü, eski sürümle karşılaştırılabilir).
+
 ## V0.9.11 — Kapalı test bildirimleri (17 gün, günde iki kez), Hz satırı kalktı (2026-10-21)
 
 - **Ayarlar'daki "Ekran 120 Hz" tanılama satırı kaldırıldı** (kullanıcı: "120 Hz yazıyor, onu kaldır"; 120 Hz isteği çalışıyordu). Pencerenin en yüksek yenileme hızını isteyen `MainActivity` kodu yerinde.

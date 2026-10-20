@@ -6,6 +6,7 @@
    - eski ve bozuk kayıtların geçişi,
    - ekran akışı: sokak, dükkân, fiş, satın alma, seçici, geri tuşu, geçiş animasyonları, ayarlar, oyun içi joker sırası, otomatik joker,
    - dil seçimi (sistem dili, Türkçe, English; kalıcı), menü müziğinin ne zaman çaldığı, gündüz ve akşam sahnesi, Türkçe harflerin yazı tipi,
+   - V0.9.12: oyun hissi (yakın vuruşta sarsıntı ve yavaş çekim yok, ibre hızı yumuşak: artış, yön değişimi, kum saati, ışınlanma; Cehennem parıltısı DOM katmanı; tema adımları seyrek; kapanan mağaza DOM'u boşalır),
    - V0.9.11: kapalı test bildirimleri (sahte eklentiyle: izin, kanal, planlama, tarih mantığı, tıklayınca kart, Ayarlar'da anahtar yok),
    - V0.9.10: geri tuşu giriş animasyonu sürerken de ilk dokunuşta çalışır, doğrudan girilen dükkândan geri menüye döner, oyun içi "128 / 180" hedef rozeti ve duraklat düğmesi,
    - V0.9.9: mağaza ısınması (görünmez, dokunuşu engellemez, bitince eski durum, girişte/pencerede bırakılır) ve kayan cepheye dokunuş yedeği.
@@ -431,6 +432,66 @@ LN.perm.reqResult='granted';await K.testSync();
 T('izin verilince bir sonraki açılışta planlanır',LN.calls.some(function(c){return c[0]==='schedule'}));
 T('Ayarlar\\'da bildirim anahtarı yok (kapatılamaz)',!document.querySelector('#setRows [data-set*=noti],#setRows [data-set*=bildirim]')&&!/bildirim|notification/i.test($('setRows').textContent)||(K.openSettings(),!/bildirim|notification/i.test($('setRows').textContent)));
 `+TAIL;
+/* oyun hissi (V0.9.12): yakın vuruşta sarsıntı/yavaş çekim yok, ibre hızı yumuşak, Cehennem parıltısı DOM katmanı, tema adımları seyrek, kapanan mağazanın DOM'u boşalır.
+   Kare döngüsü durdurulur (requestAnimationFrame yok), K.update(dt) elle sürülür: sonuçlar kesin ve tekrarlanabilir. */
+const FEELSEED = 'window.requestAnimationFrame=function(){return 0};';
+const FEELT = HEAD + `
+Object.keys(K.INTRO).forEach(function(k){S.seen[k]=1});S.lvl='usta';S.bests.usta=300;K.persist();
+K.setLevel('usta');K.start();G.mode='play';G.count=0;
+function step(n,dt){for(var i=0;i<n;i++)K.update(dt||0.016)}
+step(2);
+// 1) yakın vuruş (son saniye): sarsıntı ve yavaş çekim yok, görsel geri bildirim var
+G.time=K.CFG.nearAt-0.1;var pin=G.pins.filter(function(p){return p.kind==='gate'})[0];
+var sh0=G.shake,rp0=G.rips.length;K.hit(0,pin);
+T('yakın vuruşta ekran sarsıntısı yok',G.shake===sh0&&G.shake===0,G.shake);
+T('yakın vuruşta zaman yavaşlamaz (vuruş durması yok)',G.tscale===1&&G.tsT===0,[G.tscale,G.tsT]);
+T('yakın vuruşun halka ve parçacık geri bildirimi duruyor',G.rips.length>rp0&&G.parts.length>0);
+// 2) hız artışı yumuşak: omega 2 → 4
+G.pins=[];G.chal={kind:'tek',t:0};G.time=8;G.slow=0;G.vort=0;G.lockLeft=0;G.kind='tek';G.dir=1;G.omega=2;G.vel=NaN;
+step(1);var v=[G.vel];G.omega=4;
+for(var i=0;i<40;i++){step(1);v.push(G.vel);G.pins=[];G.time=8}
+var inc=v.slice(1).map(function(x,i){return x-v[i]});
+T('başlangıç hızı hedefe atlar (yumuşatma yok), ilk kare hedef hız',Math.abs(v[0]-2)<1e-9,v[0]);
+T('hız artışı yumuşak: kare başına artış küçük (≤ fark×%14)',Math.max.apply(null,inc)<=2*0.14+1e-9&&Math.min.apply(null,inc)>=0,[Math.max.apply(null,inc),Math.min.apply(null,inc)]);
+T('hız 0,64 sn sonra hedefe ~yaklaştı (≥ 3,9) ama ilk karede değil',v[1]<2.5&&v[40]>3.9,[v[1],v[40]]);
+// 3) yön değişimi: hız sıfırdan geçerek döner, ani sıçrama yok
+G.omega=3;G.vel=3;G.dir=1;G.pins=[];step(1);G.dir=-1;var w=[G.vel];
+for(var j=0;j<45;j++){step(1);w.push(G.vel);G.pins=[];G.time=8;G.dir=-1}
+var sg=w.map(function(x){return x<0?-1:1}),flips=sg.filter(function(x,i){return i&&x!==sg[i-1]}).length;
+var wi=w.slice(1).map(function(x,i){return Math.abs(x-w[i])});
+T('yön değişimi: hız bir kez sıfırdan geçer, sonunda ≈ −omega',flips===1&&w[45]<-2.8,[flips,w[45]]);
+T('yön değişimi: kare başına hız farkı küçük (≤ 2×omega×%14)',Math.max.apply(null,wi)<=6*0.14+1e-9,Math.max.apply(null,wi));
+// 4) kum saati (yavaşlatma) ve bitişi yumuşak
+G.dir=1;G.omega=3;G.vel=3;G.slow=5;G.slowMul=0.65;step(40);var k1=G.vel;G.slow=0;var k2=[];for(var q=0;q<30;q++){step(1);k2.push(G.vel);G.pins=[];G.time=8}
+T('kum saati yavaşlatması: hız ~0,65×omega seviyesine iner, bitince bir anda değil kademeli artar',k1<2.05&&k2[0]-k1<0.3&&k2[29]>2.9&&k2.every(function(x,i){return !i||x>=k2[i-1]}),[k1,k2[0],k2[29]]);
+// 5) ışınlanmada ibre durur, çıkınca eski hızla sürer
+G.omega=3;G.vel=3;G.slow=0;G.tun={t:0,d:5,to:1};var a0=G.ang,v0=G.vel;step(10);
+T('ışınlanırken ibre durur ve hız hafızası korunur',G.ang===a0&&G.vel===v0,[a0,G.ang,v0,G.vel]);
+G.tun=null;G.pins=[];step(1);T('ışınlanmadan çıkınca eski hızla sürer (yavaş başlamaz)',Math.abs(G.vel-3)<1e-9&&G.ang!==a0,[G.vel]);
+// 6) Cehennem parıltısı DOM katmanı; canvas'ta degrade yok
+var app=$('app'),hf=$('hfx');
+T('Cehennem parıltısı #hfx DOM katmanı olarak var',!!hf&&!app.classList.contains('hellfx')&&getComputedStyle(hf).visibility==='hidden');
+var rg=0,orig=CanvasRenderingContext2D.prototype.createRadialGradient;CanvasRenderingContext2D.prototype.createRadialGradient=function(){rg++;return orig.apply(this,arguments)};
+K.render();var rgN=rg;rg=0;
+G.thT=1;step(100,0.05);K.render();
+CanvasRenderingContext2D.prototype.createRadialGradient=orig;
+T('Cehennem hedefinde #hfx sınıfı açılır',app.classList.contains('hellfx'));
+T('Cehennem çizimi canvas\\'ta ekstra radyal degrade üretmez (normal: '+rgN+', Cehennem: '+rg+')',rg<=rgN,[rgN,rg]);
+G.thT=0;step(2);
+T('Cehennem bitince #hfx sınıfı kalkar',!app.classList.contains('hellfx'));
+// 7) tema geçişinde tam sayfa stil güncellemesi seyrek (her adım tüm sayfanın stilini yeniden hesaplatır)
+var writes=0,sp=CSSStyleDeclaration.prototype.setProperty;CSSStyleDeclaration.prototype.setProperty=function(n){if(n==='--bg')writes++;return sp.apply(this,arguments)};
+G.thT=0;step(200,0.016);writes=0;G.thT=1;step(200,0.016);G.thT=0;step(200,0.016);
+CSSStyleDeclaration.prototype.setProperty=sp;
+T('tema geçişi (içeri + dışarı): --bg yazımı ≤ 70 (eskiden ~130)',writes<=70&&writes>=8,writes);
+// 8) kapanan mağazanın DOM'u boşalır
+K.G.mode='menu';K.openShop('menu');await sleep(700);K.shopGo('alet');await sleep(300);
+T('mağaza açıkken sokak ve dükkân DOM dolu',$('stHub').children.length>0&&$('stShop').children.length>0);
+K.closeShop();await sleep(700);
+T('mağaza kapanınca DOM boşalır (oyunda stil hesabı hafif kalsın)',$('stHub').innerHTML===''&&$('stShop').innerHTML===''&&$('stSheet').innerHTML==='');
+K.openShop('menu');await sleep(500);
+T('boşaltılan mağaza yeniden açılınca düzgün kurulur',$('stHub').querySelectorAll('.fc').length===4&&K.SS.view==='hub');
+`+TAIL;
 /* dokunuş yedeği (V0.9.9): basış bir öğede, bırakış başka öğede olursa tarayıcı click'i ortak üst öğeye verir; eylem basılan öğeye gitmeli */
 const TAPFB = HEAD + `
 K.openShop('menu');await sleep(900);
@@ -474,6 +535,7 @@ await run('animasyon', ANIM, { reduceMotion: true });
 await run('yazı tipi', FONT);
 await run('dokunuş yedeği', TAPFB);
 await run('geri tuşu', BACKT);
+await run('oyun hissi', FEELT, { seed: FEELSEED });
 await run('bildirimler', NOTIT, { seed: FAKECAP });
 await run('ısınma', WARMT, { warm: true });
 await run('ısınma: girişte bırakma', WARM2, { warm: true });
