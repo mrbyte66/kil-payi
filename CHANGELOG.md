@@ -3,6 +3,14 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.9.6 — Oyuncu yanınca "Kül ve kor", Cehennem çemberinin dönüş programı (2026-10-20)
+
+- **Oyuncu yanınca çember yanıp küle döner** (kullanıcı seçimi "B. Kül ve kor", 4 canlı örnekten; "yalnızca Cehennem'de değil, her kademede olsun" dedi). Ölünce çember 0,45 sn turuncu-kırmızı alevlenir, sonra kaybolur; 8 çember parçası yavaşça dağılıp düşer, yaklaşık 150 kor yukarı sürüklenir ve közden küle solar; kalan süre yazısı da solar. Sonuç kartı eskiden 0,6 sn sonra gelirdi, şimdi 0,85 sn sonra gelir (alev görünsün diye), kor kartın arkasında 3 sn kadar sürer. **İkinci şans** alınırsa kor temizlenir ve çember ortadan dışa doğru yeniden belirir. Açık ve koyu temada denendi (Cehennem'de kor çok iyi görünür, açık temada soluk sarı kor biraz silik kalır). "Animasyonlar" anahtarı kapalıysa ve Dene modunda yok (eski davranış).
+- **Cehennem çemberi: dönüş programı** (kullanıcı seçimi "1. Yumuşak yön değişimi"): **Seviye 1-2'de dönmez** (yalnızca nefes alır), **Seviye 3-5'te tek yönlü ve yavaş** döner (4 → 10 °/sn, ibrenin tersine), **Seviye 6-10'da iki yönlü karışık** döner (12 → 20 °/sn): yön 5-9 saniyede bir rastgele değişir, çember yavaşça durur ve ters yöne döner. Nefes aynen sürer. Çentikler halkanın 2,5 katı hızda aynı yönde döner (eskiden hep dönüyordu, Seviye 1'de bile).
+- **Spiral kalktı** (kullanıcı isteği): Cehennem çemberinin içindeki sarmal çizim artık yok.
+- **Sıvı artık çemberin dönüşünü izlemez** (kullanıcı: "içerideki sıvı dönmenin momentumunda kalmasın"): eskiden sıvı yüzeyi de çemberle birlikte dönüyordu (sıvı döndürülmüş çizim bağlamında çiziliyordu); şimdi hep yatay ve sakin kalır, yalnızca nefesle birlikte büyüyüp küçülür.
+- Testler: yeni `node tools/hell-test.mjs` (35 kontrol): dönüş programı (seviye seviye, yön değişimi, hız sınırı), sarmalın olmadığı, sıvının dönmediği (çizim bağlamı), her kademede yanma ve zamanlaması, ikinci şansta yeniden belirme, Animasyonlar kapalıyken ve Dene'de yok.
+
 ## V0.9.5 — Mağazada dükkânları kaydırmak akıcı (2026-10-20)
 
 - **Dükkânları kaydırırken kasma giderildi** (kullanıcı: "animasyonlardan kaynaklı çok kasıyor, telefonum hızlı; kapatma seçeneği istemiyorum, kasmayacak şekilde performans odaklı çalışsın"). Ölçtüm: kaydırırken her karede gökyüzündeki iki büyük silüet yeniden çiziliyor, "İçeri gir" düğmesinin yazısı yeniden yazılıyor, sayfa yeniden hesaplanıyordu (iki kaydırmada ~190 boyama ve 52 yerleşim); üstüne sokakta aynı anda 65 animasyon ve 134 katman vardı. Düzeltmeler:

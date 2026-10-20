@@ -1407,7 +1407,7 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.9.5';
+const VERSION = 'V0.9.6';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -2023,7 +2023,7 @@ const G = {
   continued: false, runCounted: false, coinsGiven: 0, gain: 0, deadT: 0, overAt: 0,
   nearMsg: '', newBest: false, raw: 0, perf: 0, missRun: 0, lastRoast: -99,
   jt: 0, L: 1, ph: 'normal', phLeft: 20, lvStart: 0, open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
-  campRun: false, startL: 1, banner: null, count: 0, thT: 0, thDirty: false, ec: 0, em: [],
+  campRun: false, startL: 1, banner: null, count: 0, thT: 0, thDirty: false, ec: 0, em: [], burn: null, reform: 1,
   life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
   pendingNew: '', pendingTw: '', pendingN: 0, firstOfKind: false, card: null, saveT: 0, hellAge: 0,
   chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0,
@@ -2035,7 +2035,7 @@ const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100
 const CARD_H = { small: 60, normal: 98 };
 /* Cehennem çemberinin görüntü hali (V0.8.0): s etki gücü (yumuşak giriş-çıkış), a nefes genliği, ph nefes evresi, b yarıçap çarpanı, r bütün çemberin dönüşü,
    v dönüş hızı, tr çentiklerin ek dönüşü, sp sarmalın dönüşü. Yalnızca görüntü: açılar ve dokunuş mantığı değişmez. */
-const HX = { s: 0, a: 0, ph: 0, b: 1, r: 0, v: 0, tr: 0, sp: 0 };
+const HX = { s: 0, a: 0, ph: 0, b: 1, r: 0, v: 0, tr: 0, t: 0, sg: 1, tg: 1, nx: 0 };
 
 const pinCenter = p => p.kind === 'hold' ? norm(p.c0 + p.dirH * p.len) : (p.amp ? norm(p.c0 + p.amp * Math.sin(TAU * p.f * G.pt + p.ph)) : p.c0);
 /* O anki yarı genişlik: nefes alan hedef ve dikenler nefes alır (diken: hızlı girer, yavaş çıkar), diken yedikten sonra hedefler kısa süre daralır. */
@@ -2465,7 +2465,7 @@ const runState = L0 => ({
     kind: 'tek', lastKind: 'tek', pins: [], gainMul: 1, boostT: 0, glove: 0, waveSeen: 0, pendingRev: false,
     hint: null, dir2: -1,
     jt: jStart(L0), L: L0, ph: 'normal', phLeft: jNormal(L0), lvStart: jStart(L0), open: [], eng: {}, stars: {}, mixes: [], comboOn: false, evi: 0, narrow: 0, lock: 0, coinsJ: 0, ptsMul: 1,
-    campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: 0, thDirty: false, em: [],
+    campRun: L0 > 1, startL: L0, banner: null, count: 0, thT: 0, thDirty: false, em: [], burn: null, reform: 1,
     life: false, lifeDue: false, lifeLevel: 0, lifeFx: 0, adv: null, advT: 0, advCool: {}, usedAny: false, lastAdv: '',
     pendingNew: '', pendingTw: '', pendingN: 0, firstOfKind: false, card: null, saveT: 0, hellAge: 0,
     chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0,
@@ -3030,7 +3030,8 @@ const updateAdvice = dt => {
 const runCoins = (raw, near, coinsJ, lv) => Math.max(0, Math.round((Math.floor((raw || 0) / CFG.coinDiv) + (near || 0) * CFG.nearCoin + Math.floor(coinsJ || 0)) * lv.coin));
 const die = () => {
   if (G.mode !== 'play') return;
-  G.mode = 'dead'; G.deadT = 0.6; G.tail = null;
+  G.mode = 'dead'; G.deadT = RM ? 0.6 : 0.85; G.tail = null;
+  startBurn();
   toolsEl.classList.remove('on');
   const w = G.omega * (G.slow > 0 ? CFG.contSlowMul : 1);
   /* ışınlanma pininde ibre kapıya varmadan ya da kapıdayken "hedefe şu kadar kala" demek yanıltır */
@@ -3115,6 +3116,7 @@ const showOver = () => {
 };
 
 const doContinue = () => {
+  if (G.burn) { G.burn = null; G.reform = 0; }
   G.mode = 'play'; G.continued = true; G.contN++; G.time = CFG.contTime; G.slow = CFG.contSlow; G.slowMul = CFG.contSlowMul;
   G.combo = 0; G.tscale = 1; G.tsT = 0; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
   const g0 = primaryPin();
@@ -3892,10 +3894,71 @@ const envStep = raw => {
   G.em = thWx < 0.01 ? [] : G.em.filter(e => e.life < e.max && e.y > -10);
 };
 
+/* Oyuncu yanınca (her kademede; Animasyonlar kapalıysa yok) çember yanıp küle döner (kullanıcı seçimi "B. Kül ve kor"): 0,45 sn çember turuncu-kırmızı alevlenir, sonra çember kaybolur;
+   8 çember parçası yavaşça dağılıp düşer, ~150 kor yukarı sürüklenir ve közden küle solar. Parçacıklar ölüm anındaki çemberin yerinden ve boyundan doğar (ekran koordinatı).
+   İkinci şansta (doContinue) kor temizlenir, çember ortadan dışa doğru yeniden belirir (G.reform). Yalnızca görüntü. */
+const BURN = { flame: 0.45, life: 3.2 };
+const EMBER_COL = ['#FFD27A', '#FF8A3D', '#E8452C'];
+const startBurn = () => {
+  G.burn = null;
+  if (RM || G.practice) return;
+  const R = view.r * HX.b, RW = Math.max(14, R * 0.2), k = R / 88, r0 = HX.r, ch = [], em = [];
+  for (let i = 0; i < 8; i++) {
+    const a0 = r0 + i * TAU / 8 + 0.05, a1 = r0 + (i + 1) * TAU / 8 - 0.05, am = (a0 + a1) / 2, sp = rnd(30, 80) * k;
+    ch.push({ a0, a1, am, vx: Math.cos(am) * sp + rnd(-25, 25) * k, vy: Math.sin(am) * sp + rnd(-25, 25) * k - 40 * k, vr: rnd(-4, 4), g: 140 * k });
+  }
+  for (let i = 0; i < 150; i++) {
+    const a = rnd(0, TAU), r = R + rnd(-RW / 2, RW / 2);
+    em.push({ x0: Math.cos(a) * r, y0: Math.sin(a) * r, vx: rnd(-22, 22) * k, vy: -rnd(30, 110) * k, s: rnd(1.5, 4) * Math.min(1.6, k), max: rnd(0.8, 1.8), ph: rnd(0, TAU), del: 0.3 + rnd(0, 0.45) });
+  }
+  G.burn = { t: 0, ch, em, k };
+};
+const burnStep = raw => {
+  if (G.reform < 1) G.reform = Math.min(1, G.reform + raw / 0.45);
+  const b = G.burn;
+  if (!b) return;
+  if (G.mode !== 'dead' && G.mode !== 'over') { G.burn = null; return; }
+  b.t += raw;
+  if (b.t > BURN.life) G.burn = null;
+};
+const drawBurn = (c, cx, cy, b, R, RW) => {
+  const te = b.t, k = b.k;
+  c.save();
+  if (te < BURN.flame) {
+    const f = te / BURN.flame;
+    c.lineWidth = RW * (1 - 0.5 * f); c.strokeStyle = Math.random() < 0.5 ? EMBER_COL[1] : EMBER_COL[2]; c.globalAlpha = 0.9 - 0.3 * f;
+    c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke(); c.globalAlpha = 1;
+  }
+  c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
+  for (const p of b.ch) {
+    const tau = te - BURN.flame;
+    if (tau < 0) continue;
+    const al = clamp(1 - (tau - 0.7) / 1, 0, 1);
+    if (al <= 0) continue;
+    const mx = Math.cos(p.am) * R, my = Math.sin(p.am) * R;
+    c.save(); c.globalAlpha = al;
+    c.translate(cx + p.vx * tau + mx, cy + p.vy * tau + 0.5 * p.g * tau * tau + my); c.rotate(p.vr * tau); c.translate(-mx, -my);
+    c.beginPath(); c.arc(0, 0, R, p.a0, p.a1); c.stroke();
+    c.restore();
+  }
+  for (const e of b.em) {
+    const tau = te - e.del;
+    if (tau < 0) continue;
+    const u = tau / e.max;
+    if (u >= 1) continue;
+    c.globalAlpha = 1 - u * u; c.fillStyle = u < 0.3 ? EMBER_COL[0] : u < 0.6 ? EMBER_COL[1] : u < 0.85 ? EMBER_COL[2] : P['ink-2'];
+    c.beginPath(); c.arc(cx + e.x0 + (e.vx + Math.sin(te * 5 + e.ph) * 14 * k) * tau, cy + e.y0 + e.vy * tau, e.s * (1 - 0.5 * u), 0, TAU); c.fill();
+  }
+  c.restore();
+};
+
 /* ---------- güncelleme ---------- */
 const COUNT_STEP = 0.75;
-/* Cehennem kademesinde (yalnızca) çember nefes alır, bütün çember ibrenin tersine döner, içinde sarmal döner; seviye arttıkça güçlenir.
-   Nefes yalnızca küçülüp geri açılır (ayarlanan boyutu aşmaz, kartın altına girmez). Kapanırken çember en yakın tam tura oturur, normal görünüme sıçramaz. */
+/* Cehennem kademesinde (yalnızca) çember nefes alır ve bütün çember (çentikler, hedefler, ibre) ibrenin tersine döner; yalnızca görüntüdür, oyun mantığına dokunmaz.
+   Nefes yalnızca küçülüp geri açılır (ayarlanan boyutu aşmaz, kartın altına girmez); kapanırken çember en yakın tam tura oturur, normal görünüme sıçramaz.
+   V0.9.6 dönüş programı (kullanıcı seçimi "Yumuşak yön değişimi"; spiral kaldırıldı): Seviye 1-2 dönmez (yalnızca nefes); 3-5 tek yönlü, yavaş (4 → 10 °/sn);
+   6-10 iki yönlü karışık (12 → 20 °/sn): yön 5-9 sn'de bir rastgele, yavaşça durup ters yöne döner (HX.sg yumuşak işaret, HX.tg hedef işaret, HX.nx sonraki dönüş). Çentikler halkanın 2,5 katı hızda döner (aynı yönde). */
+const HELL_ROT = [0, 0, 4, 7, 10, 12, 14, 16, 18, 20];   /* °/sn, seviye 1..10 */
 const hellFx = raw => {
   if (G.mode === 'intro') return;
   const on = !RM && LV().hell === 'always' && !G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'dead');
@@ -3905,15 +3968,20 @@ const hellFx = raw => {
     HX.a += (0.015 + 0.012 * lv - HX.a) * k;
     HX.ph += TAU * raw / (3.4 - 0.2 * lv);
     HX.b = 1 - 2 * HX.a * (0.5 - 0.5 * Math.sin(HX.ph)) * HX.s;
-    HX.v += ((on ? -G.dir * (0.05 + 0.03 * lv) : 0) - HX.v) * k;
+    HX.t += raw;
+    if (on && lv >= 5) {
+      if (!HX.nx) HX.nx = HX.t + 5 + Math.random() * 4;
+      if (HX.t > HX.nx) { HX.tg = -HX.tg; HX.nx = HX.t + 5 + Math.random() * 4; }
+      HX.sg += (HX.tg - HX.sg) * Math.min(1, raw / 0.9);
+    } else if (on) { HX.sg = 1; HX.tg = 1; HX.nx = 0; }
+    HX.v += ((on ? -G.dir * HELL_ROT[lv] * Math.PI / 180 * HX.sg : 0) - HX.v) * k;
     HX.r += HX.v * raw;
-    HX.tr += (on ? -G.dir * (0.25 + 0.06 * lv) : 0) * raw;
-    HX.sp += (on ? -G.dir * (0.4 + 0.1 * lv) : 0) * raw;
+    HX.tr += HX.v * 2.5 * raw;
   } else HX.b = 1;
   if (!on) {
     const kk = Math.min(1, raw * 5), q = TAU / 12;
     HX.r += (Math.round(HX.r / TAU) * TAU - HX.r) * kk; HX.tr += (Math.round(HX.tr / q) * q - HX.tr) * kk;
-    if (HX.s <= 0.003 && Math.abs(HX.r - Math.round(HX.r / TAU) * TAU) < 0.002 && Math.abs(HX.tr - Math.round(HX.tr / q) * q) < 0.002) { HX.r = 0; HX.tr = 0; HX.v = 0; }
+    if (HX.s <= 0.003 && Math.abs(HX.r - Math.round(HX.r / TAU) * TAU) < 0.002 && Math.abs(HX.tr - Math.round(HX.tr / q) * q) < 0.002) { HX.r = 0; HX.tr = 0; HX.v = 0; HX.t = 0; HX.sg = 1; HX.tg = 1; HX.nx = 0; }
   }
 };
 let contLeft = 0;
@@ -3926,7 +3994,7 @@ const update = raw => {
   /* Duraklatmada her şey donar: sayaçlar, tema geçişi, parçacıklar. */
   if (G.mode === 'pause') return;
   if (G.mode === 'play' && G.introQ.length && !G.holding && !G.practice) startIntro();
-  hellFx(raw);
+  hellFx(raw); burnStep(raw);
   if (G.tsT > 0) { G.tsT -= raw; if (G.tsT <= 0) G.tscale = 1; }
   const dt = raw * G.tscale;
 
@@ -5063,6 +5131,9 @@ const render = () => {
   if (G.shake > 0) { const m = Math.min(9, G.shake * 20); c.translate((Math.random() - 0.5) * m, (Math.random() - 0.5) * m); }
 
   /* Cehennem: bütün çember (çentikler, hedefler, ibre) birlikte döner; etiket ve parçacıklar dönmeyen katmanda kalır */
+  const bu = G.mode === 'dead' || G.mode === 'over' ? G.burn : null;
+  const clipR = bu && bu.t >= BURN.flame ? 0.01 : (G.reform < 1 ? R * 1.6 * easeOut(G.reform) + 0.01 : -1);
+  if (clipR >= 0) { c.save(); c.beginPath(); c.arc(cx, cy, clipR, 0, TAU); c.clip(); }
   const hx = HX.s > 0.003 || HX.r !== 0;
   if (hx) { c.save(); c.translate(cx, cy); c.rotate(HX.r); c.translate(-cx, -cy); drawRot = HX.r; }
   const r0 = R + RW / 2 + 10;
@@ -5084,17 +5155,11 @@ const render = () => {
     c.beginPath(); c.arc(cx, cy, two ? R2 - RW2 / 2 - 4 : R - RW / 2 - 4, 0, TAU); c.fill();
     c.globalAlpha = 1;
   }
-  if (G.mode !== 'menu' && !G.practice) drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 0);
-  if (HX.s > 0.003) {
-    /* hipnoz sarmalı: halkanın içinde üç kol, kendi hızıyla ters döner */
-    const lim = two ? 0.46 : 0.62;
-    c.save(); c.translate(cx, cy); c.rotate(HX.sp); c.lineCap = 'round'; c.lineWidth = Math.max(2, R * 0.024); c.strokeStyle = mixHex(P.track, P.rose, 0.5); c.globalAlpha = 0.6 * HX.s;
-    for (let a = 0; a < 3; a++) {
-      c.beginPath();
-      for (let n = 0; n <= 48; n++) { const f = n / 48, ang = a * TAU / 3 + f * 3.4, rr = R * (0.16 + (lim - 0.16) * f), x = Math.cos(ang) * rr, y = Math.sin(ang) * rr; if (n) c.lineTo(x, y); else c.moveTo(x, y); }
-      c.stroke();
-    }
-    c.restore(); c.globalAlpha = 1;
+  if (G.mode !== 'menu' && !G.practice) {
+    /* sıvı çemberin dönüşünü izlemez (V0.9.6): döndürülmüş bağlamda ters yöne döndürülüp çizilir, yüzeyi hep yatay kalır */
+    if (hx) { c.save(); c.translate(cx, cy); c.rotate(-HX.r); c.translate(-cx, -cy); }
+    drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 0);
+    if (hx) c.restore();
   }
   drawTrackFx(c, cx, cy, R, RW, R2, RW2, two);
 
@@ -5129,6 +5194,8 @@ const render = () => {
   }
   if (dm) drawDemoFront(c, cx, cy, dm, dg);
   if (hx) { c.restore(); drawRot = 0; }
+  if (clipR >= 0) c.restore();
+  if (bu) drawBurn(c, cx, cy, bu, R, RW);
   drawFxs(c);
 
   for (const r of G.rips) {
@@ -5158,7 +5225,7 @@ const render = () => {
     c.fillText(t('best'), cx, cy + R * 0.36);
   } else {
     if (G.practice) drawPracCenter(c, cx, cy, R, two);
-    else drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 1);
+    else if (!bu || bu.t < 0.3) { if (bu) c.globalAlpha = clamp(1 - bu.t / 0.3, 0, 1); drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 1); }   /* yanınca kalan süre yazısı da solar */
     c.globalAlpha = 1;
     if (two && G.lockLeft > 0 && G.mode === 'play') drawLockTimer(c, cx, cy, R);
     if (G.mode === 'count' && G.count > 0) drawCount(c, cx, cy, R);
