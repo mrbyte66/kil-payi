@@ -80,7 +80,19 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .score{display:flex;align-items:baseline;gap:6px;min-width:0;transform-origin:left bottom}
 .score b{font-family:var(--font-display);font-weight:700;font-size:2.5rem;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink)}
 .score span{font-weight:800;font-size:var(--fs-14);color:var(--ink-2)}
-.score-row .chip{align-self:center;flex:none}
+.sgrp{display:flex;align-items:flex-end;gap:8px;min-width:0}
+/* Hedef (V0.9.10): "Rekor 180" çipi kalktı; puanın yanında "128 / (180)" gösterilir, 180 aşılacak hedef gibi çerçevelidir. Rekor geçilince çerçeve altın olur ve tik alır. */
+.goalw{display:inline-flex;align-items:center;gap:7px;margin-bottom:7px;min-width:0}
+.goalw i{font:600 1.35rem/1 var(--font-display);font-style:normal;color:var(--ink-3)}
+.goal{display:inline-flex;align-items:center;gap:4px;min-height:26px;padding:0 10px;border-radius:var(--r-pill);border:2px solid var(--lilac);color:var(--ink-2);font:600 var(--fs-14)/1 var(--font-display);font-style:normal;font-variant-numeric:tabular-nums;transition:background var(--dur-base) var(--ease),border-color var(--dur-base) var(--ease),color var(--dur-base) var(--ease)}
+.goal svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round}
+.goalw.gold i{color:var(--gold-ink)}
+.goalw.gold .goal{border-color:var(--gold);background:var(--gold);color:#5A3C00}
+/* Duraklat (V0.9.10): sağ üst köşe; köşelere oyun dokunuşu en az gelir. Düğme olduğu için oyun dokunuşu sayılmaz (#app pointerdown button'ı atlar). */
+.pausebtn{pointer-events:auto;appearance:none;border:0;cursor:pointer;position:relative;flex:none;align-self:center;width:40px;height:40px;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--ink-2);box-shadow:var(--shadow-s);transition:transform var(--dur-fast) var(--ease)}
+.pausebtn::before{content:"";position:absolute;inset:-5px}
+.pausebtn:active{transform:scale(.92)}
+.pausebtn .ic{width:20px;height:20px}
 .gauge-row{display:flex;align-items:center;gap:8px;min-height:26px}
 .gauge{position:relative;flex:1;height:10px;border-radius:var(--r-pill);background:var(--track);overflow:hidden}
 .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:var(--r-pill);background:var(--lilac);transition:width .3s var(--ease)}
@@ -222,8 +234,6 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 .eyebrow.mood.gold{color:var(--gold-ink)}
 .big-score.gold{color:var(--gold-ink)}
 .delta.win.gold{padding:6px 18px;border-radius:var(--r-pill);background:var(--gold);color:#5A3C00}
-#hudBest.gold{background:var(--gold);color:#5A3C00}
-#hudBest.gold b{color:#5A3C00}
 .row2{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:var(--r-pill);background:var(--surface);box-shadow:var(--shadow-s);width:min(100%,372px)}
 .seg button{appearance:none;border:0;cursor:pointer;min-height:40px;padding:0 4px;border-radius:var(--r-pill);background:transparent;color:var(--ink-2);font-family:var(--font-display);font-weight:600;font-size:var(--fs-14);line-height:1;white-space:nowrap;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
@@ -745,8 +755,11 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 
   <div class="hud" id="hud" aria-hidden="true">
     <div class="score-row">
-      <div class="score" id="scoreBox"><b id="hudScore">0</b><span data-i18n="score">puan</span></div>
-      <span class="chip sm" id="hudBest"></span>
+      <div class="sgrp">
+        <div class="score" id="scoreBox"><b id="hudScore">0</b></div>
+        <span class="goalw" id="hudBest" hidden><i aria-hidden="true">/</i><em class="goal" id="hudGoal"></em></span>
+      </div>
+      <button class="pausebtn" id="pauseBtn" type="button" aria-label="Duraklat"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M9 6.5v11M15 6.5v11"/></svg></button>
     </div>
     <div class="gauge-row">
       <div class="gauge"><div class="fill" id="fill"></div></div>
@@ -1182,7 +1195,7 @@ const STR = {
     paused: 'Duraklatıldı', resume: 'Devam et',
     adBadge: 'Reklam (demo)', adText: 'Gerçek sürümde burada kısa bir video oynar. Bitince ödülün hazır.', adWait: 'Ödülün hazırlanıyor…',
     adBadgeReal: 'Reklam', adLoading: 'Reklam hazırlanıyor, birazdan başlayacak.', adFail: 'Reklam şu an yüklenemedi. Biraz sonra tekrar dene.',
-    notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', coinShort: 'Yeterli coin yok.', sound: 'Ses', score: 'puan',
+    notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', coinShort: 'Yeterli coin yok.', sound: 'Ses', score: 'puan', pauseBtn: 'Duraklat',
     soundOn: 'Sesi kapat', soundOff: 'Sesi aç', vibOn: 'Titreşimi kapat', vibOff: 'Titreşimi aç', overSr: 'Süre bitti. Skor {n}.',
     play_aria: 'Oyun alanı',
     k_cift: 'Çift pim', k_kayan: 'Kayan pim', k_iki: 'İki halka',
@@ -1289,7 +1302,7 @@ const STR = {
     paused: 'Paused', resume: 'Resume',
     adBadge: 'Ad (demo)', adText: 'In the real version a short video plays here. Your reward is ready when it ends.', adWait: 'Preparing your reward…',
     adBadgeReal: 'Ad', adLoading: 'Getting your ad ready, it starts in a moment.', adFail: "The ad couldn't load right now. Try again in a moment.",
-    notEnough: 'Not enough coins. Watch an ad to keep going.', coinShort: 'Not enough coins.', sound: 'Sound', score: 'pts',
+    notEnough: 'Not enough coins. Watch an ad to keep going.', coinShort: 'Not enough coins.', sound: 'Sound', score: 'pts', pauseBtn: 'Pause',
     soundOn: 'Mute sound', soundOff: 'Unmute sound', vibOn: 'Turn vibration off', vibOff: 'Turn vibration on', overSr: 'Time is up. Score {n}.',
     play_aria: 'Play area',
     k_cift: 'Double pin', k_kayan: 'Sliding pin', k_iki: 'Twin rings',
@@ -1441,7 +1454,7 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.9.9';
+const VERSION = 'V0.9.10';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -1940,7 +1953,7 @@ const applyI18n = () => {
   document.documentElement.lang = LANG;
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
   cv.setAttribute('aria-label', t('play_aria'));
-  $('bagBtn').setAttribute('aria-label', t('shop')); $('setBtn').setAttribute('aria-label', t('setT'));
+  $('bagBtn').setAttribute('aria-label', t('shop')); $('setBtn').setAttribute('aria-label', t('setT')); $('pauseBtn').setAttribute('aria-label', t('pauseBtn'));
   $('lvlSeg').setAttribute('aria-label', t('level'));
   toolsEl.setAttribute('aria-label', t('bag'));
   toolsEl.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-label', t('tool_' + b.getAttribute('data-tool'))));
@@ -2012,12 +2025,14 @@ const refreshMenu = () => {
   renderBagRow();
   $('bookBtn').classList.toggle('dot', bookNew());
 };
-/* "En iyi" etiketi: oyun içinde rekor geçilince altın olur ve skorla birlikte yükselir (V0.9.0). */
+/* Hedef rozeti (V0.9.10): puanın yanında "/ 180"; 180 aşılacak rekordur (çerçeveli). Henüz rekor yoksa görünmez; rekor geçilince altın olur ve tik alır (V0.9.0'daki altın "En iyi" çipinin yerine). */
+const CHK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 let bestHtml = '';
 const paintBest = () => {
-  const gold = !!G.recDone, h = t('best') + ' <b>' + (gold ? Math.max(bestNow(), G.score) : bestNow()) + '</b>';
+  const best = bestNow(), gold = !!G.recDone, on = best > 0 || gold, h = on ? (gold ? CHK : '') + best : '';
   if (h === bestHtml && hudBestEl.classList.contains('gold') === gold) return;
-  bestHtml = h; hudBestEl.innerHTML = h; hudBestEl.classList.toggle('gold', gold);
+  bestHtml = h; hudBestEl.hidden = !on; hudBestEl.classList.toggle('gold', gold);
+  $('hudGoal').innerHTML = h; hudBestEl.setAttribute('aria-label', t('best') + ' ' + best);
 };
 /* menüdeki coin sayısı değişince yumuşakça sayar (mağaza açıkken tutulur, kapanınca sayar) */
 let coinShown = -1, coinAnim = 0;
@@ -3390,7 +3405,7 @@ const sGiftSvg = () => '<svg class="gbx" width="168" height="168" viewBox="0 0 1
   '<ellipse cx="40" cy="104" rx="7" ry="22" fill="#fff" opacity=".2"/></svg>';
 
 /* ---------- mağaza: ekranlar ve işleyiş ---------- */
-const SS = { shop: 'alet', idx: 0, pos: 0, view: 'hub', k: 1, sw: 296, sh: 604, anim: null, noClick: 0, timers: [], tick: 0, quick: false, busy: false, closing: false, open: false, stagger: false, pop: [], menuPop: [], bagPrev: null, day: false, force: '' };
+const SS = { shop: 'alet', idx: 0, pos: 0, view: 'hub', k: 1, sw: 296, sh: 604, anim: null, noClick: 0, timers: [], tick: 0, quick: false, busy: false, closing: false, open: false, stagger: false, pop: [], menuPop: [], bagPrev: null, day: false, force: '', direct: false, swapT: 0 };
 let shopFrom = 'menu';
 const stg = $('stg'), stHub = $('stHub'), stShop = $('stShop'), stBloom = $('stBloom'), stSheet = $('stSheet'), stScrim = $('stScrim'), stToastEl = $('stToast');
 const sName = k => k === 'gor' ? t('st_n_gor') : (k.indexOf('slot') === 0 ? t('st_slotN', { n: k.slice(4) }) : (k === 'bolt' ? t('st_auto') : (k === 'heart' ? t('st_life') : t('tool_' + k))));
@@ -3654,7 +3669,7 @@ const stBurst = (cols, sel) => {
     stg.appendChild(e); setTimeout(() => e.remove(), 1000);
   }
 };
-const stLater = (fn, ms) => { SS.timers.push(setTimeout(fn, ms)); };
+const stLater = (fn, ms) => { const id = setTimeout(fn, ms); SS.timers.push(id); return id; };
 /* Geçişler: dokunuşlar geçiş sürerken yok sayılır (stBusy); çıkışta alttaki ekran önce açılır, mağaza solarken görünür. */
 const stBusy = ms => { SS.busy = true; stLater(() => { SS.busy = false; }, ms); };
 const showView = v => {
@@ -3680,11 +3695,25 @@ const enterShop = id => {
   stLater(() => { stBloom.classList.add('out'); stBloom.classList.remove('on'); }, 560);
   stLater(() => { stHub.classList.remove('zoom'); f.classList.remove('sel'); stBloom.classList.remove('out', 'rdy'); }, 1150);
 };
+/* Dükkândan geri (V0.9.10): kullanıcı "mağazadan çıkarken geri tuşuna ilk basışta çalışmıyor, 2 kere basıyorum" dedi. Neden: giriş animasyonu sürerken (içeri gir + ~0,95 sn) SS.busy geri tuşunu yutuyordu;
+   oda ~0,5 sn'de göründüğü için gören kullanıcı hemen geri basınca ilk dokunuş kayboluyordu. Artık geri, oda göründüğü anda çalışır: bekleyen giriş/değişim işleri anında bitirilir (yakınlaşma, ışık, değişim zamanlayıcısı).
+   Menüdeki yuva kısayolundan ya da Ayarlar'dan DOĞRUDAN girilen dükkândan (SS.direct) geri, sokağa değil geldiğin yere (menü) döner. */
+const stFinishEnter = () => {
+  clearTimeout(SS.swapT); stShop.classList.remove('swap');
+  stHub.classList.remove('zoom'); stHub.querySelectorAll('.fc.sel').forEach(f => f.classList.remove('sel'));
+  stBloom.classList.remove('on', 'out', 'rdy');
+  SS.busy = false;
+};
+const leaveRoom = () => {
+  closeSheet();
+  if (SS.direct) { closeShop(); return; }
+  stFinishEnter(); showView('hub');
+};
 /* dükkânlar arası: sokaktaysan önce o cepheye kaydırır sonra girer; bir dükkânın içindeysen oda yumuşakça değişir */
 const swapShop = id => {
   if (RM) { shopGo(id); return; }
   stBusy(560); stShop.classList.add('swap');
-  stLater(() => { shopGo(id); stShop.classList.remove('swap'); }, 210);
+  SS.swapT = stLater(() => { shopGo(id); stShop.classList.remove('swap'); }, 210);
 };
 const goShop = id => {
   closeSheet();
@@ -3728,7 +3757,7 @@ const stClick = ev => {
   const a = el.getAttribute('data-a'), g = n => el.getAttribute('data-' + n), car = $('stCar');
   Snd.unlock();
   if (a === 'close') closeShop();
-  else if (a === 'back') { if (SS.busy) return; closeSheet(); showView('hub'); Snd.ui(); }
+  else if (a === 'back') { leaveRoom(); Snd.ui(); }
   else if (a === 'open') {
     if (SS.busy) return;
     const i = g('i');
@@ -3841,7 +3870,7 @@ const fitStore = () => {
 const openShop = (from, opt) => {
   opt = opt || {};
   warmStop(true);
-  shopFrom = from; SS.closing = false; SS.busy = false; SS.open = true;
+  shopFrom = from; SS.closing = false; SS.busy = false; SS.open = true; SS.direct = !!opt.shop;
   SS.timers.forEach(clearTimeout); SS.timers = [];
   shopEl.classList.remove('leaving'); stBloom.classList.remove('on', 'out', 'rdy');
   show(shopEl); app.classList.add('shopping'); fitStore(); closeSheet();
@@ -3872,7 +3901,7 @@ const closeShop = () => {
 /* Android geri tuşu: önce fiş, sonra dükkân içi, sonra mağaza. */
 const storeBack = () => {
   if (stSheet.classList.contains('on') || stSheet.classList.contains('pre')) { closeSheet(); return; }
-  if (SS.view === 'shop') { if (!SS.busy) showView('hub'); return; }
+  if (SS.view === 'shop') { leaveRoom(); return; }
   closeShop();
 };
 
@@ -5550,6 +5579,7 @@ campEl.addEventListener('click', () => { Snd.unlock(); start(save.camp); });
 $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
 $('resumeBtn').addEventListener('click', resume);
 $('bagBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
+$('pauseBtn').addEventListener('click', e => { Snd.unlock(); if (G.mode !== 'play' && G.mode !== 'count') return; Snd.ui(); Platform.haptic('light'); pause(); e.currentTarget.blur(); });
 $('bagBtn2').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'over') openShop('over'); });
 $('adBtn').addEventListener('click', () => {
   if (G.mode !== 'over') return;
