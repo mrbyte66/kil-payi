@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Açılış ekranı rengi: ikonun ortalama mor tonu (Android 12+ sistem açılışı bu zemin üzerinde ikonu gösterir). -->
+    <color name="splash_bg">#6D58E0</color>
+</resources>

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Kıl payı</string>
-    <string name="title_activity_main">Kıl payı</string>
+    <string name="app_name">Close Call</string>
+    <string name="title_activity_main">Close Call</string>
     <string name="package_name">com.mrbytestudio.kilpayi</string>
     <string name="custom_url_scheme">com.mrbytestudio.kilpayi</string>
 </resources>
