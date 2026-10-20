@@ -1,4 +1,4 @@
-package com.mrbyte66.kilpayi;
+package com.mrbytestudio.kilpayi;
 
 import android.os.Build;
 import android.os.Bundle;

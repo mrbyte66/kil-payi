@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.mrbyte66.kilpayi',
+  appId: 'com.mrbytestudio.kilpayi',
   appName: 'Kıl payı',
   webDir: 'www',
   plugins: {
