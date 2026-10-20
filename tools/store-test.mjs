@@ -95,7 +95,7 @@ K.storeBack();T('çıkış başladı: solarak kapanır',$('shop').classList.cont
 await sleep(700);T('çıkış bitti: mağaza gizli, menü açık',!$('shop').classList.contains('on')&&!$('shop').classList.contains('leaving')&&K.SS.closing===false);
 S.coins=5000;K.persist();K.refreshStats();K.openShop('menu',{shop:'yet',sheet:'bolt'});await sleep(700);click('#stSheet [data-a="unlA"]');
 T('otomatik açıldı',S.autoOwn===true&&S.autoJ===true&&S.coins===1000,[S.autoOwn,S.autoJ,S.coins]);click('#stSheet [data-a="auto"]');T('otomatik kapatıldı',S.autoJ===false);K.closeShop();await sleep(600);
-K.openSettings();T('ayarlar 5 satır (müzik, ses, titreşim, otomatik, dil)',document.querySelectorAll('#setRows .srow').length===5,document.querySelectorAll('#setRows .srow').length);
+K.openSettings();T('ayarlar 6 satır (müzik, ses, titreşim, animasyon, otomatik, dil)',document.querySelectorAll('#setRows .srow').length===6,document.querySelectorAll('#setRows .srow').length);
 click('#setRows [data-set="snd"]');T('ses kapandı',S.snd===false);click('#setRows [data-set="snd"]');T('ses açıldı',S.snd===true);
 click('#setRows [data-set="mus"]');T('müzik kapandı',S.music===false);click('#setRows [data-set="mus"]');T('müzik açıldı',S.music===true);
 click('#setRows [data-set="vib"]');T('titreşim kapandı',S.vib===false);click('#setRows [data-set="vib"]');click('#setRows [data-set="auto"]');T('ayarlardan otomatik açıldı',S.autoJ===true);K.closeSettings();
@@ -123,6 +123,40 @@ K.SS.force='';T('saat 06:30-18:00 arası gündüz sayılır',(function(){var d=n
 // sığma: buton ile alttaki şerit çakışmaz
 K.renderHub();var cta=$('stCta').getBoundingClientRect(),dock=$('stDock').getBoundingClientRect();T('İçeri gir butonu ile alt şerit çakışmaz (en az 8 px boşluk)',dock.top-cta.bottom>=8*K.SS.k,[cta.bottom,dock.top,K.SS.k]);
 K.closeShop();await sleep(600);
+` + TAIL;
+
+
+const ANIM = HEAD + `
+// Telefonun "animasyonları kaldır" ayarı AÇIK taklit edilir (başsız Chrome prefers-reduced-motion: reduce bildirir); oyun buna bakmamalı.
+var html=document.documentElement;
+T('telefon "animasyonları kaldır" diyor (taklit)',K.SYS_RM===true);
+T('oyun yine de animasyonlu (varsayılan açık)',S.anim===true&&K.getRM()===false&&!html.classList.contains('calm'),[S.anim,K.getRM()]);
+T('ayarlarda açıklama: telefonda kapalı, oyun kendi ayarına bakar',(K.openSettings(),/burada açık/.test($('setRows').innerText)),$('setRows').innerText);K.closeSettings();
+K.openShop('menu');
+T('açılışta parçalar sırayla girer (opening sınıfı)',$('shop').classList.contains('opening')&&getComputedStyle(document.querySelector('#stHub .hd')).animationName.indexOf('stDrop')>=0&&getComputedStyle(document.querySelector('#stHub .fc')).animationName.indexOf('stFcIn')>=0&&getComputedStyle($('stDock')).animationName.indexOf('stUp')>=0);
+T('mağaza açılırken solma animasyonu çalışıyor',getComputedStyle($('shop')).animationName.indexOf('stFade')>=0&&document.getAnimations().length>0,[getComputedStyle($('shop')).animationName,document.getAnimations().length]);
+await sleep(250);var mid=getComputedStyle($('shop')).opacity;T('açılış yarıdayken mağaza yarı saydam (gerçekten animasyonlu)',+mid>0&&+mid<1,mid);
+await sleep(700);T('açılış bitti: mağaza tam görünür',+getComputedStyle($('shop')).opacity===1&&!$('menu').classList.contains('on'));
+K.goShop('alet');
+T('dükkâna giriş: sokak yakınlaşıyor (zoom), içerisi henüz açılmadı',$('stHub').classList.contains('zoom')&&K.SS.view==='hub'&&K.SS.busy===true,[K.SS.view,K.SS.busy]);
+await sleep(10);T('kapı ışığı katmanı var, başta görünmez',!!$('stBloom')&&+getComputedStyle($('stBloom')).opacity<0.5);await sleep(290);var fcT=getComputedStyle(document.querySelector('#stHub .fc.sel')).transform;T('seçilen cephe büyüyor (dönüşüm var)',fcT&&fcT!=='none',fcT);
+await sleep(300);T('yakınlaşma sürerken dükkân içi açıldı',K.SS.view==='shop'&&K.SS.shop==='alet');
+await sleep(700);T('giriş bitti: dokunma yeniden serbest, ışık söndü',K.SS.busy===false&&!$('stHub').classList.contains('zoom')&&!$('stBloom').classList.contains('on'));
+K.goShop('yet');T('dükkândan dükkâna: oda önce solar (swap)',$('stShop').classList.contains('swap')&&K.SS.busy===true);
+await sleep(400);T('...sonra yeni dükkân belirir',K.SS.shop==='yet'&&!$('stShop').classList.contains('swap'),[K.SS.shop,$('stShop').className]);await sleep(500);
+K.storeBack();await sleep(120);T('geri: sokak yumuşakça belirir (ent animasyonu)',K.SS.view==='hub'&&$('stHub').classList.contains('ent')&&document.getAnimations().length>0,[K.SS.view,$('stHub').className]);
+await sleep(900);
+K.closeShop();T('çıkış: mağaza solarak kapanır (leaving)',$('shop').classList.contains('leaving')&&getComputedStyle($('shop')).animationName.indexOf('stFadeOut')>=0,getComputedStyle($('shop')).animationName);
+await sleep(120);var o2=+getComputedStyle($('shop')).opacity;T('çıkış yarıdayken mağaza yarı saydam',o2>0&&o2<1,o2);
+await sleep(500);T('çıkış bitti',!$('shop').classList.contains('on')&&$('menu').classList.contains('on'));
+// Ayarlar'dan animasyonları kapat: eski "sakin" davranış (anında geçiş)
+K.openSettings();click('#setRows [data-set="anim"]');
+T('anahtar kapandı: kayıt, sakin kip ve sınıf',S.anim===false&&K.getRM()===true&&html.classList.contains('calm')&&JSON.parse(localStorage.getItem('kilpayi.v1')).anim===false,[S.anim,K.getRM()]);
+T('anahtar kapalıyken açıklama telefon uyarısı vermez',!/burada açık/.test($('setRows').innerText));K.closeSettings();
+K.openShop('menu');await sleep(60);T('sakin kip: mağaza anında tam görünür (animasyon yok)',+getComputedStyle($('shop')).opacity===1&&getComputedStyle($('shop')).animationName==='none',[getComputedStyle($('shop')).opacity,getComputedStyle($('shop')).animationName]);
+K.goShop('alet');await sleep(60);T('sakin kip: dükkâna anında girer',K.SS.view==='shop'&&!$('stHub').classList.contains('zoom')&&K.SS.busy===false,[K.SS.view,K.SS.busy]);
+K.closeShop();await sleep(80);T('sakin kip: çıkış anında',!$('shop').classList.contains('on')&&!$('shop').classList.contains('leaving')&&$('menu').classList.contains('on'));
+K.openSettings();click('#setRows [data-set="anim"]');T('anahtar yeniden açıldı',S.anim===true&&K.getRM()===false&&!html.classList.contains('calm'));K.closeSettings();
 ` + TAIL;
 
 const MUSIC = HEAD + `
@@ -163,13 +197,14 @@ T('500 ve 700 kalınlığında da var',w('700 100px Fredoka','ğ')>w('600 100px 
 
 const MIG = [
   ['eski_v2', { coins: 777, v: 2, tools: { steto: { n: 3, l: 2 }, kron: { n: 2, l: 1 }, kalkan: { n: 0, l: 3 }, kum: { n: 1, l: 1 } }, bests: { normal: 120 }, runs: 9 },
-    "S.coins===777&&S.slots===4&&K.equipped().length===4&&S.own.steto&&S.own.kron&&S.own.kalkan&&S.own.kum&&S.tools.steto.n===3&&S.tools.steto.l===2&&S.tools.kalkan.l===3&&!S.autoOwn&&!S.autoJ&&S.v===3&&S.bests.normal===120&&S.lang===''&&S.music===true"],
+    "S.coins===777&&S.slots===4&&K.equipped().length===4&&S.own.steto&&S.own.kron&&S.own.kalkan&&S.own.kum&&S.tools.steto.n===3&&S.tools.steto.l===2&&S.tools.kalkan.l===3&&!S.autoOwn&&!S.autoJ&&S.v===3&&S.bests.normal===120&&S.lang===''&&S.music===true&&S.anim===true&&K.getRM()===false"],
   ['yeni_bos', null, "S.slots===1&&S.own.kron===1&&!S.own.kalkan&&S.tools.kron.n===1&&S.tools.steto.n===0&&K.equipped().join()==='kron'&&S.equip.length===4&&S.coins===0&&S.music===true&&S.lang===''"],
   ['v3_secili', { v: 3, coins: 50, own: { kron: 1, steto: 1 }, slots: 2, equip: ['steto', 'kron', '', ''], tools: { steto: { n: 4, l: 2 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } }, autoOwn: true, autoJ: true, gift: { n: 2, t0: 0 }, music: false, lang: 'en' },
     "K.equipped().join()==='steto,kron'&&S.slots===2&&S.autoOwn&&S.autoJ&&S.gift.n===2&&S.tools.steto.n===4&&S.music===false&&S.lang==='en'&&K.getLang()==='en'"],
   ['v092_hediye', { v: 3, coins: 10, gift: { n: 5, t: Date.now() + 5 * 3600000 } }, "S.gift.n===0&&S.gift.t0===0&&S.gift.t===undefined"],
   ['bozuk', { v: 3, own: { kron: 0, kum: 1 }, slots: 99, equip: 'x', tools: { steto: { n: -4, l: 9 }, kron: { n: 'a', l: 0 } }, autoOwn: false, autoJ: true, gift: { n: 9, t0: 0 }, lang: 'xx', music: 'abc' },
     "S.slots===4&&S.own.kum===1&&S.own.kron===0&&Array.isArray(S.equip)&&S.equip.length===4&&K.isEq('kum')&&S.tools.steto.n===0&&S.tools.steto.l===3&&S.tools.kron.l===1&&S.autoJ===false&&S.gift.n===0&&S.lang===''&&S.music===true"],
+  ['anim_kapali', { v: 3, anim: false, coins: 5 }, "S.anim===false&&K.getRM()===true&&document.documentElement.classList.contains('calm')"],
   ['otomatik_yok', { v: 3, own: { kron: 1 }, slots: 1, equip: ['kron', 'kum', '', ''], autoOwn: false, autoJ: true }, "S.autoJ===false&&K.equipped().join()==='kron'&&S.equip[1]===''"]
 ];
 
@@ -187,6 +222,7 @@ await run('ekran akışı', FLOW);
 await run('gündüz / akşam', SCENE);
 await run('müzik', MUSIC);
 await run('dil', LANG);
+await run('animasyon', ANIM, { reduceMotion: true });
 await run('yazı tipi', FONT);
 for (const [name, save, cond] of MIG) {
   const seed = save === null ? '' : 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify(save)) + ');';

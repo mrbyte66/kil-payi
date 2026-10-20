@@ -226,7 +226,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 #hudBest.gold b{color:#5A3C00}
 .row2{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:var(--r-pill);background:var(--surface);box-shadow:var(--shadow-s);width:min(100%,372px)}
-.seg button{appearance:none;border:0;cursor:pointer;min-height:40px;padding:0 4px;border-radius:var(--r-pill);background:transparent;color:var(--ink-2);font-family:var(--font-display);font-weight:600;font-size:var(--fs-14);line-height:1;white-space:nowrap;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease)}
+.seg button{appearance:none;border:0;cursor:pointer;min-height:40px;padding:0 4px;border-radius:var(--r-pill);background:transparent;color:var(--ink-2);font-family:var(--font-display);font-weight:600;font-size:var(--fs-14);line-height:1;white-space:nowrap;transition:background var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease)}
 .seg button[aria-checked="true"]{background:var(--btn);color:var(--on-btn)}
 .seg button[data-lvl="cehennem"][aria-checked="true"]{background:#D9503A;color:#fff}
 .lvhint{margin:-8px 0 0;max-width:320px;min-height:16px;color:var(--ink-3);font-weight:700;font-size:var(--fs-12);text-align:center}
@@ -256,7 +256,8 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 
 @media (max-width:339px){.tb-right{gap:6px}.topbar .icon-btn{width:38px;height:38px}}
 @media (max-height:640px){.title{font-size:2.25rem}.btn.big{min-height:56px;font-size:var(--fs-20)}.topbar{margin-bottom:6px}.tagline{display:none}.seg button{min-height:36px}.menu-foot{gap:12px}}
-@media (prefers-reduced-motion:reduce){.amb i,.breathe{animation:none}.scr.on .rise,.scr.on .card{animation-duration:1ms;animation-delay:0s}.btn,.icon-btn,.hud,.tools,.tool{transition:none}}
+/* "sakin" kip (Ayarlar > Animasyonlar kapalı): telefonun ayarına değil oyunun kendi anahtarına bağlıdır (V0.9.4) */
+html.calm .amb i,html.calm .breathe{animation:none}html.calm .scr.on .rise,html.calm .scr.on .card{animation-duration:1ms;animation-delay:0s}html.calm .btn,html.calm .icon-btn,html.calm .hud,html.calm .tools,html.calm .tool{transition:none}
 #shop .vw{position:absolute;inset:0;transition:opacity .4s,transform .5s cubic-bezier(.2,.9,.25,1);opacity:0;pointer-events:none;transform:scale(1.05)}
 #shop .vw.on{opacity:1;pointer-events:auto;transform:none}
 #shop .hd{position:absolute;left:14px;right:14px;top:16px;display:flex;align-items:center;gap:8px;height:44px;z-index:7}
@@ -357,7 +358,7 @@ svg.ic .s{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;st
 #shop .dock .dk.on small{color:#FFE9A8}
 #shop .dock .dk.on .md{transform:scale(1.12)}
 #shop .hub.zoom .hd,#shop .hub.zoom .cta,#shop .hub.zoom .dock{opacity:0;transition:opacity .25s}
-#shop .hub.zoom .fc.sel{transform:scale(2.2);transform-origin:50% 72%;z-index:20}
+#shop .hub.zoom .fc.sel{transform:scale(2.4);transform-origin:50% 66%;z-index:20}
 #shop .hub.zoom .fc:not(.sel){opacity:0}
 /* iç mekân */
 #shop .room{position:absolute;inset:0;overflow:hidden}
@@ -575,6 +576,9 @@ div.srow{cursor:default}
 .srow .si svg{display:block}
 .srow b{flex:1;min-width:0;font-family:var(--font-display);font-weight:600;font-size:var(--fs-16)}
 .srow small{display:block;margin-top:2px;font:700 var(--fs-12)/1.2 var(--font-body);color:var(--ink-2)}
+.srow{transition:transform var(--dur-fast) var(--ease)}
+button.srow:active{transform:scale(.982)}
+.seg button:active{transform:scale(.95)}
 .srow .sw{position:relative;width:46px;height:26px;border-radius:13px;background:var(--track);flex:none;transition:background var(--dur-fast) var(--ease)}
 .srow .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(41,35,63,.3);transition:left var(--dur-fast) var(--ease)}
 .srow[aria-checked="true"] .sw{background:var(--btn)}
@@ -595,7 +599,7 @@ div.srow{cursor:default}
 #shop .stg{position:absolute;left:0;top:0;width:296px;height:604px;transform-origin:0 0;transform:scale(var(--k,1));overflow:hidden;--cy:calc(var(--ex,0px) * .35);--hz:calc(440px + var(--cy))}
 #shop button{font-family:inherit;color:inherit}
 #shop:not(.on) *{animation-play-state:paused!important}
-@media (prefers-reduced-motion:reduce){#shop *{animation:none!important;transition:none!important}}
+html.calm #shop,html.calm #shop *{animation:none!important;transition:none!important}
 #shop .hd small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #shop .hd h4{white-space:nowrap}
 #shop .pch .cn{position:absolute;right:-5px;top:-1px;z-index:5;min-width:24px;height:20px;padding:0 6px;border-radius:10px;background:linear-gradient(135deg,#FFE9A8,#F4B63F);color:#3F2800;font:600 12px/20px Fredoka,system-ui,sans-serif;font-style:normal;text-align:center;box-shadow:0 3px 6px rgba(0,0,0,.4)}
@@ -667,12 +671,26 @@ div.srow{cursor:default}
 #shop,#shop.on{transition:none}
 @keyframes stFade{from{opacity:0}to{opacity:1}}
 @keyframes stFadeOut{from{opacity:1}to{opacity:0}}
-@keyframes stIn{from{transform:scale(calc(var(--k,1) * 1.06))}to{transform:scale(var(--k,1))}}
-@keyframes stOut{from{transform:scale(var(--k,1))}to{transform:scale(calc(var(--k,1) * .94))}}
-#shop.on{animation:stFade .5s ease-out both}
-#shop.leaving{animation:stFadeOut .34s ease-in both}
-#shop.on .stg{animation:stIn .6s cubic-bezier(.2,.8,.2,1) both}
-#shop.leaving .stg{animation:stOut .34s cubic-bezier(.45,0,.8,.5) both;pointer-events:none}
+/* V0.9.4: sahne sol-üst köşeden değil ekranın ortasından yakınlaşır (translate telafisi; --vw ve --vh ekranın boyudur) ve daha belirgindir */
+@keyframes stIn{from{transform:translate(calc(var(--vw,0px) * -.07),calc(var(--vh,0px) * -.07)) scale(calc(var(--k,1) * 1.14))}to{transform:scale(var(--k,1))}}
+@keyframes stOut{from{transform:scale(var(--k,1))}to{transform:translate(calc(var(--vw,0px) * .035),calc(var(--vh,0px) * .035)) scale(calc(var(--k,1) * .93))}}
+#shop.on{animation:stFade .38s ease-out both}
+#shop.leaving{animation:stFadeOut .36s ease-in both}
+#shop.on .stg{animation:stIn .85s cubic-bezier(.16,1,.3,1) both}
+#shop.leaving .stg{animation:stOut .36s cubic-bezier(.45,0,.8,.5) both;pointer-events:none}
+/* mağaza ilk açılırken (opening sınıfı ~1,5 sn): başlık yukarıdan iner, cepheler sırayla yükselir, buton zıplayarak gelir, alt şerit aşağıdan çıkar */
+@keyframes stDrop{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:none}}
+@keyframes stUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:none}}
+@keyframes stFcIn{from{opacity:0;transform:translateY(54px) scale(.93)}to{opacity:1;transform:none}}
+@keyframes stCtaIn{0%{opacity:0;transform:translateY(16px) scale(.78)}62%{opacity:1;transform:translateY(-2px) scale(1.07)}100%{opacity:1;transform:none}}
+#shop.opening .hub .hd{animation:stDrop .55s cubic-bezier(.2,.8,.2,1) .1s backwards}
+#shop.opening .hub .fc{animation:stFcIn .75s cubic-bezier(.2,.8,.2,1) calc(.14s + var(--o,0) * .1s) backwards}
+#shop.opening .hub .cta{animation:stCtaIn .6s cubic-bezier(.2,.9,.3,1) .46s backwards}
+#shop.opening .hub .dock{animation:stUp .6s cubic-bezier(.2,.8,.2,1) .28s backwards}
+/* dükkâna girerken kapıdan ışık yayılır, oda ışığın altında belirir, ışık sönerek odayı açar */
+#shop .bloom{position:absolute;inset:0;z-index:15;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 56%,rgba(255,250,232,1) 0,rgba(255,226,168,.92) 26%,rgba(255,196,120,.55) 52%,rgba(255,190,120,0) 82%);transition:opacity .26s ease-in}
+#shop .bloom.on{opacity:1}
+#shop .bloom.out{transition:opacity .55s ease-out}
 @keyframes hubIn{from{opacity:0;transform:scale(1.12)}to{opacity:1;transform:none}}
 #shop .vw.hub.ent{animation:hubIn .75s cubic-bezier(.22,.61,.36,1) both}
 @keyframes stRise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
@@ -821,6 +839,7 @@ div.srow{cursor:default}
     <div class="stg" id="stg">
       <div class="vw hub on" id="stHub"></div>
       <div class="vw shopv" id="stShop"></div>
+      <div class="bloom" id="stBloom"></div>
       <div class="scrim" id="stScrim"></div>
       <div class="sheet" id="stSheet" role="dialog" aria-modal="true"></div>
       <div class="stt" id="stToast" role="status"></div>
@@ -861,7 +880,12 @@ const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 const norm = a => { a %= TAU; return a < 0 ? a + TAU : a; };
 const angd = (a, b) => { const d = norm(a - b); return d > Math.PI ? TAU - d : d; };
 const easeOut = p => 1 - Math.pow(1 - p, 3);
-const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+/* Animasyonlar (V0.9.4): kullanıcının telefonunda "animasyonları kaldır" açıktı ve oyun o ayara uyup mağaza geçişlerini, konfetiyi ve sarsıntıyı baştan kapatıyordu ("animasyon yok").
+   Artık oyunun kendi anahtarı var (Ayarlar > Animasyonlar, varsayılan AÇIK; telefonun ayarına bakmaz). Kapalıyken RM doğrudur ve eski "sakin" davranış sürer.
+   SYS_RM yalnızca bilgi içindir (Ayarlar'da açıklama gösterir). */
+const SYS_RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+let RM = false;
+const applyMotion = () => { RM = !save.anim; document.documentElement.classList.toggle('calm', RM); };
 
 /* ---------- ayarlar: oyun dengesi ve zorluk eğrisi tek yerde ---------- */
 /*TUNE-START*/
@@ -1156,7 +1180,7 @@ const STR = {
     tool_steto: 'Steteskop', tool_kron: 'Kronometre', tool_kalkan: 'Kalkan', tool_kum: 'Kum saati',
     d_steto: '{n} sn boyunca hedefler %40 geniş', d_kron: 'Süreye +{n} sn', d_kalkan: 'Sonraki {n} hata cezasız, seri bozulmaz', d_kum: 'İbre {n} sn %35 yavaşlar',
     toolEmpty: 'Stokta yok. Mağazadan alabilirsin.', gotCoins: '+{n} coin',
-    shop: 'Mağaza', setT: 'Ayarlar', setSnd: 'Ses efektleri', setMus: 'Müzik', setVib: 'Titreşim', setAutoLock: 'Yetenekler dükkânında açılır', setLang: 'Dil', setLangSub: 'Telefonun diline göre: {l}', setLangPick: 'Seçtiğin dil', setLangSys: 'Sistem',
+    shop: 'Mağaza', setT: 'Ayarlar', setSnd: 'Ses efektleri', setMus: 'Müzik', setVib: 'Titreşim', setAnim: 'Animasyonlar', setAnimSub: 'Geçişler, konfeti ve ekran hareketleri', setAnimSys: 'Telefonunda kapalı; burada açık kalır', setAutoLock: 'Yetenekler dükkânında açılır', setLang: 'Dil', setLangSub: 'Telefonun diline göre: {l}', setLangPick: 'Seçtiğin dil', setLangSys: 'Sistem',
     st_title: 'Mağaza', st_sub: 'Dükkânları gez', st_back: 'Geri',
     st_n_alet: 'Alet çantası', st_n_yet: 'Yetenekler', st_n_gor: 'Görünüm', st_n_hed: 'Hediye',
     st_s_alet: 'Alet', st_s_yet: 'Yetenek', st_s_gor: 'Görünüm', st_s_hed: 'Hediye',
@@ -1263,7 +1287,7 @@ const STR = {
     tool_steto: 'Stethoscope', tool_kron: 'Stopwatch', tool_kalkan: 'Shield', tool_kum: 'Hourglass',
     d_steto: 'Targets 40% wider for {n} s', d_kron: '+{n} s on the clock', d_kalkan: 'Next {n} mistakes are free, streak stays', d_kum: 'Pointer 35% slower for {n} s',
     toolEmpty: 'Out of stock. Get more in the shop.', gotCoins: '+{n} coins',
-    shop: 'Shop', setT: 'Settings', setSnd: 'Sound effects', setMus: 'Music', setVib: 'Vibration', setAutoLock: 'Unlock it in the Skills shop', setLang: 'Language', setLangSub: 'Follows your phone: {l}', setLangPick: 'Your choice', setLangSys: 'System',
+    shop: 'Shop', setT: 'Settings', setSnd: 'Sound effects', setMus: 'Music', setVib: 'Vibration', setAnim: 'Animations', setAnimSub: 'Transitions, confetti and screen motion', setAnimSys: 'Off on your phone; stays on here', setAutoLock: 'Unlock it in the Skills shop', setLang: 'Language', setLangSub: 'Follows your phone: {l}', setLangPick: 'Your choice', setLangSys: 'System',
     st_title: 'Shop', st_sub: 'Take a stroll', st_back: 'Back',
     st_n_alet: 'Toolbag', st_n_yet: 'Skills', st_n_gor: 'Looks', st_n_hed: 'Gift',
     st_s_alet: 'Tools', st_s_yet: 'Skills', st_s_gor: 'Looks', st_s_hed: 'Gift',
@@ -1381,9 +1405,9 @@ const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.9.3';
+const VERSION = 'V0.9.4';
 const save = {
-  coins: 0, runs: 0, snd: true, vib: true, music: true, autoJ: false, tut: false, lvl: 'normal', lang: '',
+  coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
   tools: { steto: { n: 0, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } },
   /* Mağaza (V0.9.2): açık jokerler, açık yuva sayısı, yuvalardaki jokerler, Otomatik joker yeteneği, Hediye (reklam) basamağı ve bekleme bitişi */
@@ -1416,6 +1440,7 @@ if (save.run) { if (LEVELS.indexOf(save.run.lvl) < 0) save.run.lvl = save.lvl; e
 if (!save.tips || typeof save.tips !== 'object') save.tips = {};
 if (save.lang !== 'tr' && save.lang !== 'en') save.lang = '';
 save.music = save.music !== false;
+save.anim = save.anim !== false; applyMotion();
 save.low = save.low | 0; save.high = save.high | 0; save.highU = save.highU | 0;
 save.camp = Math.max(1, save.camp | 0); save.bestL = save.bestL | 0;
 const LV = () => LEVEL[save.lvl];
@@ -3312,7 +3337,7 @@ const sGiftSvg = () => '<svg class="gbx" width="168" height="168" viewBox="0 0 1
 /* ---------- mağaza: ekranlar ve işleyiş ---------- */
 const SS = { shop: 'alet', idx: 0, view: 'hub', k: 1, sw: 296, sh: 604, drag: null, timers: [], tick: 0, quick: false, busy: false, closing: false, open: false, stagger: false, pop: [], menuPop: [], bagPrev: null, day: false, force: '' };
 let shopFrom = 'menu';
-const stg = $('stg'), stHub = $('stHub'), stShop = $('stShop'), stSheet = $('stSheet'), stScrim = $('stScrim'), stToastEl = $('stToast');
+const stg = $('stg'), stHub = $('stHub'), stShop = $('stShop'), stBloom = $('stBloom'), stSheet = $('stSheet'), stScrim = $('stScrim'), stToastEl = $('stToast');
 const sName = k => k === 'gor' ? t('st_n_gor') : (k.indexOf('slot') === 0 ? t('st_slotN', { n: k.slice(4) }) : (k === 'bolt' ? t('st_auto') : (k === 'heart' ? t('st_life') : t('tool_' + k))));
 const waitText = ms => {
   let h = Math.floor(ms / 3600000), m = Math.ceil((ms % 3600000) / 60000);
@@ -3377,6 +3402,7 @@ const renderHub = keep => {
   stHub.classList.toggle('day', SS.day);
   const c2 = $('stCar');
   c2.style.scrollBehavior = 'auto'; c2.scrollLeft = keep === false ? SS.idx * SHOP_STEP : at; c2.style.scrollBehavior = '';
+  stHub.querySelectorAll('.fc').forEach((f, q) => f.style.setProperty('--o', Math.abs(q - SS.idx)));
   c2.addEventListener('scroll', syncHub);
   syncHub();
 };
@@ -3551,10 +3577,12 @@ const enterShop = id => {
   closeSheet();
   const f = stHub.querySelector('.fc[data-s="' + id + '"]');
   if (SS.view !== 'hub' || !f || RM) { shopGo(id); return; }
-  stBusy(1000);
+  stBusy(950); shopEl.classList.remove('opening');
   f.classList.add('sel'); stHub.classList.add('zoom'); Snd.ui();
-  stLater(() => shopGo(id), 480);
-  stLater(() => { stHub.classList.remove('zoom'); f.classList.remove('sel'); }, 1000);
+  stLater(() => stBloom.classList.add('on'), 250);
+  stLater(() => shopGo(id), 520);
+  stLater(() => { stBloom.classList.add('out'); stBloom.classList.remove('on'); }, 560);
+  stLater(() => { stHub.classList.remove('zoom'); f.classList.remove('sel'); stBloom.classList.remove('out'); }, 1150);
 };
 /* dükkânlar arası: sokaktaysan önce o cepheye kaydırır sonra girer; bir dükkânın içindeysen oda yumuşakça değişir */
 const swapShop = id => {
@@ -3685,7 +3713,7 @@ const fitStore = () => {
   const changed = Math.abs(sw - SS.sw) > 0.5;
   SS.k = k; SS.sw = sw; SS.sh = sh;
   s.width = sw.toFixed(1) + 'px'; s.height = sh.toFixed(1) + 'px'; s.setProperty('--k', k.toFixed(4));
-  s.setProperty('--sw', sw.toFixed(1) + 'px'); s.setProperty('--ex', Math.max(0, sh - 604).toFixed(1) + 'px');
+  s.setProperty('--sw', sw.toFixed(1) + 'px'); s.setProperty('--ex', Math.max(0, sh - 604).toFixed(1) + 'px'); s.setProperty('--vw', W + 'px'); s.setProperty('--vh', H + 'px');
   return changed;
 };
 /* opt.shop: doğrudan o dükkâna gir; opt.sheet: ürün fişini aç ('slot2', 'kum' ...); opt.chooser: yuvaya joker seçtir.
@@ -3694,8 +3722,9 @@ const openShop = (from, opt) => {
   opt = opt || {};
   shopFrom = from; SS.closing = false; SS.busy = false; SS.open = true;
   SS.timers.forEach(clearTimeout); SS.timers = [];
-  shopEl.classList.remove('leaving');
+  shopEl.classList.remove('leaving'); stBloom.classList.remove('on', 'out');
   show(shopEl); app.classList.add('shopping'); fitStore(); closeSheet();
+  if (!RM) { shopEl.classList.add('opening'); stLater(() => shopEl.classList.remove('opening'), 1600); }
   SS.bagPrev = bagKeys(); SS.menuPop = []; SS.pop = [];
   SS.idx = opt.shop ? Math.max(0, SHOPS.findIndex(s => s.id === opt.shop)) : SS.idx;
   renderHub(false);
@@ -3710,7 +3739,7 @@ const closeShop = () => {
   if (SS.closing) return;
   SS.closing = true; SS.open = false;
   clearInterval(SS.tick); SS.tick = 0; SS.timers.forEach(clearTimeout); SS.timers = [];
-  closeSheet(); stHub.classList.remove('zoom');
+  closeSheet(); stHub.classList.remove('zoom'); shopEl.classList.remove('opening'); stBloom.classList.remove('on', 'out');
   app.classList.remove('shopping');
   if (shopFrom === 'over') show(overEl); else show(menuEl);
   refreshStats(); SS.menuPop = [];
@@ -3721,7 +3750,7 @@ const closeShop = () => {
 /* Android geri tuşu: önce fiş, sonra dükkân içi, sonra mağaza. */
 const storeBack = () => {
   if (stSheet.classList.contains('on')) { closeSheet(); return; }
-  if (SS.view === 'shop') { showView('hub'); return; }
+  if (SS.view === 'shop') { if (!SS.busy) showView('hub'); return; }
   closeShop();
 };
 
@@ -3730,7 +3759,7 @@ const settingsEl = $('settings');
 const setIcon = k => '<span class="si">' + sGlyph(k, 20, 'currentColor', 2.2) + '</span>';
 const renderSettings = () => {
   const sw = (key, ic, name, sub, on) => '<button class="srow" type="button" role="switch" aria-checked="' + (on ? 'true' : 'false') + '" data-set="' + key + '">' + setIcon(ic) + '<b>' + name + (sub ? '<small>' + sub + '</small>' : '') + '</b><i class="sw"></i></button>';
-  let h = sw('mus', 'music', t('setMus'), '', save.music) + sw('snd', 'snd', t('setSnd'), '', save.snd) + sw('vib', 'vib', t('setVib'), '', save.vib);
+  let h = sw('mus', 'music', t('setMus'), '', save.music) + sw('snd', 'snd', t('setSnd'), '', save.snd) + sw('vib', 'vib', t('setVib'), '', save.vib) + sw('anim', 'spark', t('setAnim'), save.anim && SYS_RM ? t('setAnimSys') : t('setAnimSub'), save.anim);
   h += save.autoOwn ? sw('auto', 'bolt', t('st_auto'), t(save.autoJ ? 'st_on' : 'st_off'), save.autoJ)
     : '<button class="srow lock" type="button" data-set="autoLock">' + setIcon('bolt') + '<b>' + t('st_auto') + '<small>' + t('setAutoLock') + '</small></b><span class="pl2">' + sGlyph('lock', 13, 'currentColor', 2.4) + '</span></button>';
   const opts = [['', t('setLangSys')], ['tr', 'Türkçe'], ['en', 'English']];
@@ -3751,6 +3780,7 @@ $('setRows').addEventListener('click', e => {
   if (k === 'mus') { save.music = !save.music; persist(); renderSettings(); Snd.ui(); Music.sync(); }
   else if (k === 'snd') { save.snd = !save.snd; persist(); renderSettings(); Snd.ui(); }
   else if (k === 'vib') { save.vib = !save.vib; persist(); renderSettings(); Snd.ui(); Platform.haptic('medium'); }
+  else if (k === 'anim') { save.anim = !save.anim; applyMotion(); persist(); renderSettings(); Snd.ui(); }
   else if (k === 'auto') { save.autoJ = !save.autoJ; persist(); renderSettings(); Snd.ui(); }
   else if (k === 'autoLock') { hide(settingsEl); if (G.mode === 'menu') openShop('menu', { shop: 'yet' }); }
 });

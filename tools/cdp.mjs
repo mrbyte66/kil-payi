@@ -22,7 +22,7 @@ export const launch = async (o = {}) => {
   const port = 9300 + Math.floor(Math.random() * 600);
   const proc = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=' + port, '--user-data-dir=' + prof, '--window-size=' + Math.max(width, 520) + ',' + (height + 120), '--allow-file-access-from-files', '--autoplay-policy=no-user-gesture-required', ...flags, 'about:blank'], { stdio: 'ignore' });
   let page = null;
-  for (let i = 0; i < 80 && !page; i++) {
+  for (let i = 0; i < 240 && !page; i++) {
     try { const list = await (await fetch('http://127.0.0.1:' + port + '/json')).json(); page = list.find(t => t.type === 'page'); } catch (e) { /* henüz açılmadı */ }
     if (!page) await sleep(150);
   }
