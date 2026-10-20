@@ -5,7 +5,8 @@
    - hediye: 24 saatlik pencere (20 · 30 · 40 · 50 · 500), pencere dolunca sıfırlanma, saat oyunu,
    - eski ve bozuk kayıtların geçişi,
    - ekran akışı: sokak, dükkân, fiş, satın alma, seçici, geri tuşu, geçiş animasyonları, ayarlar, oyun içi joker sırası, otomatik joker,
-   - dil seçimi (sistem dili, Türkçe, English; kalıcı), menü müziğinin ne zaman çaldığı, gündüz ve akşam sahnesi, Türkçe harflerin yazı tipi.
+   - dil seçimi (sistem dili, Türkçe, English; kalıcı), menü müziğinin ne zaman çaldığı, gündüz ve akşam sahnesi, Türkçe harflerin yazı tipi,
+   - V0.9.9: mağaza ısınması (görünmez, dokunuşu engellemez, bitince eski durum, girişte/pencerede bırakılır) ve kayan cepheye dokunuş yedeği.
    Chrome yolu CHROME ortam değişkeniyle verilebilir. Hata varsa 1 ile çıkar. */
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
@@ -241,9 +242,83 @@ const MIG = [
   ['otomatik_yok', { v: 3, own: { kron: 1 }, slots: 1, equip: ['kron', 'kum', '', ''], autoOwn: false, autoJ: true }, "S.autoJ===false&&K.equipped().join()==='kron'&&S.equip[1]===''"]
 ];
 
+
+/* ısınma (V0.9.9): menü boşta kalınca mağaza görünmez oynatılır; menüye dokunuşu engellemez, bitince her şey eski hâlinde, girişte/pencerede bırakılır */
+const WARMT = HEAD + `
+var t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
+T('ısınma menü boşta kalınca başladı',K.WARM.on===true,Date.now()-t0);
+var sh=$('shop'),SS=K.SS,cs=getComputedStyle(sh);
+T('ısınırken mağaza görünmez ve dokunulamaz',sh.classList.contains('warm')&&!sh.classList.contains('on')&&cs.pointerEvents==='none'&&parseFloat(cs.opacity)<0.01&&cs.visibility==='visible',[sh.className,cs.opacity,cs.pointerEvents]);
+var under=function(sel){var e=document.querySelector(sel),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return h&&h.closest('#shop')?'MAĞAZA:'+h.className:'ok'};
+T('ısınırken menü düğmeleri dokunuşu alır (görünmez katman yakalamaz)',['#playBtn','#bagBtn','#setBtn'].every(function(s){return under(s)==='ok'}),['#playBtn','#bagBtn','#setBtn'].map(under));
+await sleep(1300);
+T('ısınırken oda ve sokak gerçekten çiziliyor',document.querySelectorAll('#stHub .fc').length===4||document.querySelectorAll('#stShop .itm,#stShop .gf,#stShop .pch').length>0);
+var sawCards=false;t0=Date.now();while(!K.WARM.done&&Date.now()-t0<20000){if($('settings').classList.contains('warm')&&$('pause').classList.contains('warm'))sawCards=true;await sleep(80)}
+T('cam kartlar (Ayarlar, Duraklat...) da görünmez ısındı',sawCards);
+T('ısınma bitti',K.WARM.done===true&&K.WARM.on===false,Date.now()-t0);
+T('ısınma sonrası durum eski hâlinde',!sh.classList.contains('warm')&&!sh.classList.contains('wout')&&!sh.classList.contains('opening')&&SS.idx===0&&SS.shop==='alet'&&SS.view==='hub'&&SS.pos===0&&$('stHub').classList.contains('on')&&!$('stShop').classList.contains('on')&&$('stHub').innerHTML===''&&$('stShop').innerHTML===''&&$('stSheet').innerHTML===''&&!$('stScrim').classList.contains('on')&&!$('stBloom').classList.contains('rdy')&&['settings','book','pause','over'].every(function(i){return !$(i).classList.contains('warm')}),[sh.className,SS.idx,SS.shop,SS.view,SS.pos]);
+T('ısınma sonrası menü hâlâ menü, mağaza kapalı',G.mode==='menu'&&$('menu').classList.contains('on')&&getComputedStyle(sh).visibility==='hidden'&&!SS.open);
+T('ısınma sonrası menü düğmeleri dokunuşu alır',['#playBtn','#bagBtn','#setBtn'].every(function(s){return under(s)==='ok'}));
+$('bagBtn').click();await sleep(400);
+T('ısınma sonrası mağaza açılır',sh.classList.contains('on')&&$('stHub').querySelectorAll('.fc').length===4&&SS.view==='hub'&&SS.idx===0);
+T('ısınma bir kez çalışır, yeniden başlamaz',K.WARM.on===false&&K.WARM.done===true);
+`+TAIL;
+const WARM2 = HEAD + `
+var t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
+T('ısınma başladı',K.WARM.on===true);
+await sleep(500);
+$('bagBtn').click();await sleep(60);
+var sh=$('shop'),SS=K.SS;
+T('girişte ısınma bırakıldı',K.WARM.on===false&&K.WARM.done===true&&!sh.classList.contains('warm'),[K.WARM.on,K.WARM.done,sh.className]);
+await sleep(500);
+T('ısınma sırasında girilen mağaza düzgün açıldı',sh.classList.contains('on')&&SS.view==='hub'&&$('stHub').querySelectorAll('.fc').length===4&&SS.idx===0&&SS.open===true,[sh.className,SS.view,SS.idx]);
+await sleep(2500);
+T('bırakılan ısınma sonradan geri gelmez',K.WARM.on===false&&!sh.classList.contains('warm')&&sh.classList.contains('on'));
+`+TAIL;
+const WARM3 = HEAD + `
+var t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
+await sleep(300);
+$('setBtn').click();await sleep(1000);
+var sh=$('shop');
+T('pencere açılınca ısınma bırakıldı ve bitmiş sayılmadı',K.WARM.on===false&&K.WARM.done===false&&!sh.classList.contains('warm'),[K.WARM.on,K.WARM.done,sh.className]);
+T('bırakılınca mağaza katmanı temiz',$('stHub').innerHTML===''&&$('stShop').innerHTML==='');
+$('setClose').click();await sleep(300);
+t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
+T('pencere kapanınca ısınma yeniden denenir',K.WARM.on===true,Date.now()-t0);
+`+TAIL;
+const WARM4 = HEAD + `
+var t0=Date.now();while(!K.WARM.done&&Date.now()-t0<20000)await sleep(150);
+var sh=$('shop'),SS=K.SS;
+T('animasyonlar kapalıyken de ısınma bitti ve temiz',K.getRM()===true&&K.WARM.done===true&&K.WARM.on===false&&!sh.classList.contains('warm')&&SS.idx===0&&SS.view==='hub'&&SS.shop==='alet'&&$('stHub').innerHTML==='',[K.getRM(),K.WARM.done,sh.className]);
+`+TAIL;
+/* dokunuş yedeği (V0.9.9): basış bir öğede, bırakış başka öğede olursa tarayıcı click'i ortak üst öğeye verir; eylem basılan öğeye gitmeli */
+const TAPFB = HEAD + `
+K.openShop('menu');await sleep(900);
+var SS=K.SS,yet=document.querySelector('#stHub .fc[data-s=yet]'),gor=document.querySelector('#stHub .fc[data-s=gor]'),strip=$('stStrip');
+T('başlangıçta odak Alet',SS.idx===0);
+yet.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:120,clientY:300,pointerId:7,pointerType:'touch'}));
+strip.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:123,clientY:302}));
+T('kayan cephe: tıklama ortak üst öğeye düştü, eylem basılan cepheye gitti (odak Yetenek)',SS.idx===1,SS.idx);
+await sleep(700);
+gor.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:120,clientY:300,pointerId:8,pointerType:'touch'}));
+strip.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:240,clientY:300}));
+T('parmak çok oynadıysa yedek eylem yok',SS.idx===1,SS.idx);
+strip.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:123,clientY:302}));
+T('basış kaydı tüketilir: sonraki boş tıklama bir şey yapmaz',SS.idx===1,SS.idx);
+yet.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:120,clientY:300,pointerId:9,pointerType:'touch'}));
+await sleep(1000);
+strip.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:121,clientY:300}));
+T('eski basış (1 sn önce) yedek sayılmaz',SS.idx===1&&SS.view==='hub',[SS.idx,SS.view]);
+yet.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:120,clientY:300,pointerId:10,pointerType:'touch'}));
+yet.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:120,clientY:300}));
+await sleep(80);
+T('normal dokunuş (aynı öğe) bozulmadı: odaktaki cepheye dokununca dükkâna girilir',SS.busy===true||SS.view==='shop'||$('stHub').classList.contains('zoom'),[SS.busy,SS.view]);
+`+TAIL;
+
 let bad = 0;
 const show = (name, r) => { const first = String(r).split('\n')[0]; if (!/ 0 hata/.test(first) || /İSTİSNA|ÇÖKTÜ/.test(String(r))) bad++; console.log((name + ':').padEnd(20) + String(r).replace(/\n/g, '\n' + ' '.repeat(20))); };
 const run = async (name, script, o = {}) => {
+  if (process.env.ONLY && name.indexOf(process.env.ONLY) < 0) return;   // ONLY=ısınma gibi: yalnızca adında bu geçen gruplar
   const b = await launch(Object.assign({ width: 390, height: 844, dpr: 1, lang: 'tr-TR' }, o));
   let r;
   try { await b.goto(URL); r = await b.eval(script, { timeout: 120000 }); if (b.logs.length) r += '\n' + b.logs.join('\n'); } catch (e) { r = 'ÇÖKTÜ ' + e.message; }
@@ -257,6 +332,11 @@ await run('müzik', MUSIC);
 await run('dil', LANG);
 await run('animasyon', ANIM, { reduceMotion: true });
 await run('yazı tipi', FONT);
+await run('dokunuş yedeği', TAPFB);
+await run('ısınma', WARMT, { warm: true });
+await run('ısınma: girişte bırakma', WARM2, { warm: true });
+await run('ısınma: pencerede bırakma', WARM3, { warm: true });
+await run('ısınma: animasyonsuz', WARM4, { warm: true, seed: 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify({ v: 3, anim: false, animV: 1 })) + ');' });
 for (const [name, save, cond] of MIG) {
   const seed = save === null ? '' : 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify(save)) + ');';
   const post = `(async()=>{var K=window.__kp,S=K.save,ok=false,err='';try{ok=!!(${cond})}catch(e){err=String(e)}return ok?'1 tamam, 0 hata':'0 tamam, 1 hata HATA '+err+' '+JSON.stringify({slots:S.slots,own:S.own,equip:S.equip,auto:[S.autoOwn,S.autoJ],gift:S.gift,lang:S.lang,music:S.music})})()`;
