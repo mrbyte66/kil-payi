@@ -17,10 +17,10 @@ const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/M
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 export const launch = async (o = {}) => {
-  const { width = 390, height = 844, dpr = 2, dark = false, reduceMotion = false, lang = '', seed = '', flags = [] } = o;
+  const { width = 390, height = 844, dpr = 2, dark = false, reduceMotion = false, lang = '', seed = '', flags = [], gpu = false } = o;
   const prof = mkdtempSync(join(tmpdir(), 'kp-cdp-'));
   const port = 9300 + Math.floor(Math.random() * 600);
-  const proc = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=' + port, '--user-data-dir=' + prof, '--window-size=' + Math.max(width, 520) + ',' + (height + 120), '--allow-file-access-from-files', '--autoplay-policy=no-user-gesture-required', ...flags, 'about:blank'], { stdio: 'ignore' });
+  const proc = spawn(CHROME, ['--headless=new', ...(gpu ? [] : ['--disable-gpu']), '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=' + port, '--user-data-dir=' + prof, '--window-size=' + Math.max(width, 520) + ',' + (height + 120), '--allow-file-access-from-files', '--autoplay-policy=no-user-gesture-required', ...flags, 'about:blank'], { stdio: 'ignore' });
   let page = null;
   for (let i = 0; i < 240 && !page; i++) {
     try { const list = await (await fetch('http://127.0.0.1:' + port + '/json')).json(); page = list.find(t => t.type === 'page'); } catch (e) { /* henüz açılmadı */ }
@@ -31,9 +31,10 @@ export const launch = async (o = {}) => {
   await new Promise((res, rej) => { ws.addEventListener('open', res); ws.addEventListener('error', rej); });
   let id = 0;
   const pending = new Map();
-  const logs = [];
+  const logs = [], listeners = {};
   ws.addEventListener('message', e => {
     const m = JSON.parse(e.data);
+    if (m.method && listeners[m.method]) listeners[m.method].forEach(f => f(m.params));
     if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
     else if (m.method === 'Runtime.exceptionThrown') logs.push('İSTİSNA ' + (m.params.exceptionDetails.exception ? m.params.exceptionDetails.exception.description : m.params.exceptionDetails.text));
     else if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') logs.push('console.error ' + m.params.args.map(a => a.value || a.description).join(' '));
@@ -48,6 +49,7 @@ export const launch = async (o = {}) => {
   const api = {
     logs,
     send,
+    on: (method, fn) => { (listeners[method] = listeners[method] || []).push(fn); },
     goto: async url => { await send('Page.navigate', { url }); await sleep(700); },
     eval: async (expr, opt = {}) => {
       const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true, timeout: opt.timeout || 60000 });
