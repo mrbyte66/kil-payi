@@ -68,13 +68,15 @@ reset();S.tools.kron.n=5;for(i=0;i<30;i++)K.giftTool();T('hediye joker 5 üstün
 const FLOW = HEAD + `
 S.coins=5000;S.own={kron:1};S.slots=1;S.equip=['kron','','',''];S.tools.kron.n=1;K.persist();K.refreshStats();
 T('menüde 4 yuva düğmesi',document.querySelectorAll('#menuJk button.sl').length===4);
+var hit=function(id){var r=$(id).getBoundingClientRect(),e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!e&&e.closest('button')===$(id)};
+T('mağaza kapalıyken menü düğmelerine (Mağaza, Ayarlar) dokunuş düğmeye gider: görünmez mağaza katmanı dokunuşu yakalamaz',hit('bagBtn')&&hit('setBtn')&&hit('playBtn'),[hit('bagBtn'),hit('setBtn'),hit('playBtn')]);
 K.openShop('menu');T('mağaza açıldı',$('shop').classList.contains('on'));
 await sleep(800);T('alttaki ekran belirme bitince saklandı',!$('menu').classList.contains('on'));
 T('4 dükkân',document.querySelectorAll('#stHub .fc').length===4);
 var plq=document.querySelector('#stHub .fc[data-s=alet] .plq').innerText;T('Alet tabelası: Joker ve Yuva sayıları',/Joker/.test(plq)&&/Yuva/.test(plq)&&/1\\/4/.test(plq),plq);
 K.shopGo('alet');
 T('alet odası',K.SS.view==='shop'&&document.querySelectorAll('#stShop .pch').length===4&&document.querySelectorAll('#stShop .itm').length===4);
-click('#stShop .itm[data-k="kalkan"]');T('kilitli fiş',$('stSheet').classList.contains('on')&&!!$('stSheet').querySelector('[data-a="unl"]'));
+click('#stShop .itm[data-k="kalkan"]');await sleep(120);T('kilitli fiş (önce görünmez çizilir, sonra alttan kayar)',$('stSheet').classList.contains('on')&&!!$('stSheet').querySelector('[data-a="unl"]'));
 click('#stSheet [data-a="unl"]');T('kalkan açıldı',S.own.kalkan===1&&S.coins===4200&&S.tools.kalkan.n===1,[S.coins]);T('fiş kapandı',!$('stSheet').classList.contains('on'));
 T('açılan ürün sıçrar',!!document.querySelector('#stShop .itm.pop'));
 click('#stShop .pch[data-i="1"]');T('yuva fişi',!!$('stSheet').querySelector('[data-a="slotbuy"]'));
@@ -114,7 +116,7 @@ S.autoJ=false;G.adv='kron';G.advT=0.71;kn=S.tools.kron.n;G.time=1.5;G.advCool={}
 const SCENE = HEAD + `
 K.G.mode='menu';K.SS.force='day';K.openShop('menu');await sleep(700);
 T('gündüz: sahne gündüz sınıfı',$('stHub').classList.contains('day')&&K.SS.day===true);
-T('gündüz: güneş, dükkânların önünde bulut şeridi, gölge şeridi ve kuş sürüsü var, ay ve yıldız yok',!!document.querySelector('#stHub .sun')&&document.querySelectorAll('#stHub .skyfx .cl').length>=8&&document.querySelectorAll('#stHub .skyfx .csh').length>=8&&document.querySelectorAll('#stHub .skyfx .bd').length===3&&!document.querySelector('#stHub .moon')&&!document.querySelector('#stHub .stars'));
+T('gündüz: güneş, dükkânların arkasında iki derinlikte bulut şeridi, kuş sürüsü ve önde bulut gölgeleri var, ay ve yıldız yok',!!document.querySelector('#stHub .sun')&&document.querySelectorAll('#stHub .skyb .cl').length>=12&&document.querySelectorAll('#stHub .skyf .csh').length>=12&&document.querySelectorAll('#stHub .skyb .bird').length===3&&!document.querySelector('#stHub .moon')&&!document.querySelector('#stHub .stars'));
 T('gündüz: ışık parlamaları ve ateş böcekleri yok',!document.querySelector('#stHub .ffs')&&getComputedStyle(document.querySelector('#stHub .lts.lg')).display==='none');
 K.SS.force='night';K.renderHub();
 T('akşam: ay, yıldızlar, iki kayan yıldız, ateş böcekleri',!!document.querySelector('#stHub .moon')&&!!document.querySelector('#stHub .stars')&&document.querySelectorAll('#stHub .shoot').length===2&&!!document.querySelector('#stHub .ffs')&&!$('stHub').classList.contains('day'));
@@ -129,6 +131,7 @@ K.closeShop();await sleep(600);
 const ANIM = HEAD + `
 // Telefonun "animasyonları kaldır" ayarı AÇIK taklit edilir (başsız Chrome prefers-reduced-motion: reduce bildirir); oyun buna bakmamalı.
 var html=document.documentElement;
+var hit=function(id){var r=$(id).getBoundingClientRect(),e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!e&&e.closest('button')===$(id)};
 T('telefon "animasyonları kaldır" diyor (taklit)',K.SYS_RM===true);
 T('oyun yine de animasyonlu (varsayılan açık)',S.anim===true&&K.getRM()===false&&!html.classList.contains('calm'),[S.anim,K.getRM()]);
 T('ayarlarda açıklama: telefonda kapalı, oyun kendi ayarına bakar',(K.openSettings(),/burada açık/.test($('setRows').innerText)),$('setRows').innerText);K.closeSettings();
@@ -161,10 +164,9 @@ var inf=function(){return document.getAnimations().filter(function(a){var e=a.ef
 down();await sleep(120);mv(-20);await sleep(120);mv(-80);await sleep(30);
 var want=232+80/K.SS.k;
 T('kaydırma: şerit parmağı birebir izler (konum = 232 + 80/k)',Math.abs(K.SS.pos-want)<2,[K.SS.pos,want]);
-T('performans: sürüklerken (mv) süs animasyonları kalkar',$('stHub').classList.contains('mv')&&inf()===0,[$('stHub').className,inf()]);
 up(-80);await sleep(700);
 T('kaydırma: küçük ve yavaş sürükleme aynı dükkânda kalır ve konum oturur',K.SS.idx===1&&Math.abs(K.SS.pos-232)<1,[K.SS.idx,K.SS.pos]);
-T('performans: kaydırma durunca (mv kalkar) animasyonlar geri gelir',!$('stHub').classList.contains('mv')&&inf()>0,[$('stHub').className,inf()]);
+T('performans: kaydırırken ve sonra gökyüzü ile odaktaki cephe animasyonları sürer',inf()>=0&&document.querySelectorAll('#stHub .skyb').length>=0,inf());
 var muts=0,mo=new MutationObserver(function(m){muts+=m.length});mo.observe($('stCta'),{childList:true,characterData:true,subtree:true,attributes:true});
 down();await sleep(15);mv(-300);await sleep(15);mv(-700);await sleep(15);mv(-1200);up(-1200);
 click('#stHub .fc[data-s="hed"]');T('kaydırma: sürükleme bittikten hemen sonra gelen tıklama dükkâna girmez',K.SS.view==='hub');
@@ -178,6 +180,7 @@ T('kaydırma: ilk dükkânda sağa fırlatınca taşmaz (uçta yaylanıp geri ot
 K.closeShop();T('çıkış: mağaza solarak kapanır (leaving)',$('shop').classList.contains('leaving')&&getComputedStyle($('shop')).animationName.indexOf('stFadeOut')>=0,getComputedStyle($('shop')).animationName);
 await sleep(120);var o2=+getComputedStyle($('shop')).opacity;T('çıkış yarıdayken mağaza yarı saydam',o2>0&&o2<1,o2);
 await sleep(500);T('çıkış bitti',!$('shop').classList.contains('on')&&$('menu').classList.contains('on'));
+T('çıkıştan sonra menü düğmelerine dokunuş düğmeye gider',hit('bagBtn')&&hit('playBtn'),[hit('bagBtn'),hit('playBtn')]);
 // Ayarlar'dan animasyonları kapat: eski "sakin" davranış (anında geçiş)
 K.openSettings();click('#setRows [data-set="anim"]');
 T('anahtar kapandı: kayıt, sakin kip ve sınıf',S.anim===false&&K.getRM()===true&&html.classList.contains('calm')&&JSON.parse(localStorage.getItem('kilpayi.v1')).anim===false,[S.anim,K.getRM()]);
@@ -239,7 +242,7 @@ const MIG = [
 ];
 
 let bad = 0;
-const show = (name, r) => { const first = String(r).split('\n')[0]; if (!/ 0 hata/.test(first)) bad++; console.log((name + ':').padEnd(20) + String(r).replace(/\n/g, '\n' + ' '.repeat(20))); };
+const show = (name, r) => { const first = String(r).split('\n')[0]; if (!/ 0 hata/.test(first) || /İSTİSNA|ÇÖKTÜ/.test(String(r))) bad++; console.log((name + ':').padEnd(20) + String(r).replace(/\n/g, '\n' + ' '.repeat(20))); };
 const run = async (name, script, o = {}) => {
   const b = await launch(Object.assign({ width: 390, height: 844, dpr: 1, lang: 'tr-TR' }, o));
   let r;

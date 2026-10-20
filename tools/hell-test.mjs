@@ -33,17 +33,17 @@ T('sıvı çizilirken tuval dönmüyor (çember 0,9 rad dönmüşken)',angs.leng
 CanvasRenderingContext2D.prototype.clip=oc;
 // 5) yanma: her kademede
 ['rahat','normal','usta','cehennem'].forEach(function(l){K.setLevel(l);K.start();K.G.mode='play';K.die();var b=K.G.burn;
-  T(l+': yanınca kül ve kor başladı (8 parça, 150 kor, sonuç 1,45 sn sonra)',!!b&&b.ch.length===8&&b.em.length===150&&Math.abs(K.G.deadT-0.85*K.BURN.slow)<1e-6,[!!b,K.G.deadT]);
+  T(l+': yanınca kül ve kor başladı (8 parça, 150 kor, sonuç 1,95 sn sonra)',!!b&&b.ch.length===8&&b.em.length===150&&Math.abs(K.G.deadT-0.85*K.BURN.slow)<1e-6,[!!b,K.G.deadT]);
   for(var i=0;i<30;i++)K.update(0.016);K.render();
   T(l+': 0,48 sn sonra alev sürüyor (yavaşladı: alev '+K.BURN.flame.toFixed(2)+' sn)',K.G.burn&&K.G.burn.t<K.BURN.flame&&K.G.mode==='dead',[K.G.burn&&K.G.burn.t,K.G.mode]);
-  for(var i=0;i<25;i++)K.update(0.016);K.render();
-  T(l+': 0,88 sn sonra alev bitti (çember kayboldu), sonuç ekranı henüz yok',K.G.burn&&K.G.burn.t>=K.BURN.flame&&K.G.mode==='dead',[K.G.burn&&K.G.burn.t,K.G.mode]);
-  for(var i=0;i<45;i++)K.update(0.016);
-  T(l+': 1,6 sn sonra sonuç ekranı açıldı, kor sürüyor',K.G.mode==='over'&&!!K.G.burn,[K.G.mode,!!K.G.burn]);
-  for(var i=0;i<260;i++)K.update(0.016);
-  T(l+': 5,5 sn sonra kor temizlendi',K.G.burn===null,K.G.burn&&K.G.burn.t)});
+  for(var i=0;i<50;i++)K.update(0.016);K.render();
+  T(l+': alev bitti (çember kayboldu), sonuç ekranı henüz yok',K.G.burn&&K.G.burn.t>=K.BURN.flame&&K.G.mode==='dead',[K.G.burn&&K.G.burn.t,K.G.mode]);
+  for(var i=0;i<50;i++)K.update(0.016);
+  T(l+': 2,1 sn sonra sonuç ekranı açıldı, kor sürüyor',K.G.mode==='over'&&!!K.G.burn,[K.G.mode,!!K.G.burn]);
+  for(var i=0;i<330;i++)K.update(0.016);
+  T(l+': 7,4 sn sonra kor temizlendi',K.G.burn===null,K.G.burn&&K.G.burn.t)});
 // 6) ikinci şans: çember yeniden belirir
-K.setLevel('normal');K.start();K.G.mode='play';K.die();for(var i=0;i<100;i++)K.update(0.016);K.doContinue();
+K.setLevel('normal');K.start();K.G.mode='play';K.die();for(var i=0;i<140;i++)K.update(0.016);K.doContinue();
 T('ikinci şans: kor temizlendi, çember ortadan dışa belirir (G.reform 0)',K.G.burn===null&&K.G.reform===0&&K.G.mode==='play',[K.G.reform,K.G.mode]);
 for(var i=0;i<40;i++)K.update(0.016);K.render();T('ikinci şans: 0,6 sn sonra çember tam',K.G.reform===1,K.G.reform);
 // 7) animasyonlar kapalıyken yanma yok (eski sakin davranış)
