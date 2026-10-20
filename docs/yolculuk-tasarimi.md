@@ -199,9 +199,10 @@ güçlendirir (`STAR_KINDS`; ışınlanma pimi dahil). Seviye 7'nin ★ olayı %
 20. **V0.9.11: TAMAM.** Kapalı test bildirimleri (`@capacitor/local-notifications`; 17 gün, 09:00 ve 16:30, kurulumdan 1 dk sonra bilgilendirme, o gün girildiyse ikincisi iptal, dokununca "Gün n/17" kartı `#testInfo`, kapatma anahtarı yok) ve Hz tanılama satırının kaldırılması. Test bitince (kapalı test sonrası) bloğu kaldırmak için `testSync` bloğu, `#testInfo`, `save.test`, `nt*`/`test*` metinleri ve eklenti silinir.
 21. **V0.9.12: TAMAM.** Cehennem akıcılığı (arka plan parıltısı DOM katmanı `#hfx`, tema adımları seyrek, kapanan mağaza DOM'u boşalır), yumuşak ibre hızı (`G.vel`, `VEL_TAU` 0,11 sn), yakın vuruşta sarsıntı ve yavaş çekim kalktı; bot ile zorluk karşılaştırması (`tools/bot-run.mjs`).
 22. **V0.9.13: TAMAM.** Paket adı kesinleşti: `com.mrbytestudio.kilpayi` (kullanıcı onayı); Play Store hazırlığı `docs/play-store-hazirlik.md` kontrol listesiyle sürüyor.
-23. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için.
+23. **V0.9.14: TAMAM.** Yeni ikon "Cam kadran" (uyarlanabilir + tema renkli + Play 512, `tools/make-icon.py`), markalı açılış ekranı, uygulama adı dile göre (Kıl payı / Close Call).
+24. **Sıradaki:** Kara kapı (ışınlanmanın engel ikizi) ve `docs/kilit-katalogu.md` içindeki yapılmamış kilitler (Sarkaç ✚ Balyoz, Renk, Sis, Aynalı pim, Zırhlı pim, Şifre, Makas, Ani pim, Zil pimi) sonsuz mod havuzu ve sonraki sürümler için.
    Kullanıcının oyun sonrası geri bildirimine göre sıra belirlenir.
-24. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
+25. **Mağaza hazırlığı (ayrı sürüm, kullanıcı hesabı açınca haber verecek):** ikon, imzalı paket (AAB), gizlilik sayfası, gerçek reklam kimliği ve onay penceresi,
    paket adının kesinleşmesi.
 
 Sonsuz mod şimdilik yalnızca 10. seviye sonrası otomatik devam ("Yolculuk tamamlandı", +100 coin); yoğunluk ve cehennem gücü her seviyede artar.

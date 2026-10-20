@@ -3,6 +3,14 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.9.14 — Yeni ikon "Cam kadran", açılış ekranı, İngilizce telefonda ad "Close Call" (2026-10-21)
+
+- **Yeni uygulama ikonu** (kullanıcı seçimi "Cam kadran", 4+4+4 alternatiften; "K harfi" Türkçe dışında anlamsız kalacağı için harfsiz ve dilden bağımsız): parlak cam kadran, içinde şeftali sıvı (süre) ve ibre, mor degrade zemin. Uyarlanabilir ikon (her telefonun kendi şekline uyar), Android 7 ve öncesi için ayrı simgeler, Android 13'te tema renkli tek renkli sürüm ve Play Store için 512 piksel görsel hazır. Kaynak ve üretim betiği `tools/make-icon.py`.
+- **Açılış ekranı yenilendi**: Capacitor'un varsayılan beyaz/mavi "X" görseli yerine ikonla aynı mor degrade ve ortada kadran (Android 12 ve üstünde sistem açılışı mor zeminde ikonu gösterir).
+- **Uygulamanın simge altındaki adı telefonun diline uyar**: Türkçe telefonda "Kıl payı", diğer dillerde (İngilizce dahil) "Close Call" (oyun içinde İngilizce başlık zaten "Close call").
+- Oyun, görünüm ve ayarlar V0.9.13 ile aynıdır. Paket adı yine `com.mrbytestudio.kilpayi`.
+- Teknik: `res/mipmap-anydpi-v26/ic_launcher.xml` (arka plan, ön plan, tek renkli), `mipmap-*/ic_launcher_*.png`, `drawable/ic_launcher_monochrome.xml`, `values/strings.xml` + `values-tr/strings.xml`, `values/colors.xml` (`splash_bg`), `styles.xml` (`windowSplashScreenBackground`), şablondan kalan eski vektör ikon dosyaları silindi.
+
 ## V0.9.13 — Paket adı kesinleşti: com.mrbytestudio.kilpayi (2026-10-21)
 
 - **Uygulamanın paket adı `com.mrbytestudio.kilpayi` oldu** (kullanıcı onayı; yeni Play Console hesabı "mrbyte studio"). Geçici ad `com.mrbyte66.kilpayi` idi; Play'e ilk yüklemeden sonra paket adı değiştirilemediği için şimdi kesinleştirildi. Oyun, görünüm ve ayarlar V0.9.12 ile aynıdır.
