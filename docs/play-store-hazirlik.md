@@ -29,3 +29,17 @@ Kapalı test bildirimleri (17 gün, V0.9.11) bu aşama için yapıldı.
 
 - Kapalı test şartı: https://support.google.com/googleplay/android-developer/answer/14151465
 - Hedef API şartı: https://developer.android.com/google/play/requirements/target-sdk
+
+## Play Console kurulum görevleri (hesap onaylandı, uygulama oluşturuluyor; önerilen cevaplar)
+
+Uygulama: ad "Close Call", varsayılan dil English (United States), Oyun, Ücretsiz (ücretsizden ücretliye sonradan geçilemez). Türkçe çeviri sonra eklenir (ad "Kıl payı").
+- **Uygulama erişimi:** tüm işlevler özel erişim (giriş) gerektirmeden kullanılabilir.
+- **Reklamlar:** evet, reklam içerir (AdMob ödüllü reklam).
+- **İçerik derecelendirme (IARC):** kategori Oyun; şiddet, cinsellik, küfür, kumar, kullanıcı içeriği, konum paylaşımı, gerçek parayla satın alma: hayır. İletişim e-postası geliştirici e-postası.
+- **Hedef kitle:** 13-15, 16-17 ve 18+ (5-12 ve altı SEÇME); çocukları cezbeden unsur: hayır (Aile politikasına girmemek için).
+- **Reklam kimliği:** evet kullanılıyor (AdMob); amaç: reklamcılık/pazarlama ve dolandırıcılığı önleme.
+- **Devlet uygulaması, finansal özellikler, sağlık, haber, COVID-19:** hayır / yok.
+- **Veri güvenliği:** veri topluyor/paylaşıyor: evet (AdMob SDK). Toplanan ve paylaşılan: Yaklaşık konum (IP'den), Uygulama etkileşimleri, Tanılama (uygulama bilgileri ve performans), Cihaz veya diğer kimlikler (reklam kimliği). Amaçlar: reklamcılık veya pazarlama, analiz, dolandırıcılığı önleme/güvenlik. Aktarımda şifreli: evet. Veri silme isteği yolu: yok (hesap yok; veri cihazda). Kişisel bilgi (ad, e-posta vb.): toplanmıyor. Kaynak: https://developers.google.com/admob/android/privacy/play-data-disclosure (SDK sürümüne göre güncel sayfaya bak).
+- **Gizlilik politikası:** `docs/gizlilik/index.html` (Türkçe ve İngilizce, tek sayfa). Yayın için herkese açık ikinci depo + GitHub Pages (kullanıcı onayıyla), URL Play'e yapıştırılır.
+- **Mağaza girişi:** kategori Oyun > Arcade; e-posta mrbyte.studio.dev@gmail.com; ad, kısa açıklama (80), uzun açıklama, ikon 512 (`ic_launcher-playstore.png` hazır), öne çıkan görsel 1024x500, en az 2 ekran görüntüsü.
+- **Kapalı test:** Test et ve yayınla > Kapalı test > yeni kanal > e-posta listesi (12+ kişi) > imzalı AAB yükle (APK değil). Kişisel hesapta 12 kişi x kesintisiz 14 gün, sonra üretim erişimi başvurusu.
