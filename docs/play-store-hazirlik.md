@@ -40,6 +40,13 @@ Uygulama: ad "Close Call", varsayılan dil English (United States), Oyun, Ücret
 - **Reklam kimliği:** evet kullanılıyor (AdMob); amaç: reklamcılık/pazarlama ve dolandırıcılığı önleme.
 - **Devlet uygulaması, finansal özellikler, sağlık, haber, COVID-19:** hayır / yok.
 - **Veri güvenliği:** veri topluyor/paylaşıyor: evet (AdMob SDK). Toplanan ve paylaşılan: Yaklaşık konum (IP'den), Uygulama etkileşimleri, Tanılama (uygulama bilgileri ve performans), Cihaz veya diğer kimlikler (reklam kimliği). Amaçlar: reklamcılık veya pazarlama, analiz, dolandırıcılığı önleme/güvenlik. Aktarımda şifreli: evet. Veri silme isteği yolu: yok (hesap yok; veri cihazda). Kişisel bilgi (ad, e-posta vb.): toplanmıyor. Kaynak: https://developers.google.com/admob/android/privacy/play-data-disclosure (SDK sürümüne göre güncel sayfaya bak).
-- **Gizlilik politikası:** `docs/gizlilik/index.html` (Türkçe ve İngilizce, tek sayfa). Yayın için herkese açık ikinci depo + GitHub Pages (kullanıcı onayıyla), URL Play'e yapıştırılır.
+- **Gizlilik politikası: YAYINDA** https://mrbyte66.github.io/kilpayi-gizlilik/ (Türkçe ve İngilizce, tek sayfa; herkese açık depo `mrbyte66/kilpayi-gizlilik`, GitHub Pages; kaynak `docs/gizlilik/index.html`). Play Console'da Uygulama içeriği > Gizlilik politikası alanına yapıştırılır.
 - **Mağaza girişi:** kategori Oyun > Arcade; e-posta mrbyte.studio.dev@gmail.com; ad, kısa açıklama (80), uzun açıklama, ikon 512 (`ic_launcher-playstore.png` hazır), öne çıkan görsel 1024x500, en az 2 ekran görüntüsü.
 - **Kapalı test:** Test et ve yayınla > Kapalı test > yeni kanal > e-posta listesi (12+ kişi) > imzalı AAB yükle (APK değil). Kişisel hesapta 12 kişi x kesintisiz 14 gün, sonra üretim erişimi başvurusu.
+
+## Durum (2026-10-21, ikinci güncelleme)
+
+- Hesap onaylandı, uygulama Play Console'da oluşturuldu (kontrol paneli: Dahili test, Oyununuzun kurulumunu tamamlayın, Kapalı test).
+- İmzalı AAB hazır: `dist/kil-payi-v0.9.14.aab` (`./tools/release-aab.sh`; versionCode 26; yükleme anahtarı `~/Desktop/AndroidDevelopment/KilPayi-keys/`, yedeklenmeli). Yükleme sırasında "Play Uygulama İmzalama" önerilir: kabul et.
+- Önce Dahili test (kullanıcı ve 1-2 güvenilir kişi): AAB'yi yükle, Play'den kur (eski debug APK'yı sil). Sonra kapalı test: 14+ kişi, e-posta listesi, test bağlantısı, 14 gün kesintisiz.
+- Bekleyen: mağaza girişi metinleri (TR/EN), ekran görüntüleri, öne çıkan görsel 1024x500; AdMob hesabı ve kimlikler (üretimde), UMP onay penceresi.

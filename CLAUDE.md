@@ -91,6 +91,8 @@ Hedef: abonelik, sunucu ya da API'ye bağlı olmayan, tamamen çevrimdışı ça
   `./tools/publish.sh` (android dalını etiketlerle, html dalını android'den üretip push'lar; kullanıcı her sürümde ikisinin de push'lanmasını istedi), sonra APK'yı Wi-Fi/QR ve SendUserFile ile ver.
 - Büyük değişiklikte önce görsel tasarım göster, kullanıcı onaylayınca kodla.
 
+- **Play Store yüklemesi (2026-10-21, hesap onaylandı):** Play APK değil İMZALI AAB ister: `./tools/release-aab.sh` -> `dist/kil-payi-v<sürüm>.aab` (`bundleRelease`; `release.sh` ise telefona kurulan debug imzalı APK üretir, Play'e yüklenmez). Yükleme anahtarı depo DIŞINDA: `~/Desktop/AndroidDevelopment/KilPayi-keys/` (`upload-keystore.jks` + `keystore.properties`; parola rastgele, sohbette ASLA yazma, depoya girmez; `.gitignore` zaten engeller). Kullanıcı bu klasörü yedeklemeli (Play Uygulama İmzalama açık: anahtar kaybolursa Play destek ile yükleme anahtarı sıfırlanabilir ama zaman alır). Her Play yüklemesinde `versionCode` ARTMALI (şimdi 26). Telefondaki debug imzalı APK, Play'den kurulan sürümle AYNI paket adı ama FARKLI imza olduğundan çakışır: Play'den kurmadan önce APK'yı sil. Gizlilik politikası yayında: https://mrbyte66.github.io/kilpayi-gizlilik/ (herkese açık depo `mrbyte66/kilpayi-gizlilik`, GitHub Pages; kaynak `docs/gizlilik/index.html`, güncellenince o depoya da aynı dosyayı gönder). Dahili test 100 kişiye kadar, inceleme yok, 12 kişi şartına SAYILMAZ; kapalı test (12 kişi x 14 gün) ayrı ve 14 kişiyi o zaman ekle (17 günlük sayaç ilk kurulumda başlar, dahili testte kurulan cihazın sayacı erken başlar).
+
 ## Çalışma kuralları
 
 - Oyun mantığını değiştirince `node tools/sim.mjs 2500` ile zorluk dengesini kontrol et.
