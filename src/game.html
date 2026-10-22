@@ -906,7 +906,7 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
       <div class="vw hub on" id="stHub"></div>
       <div class="vw shopv" id="stShop"></div>
       <div class="bloom" id="stBloom"></div>
-      <div class="scrim" id="stScrim"></div>
+      <div class="scrim" id="stScrim" data-a="scrim"></div>
       <div class="sheet" id="stSheet" role="dialog" aria-modal="true"></div>
       <div class="stt" id="stToast" role="status"></div>
     </div>
@@ -1540,7 +1540,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.10.1';
+const VERSION = 'V0.10.2';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -3850,15 +3850,20 @@ const stAfter = o => {
 };
 const stBuy = fn => { const from = save.coins, ok = fn(); if (ok) stCoins(from, save.coins); else stToast(t('coinShort')); return ok; };
 /* Son basış (V0.9.9): animasyonlu cephe/buton parmağın altından kayarsa (açılışta cepheler yükselir, kaydırma oturur) basış ve bırakış farklı öğelere düşer ve tarayıcı "click"i ORTAK ÜST ÖĞEYE verir;
-   o öğede data-a yoktur, dokunuş sessizce kaybolurdu ("dükkâna ilk dokunuşumda tepki vermiyor"). Parmak az oynadıysa eylem basılan öğeye verilir. */
-let stDown = null;
-stg.addEventListener('pointerdown', e => { stDown = { el: e.target.closest && e.target.closest('[data-a]'), x: e.clientX, y: e.clientY, t: performance.now() }; }, true);
-const stClick = ev => {
-  if (performance.now() < SS.noClick) return;
-  let el = ev.target.closest && ev.target.closest('[data-a]');
-  if (!el && stDown && stDown.el && stDown.el.isConnected && performance.now() - stDown.t < 900 && Math.hypot(ev.clientX - stDown.x, ev.clientY - stDown.y) < 16) el = stDown.el;
-  stDown = null;
-  if (!el || !stg.contains(el)) return;
+   o öğede data-a yoktur, dokunuş sessizce kaybolurdu ("dükkâna ilk dokunuşumda tepki vermiyor"). Parmak az oynadıysa eylem basılan öğeye verilir.
+   V0.10.2 DOKUNUŞ KATMANI (kullanıcı: "mağazada İçeri gir ve alttaki butonlara 1 kere tıklayınca çalışmıyor, bazı caselerde"): gerçek dokunuş benzetimiyle (CDP touch) iki neden ölçüldü ve giderildi:
+   (1) kaydırdıktan sonraki 350 ms boyunca HER tıklama yutuluyordu (SS.noClick): kullanıcı dükkânı kaydırıp hemen İçeri gir ya da dock'a basınca (<300 ms) ilk dokunuş kayboluyordu; artık yalnızca o sürüklemenin kendi tıklaması (80 ms) yutulur.
+   (2) cepheye 10 px ve üstü kaymalı bir dokunuş (parmak dokunurken kayar) sürükleme sayılıp eylemsiz kalıyordu (eşik 8 px; tarayıcının kendi dokunma payı ~15 px); ayrıca tarayıcı 16 px üstü kaymada hiç tıklama üretmez.
+   Çözüm: parmakla (touch/pen) yapılan dokunuş, parmak TAP_SLOP (18 px) içinde kaldıysa pointerup'ta DOĞRUDAN işlenir (basılan öğeye, bırakıldığı yere bakılmaksızın); sonradan gelen yerel "click" aynı dokunuşun tekrarı sayılıp yutulur
+   (olay zamanına bakılır: pointerup'tan 300 ms içinde herhangi bir tıklama ya da 700 ms içinde aynı öğeye tıklama). Fare, klavye ve erişilebilirlik (TalkBack) tıklamaları eskisi gibi click ile çalışır. Sürükleme eşiği de aynı 18 px. */
+const TAP_SLOP = 18;
+let stDown = null, press = null, tapT = -1e9, tapEl = null;
+stg.addEventListener('pointerdown', e => {
+  stDown = { el: e.target.closest && e.target.closest('[data-a]'), x: e.clientX, y: e.clientY, t: performance.now() };
+  press = e.isPrimary && (e.pointerType !== 'mouse') ? { id: e.pointerId, el: stDown.el, x: e.clientX, y: e.clientY, t: e.timeStamp, moved: 0 } : null;
+}, true);
+window.addEventListener('pointermove', e => { if (press && e.pointerId === press.id) press.moved = Math.max(press.moved, Math.hypot(e.clientX - press.x, e.clientY - press.y)); });
+const stAct = el => {
   const a = el.getAttribute('data-a'), g = n => el.getAttribute('data-' + n), car = $('stCar');
   Snd.unlock();
   if (a === 'close') closeShop();
@@ -3906,9 +3911,30 @@ const stClick = ev => {
       } else if (why !== 'closed') stToast(t('adFail'));
     });
   }
+  else if (a === 'scrim') { closeSheet(); Snd.ui(); }
 };
+const stClick = ev => {
+  if (ev.timeStamp < SS.noClick) return;                                  /* az önce biten bir sürüklemenin kendi tıklaması */
+  let el = ev.target.closest && ev.target.closest('[data-a]');
+  if (tapEl && (ev.timeStamp - tapT < 300 || (el === tapEl && ev.timeStamp - tapT < 700))) { stDown = null; return; }   /* aynı dokunuş pointerup'ta zaten işlendi */
+  if (!el && stDown && stDown.el && stDown.el.isConnected && performance.now() - stDown.t < 900 && Math.hypot(ev.clientX - stDown.x, ev.clientY - stDown.y) < 16) el = stDown.el;
+  stDown = null;
+  if (!el || !stg.contains(el)) return;
+  stAct(el);
+};
+const stTapEnd = e => {
+  const p = press;
+  if (!p || e.pointerId !== p.id) return;
+  press = null;
+  if (e.type !== 'pointerup') return;
+  const moved = Math.max(p.moved, Math.hypot(e.clientX - p.x, e.clientY - p.y));
+  if (!p.el || !p.el.isConnected || !stg.contains(p.el) || moved >= TAP_SLOP || e.timeStamp - p.t > 900) return;
+  tapT = e.timeStamp; tapEl = p.el; stDown = null;
+  stAct(p.el);
+};
+window.addEventListener('pointerup', stTapEnd);
+window.addEventListener('pointercancel', stTapEnd);
 stg.addEventListener('click', stClick);
-stScrim.addEventListener('click', () => { closeSheet(); Snd.ui(); });
 /* parmak ve fare sürükleme (V0.9.7): şeridi birebir izler; bırakınca en çok bir dükkân ilerler. Dikey hareket tarayıcıya bırakılır (touch-action: pan-y). */
 let drag = null;
 stg.addEventListener('pointerdown', e => {
@@ -3921,7 +3947,7 @@ window.addEventListener('pointermove', e => {
   if (!drag || e.pointerId !== drag.id) return;
   const dx = e.clientX - drag.x0;
   if (!drag.moved) {
-    if (Math.abs(dx) < 8) return;
+    if (Math.abs(dx) < TAP_SLOP) return;
     if (Math.abs(e.clientY - drag.y0) > Math.abs(dx)) { drag = null; return; }
     drag.moved = true;
     try { stg.setPointerCapture(e.pointerId); } catch (x) { /* yapay olay: yakalama yok */ }
@@ -3933,7 +3959,7 @@ const dragEnd = e => {
   if (!drag || (e && e.pointerId !== drag.id)) return;
   const d = drag; drag = null;
   if (!d.moved) return;
-  SS.noClick = performance.now() + 350;
+  SS.noClick = (e ? e.timeStamp : performance.now()) + 80;   /* yalnızca bu sürüklemenin kendi tıklaması; sonraki ayrı dokunuş yutulmaz (V0.10.2) */
   const a = d.s[0], b = d.s[d.s.length - 1], v = (b[1] - a[1]) / Math.max(1, b[0] - a[0]) / SS.k;   /* parmağın hızı, tasarım px/ms (içerik ters gider) */
   pagerTo(clamp(Math.round((SS.pos - v * 120) / SHOP_STEP), d.i0 - 1, d.i0 + 1));
 };

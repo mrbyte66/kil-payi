@@ -570,6 +570,51 @@ const run = async (name, script, o = {}) => {
   await b.close();
   show(name, r);
 };
+
+/* gerçek dokunuş (V0.10.2): CDP touch olaylarıyla (touchStart/Move/End → pointer olayları + yerel click) mağaza dokunuşları. Kullanıcı: "mağazada İçeri gir ve alttaki butonlara 1 kere tıklayınca çalışmıyor, bazı caselerde".
+   Eskiden: kaydırdıktan sonra 350 ms içindeki her dokunuş yutuluyordu; cepheye 10 px üstü kaymalı dokunuş sürükleme sayılıyordu. Şimdi her dokunuş tam bir kez işlenir (pointerup'ta; sonradan gelen click tekrar sayılmaz). */
+const touchGroup = async () => {
+  if (process.env.ONLY && 'dokunuş (gerçek)'.indexOf(process.env.ONLY) < 0) return;
+  const b = await launch({ width: 390, height: 844, dpr: 2, lang: 'tr-TR' });
+  const out = []; let ok = 0, nbad = 0;
+  const T = (n, c, e) => { if (c) ok++; else { nbad++; out.push('HATA ' + n + (e !== undefined ? ' → ' + JSON.stringify(e) : '')); } };
+  try {
+    await b.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+    const touch = (type, x, y) => b.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
+    const tap = async (x, y, drift = 0, hold = 60) => { await touch('touchStart', x, y); if (drift) { await b.sleep(20); await touch('touchMove', x + drift / 2, y); await b.sleep(20); await touch('touchMove', x + drift, y); } await b.sleep(hold); await touch('touchEnd', x + drift, y); };
+    const swipe = async (x0, y0, x1, y1, ms = 140) => { await touch('touchStart', x0, y0); for (let i = 1; i <= 8; i++) { await b.sleep(ms / 8); await touch('touchMove', x0 + (x1 - x0) * i / 8, y0 + (y1 - y0) * i / 8); } await touch('touchEnd', x1, y1); };
+    const rect = async sel => JSON.parse(await b.eval('(function(){var e=document.querySelector(' + JSON.stringify(sel) + ');if(!e)return "null";var r=e.getBoundingClientRect();return JSON.stringify({x:r.left+r.width/2,y:r.top+r.height/2})})()'));
+    const st = async () => JSON.parse(await b.eval('JSON.stringify({view:__kp.SS.view,idx:__kp.SS.idx,shop:__kp.SS.shop,n:window.__uiN||0})'));
+    const fresh = async () => {
+      await b.goto(URL); await b.sleep(800);
+      await b.eval('(function(){var K=__kp,S=K.save;S.coins=2300;S.own={kron:1,kalkan:1,steto:1,kum:1};S.slots=4;S.equip=["steto","kron","kalkan","kum"];K.persist();K.refreshStats();K.SS.force="night";window.__uiN=0;var o=K.Snd.ui;K.Snd.ui=function(){window.__uiN++;return o.apply(this,arguments)};K.openShop("menu");return 1})()');
+      await b.sleep(2300);
+    };
+    await fresh(); let c = await rect('#stCta'); await tap(c.x, c.y); await b.sleep(1500); let s = await st();
+    T('İçeri gir: tek dokunuş dükkâna girer', s.view === 'shop', s);
+    await fresh(); const car = await rect('#stCar'); await swipe(300, car.y, 90, car.y); await b.sleep(30); c = await rect('#stCta'); await tap(c.x, c.y); await b.sleep(1500); s = await st();
+    T('kaydır → 30 ms sonra İçeri gir: ilk dokunuş çalışır', s.view === 'shop' && s.idx === 1, s);
+    await fresh(); const car2 = await rect('#stCar'); await swipe(300, car2.y, 90, car2.y); await b.sleep(30); const dk = await rect('#stDock .dk[data-i="3"]'); await tap(dk.x, dk.y); await b.sleep(900); s = await st();
+    T('kaydır → 30 ms sonra alt şerit (Hediye): ilk dokunuş çalışır', s.idx === 3 && s.view === 'hub', s);
+    for (const dr of [0, 6, 12]) { await fresh(); const f = await rect('.fc[data-s="alet"]'); await tap(f.x, f.y + 40, dr); await b.sleep(1500); s = await st(); T('odaktaki cepheye ' + dr + ' px kaymalı dokunuş dükkâna girer', s.view === 'shop', s); }
+    await fresh(); const f2 = await rect('.fc[data-s="alet"]'); await swipe(f2.x + 60, f2.y + 40, f2.x - 120, f2.y + 40); await b.sleep(900); s = await st();
+    T('gerçek sürükleme dükkân sayılmaz (sokakta kalır, vitrin kayar)', s.view === 'hub' && s.idx === 1, s);
+    await fresh(); c = await rect('#stCta'); await tap(c.x, c.y); await b.sleep(1500);
+    const bk = await rect('#stShop [data-a=back]'); await b.eval('window.__uiN=0;1'); await tap(bk.x, bk.y); await b.sleep(700); s = await st();
+    T('geri düğmesi: tek dokunuş tek işlem (yerel click tekrar saymaz)', s.view === 'hub' && s.n === 1, s);
+    await fresh(); c = await rect('#stCta'); await tap(c.x, c.y); await b.sleep(1500);
+    const it = await rect('#stShop .itm'); await tap(it.x, it.y); await b.sleep(900);
+    T('odada ürün: dokunuş fişi açar', await b.eval('document.getElementById("stSheet").classList.contains("on")'));
+    await fresh(); c = await rect('#stCta'); await tap(c.x, c.y); await b.sleep(1500);
+    const it2 = await rect('#stShop .itm'); await tap(it2.x, it2.y); await b.sleep(900);
+    const sc = await rect('#stScrim'); await tap(sc.x, 60); await b.sleep(700);
+    T('fiş açıkken dışarıya dokunmak fişi kapatır (tek dokunuş)', (await b.eval('document.getElementById("stSheet").classList.contains("on")')) === false);
+    T('konsol hatası yok', b.logs.length === 0, b.logs);
+  } catch (e) { nbad++; out.push('İSTİSNA ' + e.message); }
+  await b.close();
+  show('dokunuş (gerçek)', ok + ' tamam, ' + nbad + ' hata' + (out.length ? '\n' + out.join('\n') : ''));
+};
+
 await run('fiyat ve stok', LOGIC);
 await run('ekran akışı', FLOW);
 await run('gündüz / akşam', SCENE);
@@ -579,6 +624,7 @@ await run('animasyon', ANIM, { reduceMotion: true });
 await run('yazı tipi', FONT);
 await run('dokunuş yedeği', TAPFB);
 await run('geri tuşu', BACKT);
+await touchGroup();
 await run('oyun hissi', FEELT, { seed: FEELSEED });
 await run('bildirimler', NOTIT, { seed: FAKECAP });
 await run('ısınma', WARMT, { warm: true });
