@@ -3,6 +3,17 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.10.2 — Mağazada ilk dokunuş artık kaybolmuyor (2026-10-22)
+
+- **Mağazada "İçeri gir" ve alt şerit butonlarına ilk dokunuşta tepki vermeme düzeltildi** (kullanıcı: "mağazada İçeri gir butonlarına, alttaki butonlara 1 kere tıklayınca çalışmıyor, bazı caselerde"; ilk kez V0.9.9'da gelmişti, "yine"). Neden bulundu ve ölçüldü (başsız Chrome'da gerçek dokunuş benzetimi, parmağın basma-kayma-kalkma hâli): iki ayrı yutulan dokunuş vardı.
+  1. **Vitrini kaydırdıktan sonra 350 ms boyunca HER dokunuş yutuluyordu.** Bir dükkânı kaydırıp hemen "İçeri gir"e ya da alt şeritteki simgeye basınca (300 ms içinde, yani çoğu kullanıcı) ilk dokunuş kayboluyordu, ikinci dokunuş çalışıyordu. Artık yalnızca o kaydırmanın kendi tıklaması (80 ms) yutuluyor, sonraki ayrı dokunuş anında çalışıyor.
+  2. **Dükkânın kendisine (cepheye) 10 piksel ve üstü kayarak dokunmak hiçbir şey yapmıyordu**: parmak dokunurken doğal olarak biraz kayar, oyun bunu "kaydırma" sanıp dokunuşu yok sayıyordu (eşik 8 px). Eşik 18 px oldu; küçük kaymalı dokunuş artık dokunuş sayılıyor.
+- **Yeni dokunuş katmanı**: parmakla yapılan dokunuş, parmak 18 px içinde kaldıysa parmak kalkarken DOĞRUDAN işlenir (basılan butona, parmağın nereye kaydığına bakılmaksızın; açılışta kayan cephelerde de çalışır); sonradan gelen yerel "click" aynı dokunuşun tekrarı sayılıp yutulur, yani hiçbir işlem iki kere olmaz. Fare, klavye ve erişilebilirlik (TalkBack) tıklamaları eskisi gibi çalışır. Fiş açıkken dışarıya dokunma da aynı katmandan geçer.
+- **Önce/sonra (gerçek dokunuş benzetimi)**: kaydır → 30 ms → "İçeri gir": yutuldu → çalışıyor; kaydır → 30 ms → alt şerit: yutuldu → çalışıyor; cepheye 10 ve 14 px kaymalı dokunuş: yutuldu → çalışıyor; kaydır → 300 ms ve üstü zaten çalışıyordu. Tarayıcının kendi sınırı değişmedi: ~15 px üstü kaymada Android dokunuşu iptal eder (oyun bunu kaydırma sayar).
+- Kapsam: mağaza (sokak, dükkân içleri, fiş, alt şerit). Menü ve oyun içi düğmeleri yerel tıklamayla çalışmaya devam ediyor.
+- Emülatörde GERÇEK WebView ve gerçek parmak girdisiyle (adb input) denendi: eski sürümde kaydırıp hemen "İçeri gir"e basınca dokunuş yutuldu (oda açılmadı), V0.10.2'de ilk dokunuşta açıldı.
+- Testler: `node tools/store-test.mjs` yeni **"dokunuş (gerçek)"** grubu (CDP touch ile 11 kontrol; V0.10.1 kodunda 3 hata verip bu düzeltmede geçiyor, yani gerçekten bu hatayı yakalıyor).
+
 ## V0.10.1 — Oyun dosyaları APK içinde AES ile şifreli (2026-10-22)
 
 - **Oyun dosyaları artık şifreli** (kapalı testteki arkadaşın eleştirisi: "index öylece duruyor, şifrele"; kullanıcı: "mümkün olan her yeri şifrele"). V0.10.0'da APK'yı zip olarak açınca `assets/public/index.html` okunabiliyordu (JavaScript karıştırılmış olsa da HTML, CSS ve dosyanın kendisi ortadaydı). Şimdi APK'daki bütün oyun dosyaları (oyunun kendisi ve yazı tipleri) AES-256-GCM ile şifreli (`*.kpe`); uygulama çalışırken yalnızca bellekte açılıp WebView'e veriliyor, düz hâli diske hiç yazılmıyor. APK'da `index.html` yerine 318 baytlık boş bir yedek sayfa kaldı.
