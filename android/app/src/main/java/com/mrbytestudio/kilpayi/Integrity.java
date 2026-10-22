@@ -7,11 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
-/* V0.10.0: oyunun kodu (assets/public/index.html) ve Capacitor ayar dosyaları derleme sırasında SHA-256 ile mühürlenir (build.gradle -> BuildConfig.ASSET_SHA256);
+/* V0.10.0: oyunun kodu (assets/public/index.html.kpe ya da index.html) ve Capacitor ayar dosyaları derleme sırasında SHA-256 ile mühürlenir (build.gradle -> BuildConfig.ASSET_SHA256);
    uygulama açılırken burada yeniden hesaplanır. Biri APK'yı açıp oyun dosyasını değiştirirse (kapalı testte olan buydu) özet tutmaz ve MainActivity uyarı verip kapanır.
    Yanlış alarm vermemek için beklenmedik her hata "sağlam" sayılır; mühür boşsa (derlemede dosyalar yoktu) denetim yapılmaz. */
 final class Integrity {
-    private static final String[] FILES = { "public/index.html", "capacitor.config.json", "capacitor.plugins.json" };
+    private static final String[] CONFIGS = { "capacitor.config.json", "capacitor.plugins.json" };
 
     private Integrity() {}
 
@@ -22,7 +22,11 @@ final class Integrity {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             AssetManager am = ctx.getAssets();
             byte[] buf = new byte[16384];
-            for (String f : FILES) {
+            /* V0.10.1: şifreli derlemede mühür şifreli oyun dosyasını (index.html.kpe), geliştirme derlemesinde düz index.html'i kapsar; build.gradle ile aynı sıra */
+            String main = "public/index.html.kpe";
+            try { am.open(main).close(); } catch (FileNotFoundException e) { main = "public/index.html"; }
+            String[] files = { main, CONFIGS[0], CONFIGS[1] };
+            for (String f : files) {
                 try (InputStream in = am.open(f)) {
                     int n;
                     while ((n = in.read(buf)) > 0) md.update(buf, 0, n);

@@ -23,11 +23,27 @@ if grep -q '__kp' www/index.html; then echo "HATA: yayın derlemesinde test kanc
 node tools/protect.mjs www/index.html
 node tools/smoke-release.mjs
 if grep -q 'Not your job' www/index.html; then echo "HATA: karıştırma çalışmadı (oyun metinleri düz görünüyor)"; exit 1; fi
+# V0.10.1: oyun dosyaları APK/AAB içinde AES-256-GCM ile şifrelenir (eski şifreli/düz dosyalar kalmasın diye klasör önce silinir)
+rm -rf android/app/src/main/assets/public
 npx cap sync android > /dev/null
+node tools/encrypt-assets.mjs --selftest > /dev/null
+node tools/encrypt-assets.mjs
 (cd android && ./gradlew assembleDebug -q)
 
 mkdir -p dist
 OUT="dist/kil-payi-v${VER}.apk"
 cp android/app/build/outputs/apk/debug/app-debug.apk "$OUT"
 if unzip -p "$OUT" assets/public/index.html | grep -q '__kp'; then echo "HATA: APK içinde test kancası var"; rm -f "$OUT"; exit 1; fi
+if unzip -l "$OUT" | grep -qE 'assets/public/(fonts/[a-z0-9-]+\.(woff2|css))$'; then echo "HATA: APK içinde düz (şifresiz) oyun dosyası var"; rm -f "$OUT"; exit 1; fi
+if unzip -p "$OUT" assets/public/index.html.kpe | grep -aq 'kilpayi.v1'; then echo "HATA: APK içindeki oyun dosyası şifreli görünmüyor"; rm -f "$OUT"; exit 1; fi
 echo "$OUT hazır ($(du -h "$OUT" | cut -f1 | tr -d ' '), md5 $(md5 -q "$OUT"))"
+
+# V0.10.1: BAŞKASINA verilecek "güçlü" APK: R8'li (Java kodu karıştırılmış), hata ayıklamaya kapalı, yükleme anahtarıyla imzalı. Deneme APK'sı (yukarıdaki) hata ayıklamaya açıktır ve R8'sizdir; yalnızca kendi telefonunda dene.
+if [ -f "../KilPayi-keys/keystore.properties" ]; then
+  (cd android && ./gradlew assembleRelease -q)
+  ROUT="dist/kil-payi-v${VER}-release.apk"
+  cp android/app/build/outputs/apk/release/app-release.apk "$ROUT"
+  if unzip -l "$ROUT" | grep -qE 'assets/public/(fonts/[a-z0-9-]+\.(woff2|css))$'; then echo "HATA: güçlü APK içinde düz oyun dosyası var"; rm -f "$ROUT"; exit 1; fi
+  if "$ANDROID_HOME/build-tools/35.0.1/aapt2" dump badging "$ROUT" 2>/dev/null | grep -q application-debuggable; then echo "HATA: güçlü APK hata ayıklamaya açık"; rm -f "$ROUT"; exit 1; fi
+  echo "$ROUT hazır ($(du -h "$ROUT" | cut -f1 | tr -d ' '), md5 $(md5 -q "$ROUT"))"
+fi

@@ -34,3 +34,6 @@ dist/
 
 # IDE
 .idea/
+
+# V0.10.1: şifreli oyun dosyalarının anahtar yarısı (her derlemede üretilir)
+android/app/kp-key.properties

@@ -1,6 +1,6 @@
 # Sonraki sürüm notları (kullanıcı isteği, 2026-10-22)
 
-**DURUM (V0.10.0, 2026-10-22): madde 1 (karıştırma + R8 + imzalı kayıt + yerel bütünlük), madde 2 (menü donması: neden ısınmaydı, düzeltildi; genel tarama temiz), madde 4 (R8 yapıldı; AGP 9 yapılmadı, 16 KB zaten tamam) YAPILDI. Kalan: madde 3 (reklam geliri ekonomisi: kullanıcıya alternatifler gösterilecek) ve gerçek telefonda ilk açılış doğrulaması. Ayrıntı CLAUDE.md "V0.10.0 koruma".**
+**DURUM (V0.10.0, 2026-10-22): madde 1 (karıştırma + R8 + imzalı kayıt + yerel bütünlük), madde 2 (menü donması: neden ısınmaydı, düzeltildi; genel tarama temiz), madde 4 (R8 yapıldı; AGP 9 yapılmadı, 16 KB zaten tamam) YAPILDI. V0.10.1'de oyun dosyaları APK içinde AES ile şifrelendi. Kalan: madde 3 (reklam geliri ekonomisi: kullanıcıya alternatifler gösterilecek) ve gerçek telefonda ilk açılış doğrulaması. Ayrıntı CLAUDE.md "V0.10.0 koruma".**
 
 Kapalı test sırasında bir testçi Play'den indirdiği APK'yı açıp kaynak kodu okudu, tüm jokerleri ekleyip oyunu kendi istediği gibi değiştirdi. Kullanıcı: "kaynak kodu açamamalılar, tüm açıkları kapatmalıyız, bir sonraki sürümde yapılsın, unuturum".
 

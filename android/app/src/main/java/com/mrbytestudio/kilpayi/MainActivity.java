@@ -10,6 +10,7 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.getcapacitor.Bridge;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -17,7 +18,19 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestHighRefreshRate();
+        installSecureClient();
         checkIntegrity();
+    }
+
+    /* V0.10.1: oyun dosyaları APK'da AES ile şifrelidir; Capacitor'un istemcisi yerine bellekte şifre çözen istemci takılır (bkz. SecureAssets). Sayfa yüklemesi SecureWebView'de bir tur ertelendiği için ilk istek de buradan geçer. */
+    private void installSecureClient() {
+        try {
+            Bridge br = getBridge();
+            if (br == null) return;
+            br.setWebViewClient(new SecureWebViewClient(br, new SecureAssets(getApplicationContext(), br), () -> runOnUiThread(this::showTampered)));
+        } catch (Throwable t) {
+            /* istemci takılamazsa Capacitor'un kendi istemcisi kalır (şifreli dosyalar o zaman açılmaz; yalnızca geliştirme derlemelerinde olabilir) */
+        }
     }
 
     /* V0.10.0: oyun dosyaları değiştirilmiş mi (bkz. Integrity)? Denetim arka planda yapılır (açılışı yavaşlatmaz, ana iş parçacığını tutmaz). */
@@ -28,8 +41,11 @@ public class MainActivity extends BridgeActivity {
         }, "kp-check").start();
     }
 
+    private boolean tamperShown;
+
     private void showTampered() {
-        if (isFinishing()) return;
+        if (isFinishing() || tamperShown) return;
+        tamperShown = true;
         try {
             new AlertDialog.Builder(this)
                 .setTitle(R.string.app_name)

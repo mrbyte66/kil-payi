@@ -24,13 +24,19 @@ if grep -q '__kp' www/index.html; then echo "HATA: yayın derlemesinde test kanc
 node tools/protect.mjs www/index.html
 node tools/smoke-release.mjs
 if grep -q 'Not your job' www/index.html; then echo "HATA: karıştırma çalışmadı (oyun metinleri düz görünüyor)"; exit 1; fi
+# V0.10.1: oyun dosyaları APK/AAB içinde AES-256-GCM ile şifrelenir (eski şifreli/düz dosyalar kalmasın diye klasör önce silinir)
+rm -rf android/app/src/main/assets/public
 npx cap sync android > /dev/null
+node tools/encrypt-assets.mjs --selftest > /dev/null
+node tools/encrypt-assets.mjs
 (cd android && ./gradlew bundleRelease -q)
 
 mkdir -p dist
 OUT="dist/kil-payi-v${VER}.aab"
 cp android/app/build/outputs/bundle/release/app-release.aab "$OUT"
 if unzip -p "$OUT" base/assets/public/index.html | grep -q '__kp'; then echo "HATA: AAB içinde test kancası var"; rm -f "$OUT"; exit 1; fi
+if unzip -l "$OUT" | grep -qE 'base/assets/public/(fonts/[a-z0-9-]+\.(woff2|css))$'; then echo "HATA: AAB içinde düz (şifresiz) oyun dosyası var"; rm -f "$OUT"; exit 1; fi
+if unzip -p "$OUT" base/assets/public/index.html.kpe | grep -aq 'kilpayi.v1'; then echo "HATA: AAB içindeki oyun dosyası şifreli görünmüyor"; rm -f "$OUT"; exit 1; fi
 SIG=$("$JAVA_HOME/bin/jarsigner" -verify "$OUT" 2>&1 | grep -m1 "verified")   # kendi imzalı (yükleme anahtarı) olduğu için "sertifika zinciri geçersiz" uyarısı beklenir, sorun değil
 case "$SIG" in *verified*) ;; *) echo "HATA: AAB imzası doğrulanamadı: $SIG"; rm -f "$OUT"; exit 1;; esac
 FP=$("$JAVA_HOME/bin/keytool" -printcert -jarfile "$OUT" 2>/dev/null | sed -n 's/.*SHA256: *//p' | head -1)

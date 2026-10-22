@@ -8,12 +8,18 @@ if (ksFile.exists()) { ksFile.withInputStream { ksProps.load(it) } }
 /* V0.10.0: oyun dosyalarının mührü (bkz. Integrity.java). Sırayla: oyun (index.html) ve Capacitor ayar dosyaları; yalnızca var olanlar. `npx cap sync` bu dosyaları yazdıktan SONRA derle (tools/release*.sh böyle yapar). */
 def kpAssetSha = {
     def md = java.security.MessageDigest.getInstance('SHA-256')
-    ['src/main/assets/public/index.html', 'src/main/assets/capacitor.config.json', 'src/main/assets/capacitor.plugins.json'].each { n ->
-        def f = file(n)
+    def main = file('src/main/assets/public/index.html.kpe')
+    if (!main.exists()) main = file('src/main/assets/public/index.html')
+    [main, file('src/main/assets/capacitor.config.json'), file('src/main/assets/capacitor.plugins.json')].each { f ->
         if (f.exists()) md.update(f.bytes)
     }
     return md.digest().encodeHex().toString()
 }
+
+/* V0.10.1: oyun dosyalarının AES anahtarının yarısı (tools/encrypt-assets.mjs her derlemede üretir, depoya girmez); boşsa şifreleme yoktur ve düz dosyalar sunulur (bkz. SecureAssets.java). */
+def kpKeyProps = new Properties()
+def kpKeyFile = file('kp-key.properties')
+if (kpKeyFile.exists()) { kpKeyFile.withInputStream { kpKeyProps.load(it) } }
 
 android {
     namespace = "com.mrbytestudio.kilpayi"
@@ -23,10 +29,11 @@ android {
         applicationId "com.mrbytestudio.kilpayi"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 27
-        versionName "0.10.0"
+        versionCode 28
+        versionName "0.10.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField 'String', 'ASSET_SHA256', "\"${kpAssetSha()}\""
+        buildConfigField 'String', 'KP_A', "\"${kpKeyProps.getProperty('a', '')}\""
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
