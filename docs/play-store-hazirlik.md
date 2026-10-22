@@ -29,3 +29,30 @@ Kapalı test bildirimleri (17 gün, V0.9.11) bu aşama için yapıldı.
 
 - Kapalı test şartı: https://support.google.com/googleplay/android-developer/answer/14151465
 - Hedef API şartı: https://developer.android.com/google/play/requirements/target-sdk
+
+## Play Console kurulum görevleri (hesap onaylandı, uygulama oluşturuluyor; önerilen cevaplar)
+
+Uygulama: ad "Close Call", varsayılan dil English (United States), Oyun, Ücretsiz (ücretsizden ücretliye sonradan geçilemez). Türkçe çeviri sonra eklenir (ad "Kıl payı").
+- **Uygulama erişimi:** tüm işlevler özel erişim (giriş) gerektirmeden kullanılabilir.
+- **Reklamlar:** evet, reklam içerir (AdMob ödüllü reklam).
+- **İçerik derecelendirme (IARC):** kategori Oyun; şiddet, cinsellik, küfür, kumar, kullanıcı içeriği, konum paylaşımı, gerçek parayla satın alma: hayır. İletişim e-postası geliştirici e-postası.
+- **Hedef kitle:** 13-15, 16-17 ve 18+ (5-12 ve altı SEÇME); çocukları cezbeden unsur: hayır (Aile politikasına girmemek için).
+- **Reklam kimliği:** evet kullanılıyor (AdMob); amaç: reklamcılık/pazarlama ve dolandırıcılığı önleme.
+- **Devlet uygulaması, finansal özellikler, sağlık, haber, COVID-19:** hayır / yok.
+- **Veri güvenliği:** veri topluyor/paylaşıyor: evet (AdMob SDK). Toplanan ve paylaşılan: Yaklaşık konum (IP'den), Uygulama etkileşimleri, Tanılama (uygulama bilgileri ve performans), Cihaz veya diğer kimlikler (reklam kimliği). Amaçlar: reklamcılık veya pazarlama, analiz, dolandırıcılığı önleme/güvenlik. Aktarımda şifreli: evet. Veri silme isteği yolu: yok (hesap yok; veri cihazda). Kişisel bilgi (ad, e-posta vb.): toplanmıyor. Kaynak: https://developers.google.com/admob/android/privacy/play-data-disclosure (SDK sürümüne göre güncel sayfaya bak).
+- **Gizlilik politikası: YAYINDA** https://mrbyte66.github.io/kilpayi-gizlilik/ (Türkçe ve İngilizce, tek sayfa; herkese açık depo `mrbyte66/kilpayi-gizlilik`, GitHub Pages; kaynak `docs/gizlilik/index.html`). Play Console'da Uygulama içeriği > Gizlilik politikası alanına yapıştırılır.
+- **Mağaza girişi:** kategori Oyun > Arcade; e-posta mrbyte.studio.dev@gmail.com; ad, kısa açıklama (80), uzun açıklama, ikon 512 (`ic_launcher-playstore.png` hazır), öne çıkan görsel 1024x500, en az 2 ekran görüntüsü.
+- **Kapalı test:** Test et ve yayınla > Kapalı test > yeni kanal > e-posta listesi (12+ kişi) > imzalı AAB yükle (APK değil). Kişisel hesapta 12 kişi x kesintisiz 14 gün, sonra üretim erişimi başvurusu.
+
+## Durum (2026-10-21, ikinci güncelleme)
+
+- Hesap onaylandı, uygulama Play Console'da oluşturuldu (kontrol paneli: Dahili test, Oyununuzun kurulumunu tamamlayın, Kapalı test).
+- İmzalı AAB hazır: `dist/kil-payi-v0.9.14.aab` (`./tools/release-aab.sh`; versionCode 26; yükleme anahtarı `~/Desktop/AndroidDevelopment/KilPayi-keys/`, yedeklenmeli). Yükleme sırasında "Play Uygulama İmzalama" önerilir: kabul et.
+- Önce Dahili test (kullanıcı ve 1-2 güvenilir kişi): AAB'yi yükle, Play'den kur (eski debug APK'yı sil). Sonra kapalı test: 14+ kişi, e-posta listesi, test bağlantısı, 14 gün kesintisiz.
+- Bekleyen: mağaza girişi metinleri (TR/EN), ekran görüntüleri, öne çıkan görsel 1024x500; AdMob hesabı ve kimlikler (üretimde), UMP onay penceresi.
+
+## Durum (2026-10-22): V0.10.0
+
+- Kapalı test (Test et ve yayınla > Kapalı test) etkin; testçiler Google Grubu üzerinden. V0.10.0 AAB'si (`dist/kil-payi-v0.10.0.aab`, versionCode 27) yeni sürüm olarak yüklenir (Sürüm oluştur > aynı kanal; 14 günlük sayaç sıfırlanmaz). Sürüm notu örneği: "Ana ekran donması düzeltildi; ilk açılışta kısa bir hazırlık ekranı var; güvenlik iyileştirmeleri."
+- Play'in "kod karartma" önerisi R8 ile karşılandı; AAB içindeki eşleme dosyasını (proguard.map) Play Console kendisi alır, ayrıca yüklemek gerekmez.
+- Kapalı testçiler V0.9.14'ten V0.10.0'a Play üzerinden güncellenir; ilk açılışta bir kez "Oyun cihazına hazırlanıyor" ekranı görürler.

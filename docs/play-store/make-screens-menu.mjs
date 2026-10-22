@@ -1,0 +1,12 @@
+import { launch } from '/Users/beytullahgonulal/Desktop/AndroidDevelopment/KilPayi/tools/cdp.mjs';
+const ROOT = '/Users/beytullahgonulal/Desktop/AndroidDevelopment/KilPayi', OUT = process.argv[2], LANGC = process.argv[3] || 'en';
+const b = await launch({ width: 405, height: 720, dpr: 8 / 3, gpu: true, lang: LANGC === 'tr' ? 'tr-TR' : 'en-US', seed: 'document.documentElement.setAttribute("data-theme","light");' });
+await b.goto('file://' + ROOT + '/www/index.html');
+await b.eval(`(function(){var K=window.__kp,S=K.save;Object.keys(K.INTRO).forEach(function(k){S.seen[k]=1});S.lvl='normal';S.coins=1280;S.runs=24;S.own={kron:1,kalkan:1,steto:1,kum:1};S.slots=4;S.equip=['steto','kron','kalkan','kum'];S.tools={steto:{n:3,l:1},kron:{n:3,l:1},kalkan:{n:2,l:1},kum:{n:3,l:1}};S.bests={rahat:210,normal:342,usta:180,cehennem:96};S.bestL=7;K.persist();K.refreshStats();K.renderBagRow&&K.renderBagRow();return 1})()`);
+await b.sleep(1800);
+await b.shot(OUT + '/menu.png');
+await b.eval('window.__kp.SS.force="night";window.__kp.openShop();1');
+await b.sleep(3500);
+await b.shot(OUT + '/shop.png');
+console.log(b.logs.join('\n'));
+await b.close(); process.exit(0);
