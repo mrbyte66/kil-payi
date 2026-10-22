@@ -2,6 +2,7 @@ package com.mrbytestudio.kilpayi;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.util.Log;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -36,8 +37,12 @@ final class Integrity {
             }
             StringBuilder sb = new StringBuilder();
             for (byte b : md.digest()) sb.append(String.format("%02x", b & 0xff));
-            return sb.toString().equalsIgnoreCase(expected);
+            boolean ok = sb.toString().equalsIgnoreCase(expected);
+            if (!ok) Log.w("KilPayi", "oyun dosyalarının mührü tutmadı");
+            return ok;
         } catch (Throwable t) {
+            /* kasıtlı: beklenmedik bir hatada (G/Ç, sağlayıcı) oyunu engellemek meşru oyuncuyu cezalandırır; bu denetim zaten kararlı birini durdurmaz (bkz. docs/guvenlik-raporu.md) */
+            Log.w("KilPayi", "bütünlük denetimi çalışamadı: " + t.getClass().getSimpleName());
             return true;
         }
     }

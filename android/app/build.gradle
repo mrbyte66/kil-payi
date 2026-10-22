@@ -29,8 +29,8 @@ android {
         applicationId "com.mrbytestudio.kilpayi"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 29
-        versionName "0.10.2"
+        versionCode 30
+        versionName "0.10.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField 'String', 'ASSET_SHA256', "\"${kpAssetSha()}\""
         buildConfigField 'String', 'KP_A', "\"${kpKeyProps.getProperty('a', '')}\""
@@ -53,6 +53,7 @@ android {
     buildTypes {
         release {
             /* V0.10.0: R8 ile Java kodu küçültülür ve adları karıştırılır (Play "kod karartma" önerisi; yeniden paketleyenin işini zorlaştırır). Kurallar proguard-rules.pro'da, Capacitor'ın kendi kuralları kitaplıkla gelir. */
+            vcsInfo { include false }   /* V0.10.3: META-INF/version-control-info.textproto ("NO_SUPPORTED_VCS_FOUND") pakete girmesin */
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

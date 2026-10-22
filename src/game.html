@@ -1540,7 +1540,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.10.2';
+const VERSION = 'V0.10.3';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -1952,6 +1952,8 @@ document.addEventListener('visibilitychange', () => Music.sync());
 const CAP = window.Capacitor;
 const NATIVE = !!(CAP && CAP.isNativePlatform && CAP.isNativePlatform());
 const ADS = { test: true, rewardedId: 'ca-app-pub-3940256099942544/5224354917' };
+/* Sahte reklam (3 sn ilerleme çubuğu, sonra ödül) yalnızca tarayıcıda ve testlerde içindir: build.sh yayın derlemesinde bu bayrağı false yapar (V0.10.3, güvenlik raporu "reklam gösterilmeden ödül") */
+const DEMO_ADS = /*DEMOADS*/true;
 const plugins = {};
 const plugin = name => {
   if (!NATIVE) return null;
@@ -1987,6 +1989,7 @@ const Platform = {
   track(name, params) { try { if (window.console && console.debug) console.debug('[kp]', name, params || ''); } catch (e) {} },
   rewardedAd(done) {
     const A = plugin('AdMob'), el = $('ad'), bar = $('adFill');
+    if (!A && !DEMO_ADS) { done(false, 'fail'); return; }   /* yayın derlemesinde "reklam gösterilmeden ödül" yolu yoktur (V0.10.3) */
     if (!A) {
       const t0 = performance.now(), dur = CFG.adSeconds * 1000;
       bar.style.width = '0%'; show(el);

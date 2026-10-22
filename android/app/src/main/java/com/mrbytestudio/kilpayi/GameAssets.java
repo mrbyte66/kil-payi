@@ -28,13 +28,13 @@ import javax.crypto.spec.SecretKeySpec;
    Uygulama çalışırken istek geldiğinde burada, yalnızca bellekte açılıp WebView'e verilir; düz hâli diske hiçbir zaman yazılmaz.
    Anahtar APK'da hazır durmaz: KP_A (derleme sırasında üretilir) ile capacitor.config.json + capacitor.plugins.json'un özetinin XOR'udur; ayar dosyalarından biri değiştirilirse anahtar tutmaz.
    Etiket tutmazsa (dosya değiştirilmiş) istisna atılır ve MainActivity "değiştirilmiş kopya" uyarısını gösterir. KP_A boşsa (geliştirme derlemesi, şifreleme adımı çalışmamış) hiçbir şey yapılmaz, Capacitor düz dosyaları kendisi sunar. */
-final class SecureAssets {
+final class GameAssets {
     private final AssetManager assets;
     private final Bridge bridge;
     private final ConcurrentHashMap<String, byte[]> cache = new ConcurrentHashMap<>();
     private volatile byte[] key;
 
-    SecureAssets(Context ctx, Bridge bridge) {
+    GameAssets(Context ctx, Bridge bridge) {
         this.assets = ctx.getAssets();
         this.bridge = bridge;
     }

@@ -21,7 +21,8 @@ FONTS_LOCAL='<link rel="stylesheet" href="fonts/fonts.css">'
         -e '/<!--FONTS-START-->/,/<!--FONTS-END-->/c\
 '"$FONTS_LOCAL" src/game.html
   else
-    sed -e '/<!--FONTS-START-->/,/<!--FONTS-END-->/c\
+    sed -e 's#/\*DEMOADS\*/true#false#' \
+        -e '/<!--FONTS-START-->/,/<!--FONTS-END-->/c\
 '"$FONTS_LOCAL" src/game.html
   fi
   printf '%s\n' '</body></html>'

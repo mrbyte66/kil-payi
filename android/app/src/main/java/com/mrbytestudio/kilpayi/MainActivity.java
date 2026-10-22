@@ -6,7 +6,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Display;
+import android.util.Log;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -18,19 +20,36 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestHighRefreshRate();
-        installSecureClient();
+        installClient();
         checkIntegrity();
     }
 
-    /* V0.10.1: oyun dosyaları APK'da AES ile şifrelidir; Capacitor'un istemcisi yerine bellekte şifre çözen istemci takılır (bkz. SecureAssets). Sayfa yüklemesi SecureWebView'de bir tur ertelendiği için ilk istek de buradan geçer. */
-    private void installSecureClient() {
+    /* V0.10.1: oyun dosyaları APK'da AES ile şifrelidir; Capacitor'un istemcisi yerine bellekte şifre çözen istemci takılır (bkz. GameAssets). Sayfa yüklemesi GameWebView'de bir tur ertelendiği için ilk istek de buradan geçer. */
+    private void installClient() {
         try {
             Bridge br = getBridge();
             if (br == null) return;
-            br.setWebViewClient(new SecureWebViewClient(br, new SecureAssets(getApplicationContext(), br), () -> runOnUiThread(this::showTampered)));
+            br.setWebViewClient(new GameWebViewClient(br, new GameAssets(getApplicationContext(), br), () -> runOnUiThread(this::showTampered)));
+            hardenWebView(br);
         } catch (Throwable t) {
             /* istemci takılamazsa Capacitor'un kendi istemcisi kalır (şifreli dosyalar o zaman açılmaz; yalnızca geliştirme derlemelerinde olabilir) */
+            Log.w("KilPayi", "istemci takılamadı: " + t.getClass().getSimpleName());
         }
+    }
+
+    /* V0.10.3: oyunun kullanmadığı WebView yetenekleri kapatılır (Capacitor varsayılanları geniştir): konum, dosya ve içerik erişimi, otomatik pencere açma, karışık içerik. Müzik için
+       setMediaPlaybackRequiresUserGesture(false) (Capacitor'un ayarı) bilerek KORUNUR: menü müziği Web Audio ile ilk dokunuşsuz başlar. */
+    @SuppressWarnings("deprecation")
+    private void hardenWebView(Bridge br) {
+        WebSettings s = br.getWebView().getSettings();
+        s.setGeolocationEnabled(false);
+        s.setAllowFileAccess(false);
+        s.setAllowContentAccess(false);
+        s.setAllowFileAccessFromFileURLs(false);
+        s.setAllowUniversalAccessFromFileURLs(false);
+        s.setJavaScriptCanOpenWindowsAutomatically(false);
+        s.setSupportMultipleWindows(false);
+        s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
     }
 
     /* V0.10.0: oyun dosyaları değiştirilmiş mi (bkz. Integrity)? Denetim arka planda yapılır (açılışı yavaşlatmaz, ana iş parçacığını tutmaz). */

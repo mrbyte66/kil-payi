@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- V0.10.3: Android 12+ için aynı kurallar (bulut yedeği ve cihazdan cihaza aktarım). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="app_webview/Default/Code Cache" />
+        <exclude domain="root" path="app_webview/Default/GPUCache" />
+        <exclude domain="root" path="app_webview/GPUCache" />
+        <exclude domain="root" path="app_webview/ShaderCache" />
+        <exclude domain="root" path="app_webview/Default/Service Worker" />
+        <exclude domain="root" path="app_webview/Default/blob_storage" />
+        <exclude domain="root" path="app_webview/Default/shared_proto_db" />
+        <exclude domain="root" path="app_webview/Default/Shared Dictionary" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" path="app_webview/Default/Code Cache" />
+        <exclude domain="root" path="app_webview/Default/GPUCache" />
+        <exclude domain="root" path="app_webview/GPUCache" />
+        <exclude domain="root" path="app_webview/ShaderCache" />
+        <exclude domain="root" path="app_webview/Default/Service Worker" />
+        <exclude domain="root" path="app_webview/Default/blob_storage" />
+        <exclude domain="root" path="app_webview/Default/shared_proto_db" />
+        <exclude domain="root" path="app_webview/Default/Shared Dictionary" />
+    </device-transfer>
+</data-extraction-rules>

@@ -4,6 +4,9 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:usesCleartextTraffic="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -31,15 +34,7 @@
 
         </activity>
 
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
-        </provider>
+        <!-- V0.10.3: Capacitor şablonundaki FileProvider (dış depolamanın tamamını paylaşılabilir yapan file_paths.xml ile) kaldırıldı: oyun dosya seçici/kamera kullanmaz, hiçbir eklenti onu istemez. -->
     </application>
 
     <!-- Permissions -->
