@@ -21,3 +21,8 @@ Kapalı test sırasında bir testçi Play'den indirdiği APK'yı açıp kaynak k
 
 - Kullanıcı: "millet reklam izlemiyor, çünkü jokerleri açabiliyor, para basabiliyor; para kazanamıyorum."
 - Madde 1'deki kayıt koruması bunun ön koşulu. Ayrıca ekonomiyi gözden geçir: reklamın değeri (Hediye merdiveni, ikinci şans, coin ödülü) oyuncuya yeterince cazip mi? Bu bir tasarım kararı: önce kullanıcıya 3-4 alternatif göster (CLAUDE.md "Büyük değişiklikte önce görsel tasarım göster"), kodlama onaydan sonra. Gerçek reklam kimliği ve UMP onay formu Play üretim öncesi ayrı iş (bkz. docs/play-store-hazirlik.md).
+
+## 4. Play Console "DEX kodu optimizasyonu" önerileri (kullanıcı, 2026-10-22)
+
+- Play "kod karartma %1, R8 yapılandırması yok, en iyi performans için AGP 9.0'a yükselt ve R8'i kullan" diyor (önem: düşük, yayını engellemez). Madde 1'deki R8/minify ile birlikte yap: `android/app/build.gradle` `minifyEnabled true` + `shrinkResources`, `proguard-rules.pro` (Capacitor ve AdMob eklentisi kuralları), AGP 9.0 yükseltmesi Capacitor 8.5.3 ve Gradle 8.14.3 ile uyumlu mu önce kontrol et (uyumsuzsa AGP'yi mevcut sürümde bırak, yalnızca R8 aç); yükseltmeden sonra emülatörde tam akış (açılış, reklam, bildirim, mağaza) ve `./tools/release-aab.sh` denetimi.
+- "Bellek sayfa boyutu: 16 KB'ı destekler" yazıyor, yani bu kısım tamam; yeni AGP/eklenti sürümünde yeniden doğrula (yerel `.so` kitaplığı varsa 16 KB hizalı olmalı).
