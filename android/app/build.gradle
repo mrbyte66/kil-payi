@@ -5,16 +5,28 @@ def ksFile = rootProject.file('../../KilPayi-keys/keystore.properties')
 def ksProps = new Properties()
 if (ksFile.exists()) { ksFile.withInputStream { ksProps.load(it) } }
 
+/* V0.10.0: oyun dosyalarının mührü (bkz. Integrity.java). Sırayla: oyun (index.html) ve Capacitor ayar dosyaları; yalnızca var olanlar. `npx cap sync` bu dosyaları yazdıktan SONRA derle (tools/release*.sh böyle yapar). */
+def kpAssetSha = {
+    def md = java.security.MessageDigest.getInstance('SHA-256')
+    ['src/main/assets/public/index.html', 'src/main/assets/capacitor.config.json', 'src/main/assets/capacitor.plugins.json'].each { n ->
+        def f = file(n)
+        if (f.exists()) md.update(f.bytes)
+    }
+    return md.digest().encodeHex().toString()
+}
+
 android {
     namespace = "com.mrbytestudio.kilpayi"
     compileSdk = rootProject.ext.compileSdkVersion
+    buildFeatures { buildConfig true }
     defaultConfig {
         applicationId "com.mrbytestudio.kilpayi"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 26
-        versionName "0.9.14"
+        versionCode 27
+        versionName "0.10.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField 'String', 'ASSET_SHA256', "\"${kpAssetSha()}\""
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -33,7 +45,9 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            /* V0.10.0: R8 ile Java kodu küçültülür ve adları karıştırılır (Play "kod karartma" önerisi; yeniden paketleyenin işini zorlaştırır). Kurallar proguard-rules.pro'da, Capacitor'ın kendi kuralları kitaplıkla gelir. */
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             if (ksFile.exists()) { signingConfig signingConfigs.release }
         }

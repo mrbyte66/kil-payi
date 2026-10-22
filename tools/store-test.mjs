@@ -9,11 +9,13 @@
    - V0.9.12: oyun hissi (yakın vuruşta sarsıntı ve yavaş çekim yok, ibre hızı yumuşak: artış, yön değişimi, kum saati, ışınlanma; Cehennem parıltısı DOM katmanı; tema adımları seyrek; kapanan mağaza DOM'u boşalır),
    - V0.9.11: kapalı test bildirimleri (sahte eklentiyle: izin, kanal, planlama, tarih mantığı, tıklayınca kart, Ayarlar'da anahtar yok),
    - V0.9.10: geri tuşu giriş animasyonu sürerken de ilk dokunuşta çalışır, doğrudan girilen dükkândan geri menüye döner, oyun içi "128 / 180" hedef rozeti ve duraklat düğmesi,
+   - V0.10.0: ısınma yalnızca ilk açılışta ve örtü arkasında (ısınma grupları), imzalı kayıt (SHA-256/HMAC düğüm sonuçlarıyla aynı, kurcalama sıfırlar, eski imzasız kayıt bir kez kabul),
    - V0.9.9: mağaza ısınması (görünmez, dokunuşu engellemez, bitince eski durum, girişte/pencerede bırakılır) ve kayan cepheye dokunuş yedeği.
    Chrome yolu CHROME ortam değişkeniyle verilebilir. Hata varsa 1 ile çıkar. */
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash, createHmac } from 'node:crypto';
 import { launch } from './cdp.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -246,53 +248,54 @@ const MIG = [
 ];
 
 
-/* ısınma (V0.9.9): menü boşta kalınca mağaza görünmez oynatılır; menüye dokunuşu engellemez, bitince her şey eski hâlinde, girişte/pencerede bırakılır */
+/* ısınma (V0.10.0): YALNIZCA ilk açılışta (save.warm < 1) ve açılış ekranı gibi bir örtünün (#warmVeil) arkasında; menü ibresi her açılışta boğulmasın.
+   Örtü ilk kareden görünür, dokunuşu tutar; aşamalar ekran kartı yetişene dek ilerler; bitince save.warm yazılır, örtü solar, her şey eski hâline döner; sonraki açılışta hiç çalışmaz. */
 const WARMT = HEAD + `
+var veil=$('warmVeil'),sh=$('shop'),SS=K.SS,cs=getComputedStyle(sh);
+T('ilk açılışta örtü ilk andan itibaren görünür (save.warm yok)',veil.classList.contains('on')&&getComputedStyle(veil).display==='flex'&&S.warm===0,[veil.className,S.warm]);
+var under=function(sel){var e=document.querySelector(sel),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return h&&h.closest('#shop')?'MAĞAZA:'+h.className:(h&&h.closest('#warmVeil')?'ÖRTÜ':'ok')};
+T('örtü menü düğmelerini tutar (ısınırken yanlışlıkla oyun/mağaza açılmaz)',['#playBtn','#bagBtn','#setBtn'].every(function(s){return under(s)==='ÖRTÜ'}),['#playBtn','#bagBtn','#setBtn'].map(under));
 var t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
-T('ısınma menü boşta kalınca başladı',K.WARM.on===true,Date.now()-t0);
-var sh=$('shop'),SS=K.SS,cs=getComputedStyle(sh);
+T('ısınma menü hazır olunca başladı',K.WARM.on===true,Date.now()-t0);
 T('ısınırken mağaza görünmez ve dokunulamaz',sh.classList.contains('warm')&&!sh.classList.contains('on')&&cs.pointerEvents==='none'&&parseFloat(cs.opacity)<0.01&&cs.visibility==='visible',[sh.className,cs.opacity,cs.pointerEvents]);
-var under=function(sel){var e=document.querySelector(sel),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return h&&h.closest('#shop')?'MAĞAZA:'+h.className:'ok'};
-T('ısınırken menü düğmeleri dokunuşu alır (görünmez katman yakalamaz)',['#playBtn','#bagBtn','#setBtn'].every(function(s){return under(s)==='ok'}),['#playBtn','#bagBtn','#setBtn'].map(under));
-await sleep(1300);
+await sleep(900);
 T('ısınırken oda ve sokak gerçekten çiziliyor',document.querySelectorAll('#stHub .fc').length===4||document.querySelectorAll('#stShop .itm,#stShop .gf,#stShop .pch').length>0);
-var sawCards=false;t0=Date.now();while(!K.WARM.done&&Date.now()-t0<20000){if($('settings').classList.contains('warm')&&$('pause').classList.contains('warm'))sawCards=true;await sleep(80)}
-T('cam kartlar (Ayarlar, Duraklat...) da görünmez ısındı',sawCards);
-T('ısınma bitti',K.WARM.done===true&&K.WARM.on===false,Date.now()-t0);
-T('ısınma sonrası durum eski hâlinde',!sh.classList.contains('warm')&&!sh.classList.contains('wout')&&!sh.classList.contains('opening')&&SS.idx===0&&SS.shop==='alet'&&SS.view==='hub'&&SS.pos===0&&$('stHub').classList.contains('on')&&!$('stShop').classList.contains('on')&&$('stHub').innerHTML===''&&$('stShop').innerHTML===''&&$('stSheet').innerHTML===''&&!$('stScrim').classList.contains('on')&&!$('stBloom').classList.contains('rdy')&&['settings','book','pause','over'].every(function(i){return !$(i).classList.contains('warm')}),[sh.className,SS.idx,SS.shop,SS.view,SS.pos]);
+var sawCards=false,maxFill=0;t0=Date.now();while(!(K.WARM.done&&!K.WARM.on)&&Date.now()-t0<25000){if($('settings').classList.contains('warm')&&$('pause').classList.contains('warm'))sawCards=true;maxFill=Math.max(maxFill,parseFloat($('wvFill').style.width)||0);await sleep(60)}
+T('cam kartlar (Ayarlar, Duraklat...) da ısındı',sawCards);
+T('ısınma bitti ve ilerleme çubuğu doldu',K.WARM.done===true&&K.WARM.on===false&&maxFill>=100,[maxFill,Date.now()-t0]);
+T('bitince save.warm yazıldı (sonraki açılışta çalışmaz)',S.warm===1&&JSON.parse(localStorage.getItem('kilpayi.v1')).warm===1,S.warm);
+await sleep(500);
+T('örtü soldu ve kalktı',!veil.classList.contains('on')&&getComputedStyle(veil).display==='none',[veil.className]);
+T('ısınma sonrası durum eski hâlinde',!sh.classList.contains('warm')&&!sh.classList.contains('wout')&&!sh.classList.contains('opening')&&SS.idx===0&&SS.shop==='alet'&&SS.view==='hub'&&SS.pos===0&&$('stHub').classList.contains('on')&&!$('stShop').classList.contains('on')&&$('stHub').innerHTML===''&&$('stShop').innerHTML===''&&$('stSheet').innerHTML===''&&!$('stScrim').classList.contains('on')&&!$('stBloom').classList.contains('on'),[sh.className,SS.idx,SS.shop,SS.view,SS.pos]);
 T('ısınma sonrası menü hâlâ menü, mağaza kapalı',G.mode==='menu'&&$('menu').classList.contains('on')&&getComputedStyle(sh).visibility==='hidden'&&!SS.open);
-T('ısınma sonrası menü düğmeleri dokunuşu alır',['#playBtn','#bagBtn','#setBtn'].every(function(s){return under(s)==='ok'}));
+T('ısınma sonrası menü düğmeleri dokunuşu alır',['#playBtn','#bagBtn','#setBtn'].every(function(s){return under(s)==='ok'}),['#playBtn','#bagBtn','#setBtn'].map(under));
 $('bagBtn').click();await sleep(400);
 T('ısınma sonrası mağaza açılır',sh.classList.contains('on')&&$('stHub').querySelectorAll('.fc').length===4&&SS.view==='hub'&&SS.idx===0);
 T('ısınma bir kez çalışır, yeniden başlamaz',K.WARM.on===false&&K.WARM.done===true);
 `+TAIL;
+/* sonraki açılış: save.warm var, ısınma ve örtü hiç yok, menü ilk andan akıcı */
 const WARM2 = HEAD + `
-var t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
-T('ısınma başladı',K.WARM.on===true);
-await sleep(500);
-$('bagBtn').click();await sleep(60);
-var sh=$('shop'),SS=K.SS;
-T('girişte ısınma bırakıldı',K.WARM.on===false&&K.WARM.done===true&&!sh.classList.contains('warm'),[K.WARM.on,K.WARM.done,sh.className]);
-await sleep(500);
-T('ısınma sırasında girilen mağaza düzgün açıldı',sh.classList.contains('on')&&SS.view==='hub'&&$('stHub').querySelectorAll('.fc').length===4&&SS.idx===0&&SS.open===true,[sh.className,SS.view,SS.idx]);
-await sleep(2500);
-T('bırakılan ısınma sonradan geri gelmez',K.WARM.on===false&&!sh.classList.contains('warm')&&sh.classList.contains('on'));
+var veil=$('warmVeil');
+T('save.warm varken örtü hiç görünmez',!veil.classList.contains('on')&&getComputedStyle(veil).display==='none'&&K.WARM.done===true,[veil.className,K.WARM.done]);
+await sleep(3500);
+T('save.warm varken ısınma hiç başlamaz (menü ibresi boğulmaz)',K.WARM.on===false&&!$('shop').classList.contains('warm')&&$('stHub').innerHTML==='',[K.WARM.on,$('shop').className]);
 `+TAIL;
+/* ısınma sürerken pencere açılırsa (örtü varken kullanıcı açamaz; kod açarsa) ısınma bırakılır, bitmiş sayılmaz, kayıt yazılmaz; pencere kapanınca yeniden denenir */
 const WARM3 = HEAD + `
 var t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
 await sleep(300);
-$('setBtn').click();await sleep(1000);
-var sh=$('shop');
-T('pencere açılınca ısınma bırakıldı ve bitmiş sayılmadı',K.WARM.on===false&&K.WARM.done===false&&!sh.classList.contains('warm'),[K.WARM.on,K.WARM.done,sh.className]);
-T('bırakılınca mağaza katmanı temiz',$('stHub').innerHTML===''&&$('stShop').innerHTML==='');
+K.openSettings();await sleep(1200);
+var sh=$('shop'),veil=$('warmVeil');
+T('pencere açılınca ısınma bırakıldı, bitmiş sayılmadı, kayıt yazılmadı',K.WARM.on===false&&K.WARM.done===false&&S.warm===0&&!sh.classList.contains('warm'),[K.WARM.on,K.WARM.done,S.warm,sh.className]);
+T('bırakılınca örtü kalktı ve mağaza katmanı temiz',!veil.classList.contains('on')&&$('stHub').innerHTML===''&&$('stShop').innerHTML==='',[veil.className]);
 $('setClose').click();await sleep(300);
 t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
-T('pencere kapanınca ısınma yeniden denenir',K.WARM.on===true,Date.now()-t0);
+T('pencere kapanınca ısınma yeniden denenir',K.WARM.on===true&&veil.classList.contains('on'),Date.now()-t0);
 `+TAIL;
 const WARM4 = HEAD + `
-var t0=Date.now();while(!K.WARM.done&&Date.now()-t0<20000)await sleep(150);
-var sh=$('shop'),SS=K.SS;
-T('animasyonlar kapalıyken de ısınma bitti ve temiz',K.getRM()===true&&K.WARM.done===true&&K.WARM.on===false&&!sh.classList.contains('warm')&&SS.idx===0&&SS.view==='hub'&&SS.shop==='alet'&&$('stHub').innerHTML==='',[K.getRM(),K.WARM.done,sh.className]);
+var t0=Date.now();while(!K.WARM.done&&Date.now()-t0<25000)await sleep(150);
+var sh=$('shop'),SS=K.SS;await sleep(500);
+T('animasyonlar kapalıyken de ısınma bitti ve temiz',K.getRM()===true&&K.WARM.done===true&&K.WARM.on===false&&!sh.classList.contains('warm')&&SS.idx===0&&SS.view==='hub'&&SS.shop==='alet'&&$('stHub').innerHTML===''&&!$('warmVeil').classList.contains('on'),[K.getRM(),K.WARM.done,sh.className]);
 `+TAIL;
 /* geri (V0.9.10): giriş animasyonu sürerken (busy) geri ilk dokunuşta çalışmalı; doğrudan girilen dükkândan geri menüye döner */
 const BACKT = HEAD + `
@@ -516,6 +519,47 @@ await sleep(80);
 T('normal dokunuş (aynı öğe) bozulmadı: odaktaki cepheye dokununca dükkâna girilir',SS.busy===true||SS.view==='shop'||$('stHub').classList.contains('zoom'),[SS.busy,SS.view]);
 `+TAIL;
 
+
+/* imzalı kayıt (V0.10.0): SHA-256 ve HMAC düğümün crypto sonuçlarıyla aynı olmalı; imza metin üzerinden doğrulanır; kurcalama ekonomiyi sıfırlar, eski imzasız kayıt bir kez kabul edilir */
+const SIG_KEY = ['kilpayi', 'cam\u00b7kadran', String(0x6d58e0 ^ 0x2a1b80), 'mrbyte-studio', 'v10'].join('|');
+const nodeSig = body => createHmac('sha256', SIG_KEY).update(body).digest('hex').slice(0, 24);
+const VEC = ['', 'abc', 'a'.repeat(55), 'a'.repeat(56), 'a'.repeat(63), 'a'.repeat(64), 'a'.repeat(1000), 'ğüşiçö İıÇ · ★ 🎯', JSON.stringify({ coins: 12345.678, bests: { rahat: 1, normal: 2 }, ad: 'x'.repeat(300) })];
+const VECT = HEAD + `
+var enc=new TextEncoder(),hex=function(b){return Array.from(b,function(v){return (v<16?'0':'')+v.toString(16)}).join('')};
+var V=${JSON.stringify(VEC.map(v => ({ m: v, h: createHash('sha256').update(v).digest('hex') })))};
+var badv=V.filter(function(x){return hex(K.sha256(enc.encode(x.m)))!==x.h}).length;
+T('SHA-256 bilinen ve sınır uzunluklu girdilerde düğüm crypto ile aynı',badv===0,badv);
+var HK=${JSON.stringify([['k', 'm'], ['a'.repeat(64), 'ileti'], ['b'.repeat(100), 'x'.repeat(200)], ['anahtar', 'ğüş'] ].map(([k, m]) => ({ k, m, h: createHmac('sha256', k).update(m).digest('hex') })))};
+var badh=HK.filter(function(x){return hex(K.hmac(enc.encode(x.k),enc.encode(x.m)))!==x.h}).length;
+T('HMAC-SHA256 kısa, 64 ve uzun anahtarla düğüm crypto ile aynı',badh===0,badh);
+var m=K.sigOf('{"coins":5}');
+T('imza anahtarı ve biçimi testteki ile aynı (24 hex)',m===${JSON.stringify(nodeSig('{"coins":5}'))}&&/^[0-9a-f]{24}$/.test(m),m);
+// persist → metin üzerinden doğrulama, 150 rastgele kayıt (ondalık, Türkçe, iç içe)
+var okc=0,tot=0,rx=/,"sig":"([0-9a-f]{24})"\\}$/;
+for(var i=0;i<150;i++){S.coins=Math.floor(Math.random()*1e6)+Math.random();S.gift={n:i%6,t0:Date.now()+i};S.lang=['','tr','en'][i%3];S.bests.normal=i*7;S.tips={['ğ'+i]:1};S.test.infoAt=Math.random()*1e12;K.persist();
+ var raw=localStorage.getItem('kilpayi.v1'),mm=rx.exec(raw);tot++;
+ if(mm){var body=raw.slice(0,mm.index)+'}';if(K.sigOf(body)===mm[1]&&JSON.parse(body).coins===S.coins&&JSON.parse(raw).sg===1)okc++}}
+T('150 rastgele persist: imza metin üzerinden her seferinde tutar, kayıt geçerli JSON ve sg=1',okc===tot,[okc,tot]);
+`+TAIL;
+const sgOf = o => { const body = JSON.stringify(o); return body.slice(0, -1) + ',"sig":"' + nodeSig(body) + '"}'; };
+const base = { v: 3, sg: 1, coins: 777, lang: 'en', music: false, own: { kron: 1, kalkan: 1, steto: 0, kum: 0 }, slots: 2, equip: ['kron', 'kalkan', '', ''], tools: { steto: { n: 0, l: 1 }, kron: { n: 3, l: 1 }, kalkan: { n: 2, l: 1 }, kum: { n: 0, l: 1 } }, bests: { rahat: 0, normal: 321, usta: 0, cehennem: 0 }, gift: { n: 2, t0: Date.now() } };
+const signedOk = sgOf(base);
+const edited = signedOk.replace('"coins":777', '"coins":99999');
+const stripped = JSON.stringify(base);
+const wrongSig = JSON.stringify(base).slice(0, -1) + ',"sig":"' + '0'.repeat(24) + '"}';
+const legacy = JSON.stringify({ v: 3, coins: 555, own: { kron: 1, kalkan: 1, steto: 0, kum: 0 }, slots: 2, equip: ['kron', 'kalkan', '', ''], bests: { rahat: 0, normal: 90, usta: 0, cehennem: 0 } });
+const RESET = 'S.coins===0&&S.slots===1&&S.own.kalkan===0&&S.own.kron===1&&S.equip.join()===\'kron,,,\'&&S.bests.normal===0&&S.gift.n===0';
+const SIGT = [
+  ['imzalı kayıt aynen yüklenir', signedOk, "K.tampered()===false&&S.coins===777&&S.slots===2&&S.own.kalkan===1&&S.bests.normal===321&&S.tools.kron.n===3"],
+  ['coin metinde değiştirilince sıfırlanır', edited, "K.tampered()===true&&" + RESET],
+  ['kurcalamada ayarlar ve dil korunur', edited, "K.tampered()===true&&S.lang==='en'&&S.music===false"],
+  ['imza silinirse (sg=1) sıfırlanır', stripped, "K.tampered()===true&&" + RESET],
+  ['yanlış imza sıfırlanır', wrongSig, "K.tampered()===true&&" + RESET],
+  ['eski sürümün imzasız kaydı kabul edilir', legacy, "K.tampered()===false&&S.coins===555&&S.bests.normal===90&&S.own.kalkan===1&&S.sg===1"],
+  ['eski kayıt ilk persist\'te imzalanır', legacy, "(function(){K.persist();var raw=localStorage.getItem('kilpayi.v1'),m=/,\"sig\":\"([0-9a-f]{24})\"\\}$/.exec(raw);return !!m&&K.sigOf(raw.slice(0,m.index)+'}')===m[1]})()"],
+  ['kurcalama sonrası kayıt yeniden imzalanır (bir sonraki açılışta temiz)', edited, "(function(){var raw=localStorage.getItem('kilpayi.v1'),m=/,\"sig\":\"([0-9a-f]{24})\"\\}$/.exec(raw);return K.tampered()===true&&!!m&&K.sigOf(raw.slice(0,m.index)+'}')===m[1]&&JSON.parse(raw).coins===0})()"]
+];
+
 let bad = 0;
 const show = (name, r) => { const first = String(r).split('\n')[0]; if (!/ 0 hata/.test(first) || /İSTİSNA|ÇÖKTÜ/.test(String(r))) bad++; console.log((name + ':').padEnd(20) + String(r).replace(/\n/g, '\n' + ' '.repeat(20))); };
 const run = async (name, script, o = {}) => {
@@ -538,9 +582,15 @@ await run('geri tuşu', BACKT);
 await run('oyun hissi', FEELT, { seed: FEELSEED });
 await run('bildirimler', NOTIT, { seed: FAKECAP });
 await run('ısınma', WARMT, { warm: true });
-await run('ısınma: girişte bırakma', WARM2, { warm: true });
+await run('ısınma: sonraki açılış', WARM2, { warm: true, seed: 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify({ v: 3, warm: 1 })) + ');' });
 await run('ısınma: pencerede bırakma', WARM3, { warm: true });
 await run('ısınma: animasyonsuz', WARM4, { warm: true, seed: 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify({ v: 3, anim: false, animV: 1 })) + ');' });
+await run('imza: SHA-256/HMAC', VECT);
+for (const [name, raw, cond] of SIGT) {
+  const seed = 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(raw) + ');';
+  const post = `(async()=>{var K=window.__kp,S=K.save,ok=false,err='';try{ok=!!(${cond})}catch(e){err=String(e)}return ok?'1 tamam, 0 hata':'0 tamam, 1 hata HATA '+err+' '+JSON.stringify({t:K.tampered(),coins:S.coins,slots:S.slots,own:S.own,sg:S.sg})})()`;
+  await run('imza: ' + name, post, { seed });
+}
 for (const [name, save, cond] of MIG) {
   const seed = save === null ? '' : 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify(save)) + ');';
   const post = `(async()=>{var K=window.__kp,S=K.save,ok=false,err='';try{ok=!!(${cond})}catch(e){err=String(e)}return ok?'1 tamam, 0 hata':'0 tamam, 1 hata HATA '+err+' '+JSON.stringify({slots:S.slots,own:S.own,equip:S.equip,auto:[S.autoOwn,S.autoJ],gift:S.gift,lang:S.lang,music:S.music})})()`;

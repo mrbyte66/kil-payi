@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">Kıl payı</string>
     <string name="title_activity_main">Kıl payı</string>
+    <string name="kp_tamper_msg">Uygulamanın bu kopyası değiştirilmiş görünüyor. Güvenliğin ve güncellemeler için lütfen aslını Google Play’den yükle.</string>
+    <string name="kp_tamper_btn">Google Play’i aç</string>
+    <string name="kp_tamper_close">Kapat</string>
 </resources>

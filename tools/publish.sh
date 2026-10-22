@@ -17,7 +17,7 @@ ASSET=android/app/src/main/assets/public/index.html
 VER=$(sed -n 's/.*versionName "\(.*\)".*/\1/p' android/app/build.gradle | head -1)
 git cat-file -e "HEAD:$ASSET" 2>/dev/null || { echo "HATA: $ASSET depoda yok; ./tools/release.sh çalıştırıp commit'le"; exit 1; }
 if git show "HEAD:$ASSET" | grep -q '__kp'; then echo "HATA: depodaki paketlenmiş oyunda test kancası var"; exit 1; fi
-git show "HEAD:$ASSET" | grep -q "const VERSION = 'V$VER'" || { echo "HATA: $ASSET sürümü ($VER) ile uyuşmuyor; ./tools/release.sh çalıştırıp commit'le"; exit 1; }
+git show "HEAD:$ASSET" | grep -qE "const VERSION = 'V$VER'|<!--kp:V$VER-->" || { echo "HATA: $ASSET sürümü ($VER) ile uyuşmuyor; ./tools/release.sh çalıştırıp commit'le"; exit 1; }
 
 # html ağacı: android'in HEAD ağacından Android dosyalarını çıkar, README'yi HTML sürümüyle değiştir
 EXCL="android capacitor.config.ts package.json package-lock.json tools/release.sh tools/publish.sh tools/branches CLAUDE.md"

@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# ---- Kıl payı (V0.10.0): R8 etkin ----
+# Capacitor eklentileri sınıf adlarıyla ve yansımayla yüklenir (capacitor.plugins.json): sınıflar ve @PluginMethod yöntemleri korunur.
+-keep @com.getcapacitor.annotation.CapacitorPlugin public class * {
+    @com.getcapacitor.annotation.PermissionCallback <methods>;
+    @com.getcapacitor.annotation.ActivityCallback <methods>;
+    @com.getcapacitor.annotation.Permission <methods>;
+    @com.getcapacitor.PluginMethod public <methods>;
+}
+-keep public class * extends com.getcapacitor.Plugin { *; }
+-keep class com.getcapacitor.** { *; }
+-keep class com.getcapacitor.community.admob.** { *; }
+-keep class com.capacitorjs.plugins.** { *; }
+# WebView'e açılan JavaScript köprüsü
+-keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }
+# Çökme raporlarında satır numaraları kalsın (Play Console eşlemeyi AAB ile birlikte alır)
+-keepattributes SourceFile,LineNumberTable,*Annotation*,Signature,InnerClasses,EnclosingMethod
+-renamesourcefileattribute SourceFile

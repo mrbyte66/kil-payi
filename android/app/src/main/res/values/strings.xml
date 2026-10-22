@@ -4,4 +4,7 @@
     <string name="title_activity_main">Close Call</string>
     <string name="package_name">com.mrbytestudio.kilpayi</string>
     <string name="custom_url_scheme">com.mrbytestudio.kilpayi</string>
+    <string name="kp_tamper_msg">This copy of the app looks modified. For your safety and to get updates, please install the original from Google Play.</string>
+    <string name="kp_tamper_btn">Open Google Play</string>
+    <string name="kp_tamper_close">Close</string>
 </resources>

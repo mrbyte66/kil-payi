@@ -1,9 +1,14 @@
 package com.mrbytestudio.kilpayi;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.WindowManager;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -12,6 +17,33 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestHighRefreshRate();
+        checkIntegrity();
+    }
+
+    /* V0.10.0: oyun dosyaları değiştirilmiş mi (bkz. Integrity)? Denetim arka planda yapılır (açılışı yavaşlatmaz, ana iş parçacığını tutmaz). */
+    private void checkIntegrity() {
+        final Context app = getApplicationContext();
+        new Thread(() -> {
+            if (!Integrity.assetsIntact(app)) runOnUiThread(this::showTampered);
+        }, "kp-check").start();
+    }
+
+    private void showTampered() {
+        if (isFinishing()) return;
+        try {
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.kp_tamper_msg)
+                .setCancelable(false)
+                .setPositiveButton(R.string.kp_tamper_btn, (d, w) -> {
+                    try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()))); } catch (Exception e) { /* Play yok */ }
+                    finishAffinity();
+                })
+                .setNegativeButton(R.string.kp_tamper_close, (d, w) -> finishAffinity())
+                .show();
+        } catch (Exception e) {
+            finishAffinity();
+        }
     }
 
     @Override

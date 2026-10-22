@@ -19,6 +19,10 @@ node tools/check-strings.mjs
 # Test yardımcıları (bot.js, kp-*.js, index-en.html vb.) www/ içinde unutulmuş olabilir; yayına yalnızca index.html ve fonts/ girer.
 find www -mindepth 1 -maxdepth 1 ! -name index.html ! -name fonts -exec rm -rf {} +
 if grep -q '__kp' www/index.html; then echo "HATA: yayın derlemesinde test kancası var"; exit 1; fi
+# V0.10.0: oyun kodu karıştırılır (okunmaz hâle gelir) ve duman testinden geçirilir; kancayı yukarıda, karıştırmadan ÖNCE denetledik (sonra metinler kodlanmış olur).
+node tools/protect.mjs www/index.html
+node tools/smoke-release.mjs
+if grep -q 'Not your job' www/index.html; then echo "HATA: karıştırma çalışmadı (oyun metinleri düz görünüyor)"; exit 1; fi
 npx cap sync android > /dev/null
 (cd android && ./gradlew assembleDebug -q)
 

@@ -732,6 +732,14 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop.warm *{pointer-events:none!important;animation-play-state:running!important}
 #shop.warm .stg{animation:stIn .85s cubic-bezier(.16,1,.3,1) backwards}
 #shop.warm.wout .stg{animation:stOut .36s cubic-bezier(.45,0,.8,.5) both}
+/* ilk açılış örtüsü (V0.10.0): mağaza ısınması yalnızca ilk açılışta, bu örtünün arkasında yapılır (açılış ekranının devamı gibi görünür); sonraki açılışlarda hiç çıkmaz */
+#warmVeil{position:absolute;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:0 40px;text-align:center;color:#fff;background:radial-gradient(120% 85% at 50% 30%,#B7A8FF 0,#6D58E0 50%,#2A1B80 100%);transition:opacity .28s ease}
+#warmVeil.on{display:flex}
+#warmVeil.out{opacity:0;pointer-events:none}
+#warmVeil svg{width:132px;height:132px;filter:none}
+#warmVeil p{margin:0;font:600 15px/1.4 Nunito,sans-serif;opacity:.92;max-width:260px}
+.wvBar{width:150px;height:6px;border-radius:3px;background:rgba(255,255,255,.28);overflow:hidden}
+.wvBar i{display:block;height:100%;width:0;background:#FFC48A;border-radius:3px;transition:width .3s ease}
 /* mağaza ilk açılırken (opening sınıfı ~1,5 sn): başlık yukarıdan iner, cepheler sırayla yükselir, buton zıplayarak gelir, alt şerit aşağıdan çıkar */
 @keyframes stDrop{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:none}}
 @keyframes stUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:none}}
@@ -933,6 +941,11 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
     </div>
   </section>
 
+  <div id="warmVeil" aria-hidden="true">
+    <svg viewBox="18 18 72 72" aria-hidden="true"><defs><radialGradient id="wv_bez" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C9BEFF"/></radialGradient><radialGradient id="wv_glass" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#5A44C8"/><stop offset="1" stop-color="#2A1B80"/></radialGradient><linearGradient id="wv_liq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC48A"/><stop offset="1" stop-color="#FF6B3A"/></linearGradient><clipPath id="wv_clip"><circle cx="54" cy="52" r="22.5"/></clipPath></defs><circle cx="54" cy="52" r="31" fill="url(#wv_bez)"/><circle cx="54" cy="52" r="26.5" fill="#6D58E0"/><circle cx="54" cy="52" r="22.5" fill="url(#wv_glass)"/><g clip-path="url(#wv_clip)"><path d="M28 54C36 47 43 61 54 54S71 47 80 54V80H28Z" fill="url(#wv_liq)"/></g><path d="M54 52L66.7 37.9" stroke="#FFFFFF" stroke-width="3.8" stroke-linecap="round"/><circle cx="66.7" cy="37.9" r="4.6" fill="#FFFFFF"/><circle cx="66.7" cy="37.9" r="1.8" fill="#FF7D43"/><circle cx="54" cy="52" r="4.2" fill="#FFFFFF"/></svg>
+    <p id="wvTxt" data-i18n="warmMsg"></p>
+    <div class="wvBar" aria-hidden="true"><i id="wvFill"></i></div>
+  </div>
   <canvas id="cv2" aria-hidden="true"></canvas>
   <div class="toast" id="toast" role="status"></div>
   <div class="sr" id="live" aria-live="polite"></div>
@@ -1216,6 +1229,8 @@ const STR = {
     adBadge: 'Reklam (demo)', adText: 'Gerçek sürümde burada kısa bir video oynar. Bitince ödülün hazır.', adWait: 'Ödülün hazırlanıyor…',
     adBadgeReal: 'Reklam', adLoading: 'Reklam hazırlanıyor, birazdan başlayacak.', adFail: 'Reklam şu an yüklenemedi. Biraz sonra tekrar dene.',
     notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', coinShort: 'Yeterli coin yok.', sound: 'Ses', score: 'puan', pauseBtn: 'Duraklat',
+    warmMsg: 'Oyun cihazına hazırlanıyor… (yalnızca ilk açılışta)',
+    saveReset: 'Kayıt dosyası değiştirilmiş görünüyor, sıfırlandı.',
     ntChan: 'Test bildirimleri', ntChanD: 'Kapalı test sürecindeki günlük duyurular', ntInfoT: 'Kapalı test başladı', ntInfoB: '{m} gün boyunca günde iki kez haber vereceğiz. Teşekkürler!', ntDayT: 'Kıl payı · Gün {d}/{m}',
     ntA0: 'Günaydın! Test için teşekkürler. Bugün rekoru zorlayalım mı?', ntA1: 'Günaydın! Bir tur oynayıp kıl payı kurtulmaya ne dersin?', ntA2: 'Teşekkürler! Bugün kaç puan yapacaksın?', ntA3: 'Yeni gün, yeni rekor şansı. Bir tur oyna!', ntA4: 'Refleksler sabah daha keskin. Bir tur?', ntA5: 'Testimize katıldığın için teşekkürler! Bugün de bir tur oyna.',
     ntB0: 'Bugün henüz oynamadın. Bir tur, kıl payı bile olsa!', ntB1: 'Rekorun seni bekliyor. Gel, bir tur oyna!', ntB2: 'Kısa bir mola mı? Bir tur Kıl payı iyi gider.', ntB3: 'Bugünün turunu unutma. Teşekkürler!', ntB4: 'Bir tur oyna, test sayacına bir gün daha ekle.', ntB5: 'İbre seni bekliyor. Bir tur oynar mısın?',
@@ -1327,6 +1342,8 @@ const STR = {
     adBadge: 'Ad (demo)', adText: 'In the real version a short video plays here. Your reward is ready when it ends.', adWait: 'Preparing your reward…',
     adBadgeReal: 'Ad', adLoading: 'Getting your ad ready, it starts in a moment.', adFail: "The ad couldn't load right now. Try again in a moment.",
     notEnough: 'Not enough coins. Watch an ad to keep going.', coinShort: 'Not enough coins.', sound: 'Sound', score: 'pts', pauseBtn: 'Pause',
+    warmMsg: 'Getting the game ready for your device… (first launch only)',
+    saveReset: 'Your save file looks modified, so it was reset.',
     ntChan: 'Test notifications', ntChanD: 'Daily updates during the closed test', ntInfoT: 'Closed test started', ntInfoB: "We'll check in twice a day for {m} days. Thanks!", ntDayT: 'Close call · Day {d}/{m}',
     ntA0: 'Good morning! Thanks for testing. Shall we chase the record today?', ntA1: 'Good morning! How about a round and a close call?', ntA2: 'Thank you! How many points will you score today?', ntA3: 'New day, new shot at the record. Play a round!', ntA4: 'Reflexes are sharper in the morning. One round?', ntA5: 'Thanks for joining our test! Play a round today too.',
     ntB0: "You haven't played yet today. Just one round!", ntB1: 'Your record is waiting. Come play a round!', ntB2: 'Quick break? A round of Close call fits right in.', ntB3: "Don't forget today's round. Thank you!", ntB4: 'Play a round and add one more day to the test counter.', ntB5: 'The needle is waiting. Play a round?',
@@ -1481,20 +1498,65 @@ const pickLine = (k, sub) => {
 const praiseKey = c => MILESTONES.indexOf(c) >= 0 ? c : (c > 100 && c % 25 === 0 ? 100 : 0);
 const toolDesc = (id, n) => { const k = 'd_' + id + '1'; return n === 1 && STR[LANG][k] ? t(k) : t('d_' + id, { n }); };
 
+/* ---------- kayıt imzası (V0.10.0) ----------
+   Kapalı testte bir testçi oyunu değiştirip jokerleri açtı; reklam izlenmemesinin sebebi de kayda kolayca coin/joker yazılabilmesi. Kayıt artık kendi içinde bir imza taşır (HMAC-SHA256, anahtar kodda gömülü ve karıştırılmış):
+   `{...alanlar...,"sig":"<24 hex>"}`; imza, ondan önceki metnin (JSON.stringify çıktısının) kendisi üzerinden hesaplanır, yeniden biçimlendirme riski yoktur.
+   Yüklerken imza yoksa ama kayıtta sg=1 varsa ya da imza tutmuyorsa kayıt kurcalanmıştır: ekonomi alanları (coin, joker, yuva, hediye, rekorlar, yarım oyun) sıfırlanır, ayarlar ve dil korunur.
+   Eski sürümün imzasız kaydı (sg yok) bir kez kabul edilir ve ilk persist'te imzalanır. Anahtar cihaza bağlı DEĞİLDİR (Android otomatik yedeği başka telefona taşıyabilsin). Tam koruma değil, kolay hileyi zorlaştırır. */
+const SHA_K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+const sha256 = bytes => {
+  const l = bytes.length, n = (((l + 8) >> 6) + 1) << 6;
+  const m = new Uint8Array(n); m.set(bytes); m[l] = 0x80;
+  const dv = new DataView(m.buffer); dv.setUint32(n - 4, (l << 3) >>> 0); dv.setUint32(n - 8, Math.floor(l / 0x20000000));
+  let h = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  const w = new Uint32Array(64);
+  for (let o = 0; o < n; o += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
+    for (let i = 16; i < 64; i++) {
+      const x = w[i - 15], y = w[i - 2];
+      w[i] = (w[i - 16] + (((x >>> 7) | (x << 25)) ^ ((x >>> 18) | (x << 14)) ^ (x >>> 3)) + w[i - 7] + (((y >>> 17) | (y << 15)) ^ ((y >>> 19) | (y << 13)) ^ (y >>> 10))) | 0;
+    }
+    let a = h[0], b = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], q = h[7];
+    for (let i = 0; i < 64; i++) {
+      const t1 = (q + (((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7))) + ((e & f) ^ (~e & g)) + SHA_K[i] + w[i]) | 0;
+      const t2 = ((((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10))) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      q = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    h = [(h[0] + a) | 0, (h[1] + b) | 0, (h[2] + c) | 0, (h[3] + d) | 0, (h[4] + e) | 0, (h[5] + f) | 0, (h[6] + g) | 0, (h[7] + q) | 0];
+  }
+  const out = new Uint8Array(32), ov = new DataView(out.buffer);
+  h.forEach((v, i) => ov.setUint32(i * 4, v >>> 0));
+  return out;
+};
+const hmac = (key, msg) => {
+  const k = key.length > 64 ? sha256(key) : key, ip = new Uint8Array(64 + msg.length), op = new Uint8Array(96);
+  ip.fill(0x36, 0, 64); op.fill(0x5c, 0, 64);
+  for (let i = 0; i < k.length; i++) { ip[i] ^= k[i]; op[i] ^= k[i]; }
+  ip.set(msg, 64); op.set(sha256(ip), 64);
+  return sha256(op);
+};
+const SIG_KEY = ['kilpayi', 'cam\u00b7kadran', String(0x6d58e0 ^ 0x2a1b80), 'mrbyte-studio', 'v10'].join('|');
+const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(enc.encode(SIG_KEY), enc.encode(body)).subarray(0, 12), v => (v < 16 ? '0' : '') + v.toString(16)).join(''); };
+let saveTampered = false;
+
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.9.14';
+const VERSION = 'V0.10.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
   tools: { steto: { n: 0, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } },
   /* Mağaza (V0.9.2): açık jokerler, açık yuva sayısı, yuvalardaki jokerler, Otomatik joker yeteneği, Hediye (reklam) basamağı ve bekleme bitişi */
   own: { kron: 1 }, slots: 1, equip: ['kron', '', '', ''], autoOwn: false, gift: { n: 0, t0: 0 },
-  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, intro: {}, test: null, v: 3
+  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, intro: {}, test: null, warm: 0, sg: 1, v: 3
 };
 try {
   const raw = localStorage.getItem('kilpayi.v1');
   if (raw) {
-    const o = JSON.parse(raw);
+    let body = raw;
+    const sm = /,"sig":"([0-9a-f]{24})"\}$/.exec(raw);
+    if (sm) { body = raw.slice(0, sm.index) + '}'; if (sigOf(body) !== sm[1]) saveTampered = true; }
+    const o = JSON.parse(body);
+    if (!sm && o && o.sg === 1) saveTampered = true;                  /* imza silinmiş */
     Object.keys(save).forEach(k => { if (o && o[k] !== undefined) save[k] = o[k]; });
     if (o && !o.bests && typeof o.best === 'number') save.bests = { rahat: 0, normal: o.best | 0, usta: 0 };
     /* V0.4.1'e geçiş: eski kayıtta her jokerden en az 2 olsun, her seferinde bir kez */
@@ -1502,7 +1564,14 @@ try {
     /* V0.9.2'ye geçiş: mağaza öncesi kayıtta dört joker ve dört yuva zaten kullanımdaydı, açık kalır (elindekini kimse kaybetmez); yeni kurulumda yalnızca Kronometre ve tek yuva vardır. */
     if (!(o && o.v >= 3)) { save.own = { steto: 1, kron: 1, kalkan: 1, kum: 1 }; save.slots = 4; save.equip = ['steto', 'kron', 'kalkan', 'kum']; }
   }
-  save.v = 3;
+  save.v = 3; save.sg = 1;
+  if (saveTampered) {
+    /* kurcalanmış kayıt: ekonomi ve ilerleme sıfırlanır; ayarlar, dil, kapalı test sayacı, ısınma durumu ve görülmüş tanıtımlar korunur */
+    save.coins = 0; save.runs = 0; save.bests = { rahat: 0, normal: 0, usta: 0, cehennem: 0 };
+    save.tools = { steto: { n: 0, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } };
+    save.own = { kron: 1 }; save.slots = 1; save.equip = ['kron', '', '', '']; save.autoOwn = false; save.autoJ = false; save.gift = { n: 0, t0: 0 };
+    save.unl = {}; save.low = 0; save.high = 0; save.highU = 0; save.camp = 1; save.bestL = 0; save.run = null; save.book = {};
+  }
 } catch (e) {}
 if (!save.book || typeof save.book !== 'object') save.book = {};
 if (!save.intro || typeof save.intro !== 'object') save.intro = {};
@@ -1525,7 +1594,7 @@ save.music = save.music !== false;
 /* V0.9.7: kullanıcı "animasyonlar varsayılan olarak açık gelsin" dedi: önceki sürümlerde denerken kapatılmış olabilir, güncellemede bir kez açılır (sonra seçimi korunur) */
 if (save.animV !== 1) { save.anim = true; save.animV = 1; }
 save.anim = save.anim !== false; applyMotion();
-save.low = save.low | 0; save.high = save.high | 0; save.highU = save.highU | 0;
+save.low = save.low | 0; save.high = save.high | 0; save.highU = save.highU | 0; save.warm = save.warm | 0;
 save.camp = Math.max(1, save.camp | 0); save.bestL = save.bestL | 0;
 const LV = () => LEVEL[save.lvl];
 const bestNow = () => save.bests[save.lvl];
@@ -1544,7 +1613,7 @@ if (save.gift.t0 === undefined) { save.gift.n = 0; save.gift.t0 = 0; }
 delete save.gift.t;
 save.gift.n = clamp(save.gift.n | 0, 0, 5); save.gift.t0 = +save.gift.t0 || 0;
 if (save.gift.n >= 5 && !save.gift.t0) save.gift.n = 0;
-const persist = () => { try { localStorage.setItem('kilpayi.v1', JSON.stringify(save)); } catch (e) {} };
+const persist = () => { try { const body = JSON.stringify(save); localStorage.setItem('kilpayi.v1', body.slice(0, -1) + ',"sig":"' + sigOf(body) + '"}'); } catch (e) {} };
 
 /* ---------- mağaza ekonomisi (V0.9.2) ----------
    Bir Normal oyun ≈ 85 coin kazandırır; açılışlar kasten pahalıdır (hepsi birkaç saatlik oyun).
@@ -3941,19 +4010,32 @@ const storeBack = () => {
   closeShop();
 };
 
-/* ---------- ısınma (V0.9.9) ----------
-   Kullanıcı: "ilk mağazaya girişte ve ilk İçeri gir'de kasıyor, bazı ilk dokunuşlar kasıyor, sonrakiler akıcı." Emülatör izinde ana iş parçacığı ilk girişte ikincisinden ağır değildi;
-   fark ekran kartı tarafında: her efekt (degrade, gölge, bulanıklık, yazı) ilk kullanımda derlenir/hazırlanır, katmanlar ilk kez açılır, harfler ilk kez atlasa işlenir.
-   Çözüm: menü ilk kez ~1,3 sn boşta kalınca mağaza (açılış, giriş yakınlaşması ve ışık, dört dükkân, fiş, seçici, kaydırma, çıkış) menünün üstünde GÖRÜNMEZ (opaklık 0,006, dokunuşa kapalı)
-   bir kez baştan sona oynatılır. Kullanıcı bu sırada mağazaya girerse (openShop) ısınma hemen bırakılır; oyun başlarsa/pencere açılırsa bir sonraki adımda bırakılır ve sonraki boşta yeniden denenir. */
-const WARM = { on: false, done: false, tm: [], keep: null, ok: 0, iv: 0 };
+/* ---------- ısınma (V0.9.9, V0.10.0'da yeniden yazıldı) ----------
+   Sorun: mağazadaki her efekt (degrade, gölge, bulanıklık, yazı) ekran kartında ilk kullanımda derlenir; ilk girişte kasma bundandı.
+   V0.9.9 çözümü menü boştayken mağazayı görünmez oynatmaktı AMA bu menünün dönen ibresini her açılışta 5-6 sn boğuyordu (ölçüm: 300-2000 ms'lik kare kayıpları; kullanıcı "ana ekranda şeftali dönerken donuyor").
+   V0.10.0: ısınma yalnızca İLK açılışta (save.warm < WARM_EPOCH; derlenen programlar cihazda kalıcı önbelleğe yazılır) ve açılış ekranının devamı gibi görünen bir örtünün (#warmVeil) arkasında çalışır;
+   aşamalar gerçek zamana bağlı değil, ekran kartı yetişene dek (art arda iki kare < 34 ms) beklenerek ilerler, toplam en çok WARM_CAP; bitince ya da sınırda save.warm yazılır ve örtü solar.
+   Örtü dokunuşu tutar; oyun/pencere/uygulama arka plana giderse ısınma bırakılır ve bir sonraki açılışta yeniden denenir. */
+const WARM_EPOCH = 1, WARM_CAP = 8000;
+const WARM = { on: false, done: false, keep: null, ok: 0, iv: 0, gen: 0, t0: 0 };
+const warmVeilEl = $('warmVeil'), wvFill = $('wvFill');
+WARM.done = (save.warm | 0) >= WARM_EPOCH || !!window.NO_WARM;
 const warmOk = () => G.mode === 'menu' && !SS.open && !SS.closing && !document.hidden && !G.practice && menuEl.classList.contains('on') &&
   !settingsEl.classList.contains('on') && !bookEl.classList.contains('on') && !adEl.classList.contains('on') && !$('swap').classList.contains('on') && !$('testInfo').classList.contains('on');
 const WARM_CARDS = ['settings', 'book', 'pause', 'over'];
+const warmVeil = on => {
+  if (on) { warmVeilEl.classList.remove('out'); warmVeilEl.classList.add('on'); warmVeilEl.removeAttribute('aria-hidden'); wvFill.style.width = '0%'; }
+  else if (warmVeilEl.classList.contains('on')) {
+    warmVeilEl.classList.add('out'); warmVeilEl.setAttribute('aria-hidden', 'true');
+    setTimeout(() => { if (!WARM.on) warmVeilEl.classList.remove('on', 'out'); }, RM ? 0 : 320);
+  }
+};
+if (!WARM.done) warmVeil(true);                                                  /* ilk açılış: örtü ilk kareden itibaren, menü hiç görünmez */
+setTimeout(() => { if (!WARM.on && !WARM.done) warmVeil(false); }, 5000);       /* ısınma hiç başlayamazsa örtü takılı kalmaz (sonraki açılışta yeniden denenir) */
 const warmStop = done => {
   if (done) WARM.done = true;
   if (!WARM.on) return;
-  WARM.on = false; WARM.tm.forEach(clearTimeout); WARM.tm = [];
+  WARM.on = false; WARM.gen++;
   WARM_CARDS.forEach(id => $(id).classList.remove('warm'));
   shopEl.classList.remove('warm', 'wout', 'opening');
   stHub.classList.remove('zoom', 'ent'); stBloom.classList.remove('on', 'out', 'rdy');
@@ -3962,36 +4044,53 @@ const warmStop = done => {
   SS.shop = k.shop; SS.idx = k.idx; SS.pos = k.pos; SS.view = 'hub'; SS.stagger = false; SS.quick = false; SS.pop = [];
   stHub.classList.add('on'); stShop.classList.remove('on');
   stHub.innerHTML = ''; stShop.innerHTML = ''; stSheet.innerHTML = '';
+  warmVeil(false);
 };
-const warmAt = (ms, fn) => { WARM.tm.push(setTimeout(() => { if (!WARM.on) return; if (!warmOk()) { warmStop(false); return; } fn(); }, ms)); };
-const warmStore = () => {
+const warmWait = ms => new Promise(r => setTimeout(r, ms));
+/* en az `min` ms bekler, sonra ekran kartı yetişene (art arda iki kare 34 ms altında) ya da en çok `max` ms dolana dek */
+const warmSettle = async (gen, min, max) => {
+  const t0 = performance.now(); await warmWait(min);
+  let good = 0, last = performance.now();
+  while (gen === WARM.gen && WARM.on && performance.now() - t0 < max && good < 2) {
+    await Promise.race([new Promise(r => requestAnimationFrame(r)), warmWait(120)]);
+    const n = performance.now(); good = n - last < 34 ? good + 1 : 0; last = n;
+  }
+};
+const WARM_STAGES = [
+  [450, () => { shopEl.classList.add('warm'); if (!RM) shopEl.classList.add('opening'); renderHub(false); showView('hub'); }],      /* mağazaya giriş: sahne yakınlaşması, cepheler, başlık, dock */
+  [300, () => { shopEl.classList.remove('opening'); if (RM) return; const f = stHub.querySelector('.fc[data-s="alet"]'); if (f) f.classList.add('sel'); stHub.classList.add('zoom'); stBloom.classList.add('rdy'); void stBloom.offsetWidth; stBloom.classList.add('on'); }],   /* dükkâna giriş: cephe yakınlaşır, ışık yayılır */
+  [220, () => { stBloom.classList.add('out'); stBloom.classList.remove('on'); shopGo('alet'); }],                                  /* oda ışığın altında belirir */
+  [200, () => { stHub.classList.remove('zoom'); stBloom.classList.remove('out', 'rdy'); itemSheet('kron'); }],                     /* kağıt fiş */
+  [180, () => chooser(0)],                                                                                                         /* yuva seçici */
+  [180, () => { closeSheet(); shopGo('yet'); }],
+  [180, () => shopGo('gor')],
+  [300, () => shopGo('hed')],                                                                                                      /* en ağır oda: kadran, balon, konfeti, hediye kutusu */
+  [180, () => { showView('hub'); pagerTo(1, 160); }],                                                                              /* geri dönüş ve kaydırma animasyonu */
+  [220, () => { pagerTo(0, 160); shopEl.classList.add('wout'); }],                                                                 /* çıkış */
+  [220, () => WARM_CARDS.forEach(id => $(id).classList.add('warm'))]                                                               /* Ayarlar, Kilit defteri, Duraklat, Oyun sonu kartları: bulanık arka plan (backdrop-filter) */
+];
+const warmStore = async () => {
   if (WARM.on || WARM.done || window.NO_WARM || !warmOk()) return;
-  WARM.on = true; WARM.keep = { shop: SS.shop, idx: SS.idx, pos: SS.pos };
+  const gen = ++WARM.gen;
+  WARM.on = true; WARM.t0 = performance.now(); WARM.keep = { shop: SS.shop, idx: SS.idx, pos: SS.pos };
+  warmVeil(true);
   fitStore(); SS.idx = 0; SS.pop = [];
-  shopEl.classList.add('warm'); if (!RM) shopEl.classList.add('opening');
-  renderHub(false); showView('hub');                                                       /* mağazaya giriş: sahne yakınlaşması, cepheler, başlık, dock */
-  warmAt(1000, () => {                                                                     /* dükkâna giriş: cephe yakınlaşır, ışık yayılır */
-    shopEl.classList.remove('opening');
-    if (RM) return;
-    const f = stHub.querySelector('.fc[data-s="alet"]');
-    if (f) f.classList.add('sel');
-    stHub.classList.add('zoom'); stBloom.classList.add('rdy'); void stBloom.offsetWidth; stBloom.classList.add('on');
-  });
-  warmAt(1500, () => { stBloom.classList.add('out'); stBloom.classList.remove('on'); shopGo('alet'); });   /* oda ışığın altında belirir */
-  warmAt(2100, () => { stHub.classList.remove('zoom'); stBloom.classList.remove('out', 'rdy'); itemSheet('kron'); });   /* kağıt fiş */
-  warmAt(2700, () => chooser(0));                                                          /* yuva seçici */
-  warmAt(3300, () => { closeSheet(); shopGo('yet'); });
-  warmAt(3800, () => shopGo('gor'));
-  warmAt(4300, () => shopGo('hed'));                                                       /* en ağır oda: kadran, balon, konfeti, hediye kutusu */
-  warmAt(5000, () => { showView('hub'); pagerTo(1, 160); });                               /* geri dönüş ve kaydırma animasyonu */
-  warmAt(5400, () => { pagerTo(0, 160); shopEl.classList.add('wout'); });                  /* çıkış */
-  warmAt(5800, () => WARM_CARDS.forEach(id => $(id).classList.add('warm')));              /* Ayarlar, Kilit defteri, Duraklat, Oyun sonu kartları: bulanık arka plan (backdrop-filter) ilk kez burada hazırlanır */
-  warmAt(6400, () => warmStop(true));
+  for (let i = 0; i < WARM_STAGES.length; i++) {
+    if (gen !== WARM.gen || !WARM.on) return;                                    /* dışarıdan bırakıldı */
+    if (!warmOk()) { warmStop(false); return; }
+    if (performance.now() - WARM.t0 > WARM_CAP) break;                           /* yavaş cihaz: kalanı ilk kullanımda derlenir */
+    try { WARM_STAGES[i][1](); } catch (e) { /* bir aşama hata verirse ısınma sürer */ }
+    wvFill.style.width = Math.round((i + 1) / WARM_STAGES.length * 100) + '%';
+    await warmSettle(gen, WARM_STAGES[i][0], 900);
+  }
+  if (gen !== WARM.gen || !WARM.on) return;
+  save.warm = WARM_EPOCH; persist();
+  warmStop(true);
 };
 const warmWatch = () => {
   if (WARM.done) { clearInterval(WARM.iv); return; }
   if (WARM.on) return;
-  if (warmOk() && (!document.fonts || document.fonts.status !== 'loading')) { if (++WARM.ok >= 2) { WARM.ok = 0; warmStore(); } } else WARM.ok = 0;
+  if (warmOk() && (!document.fonts || document.fonts.status !== 'loading')) warmStore();
 };
 
 /* ---------- ayarlar (V0.9.2): ses, titreşim, otomatik joker, dil; menüdeki çanta satırı ---------- */
@@ -5690,6 +5789,7 @@ $('tiPlay').addEventListener('click', () => { Snd.unlock(); hide($('testInfo'));
 
 /* ---------- açılış ---------- */
 applyI18n(); refreshLevel(); refreshStats();
+if (saveTampered) { persist(); setTimeout(() => toast(t('saveReset')), 1800); }   /* kurcalanmış kayıt sıfırlandı: yeniden imzala ve kısaca haber ver */
 resize();
 if (window.ResizeObserver) new ResizeObserver(resize).observe(app); else window.addEventListener('resize', resize);
 if (document.fonts && document.fonts.load) {
@@ -5702,7 +5802,8 @@ WARM.iv = setInterval(warmWatch, 650);
 {
   const LNP = plugin('LocalNotifications');
   if (LNP) { try { LNP.addListener('localNotificationActionPerformed', () => showTestInfo()); } catch (e) {} }
-  setTimeout(testSync, 1500);
+  /* ilk açılışta sistem izin penceresi ısınma örtüsünün üstüne düşmesin: örtü kalkana kadar beklenir (en çok ~20 sn) */
+  { let n = 0; const kick = () => { if (warmVeilEl.classList.contains('on') && n++ < 40) setTimeout(kick, 500); else testSync(); }; setTimeout(kick, 1500); }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) testSync(); });
 }
 const AppP = plugin('App'), StatusP = plugin('StatusBar');
