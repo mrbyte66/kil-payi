@@ -3,6 +3,15 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.10.3 — Güvenlik raporunun gerçek maddeleri kapatıldı (2026-10-22)
+
+- **Arkadaşın tersine mühendislik raporu değerlendirildi** (ayrıntı `docs/guvenlik-raporu.md`). Rapordaki maddeler tek tek APK ve kaynağa karşı doğrulandı: bir kısmı gerçek ve kapatıldı, bir kısmı yanlış çıktı, büyük kısmı çevrimdışı ve sunucusuz bir oyunun doğası (şifre anahtarı, kayıt imzası, bütünlük denetimi ve ekonomi istemcide durmak zorunda; kararlı biri hepsini değiştirebilir). Bunlar yalnızca sunucuyla çözülür, "sunucu yok" kuralımıza ters olduğu için yapılmadı.
+- **Kapatılanlar**: (1) yayın derlemesinde "reklam gösterilmeden ödül" (sahte reklam) yolu tamamen kaldırıldı; (2) Capacitor şablonundaki, dış depolamanın tamamını paylaşılabilir yapan FileProvider kaldırıldı; (3) WebView sertleştirildi: konum, dosya ve içerik erişimi, otomatik pencere açma, karışık içerik kapalı, yalnızca kendi yerel sayfasına gezinilebiliyor (menü müziği için otomatik oynatma izni bilerek açık kaldı); (4) yedekleme açık kalıyor (yeni telefona ilerleme gelsin) ama kuralları açıkça tanımlandı, cihaza özgü önbellekler yedeğe girmiyor; (5) bütünlük ve şifre çözme hataları günlüğe yazılıyor; (6) şifreli paket hiç açılamazsa boş mor ekran yerine kısa bir açıklama çıkıyor; (7) pakete giren `version-control-info.textproto` ve açık olmayan çıplak bağlantı ayarı temizlendi; (8) "SecureWebView/SecureAssets" adları yanıltıcıydı, `GameWebView/GameAssets` oldu (işlevleri aynı).
+- **Raporun yanlış çıkan iddiaları**: reklam kimliklerinin "test modu kapalı" olduğu (açık, reklamda "Test Ad" yazıyor), yazı tiplerinin şifresiz olduğu (V0.10.1'den beri hepsi şifreli), uygulama adının tutarsız olduğu (ad dile göre: Kıl payı / Close Call).
+- **Bilinçli olarak yapılmadı**: bütünlük denetimini "hatada kilitle" yapmak (meşru oyuncuyu cezalandırır) ve anahtarı parçalamak/denetimi çoğaltmak gibi ek gizleme katmanları (bu raporun yazarını dakikalar kadar yavaşlatır, gerçek koruma değildir).
+- **Hâlâ bekleyen**: gerçek AdMob uygulama ve reklam birimi kimlikleri (şimdilik Google test kimlikleri; kullanıcının AdMob hesabı açılınca).
+- Teknik: `GameWebViewClient.shouldOverrideUrlLoading`, `MainActivity.hardenWebView`, `build.sh` `DEMO_ADS`, `res/xml/backup_rules.xml` ve `data_extraction_rules.xml`, `AndroidManifest.xml`, `build.gradle` `vcsInfo`, `tools/encrypt-assets.mjs` yedek sayfa mesajı.
+
 ## V0.10.2 — Mağazada ilk dokunuş artık kaybolmuyor (2026-10-22)
 
 - **Mağazada "İçeri gir" ve alt şerit butonlarına ilk dokunuşta tepki vermeme düzeltildi** (kullanıcı: "mağazada İçeri gir butonlarına, alttaki butonlara 1 kere tıklayınca çalışmıyor, bazı caselerde"; ilk kez V0.9.9'da gelmişti, "yine"). Neden bulundu ve ölçüldü (başsız Chrome'da gerçek dokunuş benzetimi, parmağın basma-kayma-kalkma hâli): iki ayrı yutulan dokunuş vardı.

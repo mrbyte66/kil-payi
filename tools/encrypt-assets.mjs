@@ -47,8 +47,10 @@ export const encryptDir = (assets, propsFile) => {
     writeFileSync(join(pub, rel + '.kpe'), Buffer.concat([iv, ct, c.getAuthTag()]));
     if (rel === 'index.html') {
       const mark = (/<!--kp:V[^>]*-->/.exec(plain.toString('utf8')) || [''])[0];
+      /* yedek sayfa: normalde HİÇ gösterilmez (şifre çözen istemci gerçek sayfayı verir); açılamazsa 25 yeniden denemeden sonra boş mor ekran yerine kısa bir açıklama gösterir */
+      const msg = "var tr=((navigator.language||'').slice(0,2)==='tr');document.body.innerHTML='<p style=\"font:16px sans-serif;color:#fff;text-align:center;margin:40vh 24px 0\">'+(tr?'Oyun açılamadı. Lütfen uygulamayı Google Play\\'den yeniden yükle.':'The game could not start. Please reinstall the app from Google Play.')+'</p>'";
       writeFileSync(join(pub, rel), '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#6D58E0">' + mark +
-        '<script>var n=+(sessionStorage.getItem("kpr")||0);if(n<25){sessionStorage.setItem("kpr",n+1);setTimeout(function(){location.reload()},150)}</script></body>');
+        '<script>var n=+(sessionStorage.getItem("kpr")||0);if(n<25){sessionStorage.setItem("kpr",n+1);setTimeout(function(){location.reload()},150)}else{' + msg + '}</script></body>');
     } else rmSync(join(pub, rel));
     total += plain.length;
   }
