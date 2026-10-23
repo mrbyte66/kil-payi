@@ -1540,7 +1540,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.10.3';
+const VERSION = 'V0.10.4';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -1549,30 +1549,55 @@ const save = {
   own: { kron: 1 }, slots: 1, equip: ['kron', '', '', ''], autoOwn: false, gift: { n: 0, t0: 0 },
   unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, intro: {}, test: null, warm: 0, sg: 1, v: 3
 };
+/* V0.10.4: hiçbir ekonomi alanı doğrulamadan canlı kayda aktarılmaz.
+   İmzasız eski kayıtlar güvenilir bir geçiş kanıtı değildir; yalnız ayarlar korunur. */
+const record = o => !!o && typeof o === 'object' && !Array.isArray(o);
+const bounded = (n, max = 2147483647) => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= max;
+const safeTree = (o, depth = 0) => {
+  if (depth > 12) return false;
+  if (typeof o === 'number') return Number.isFinite(o) && Math.abs(o) <= Number.MAX_SAFE_INTEGER;
+  if (!o || typeof o !== 'object') return true;
+  return Object.keys(o).every(k => !['__proto__', 'constructor', 'prototype'].includes(k) && safeTree(o[k], depth + 1));
+};
+const validSave = o => {
+  if (!record(o) || !safeTree(o)) return false;
+  for (const k of ['coins', 'runs', 'low', 'high', 'highU', 'camp', 'bestL'])
+    if (o[k] !== undefined && (!bounded(o[k]) || !Number.isInteger(o[k]))) return false;
+  for (const k of ['bests', 'tools', 'own', 'gift', 'unl', 'seen', 'tips', 'book', 'intro'])
+    if (o[k] !== undefined && !record(o[k])) return false;
+  if (o.tools && Object.keys(o.tools).some(k => !TOOL_IDS.includes(k) || !record(o.tools[k]) || !bounded(o.tools[k].n, 99) || !Number.isInteger(o.tools[k].n) || ![1, 2, 3].includes(o.tools[k].l))) return false;
+  if (o.bests && Object.values(o.bests).some(n => !bounded(n) || !Number.isInteger(n))) return false;
+  if (o.equip !== undefined && (!Array.isArray(o.equip) || o.equip.length > 4 || o.equip.some(k => k !== '' && !TOOL_IDS.includes(k)))) return false;
+  if (o.gift && ((!bounded(o.gift.n, 5) || !Number.isInteger(o.gift.n)) || (o.gift.t0 !== undefined && !bounded(o.gift.t0, 8640000000000000)))) return false;
+  return true;
+};
 try {
   const raw = localStorage.getItem('kilpayi.v1');
   if (raw) {
-    let body = raw;
+    if (raw.length > 1000000) throw new Error('save size');
     const sm = /,"sig":"([0-9a-f]{24})"\}$/.exec(raw);
-    if (sm) { body = raw.slice(0, sm.index) + '}'; if (sigOf(body) !== sm[1]) saveTampered = true; }
+    const body = sm ? raw.slice(0, sm.index) + '}' : raw;
     const o = JSON.parse(body);
-    if (!sm && o && o.sg === 1) saveTampered = true;                  /* imza silinmiş */
-    Object.keys(save).forEach(k => { if (o && o[k] !== undefined) save[k] = o[k]; });
-    if (o && !o.bests && typeof o.best === 'number') save.bests = { rahat: 0, normal: o.best | 0, usta: 0 };
-    /* V0.4.1'e geçiş: eski kayıtta her jokerden en az 2 olsun, her seferinde bir kez */
-    if (!(o && o.v >= 2)) for (const id in save.tools) save.tools[id].n = Math.max(save.tools[id].n | 0, 2);
-    /* V0.9.2'ye geçiş: mağaza öncesi kayıtta dört joker ve dört yuva zaten kullanımdaydı, açık kalır (elindekini kimse kaybetmez); yeni kurulumda yalnızca Kronometre ve tek yuva vardır. */
-    if (!(o && o.v >= 3)) { save.own = { steto: 1, kron: 1, kalkan: 1, kum: 1 }; save.slots = 4; save.equip = ['steto', 'kron', 'kalkan', 'kum']; }
+    /* Hatalı kayıttan yalnızca sınırlı, ekonomik değeri olmayan tercihler alınır. */
+    if (record(o)) {
+      for (const k of ['snd', 'vib', 'music', 'anim', 'tut']) if (typeof o[k] === 'boolean') save[k] = o[k];
+      if (['', 'tr', 'en'].includes(o.lang)) save.lang = o.lang;
+      if (o.animV === 1) save.animV = 1;
+      if (o.warm === 1) save.warm = 1;
+    }
+    if (!sm || sigOf(body) !== sm[1] || !validSave(o)) saveTampered = true;
+    else {
+      /* Geçiş de geçici nesnede: hata olursa kısmen yüklenmiş ekonomi kalmaz. */
+      const next = JSON.parse(JSON.stringify(save));
+      Object.keys(next).forEach(k => { if (o[k] !== undefined) next[k] = o[k]; });
+      if (!o.bests && bounded(o.best)) next.bests.normal = Math.floor(o.best);
+      if (!(o.v >= 2)) TOOL_IDS.forEach(id => { const t = next.tools[id]; if (t) t.n = Math.max(t.n, 2); });
+      if (!(o.v >= 3)) { next.own = { steto: 1, kron: 1, kalkan: 1, kum: 1 }; next.slots = 4; next.equip = ['steto', 'kron', 'kalkan', 'kum']; }
+      Object.assign(save, next);
+    }
   }
-  save.v = 3; save.sg = 1;
-  if (saveTampered) {
-    /* kurcalanmış kayıt: ekonomi ve ilerleme sıfırlanır; ayarlar, dil, kapalı test sayacı, ısınma durumu ve görülmüş tanıtımlar korunur */
-    save.coins = 0; save.runs = 0; save.bests = { rahat: 0, normal: 0, usta: 0, cehennem: 0 };
-    save.tools = { steto: { n: 0, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } };
-    save.own = { kron: 1 }; save.slots = 1; save.equip = ['kron', '', '', '']; save.autoOwn = false; save.autoJ = false; save.gift = { n: 0, t0: 0 };
-    save.unl = {}; save.low = 0; save.high = 0; save.highU = 0; save.camp = 1; save.bestL = 0; save.run = null; save.book = {};
-  }
-} catch (e) {}
+} catch (e) { saveTampered = true; }
+save.v = 3; save.sg = 1;
 if (!save.book || typeof save.book !== 'object') save.book = {};
 if (!save.intro || typeof save.intro !== 'object') save.intro = {};
 if (!save.seen || typeof save.seen !== 'object') save.seen = {};
@@ -1677,7 +1702,7 @@ const nextGoal = () => {
 const shopDot = () => { const g = nextGoal(); return (!!g && save.coins >= g.p) || (!save.autoOwn && save.coins >= AUTO_PRICE); };
 
 /* Alışverişler: yeterli coin varsa düşer, durumu değiştirir, kaydeder; başarı true. */
-const spendCoins = c => { if (save.coins < c) return false; save.coins -= c; return true; };
+const spendCoins = c => { if (!bounded(c) || !Number.isInteger(c) || !bounded(save.coins) || save.coins < c) return false; save.coins -= c; return true; };
 const buyStock = id => {
   const s = save.tools[id];
   if (!save.own[id] || s.n >= STOCK_MAX || !spendCoins(stockPrice(id))) return false;
@@ -1706,8 +1731,12 @@ const buyAuto = () => {
 };
 /* Hediye (reklam, V0.9.3): 20 · 30 · 40 · 50 · 500. 24 saatlik pencere İLK reklamla başlar (save.gift.t0); pencere dolunca basamaklar baştan başlar.
    Beş hediye de alınmışsa düğme pencerenin bitmesine kalan süreyi söyler. Saat geri alınırsa pencere bugünden başlar (24 saati aşamaz). */
+/* Oturum içinde cihaz saatini değiştirmek hediye süresini ilerletemez.
+   Yeniden başlatmalar arası güvenilir takvim sunucusuz olarak garanti edilemez. */
+const giftWall = Date.now(), giftMono = performance.now();
+const giftNow = () => giftWall + Math.max(0, performance.now() - giftMono);
 const giftState = () => {
-  const g = save.gift, now = Date.now();
+  const g = save.gift, now = giftNow();
   if (g.t0 > now) g.t0 = now;
   if (g.t0 && now >= g.t0 + GIFT_WINDOW) { g.n = 0; g.t0 = 0; persist(); }
   const left = g.t0 ? g.t0 + GIFT_WINDOW - now : GIFT_WINDOW, full = g.n >= GIFT_STEP.length;
@@ -1717,7 +1746,7 @@ const giftClaim = () => {
   const s = giftState();
   if (s.wait > 0 || !s.next) return 0;
   const g = save.gift;
-  if (!g.t0) g.t0 = Date.now();
+  if (!g.t0) g.t0 = giftNow();
   save.coins += s.next; g.n++;
   persist(); return s.next;
 };
@@ -1962,8 +1991,8 @@ const plugin = name => {
   }
   return plugins[name];
 };
-let adMobReady = null;
-const adMobInit = A => adMobReady || (adMobReady = A.initialize({ initializeForTesting: ADS.test }).then(() => true, () => false));
+let adMobReady = null, activeReward = null, runEpoch = 0;
+const adMobInit = A => adMobReady || (adMobReady = A.initialize({ initializeForTesting: ADS.test }).then(() => true, () => { adMobReady = null; return false; }));
 
 const Platform = {
   native: NATIVE,
@@ -1988,6 +2017,7 @@ const Platform = {
   },
   track(name, params) { try { if (window.console && console.debug) console.debug('[kp]', name, params || ''); } catch (e) {} },
   rewardedAd(done) {
+    if (activeReward) { done(false, 'busy'); return; }
     const A = plugin('AdMob'), el = $('ad'), bar = $('adFill');
     if (!A && !DEMO_ADS) { done(false, 'fail'); return; }   /* yayın derlemesinde "reklam gösterilmeden ödül" yolu yoktur (V0.10.3) */
     if (!A) {
@@ -2004,27 +2034,38 @@ const Platform = {
     $('adBadgeEl').textContent = t('adBadgeReal'); $('adTextEl').textContent = t('adLoading');
     el.classList.add('real'); bar.style.width = '35%'; show(el);
     const handles = [];
-    let settled = false, earned = false, timer = 0;
+    let settled = false, earned = false, timer = 0, showRequested = false, cancelled = false;
     const finish = (ok, why) => {
       if (settled) return;
       settled = true; clearTimeout(timer);
       handles.forEach(h => { try { h.remove(); } catch (e) {} });
       el.classList.remove('real'); hide(el);
       $('adBadgeEl').textContent = t('adBadge'); $('adTextEl').textContent = t('adText');
-      done(ok, why);
+      activeReward = null;
+      done(ok && !cancelled, cancelled ? 'cancelled' : why);
+    };
+    /* Native reklam ekrandaysa yeni istek eski olayları tüketmesin: kapanışa kadar kilitli. */
+    activeReward = () => { if (showRequested) cancelled = true; else finish(false, 'cancelled'); };
+    const listen = async (name, cb) => {
+      const h = await A.addListener(name, () => { if (!settled) cb(); });
+      if (settled) { try { await h.remove(); } catch (e) {} return false; }
+      handles.push(h); return true;
     };
     timer = setTimeout(() => finish(false, 'fail'), 25000);
     (async () => {
       try {
         if (!(await adMobInit(A))) { finish(false, 'fail'); return; }
-        handles.push(await A.addListener('onRewardedVideoAdShowed', () => { clearTimeout(timer); }));
-        handles.push(await A.addListener('onRewardedVideoAdReward', () => { earned = true; }));
-        handles.push(await A.addListener('onRewardedVideoAdDismissed', () => finish(earned, earned ? 'ok' : 'closed')));
-        handles.push(await A.addListener('onRewardedVideoAdFailedToShow', () => finish(false, 'fail')));
-        handles.push(await A.addListener('onRewardedVideoAdFailedToLoad', () => finish(false, 'fail')));
+        if (settled) return;
+        if (!(await listen('onRewardedVideoAdShowed', () => { clearTimeout(timer); timer = setTimeout(() => finish(false, 'fail'), 180000); }))) return;
+        if (!(await listen('onRewardedVideoAdReward', () => { earned = true; }))) return;
+        if (!(await listen('onRewardedVideoAdDismissed', () => finish(earned, earned ? 'ok' : 'closed')))) return;
+        if (!(await listen('onRewardedVideoAdFailedToShow', () => finish(false, 'fail')))) return;
+        if (!(await listen('onRewardedVideoAdFailedToLoad', () => finish(false, 'fail')))) return;
         await A.prepareRewardVideoAd({ adId: ADS.rewardedId, isTesting: ADS.test });
+        if (settled) return;
+        showRequested = true;
         const item = await A.showRewardVideoAd();
-        if (item) earned = true;
+        if (!settled && item) earned = true;
       } catch (e) { finish(false, 'fail'); }
     })();
   }
@@ -2610,6 +2651,24 @@ const resize = () => {
 
 /* Oyun kaydı: uygulamadan çıkınca (kapansa bile) kaldığı yerden devam edebilmek için. */
 const RUN_KEYS = ['jt', 'L', 'ph', 'time', 'score', 'n', 'combo', 'maxCombo', 'near', 'raw', 'perf', 'missRun', 'adapt', 'mercy', 'open', 'eng', 'stars', 'mixes', 'comboOn', 'evi', 'glove', 'boostT', 'slow', 'slowMul', 'narrow', 'coinsJ', 'life', 'lifeLevel', 'campRun', 'startL', 'coinsGiven', 'continued', 'runCounted', 'waveSeen', 'dir', 'contN'];
+const validRun = o => {
+  if (!record(o) || o.v !== 2 || !safeTree(o)) return false;
+  if (!bounded(o.time, CFG.maxTime) || !bounded(o.score) || !bounded(o.jt, 10000000)) return false;
+  if (!Number.isInteger(o.contN) || !bounded(o.contN, CFG.contMax)) return false;
+  if (!Array.isArray(o.open) || !record(o.stars) || !Array.isArray(o.mixes) || !record(o.eng)) return false;
+  if (o.open.some(k => typeof k !== 'string' || !Object.hasOwn(IMPL_GOOD, k))) return false;
+  if (Object.entries(o.stars).some(([k, n]) => !Object.hasOwn(IMPL_GOOD, k) || !Number.isInteger(n) || !bounded(n, 2))) return false;
+  if (Object.entries(o.eng).some(([k, v]) => !Object.hasOwn(IMPL_TWIN, k) || typeof v !== 'boolean')) return false;
+  if (o.mixes.some(m => !Array.isArray(m) || m.length !== 2 || !Object.values(MIXES).some(pair => pair[0] === m[0] && pair[1] === m[1]))) return false;
+  if (!Number.isInteger(o.startL) || o.startL < 1 || o.startL > 10000) return false;
+  for (const k of RUN_KEYS) {
+    if (o[k] === undefined) continue;
+    if (['open', 'stars', 'mixes', 'eng', 'ph'].includes(k)) continue;
+    const type = typeof runState(1)[k];
+    if (typeof o[k] !== type || (type === 'number' && !Number.isFinite(o[k]))) return false;
+  }
+  return true;
+};
 const snapRun = () => { const o = { v: 2, lvl: save.lvl }; RUN_KEYS.forEach(k => { o[k] = G[k]; }); return JSON.parse(JSON.stringify(o)); };
 const persistRun = () => { if (!G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause' || G.mode === 'intro')) { save.run = snapRun(); persist(); } };
 
@@ -2631,7 +2690,9 @@ const runState = L0 => ({
 });
 
 const start = (fromL, snap) => {
-  const L0 = fromL || 1;
+  if (snap && !validRun(snap)) { save.run = null; persist(); return false; }
+  runEpoch++; if (activeReward) activeReward();
+  const L0 = Number.isInteger(fromL) && fromL >= 1 && fromL <= 10000 ? fromL : 1;
   Snd.ui();
   Object.assign(G, runState(L0));
   G.best0 = bestNow();
@@ -2662,11 +2723,13 @@ const start = (fromL, snap) => {
 const resumeSaved = () => {
   const snap = save.run;
   if (!snap) return false;
+  if (!validRun(snap)) { save.run = null; persist(); return false; }
   start(snap.startL, snap); G.mode = 'count'; G.count = 3;
   return true;
 };
 
 const goMenu = () => {
+  runEpoch++; if (activeReward) activeReward();
   G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0; G.kind = 'tek'; G.hint = null;
   G.thT = 0; G.thDirty = true; G.banner = null; G.count = 0; G.card = null; G.tail = null; G.adv = null;
   G.practice = null; hide($('pracDone')); app.classList.remove('prac');
@@ -3273,7 +3336,9 @@ const showOver = () => {
   show(overEl);
 };
 
-const doContinue = () => {
+const canContinue = (ad = false) => G.mode === 'over' && G.n >= 3 && G.contN < CFG.contMax && contLeft > 0 && (!ad || G.contN < CFG.contAds);
+const doContinue = (rewarded = false) => {
+  if (rewarded ? (G.mode !== 'ad' || G.contN >= CFG.contAds || G.contN >= CFG.contMax || G.n < 3) : !canContinue()) return false;
   if (G.burn) { G.burn = null; G.reform = 0; }
   G.mode = 'play'; G.continued = true; G.contN++; G.time = CFG.contTime; G.slow = CFG.contSlow; G.slowMul = CFG.contSlowMul;
   G.combo = 0; G.tscale = 1; G.tsT = 0; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
@@ -4331,7 +4396,7 @@ const hellFx = raw => {
 let contLeft = 0;
 const setCd = () => { cdArc.style.strokeDashoffset = (176 * (1 - Math.max(0, Math.min(1, contLeft / CFG.contWait)))).toFixed(1); };
 const contCost = n => CFG.contCoins * Math.pow(2, n);
-const update = raw => {
+const update = (raw, elapsed = raw) => {
   G.clock += raw;
   const k = Math.min(1, raw * 9);
   view.cx += (view.tcx - view.cx) * k; view.cy += (view.tcy - view.cy) * k; view.r += (view.tr - view.r) * k;
@@ -4379,7 +4444,7 @@ const update = raw => {
       G.ang2 = norm(G.ang2 + G.vel2 * dt);
     }
     updateChal(dt);
-    if (PR) G.time = CFG.maxTime; else G.time -= dt * pm.drain * (LV().drain || 1);
+    if (PR) G.time = CFG.maxTime; else G.time -= elapsed * G.tscale * pm.drain * (LV().drain || 1);
     if (G.slow > 0) G.slow -= raw;
     if (G.boostT > 0) G.boostT = Math.max(0, G.boostT - raw);
     if (G.narrow > 0) G.narrow = Math.max(0, G.narrow - raw);
@@ -4446,7 +4511,7 @@ const update = raw => {
   }
   /* ikinci şans: 5 sn içinde karar; dükkân açıkken ya da reklam oynarken sayaç durur */
   if (G.mode === 'over' && contLeft > 0 && !contEl.hidden && !shopEl.classList.contains('on')) {
-    contLeft -= raw;
+    contLeft -= elapsed;
     if (contLeft <= 0) { contLeft = 0; contEl.classList.add('fade'); setTimeout(() => { contEl.hidden = true; contEl.classList.remove('fade'); }, 420); }
     setCd();
   }
@@ -5737,16 +5802,21 @@ $('bagBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu
 $('pauseBtn').addEventListener('click', e => { Snd.unlock(); if (G.mode !== 'play' && G.mode !== 'count') return; Snd.ui(); Platform.haptic('light'); pause(); e.currentTarget.blur(); });
 $('bagBtn2').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'over') openShop('over'); });
 $('adBtn').addEventListener('click', () => {
-  if (G.mode !== 'over') return;
+  if (!canContinue(true)) return;
+  const epoch = runEpoch;
   Snd.unlock(); G.mode = 'ad'; hide(overEl);
-  Platform.rewardedAd((ok, why) => { if (ok) doContinue(); else { G.mode = 'over'; show(overEl); contLeft = CFG.contWait; setCd(); if (why !== 'closed') toast(t('adFail')); } });
+  Platform.rewardedAd((ok, why) => {
+    if (epoch !== runEpoch || G.mode !== 'ad') return;
+    if (ok) doContinue(true);
+    else { G.mode = 'over'; show(overEl); setCd(); if (why !== 'closed' && why !== 'cancelled') toast(t('adFail')); }
+  });
 });
 $('coinBtn').addEventListener('click', () => {
-  if (G.mode !== 'over') return;
+  if (!canContinue()) return;
   Snd.unlock();
   const cost = contCost(G.contN);
-  if (save.coins < cost) { toast(t(G.contN < CFG.contAds ? 'notEnough' : 'coinShort')); return; }
-  save.coins -= cost; persist(); refreshStats(); doContinue();
+  if (!spendCoins(cost)) { toast(t(G.contN < CFG.contAds ? 'notEnough' : 'coinShort')); return; }
+  persist(); refreshStats(); doContinue();
 });
 
 /* ---------- kapalı test bildirimleri (V0.9.11) ----------
@@ -5869,9 +5939,9 @@ if (AppP) {
 let last = 0;
 const frame = ts => {
   if (!last) last = ts;
-  const raw = Math.min(0.05, (ts - last) / 1000); last = ts;
+  const elapsed = Math.max(0, (ts - last) / 1000), raw = Math.min(0.05, elapsed); last = ts;
   if ((musicT += raw) > 0.3) { musicT = 0; try { Music.sync(); } catch (e) {} }
-  try { update(raw); if (!shopEl.classList.contains('on') || shopEl.classList.contains('leaving')) render(); } catch (e) {
+  try { update(raw, elapsed); if (!shopEl.classList.contains('on') || shopEl.classList.contains('leaving')) render(); } catch (e) {
     if (!frame.failed) { frame.failed = true; try { console.error('[kp] kare hatası', e && e.stack ? e.stack : e); } catch (x) {} }
   }
   requestAnimationFrame(frame);

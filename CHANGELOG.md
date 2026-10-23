@@ -3,6 +3,16 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.10.4 — Kayıt ve ödül doğrulaması (2026-10-23)
+
+- İmzasız kayıtla para/ilerleme yükleme ve bozuk eski kayıtla sıfırlamayı atlatma yolları kapatıldı. Doğrulama ve geçiş canlı kayda aktarılmadan tamamlanıyor. Geçerli imzalı V0.10.3 kayıtları korunur; imzasız çok eski kayıtların ekonomisi sıfırlanır, temel kullanıcı tercihleri korunur.
+- Bozuk araç verileri, sonlu olmayan para ve geçersiz yarım tur değerleri reddediliyor.
+- Devam hakkı kotası ve süre sınırı işlem sırasında kontrol ediliyor; gizli düğmeyi çağırmak sınırı aşmıyor.
+- Reklam ödül istekleri tekilleştirildi. Zaman aşımından sonra geciken işler gösterime geçemiyor; eski turun ödülü yeni turu değiştiremiyor. Ekrandaki eski reklam kapanana kadar yeni istek kabul edilmiyor.
+- Düşük kare hızında oyun sayacı gerçek geçen zamanı tüketiyor. Hediye penceresi oturum içinde monoton saat kullanıyor.
+- Yayın aracı yalnızca imzalı release APK üretir; imza, sürüm, şifreli içerik ve hata ayıklama bayrağını doğrular. Linux desteği ve Gradle dağıtım SHA-256 doğrulaması eklendi.
+- Sunucusuz sınırlar değişmedi: tüm yerel veriyi geri alma, APK kodunu değiştirme ve yeniden başlatmalar arasında cihaz saatini yanıltma kesin olarak engellenemez. Ayrıntı: `docs/guvenlik-v0.10.4.md`.
+
 ## V0.10.3 — Güvenlik raporunun gerçek maddeleri kapatıldı (2026-10-22)
 
 - **Arkadaşın tersine mühendislik raporu değerlendirildi** (ayrıntı `docs/guvenlik-raporu.md`). Rapordaki maddeler tek tek APK ve kaynağa karşı doğrulandı: bir kısmı gerçek ve kapatıldı, bir kısmı yanlış çıktı, büyük kısmı çevrimdışı ve sunucusuz bir oyunun doğası (şifre anahtarı, kayıt imzası, bütünlük denetimi ve ekonomi istemcide durmak zorunda; kararlı biri hepsini değiştirebilir). Bunlar yalnızca sunucuyla çözülür, "sunucu yok" kuralımıza ters olduğu için yapılmadı.

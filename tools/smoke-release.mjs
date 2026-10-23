@@ -1,14 +1,16 @@
+import { serveTestFile } from './test-server.mjs';
 /* Yayın derlemesi (karıştırılmış, kancasız) duman testi: node tools/smoke-release.mjs [www/index.html]
    Neden: karıştırılmış kodu hook olmadan doğrulamanın tek yolu davranışı dışarıdan görmek. Başsız Chrome'da açar; konsol hatası yok, menü görünür, Oyna ile oyun başlar, HUD çıkar,
    birkaç saniye hata olmadan döner, Ayarlar açılıp kapanır, mağaza açılıp kapanır. Hata varsa 1 ile çıkar. */
 import { launch } from './cdp.mjs';
 import { resolve } from 'node:path';
 const file = resolve(process.argv[2] || 'www/index.html');
+const url = await serveTestFile(file);
 const b = await launch({ width: 390, height: 844, dpr: 2, lang: 'tr-TR', seed: 'document.documentElement.setAttribute("data-theme","light");' });
 const out = []; let bad = 0;
 const T = (n, c, e) => { if (c) out.push('ok   ' + n); else { bad++; out.push('HATA ' + n + (e !== undefined ? ' → ' + JSON.stringify(e) : '')); } };
 const click = sel => b.eval(`(function(){var e=document.querySelector(${JSON.stringify(sel)});if(!e)return 'YOK';e.dispatchEvent(new MouseEvent('click',{bubbles:true}));return 'ok'})()`);
-await b.goto('file://' + file);
+await b.goto(url);
 await b.sleep(1500);
 T('menü görünür, hook yok', await b.eval('document.getElementById("menu").classList.contains("on")&&!window.__kp&&!document.documentElement.innerHTML.includes("__kp")'));
 T('Türkçe metinler yüklü (Oyna düğmesi)', await b.eval('document.getElementById("playBtn").textContent.trim().length>0'), await b.eval('document.getElementById("playBtn").textContent'));
@@ -26,7 +28,7 @@ T('konsol hatası ve istisna yok', b.logs.length === 0, b.logs);
 await b.close();
 // ilk açılış yolu: ısınma örtüsü görünür, biter, menü açılır, mağaza sorunsuz (kayıtsız temiz profil; NO_WARM bayrağı yok)
 const w = await launch({ width: 390, height: 844, dpr: 2, lang: 'en-US', warm: true, seed: 'document.documentElement.setAttribute("data-theme","light");' });
-await w.goto('file://' + file); await w.sleep(250);
+await w.goto(url); await w.sleep(250);
 T('ilk açılış: örtü hemen görünür', await w.eval('document.getElementById("warmVeil").classList.contains("on")'));
 let gone = false; for (let i = 0; i < 160 && !gone; i++) { await w.sleep(150); gone = await w.eval('!document.getElementById("warmVeil").classList.contains("on")'); }
 T('ilk açılış: ısınma bitip örtü kalktı', gone);
