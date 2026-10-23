@@ -2,11 +2,20 @@
 # Sürüm APK'sını üretir: ./tools/release.sh
 # Sürüm adı android/app/build.gradle içindeki versionName'dir; çıktı dist/kil-payi-v<sürüm>.apk olur.
 # Test kancası (window.__kp) yayın derlemesine girmemeli; hem www/ hem APK içi kontrol edilir.
-# Bu APK debug anahtarıyla imzalıdır (telefona kurmak içindir). Play Store için imzalı AAB ayrıca yapılacak.
+# Yalnız imzalı, R8 etkin release APK üretir. Debug anahtarına geri dönüş yoktur.
 set -e
 cd "$(dirname "$0")/.."
-export JAVA_HOME="${JAVA_HOME:-$(/usr/libexec/java_home)}"
+if [ -z "${JAVA_HOME:-}" ]; then
+  if [ -x /usr/libexec/java_home ]; then JAVA_HOME=$(/usr/libexec/java_home)
+  else JAVA_HOME=$(dirname "$(dirname "$(readlink -f "$(command -v java)")")"); fi
+fi
+export JAVA_HOME
 export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
+
+KS="${KP_KEYSTORE_PROPERTIES:-../KilPayi-keys/keystore.properties}"
+[ -f "$KS" ] || { echo "HATA: release imza dosyası eksik; KP_KEYSTORE_PROPERTIES ayarla"; exit 1; }
+BT="${ANDROID_BUILD_TOOLS:-$ANDROID_HOME/build-tools/35.0.1}"
+[ -x "$BT/apksigner" ] && [ -x "$BT/aapt2" ] || { echo "HATA: Android build-tools 35.0.1 gerekli"; exit 1; }
 
 VER=$(sed -n 's/.*versionName "\(.*\)".*/\1/p' android/app/build.gradle | head -1)
 [ -n "$VER" ] || { echo "versionName bulunamadı"; exit 1; }
@@ -29,22 +38,19 @@ rm -rf android/app/src/main/assets/public
 npx cap sync android > /dev/null
 node tools/encrypt-assets.mjs --selftest > /dev/null
 node tools/encrypt-assets.mjs
-(cd android && ./gradlew assembleDebug -q)
-
+(cd android && ./gradlew assembleRelease -q)
 mkdir -p dist
-OUT="dist/kil-payi-v${VER}.apk"
-cp android/app/build/outputs/apk/debug/app-debug.apk "$OUT"
-if unzip -p "$OUT" assets/public/index.html | grep -q '__kp'; then echo "HATA: APK içinde test kancası var"; rm -f "$OUT"; exit 1; fi
-if unzip -l "$OUT" | grep -qE 'assets/public/(fonts/[a-z0-9-]+\.(woff2|css))$'; then echo "HATA: APK içinde düz (şifresiz) oyun dosyası var"; rm -f "$OUT"; exit 1; fi
-if unzip -p "$OUT" assets/public/index.html.kpe | grep -aq 'kilpayi.v1'; then echo "HATA: APK içindeki oyun dosyası şifreli görünmüyor"; rm -f "$OUT"; exit 1; fi
-echo "$OUT hazır ($(du -h "$OUT" | cut -f1 | tr -d ' '), md5 $(md5 -q "$OUT"))"
-
-# V0.10.1: BAŞKASINA verilecek "güçlü" APK: R8'li (Java kodu karıştırılmış), hata ayıklamaya kapalı, yükleme anahtarıyla imzalı. Deneme APK'sı (yukarıdaki) hata ayıklamaya açıktır ve R8'sizdir; yalnızca kendi telefonunda dene.
-if [ -f "../KilPayi-keys/keystore.properties" ]; then
-  (cd android && ./gradlew assembleRelease -q)
-  ROUT="dist/kil-payi-v${VER}-release.apk"
-  cp android/app/build/outputs/apk/release/app-release.apk "$ROUT"
-  if unzip -l "$ROUT" | grep -qE 'assets/public/(fonts/[a-z0-9-]+\.(woff2|css))$'; then echo "HATA: güçlü APK içinde düz oyun dosyası var"; rm -f "$ROUT"; exit 1; fi
-  if "$ANDROID_HOME/build-tools/35.0.1/aapt2" dump badging "$ROUT" 2>/dev/null | grep -q application-debuggable; then echo "HATA: güçlü APK hata ayıklamaya açık"; rm -f "$ROUT"; exit 1; fi
-  echo "$ROUT hazır ($(du -h "$ROUT" | cut -f1 | tr -d ' '), md5 $(md5 -q "$ROUT"))"
-fi
+OUT="dist/kil-payi-v${VER}-release.apk"
+CANDIDATE="android/app/build/outputs/apk/release/app-release.apk"
+[ -f "$CANDIDATE" ] || { echo "HATA: imzalı release APK üretilmedi"; exit 1; }
+"$BT/apksigner" verify --verbose "$CANDIDATE"
+BADGING=$("$BT/aapt2" dump badging "$CANDIDATE")
+if printf '%s' "$BADGING" | grep -q application-debuggable; then echo "HATA: release hata ayıklamaya açık"; exit 1; fi
+printf '%s' "$BADGING" | grep -F "versionName='$VER'" >/dev/null || { echo "HATA: APK sürümü uyuşmuyor"; exit 1; }
+if unzip -p "$CANDIDATE" assets/public/index.html | grep -q '__kp'; then echo "HATA: APK içinde test kancası var"; exit 1; fi
+if unzip -l "$CANDIDATE" | grep -qE 'assets/public/(fonts/[a-z0-9-]+\.(woff2|css))$'; then echo "HATA: APK içinde düz oyun dosyası var"; exit 1; fi
+unzip -p "$CANDIDATE" assets/public/index.html.kpe >/dev/null || { echo "HATA: şifreli oyun eksik"; exit 1; }
+cp "$CANDIDATE" "$OUT"
+if command -v sha256sum >/dev/null 2>&1; then sha256sum "$OUT" > "$OUT.sha256"
+else shasum -a 256 "$OUT" > "$OUT.sha256"; fi
+echo "$OUT hazır"

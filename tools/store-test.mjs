@@ -1,3 +1,4 @@
+import { serveTestFile } from './test-server.mjs';
 /* Mağaza, dil, müzik ve görünüm testi: node tools/store-test.mjs
    DEBUG=1 derlemesini yapar, oyunu başsız Chrome'da (tools/cdp.mjs) açar ve şunları kontrol eder:
    - fiyat ve stok kuralları (merdiven, en çok 5, yetersiz coin, yuva sırası, takas),
@@ -9,7 +10,7 @@
    - V0.9.12: oyun hissi (yakın vuruşta sarsıntı ve yavaş çekim yok, ibre hızı yumuşak: artış, yön değişimi, kum saati, ışınlanma; Cehennem parıltısı DOM katmanı; tema adımları seyrek; kapanan mağaza DOM'u boşalır),
    - V0.9.11: kapalı test bildirimleri (sahte eklentiyle: izin, kanal, planlama, tarih mantığı, tıklayınca kart, Ayarlar'da anahtar yok),
    - V0.9.10: geri tuşu giriş animasyonu sürerken de ilk dokunuşta çalışır, doğrudan girilen dükkândan geri menüye döner, oyun içi "128 / 180" hedef rozeti ve duraklat düğmesi,
-   - V0.10.0: ısınma yalnızca ilk açılışta ve örtü arkasında (ısınma grupları), imzalı kayıt (SHA-256/HMAC düğüm sonuçlarıyla aynı, kurcalama sıfırlar, eski imzasız kayıt bir kez kabul),
+   - V0.10.0: ısınma yalnızca ilk açılışta ve örtü arkasında (ısınma grupları), imzalı kayıt (SHA-256/HMAC düğüm sonuçlarıyla aynı, kurcalama sıfırlar, imzasız kayıt reddedilir, imzalı kayıt korunur),
    - V0.9.9: mağaza ısınması (görünmez, dokunuşu engellemez, bitince eski durum, girişte/pencerede bırakılır) ve kayan cepheye dokunuş yedeği.
    Chrome yolu CHROME ortam değişkeniyle verilebilir. Hata varsa 1 ile çıkar. */
 import { execFileSync } from 'node:child_process';
@@ -20,7 +21,7 @@ import { launch } from './cdp.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 execFileSync('sh', ['-c', 'DEBUG=1 ./build.sh'], { cwd: root, stdio: 'ignore' });
-const URL = 'file://' + join(root, 'www', 'index.html');
+const URL = await serveTestFile(join(root, 'www', 'index.html'));
 
 /* sayfa içi test çatısı */
 const HEAD = `(async()=>{var out=[],ok=0,bad=0;function T(n,c,e){if(c){ok++}else{bad++;out.push('HATA '+n+(e!==undefined?' → '+JSON.stringify(e):''))}}
@@ -241,7 +242,7 @@ const MIG = [
     "K.equipped().join()==='steto,kron'&&S.slots===2&&S.autoOwn&&S.autoJ&&S.gift.n===2&&S.tools.steto.n===4&&S.music===false&&S.lang==='en'&&K.getLang()==='en'"],
   ['v092_hediye', { v: 3, coins: 10, gift: { n: 5, t: Date.now() + 5 * 3600000 } }, "S.gift.n===0&&S.gift.t0===0&&S.gift.t===undefined"],
   ['bozuk', { v: 3, own: { kron: 0, kum: 1 }, slots: 99, equip: 'x', tools: { steto: { n: -4, l: 9 }, kron: { n: 'a', l: 0 } }, autoOwn: false, autoJ: true, gift: { n: 9, t0: 0 }, lang: 'xx', music: 'abc' },
-    "S.slots===4&&S.own.kum===1&&S.own.kron===0&&Array.isArray(S.equip)&&S.equip.length===4&&K.isEq('kum')&&S.tools.steto.n===0&&S.tools.steto.l===3&&S.tools.kron.l===1&&S.autoJ===false&&S.gift.n===0&&S.lang===''&&S.music===true"],
+    "K.tampered()&&S.coins===0&&S.slots===1&&S.own.kron===1&&!S.own.kum&&S.tools.kron.n===1&&S.autoJ===false&&S.gift.n===0&&S.lang===''&&S.music===true"],
   ['anim_kapali', { v: 3, anim: false, animV: 1, coins: 5 }, "S.anim===false&&K.getRM()===true&&document.documentElement.classList.contains('calm')"],
   ['anim_eski_kapali', { v: 3, anim: false, coins: 5 }, "S.anim===true&&S.animV===1&&K.getRM()===false&&!document.documentElement.classList.contains('calm')"],
   ['otomatik_yok', { v: 3, own: { kron: 1 }, slots: 1, equip: ['kron', 'kum', '', ''], autoOwn: false, autoJ: true }, "S.autoJ===false&&K.equipped().join()==='kron'&&S.equip[1]===''"]
@@ -520,7 +521,7 @@ T('normal dokunuş (aynı öğe) bozulmadı: odaktaki cepheye dokununca dükkân
 `+TAIL;
 
 
-/* imzalı kayıt (V0.10.0): SHA-256 ve HMAC düğümün crypto sonuçlarıyla aynı olmalı; imza metin üzerinden doğrulanır; kurcalama ekonomiyi sıfırlar, eski imzasız kayıt bir kez kabul edilir */
+/* imzalı kayıt (V0.10.0): SHA-256 ve HMAC düğümün crypto sonuçlarıyla aynı olmalı; imza metin üzerinden doğrulanır; kurcalama ekonomiyi sıfırlar, imzasız kayıt reddedilir, imzalı kayıt korunur edilir */
 const SIG_KEY = ['kilpayi', 'cam\u00b7kadran', String(0x6d58e0 ^ 0x2a1b80), 'mrbyte-studio', 'v10'].join('|');
 const nodeSig = body => createHmac('sha256', SIG_KEY).update(body).digest('hex').slice(0, 24);
 const VEC = ['', 'abc', 'a'.repeat(55), 'a'.repeat(56), 'a'.repeat(63), 'a'.repeat(64), 'a'.repeat(1000), 'ğüşiçö İıÇ · ★ 🎯', JSON.stringify({ coins: 12345.678, bests: { rahat: 1, normal: 2 }, ad: 'x'.repeat(300) })];
@@ -555,7 +556,7 @@ const SIGT = [
   ['kurcalamada ayarlar ve dil korunur', edited, "K.tampered()===true&&S.lang==='en'&&S.music===false"],
   ['imza silinirse (sg=1) sıfırlanır', stripped, "K.tampered()===true&&" + RESET],
   ['yanlış imza sıfırlanır', wrongSig, "K.tampered()===true&&" + RESET],
-  ['eski sürümün imzasız kaydı kabul edilir', legacy, "K.tampered()===false&&S.coins===555&&S.bests.normal===90&&S.own.kalkan===1&&S.sg===1"],
+  ['imzasız eski kayıt ekonomisi reddedilir', legacy, "K.tampered()===true&&" + RESET],
   ['eski kayıt ilk persist\'te imzalanır', legacy, "(function(){K.persist();var raw=localStorage.getItem('kilpayi.v1'),m=/,\"sig\":\"([0-9a-f]{24})\"\\}$/.exec(raw);return !!m&&K.sigOf(raw.slice(0,m.index)+'}')===m[1]})()"],
   ['kurcalama sonrası kayıt yeniden imzalanır (bir sonraki açılışta temiz)', edited, "(function(){var raw=localStorage.getItem('kilpayi.v1'),m=/,\"sig\":\"([0-9a-f]{24})\"\\}$/.exec(raw);return K.tampered()===true&&!!m&&K.sigOf(raw.slice(0,m.index)+'}')===m[1]&&JSON.parse(raw).coins===0})()"]
 ];
@@ -638,7 +639,7 @@ for (const [name, raw, cond] of SIGT) {
   await run('imza: ' + name, post, { seed });
 }
 for (const [name, save, cond] of MIG) {
-  const seed = save === null ? '' : 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(JSON.stringify(save)) + ');';
+  const seed = save === null ? '' : 'localStorage.setItem("kilpayi.v1",' + JSON.stringify(sgOf(save)) + ');';
   const post = `(async()=>{var K=window.__kp,S=K.save,ok=false,err='';try{ok=!!(${cond})}catch(e){err=String(e)}return ok?'1 tamam, 0 hata':'0 tamam, 1 hata HATA '+err+' '+JSON.stringify({slots:S.slots,own:S.own,equip:S.equip,auto:[S.autoOwn,S.autoJ],gift:S.gift,lang:S.lang,music:S.music})})()`;
   await run('kayıt: ' + name, post, { seed });
 }

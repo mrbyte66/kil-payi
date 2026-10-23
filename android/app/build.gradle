@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 /* Play yükleme anahtarı (V0.9.14 sonrası): depo DIŞINDA, ../KilPayi-keys/keystore.properties (storeFile, storePassword, keyAlias, keyPassword). Dosya yoksa release imzasız kalır; debug derlemesi (APK) etkilenmez. */
-def ksFile = rootProject.file('../../KilPayi-keys/keystore.properties')
+def ksFile = rootProject.file(System.getenv('KP_KEYSTORE_PROPERTIES') ?: '../../KilPayi-keys/keystore.properties')
 def ksProps = new Properties()
 if (ksFile.exists()) { ksFile.withInputStream { ksProps.load(it) } }
 
@@ -29,8 +29,8 @@ android {
         applicationId "com.mrbytestudio.kilpayi"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 30
-        versionName "0.10.3"
+        versionCode 31
+        versionName "0.10.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField 'String', 'ASSET_SHA256', "\"${kpAssetSha()}\""
         buildConfigField 'String', 'KP_A', "\"${kpKeyProps.getProperty('a', '')}\""
@@ -89,4 +89,15 @@ try {
     }
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
+
+// Release must never silently become unsigned or ship encrypted assets without their key.
+tasks.configureEach { task ->
+    if (task.name == 'preReleaseBuild') {
+        task.doFirst {
+            if (!ksFile.exists()) throw new GradleException('Release signing properties missing; set KP_KEYSTORE_PROPERTIES')
+            if (!file('src/main/assets/public/index.html.kpe').exists() || !kpKeyProps.getProperty('a', '').matches('[0-9a-f]{64}'))
+                throw new GradleException('Run tools/release.sh to generate encrypted release assets and key together')
+        }
+    }
 }

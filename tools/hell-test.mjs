@@ -1,3 +1,4 @@
+import { serveTestFile } from './test-server.mjs';
 /* Cehennem çemberi ve yanma etkisi testi: node tools/hell-test.mjs
    DEBUG=1 derlemesini yapar, başsız Chrome'da (tools/cdp.mjs, telefonun "animasyonları kaldır" ayarı taklit edilir) şunları kontrol eder:
    - dönüş programı: Seviye 1-2 dönmez (nefes sürer), 3-5 tek yönlü ve hedef hızda, 6-10 iki yönlü karışık (yön değişir, arada durur, hız sınırı aşılmaz), sarmal yok,
@@ -43,7 +44,7 @@ CanvasRenderingContext2D.prototype.clip=oc;
   for(var i=0;i<330;i++)K.update(0.016);
   T(l+': 7,4 sn sonra kor temizlendi',K.G.burn===null,K.G.burn&&K.G.burn.t)});
 // 6) ikinci şans: çember yeniden belirir
-K.setLevel('normal');K.start();K.G.mode='play';K.die();for(var i=0;i<140;i++)K.update(0.016);K.doContinue();
+K.setLevel('normal');K.start();K.G.mode='play';K.G.n=3;K.die();for(var i=0;i<140;i++)K.update(0.016);K.doContinue();
 T('ikinci şans: kor temizlendi, çember ortadan dışa belirir (G.reform 0)',K.G.burn===null&&K.G.reform===0&&K.G.mode==='play',[K.G.reform,K.G.mode]);
 for(var i=0;i<40;i++)K.update(0.016);K.render();T('ikinci şans: 0,6 sn sonra çember tam',K.G.reform===1,K.G.reform);
 // 7) animasyonlar kapalıyken yanma yok (eski sakin davranış)
@@ -54,9 +55,9 @@ S.anim=true;K.applyMotion();
 K.setLevel('normal');K.start();K.G.mode='play';K.G.practice={};K.die();T('Dene modunda kor yok',K.G.burn===null);K.G.practice=null;
 }catch(e){out.push('İSTİSNA '+e.stack)}return ok+' tamam, '+bad+' hata'+(out.length?'\\n'+out.join('\\n'):'')})()`;
 const b = await launch({ width: 390, height: 844, dpr: 1, lang: 'tr-TR', reduceMotion: true });
-await b.goto('file://' + join(root, 'www', 'index.html'));
+await b.goto(await serveTestFile(join(root, 'www', 'index.html')));
 let r;
 try { r = await b.eval(SCRIPT, { timeout: 120000 }); if (b.logs.length) r += '\n' + b.logs.join('\n'); } catch (e) { r = 'ÇÖKTÜ ' + e.message; }
 await b.close();
 console.log(r);
-process.exit(/ 0 hata/.test(String(r).split('\n')[0]) ? 0 : 1);
+process.exit(/ 0 hata/.test(String(r).split('\n')[0]) && !/İSTİSNA|ÇÖKTÜ/.test(String(r)) ? 0 : 1);
