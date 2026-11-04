@@ -3,6 +3,12 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V1.0.0 — İlk üretim sürümü (2026-11-04)
+
+- Play Store üretimine çıkacak ilk sürüm. Oyun V0.14.0 ile aynı; yalnızca sürüm adı değişti.
+- Bu sürümde: Kadran menü ve tek Oyna, kısa öğretim, gerçek reklamlar ve Avrupa izin penceresi, kod ve dosya koruması.
+- Play için imzalı AAB ile üretildi (`dist/kil-payi-v1.0.0.aab`, versionCode 39).
+
 ## V0.14.0 — Gerçek reklamlar (2026-11-04)
 
 - **AdMob bağlandı.** Yayın sürümü artık gerçek reklam ister. AdMob'da "Kıl payı" uygulaması ve ödüllü reklam birimi oluşturuldu.
