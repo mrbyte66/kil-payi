@@ -24,6 +24,11 @@ T('Avrupa dışı: pencere yok', await b.eval(`__c.info===1&&__c.form===0`));
 T('Ayarlar: gizlilik satırı yok', !(await b.eval(row)));
 await b.close();
 
+b = await open(`{status:'NOT_REQUIRED',isConsentFormAvailable:true,canRequestAds:true,privacyOptionsRequirementStatus:'REQUIRED'}`);
+T('ABD eyaleti: açılışta pencere yok', await b.eval(`__c.info===1&&__c.form===0`));
+T('ABD eyaleti: Ayarlar satırı var', await b.eval(row));
+await b.close();
+
 b = await open(`new Error('offline')`);
 T('çevrimdışı: oyun açık', await b.eval(`__kp.G.mode==='menu'&&__c.form===0`));
 T('konsol temiz', !b.logs.length, b.logs.join(' | ')); await b.close();
