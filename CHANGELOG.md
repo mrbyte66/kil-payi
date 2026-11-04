@@ -3,6 +3,14 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.12.1 — Menü yazıları dilimlerin içinde, yeni oyun sonu ve duraklatma (2026-11-04)
+
+- **Menüde yazılar dilimlerin içine girdi** (kullanıcı: "yazılar sırıtmış, sığmamış"). Beyaz etiketler kalktı, isimler halkanın eğimine uyarak dilimin içinde yazıyor, yanında ikon var. Halka biraz büyüdü, dar ekranda taşma bitti. Süreli'de zorluğun yanında en iyi skor yazıyor.
+- **Yeni oyun sonu.** Çember yanar, sonra ikinci şans kadranı olarak geri gelir: Reklam izle, Tekrar, Ana ekran ve altın dilimleri; dıştaki çizgi kalan süreyi gösterir. Dokununca ibre dilime koşar, menüdeki gibi beklemek yok. Süre dolunca kadran küçülüp yukarı çıkar, alttan sayfa gelir: Tekrar dene, Mağaza, Ana ekran. İkinci şans hakkı yoksa doğrudan sayfa gelir. Oyun sonunda arkada kalan puan ve seviye yazıları da kalktı.
+- **Yeni duraklatma:** oyunu kapatmayan alt pencere: Devam et ve Menü. Kadran, süre ve ibre görünür kalır; pencere dışına dokununca da oyun sürer.
+- Oyun sonundan kalkanlar: en uzun seri ve son saniye sayıları, "kronometre vardı" uyarısı, seviye önerisi.
+- Teknik: `src/game.html` "oyun sonu" bloğu (`OV`, `ovStage`, `drawOverRing`), `menuTextLayer` (kıvrık yazı bir kez çizilir), `tools/menu-test.mjs` oyun sonu ve duraklatma denetimleri.
+
 ## V0.12.0 — Yeni ana menü: Kadran menü (2026-11-04)
 
 - **Ana ekran baştan yazıldı** (kullanıcı: "karşılayan menü çok kötü", seçim "Kadran menü"). Halkanın kendisi menü: Bölümler, Süreli, Mağaza ve Defter dilimleri.
