@@ -726,15 +726,45 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop.warm *{pointer-events:none!important;animation-play-state:running!important}
 #shop.warm .stg{animation:stIn .85s cubic-bezier(.16,1,.3,1) backwards}
 #shop.warm.wout .stg{animation:stOut .36s cubic-bezier(.45,0,.8,.5) both}
+/* Oyun sonu (V0.12.1, kullanıcı seçimi): önce ikinci şans kadranı (dilimler, süre çizgisi), sonra kadran küçülür ve alt sayfa gelir. Duraklatma oyunu kapatmayan alt pencere. */
+#app.ovr .hud{opacity:0}
+#app.ovr .hud *{pointer-events:none!important}
+#over{padding:0}
+#cont{display:none!important}
+.ovtop{position:absolute;left:16px;right:16px;top:18px;display:flex;justify-content:space-between;align-items:center;gap:8px;pointer-events:none;opacity:0;transition:opacity .25s}
+#over.ch .ovtop{opacity:1}
+.ovc{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;pointer-events:none;width:var(--ow,170px)}
+.ovc .big-score{font-size:var(--os,56px)}
+.ovc .eyebrow,.ovc .delta{font-size:var(--fs-14);transition:opacity .2s}
+#over.end .ovc .eyebrow,#over.end .ovc .delta{opacity:0;height:0;overflow:hidden}
+.ovch{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 20px;text-align:center;pointer-events:none;transition:opacity .2s}
+#over.end .ovch{opacity:0}
+.ovcd{margin:0;font-weight:800;font-size:var(--fs-14);color:var(--btn)}
+.ovsheet{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 20px 22px;border-radius:30px 30px 0 0;background:var(--surface);box-shadow:0 -8px 28px rgba(40,25,110,.16);transform:translateY(106%);transition:transform .42s var(--ease);visibility:hidden}
+#over.end .ovsheet{transform:none;visibility:inherit}
+.ovgrab{width:44px;height:5px;border-radius:3px;background:var(--track)}
+.ovhead{font-family:var(--font-display);font-weight:600;font-size:var(--fs-20);text-align:center}
+.ovhead.gold{color:var(--gold-ink)}
+.ovline{margin:-6px 0 0;font-weight:800;font-size:var(--fs-14);color:var(--ink-2);text-align:center}
+.ovsheet .btn.big{width:100%}
+.ovrow{width:100%;display:flex;gap:10px}
+.ovrow .btn{flex:1;min-width:0;padding:0 10px}
+.btn.soft{background:var(--bg);color:var(--ink-2);box-shadow:none;font-size:var(--fs-16)}
+#pause{justify-content:flex-end;padding-bottom:20px}
+.pwin{width:min(100%,380px);display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 16px 16px;border-radius:28px;background:var(--surface);box-shadow:0 12px 30px rgba(40,25,110,.22)}
+.scr.on .pwin{animation:pwinIn .26s var(--ease) backwards}
+@keyframes pwinIn{from{transform:translateY(30px);opacity:0}}
+.pwin #resumeBtn{flex:1.7}
+html.calm .scr.on .pwin{animation-duration:1ms}
+html.calm .ovsheet{transition:none}
 /* Kadran menü (V0.12.0): halka dilimleri canvas'ta (drawMenuRing), etiketler gerçek düğmeler (placeMenu konumlar). Süreli'de Cehennem katmanı bileşende kayar: tek kez çizilir, kare başına yalnız transform yazılır. */
 #menu{touch-action:none}
 .mset{position:absolute;inset:0;pointer-events:none}
 #mSet2{opacity:0}
-.mset.live .mlab,.mset.live .mback{pointer-events:auto}
-.mlab{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:5px;border:0;border-radius:15px;padding:8px 13px;background:var(--surface);color:var(--ink);font-family:var(--font-display);font-weight:600;font-size:var(--fs-16);box-shadow:0 4px 10px rgba(40,25,110,.14);white-space:nowrap;cursor:pointer}
-.mlab em{font-style:normal;color:#C2542A}
-.mlab em:empty{display:none}
-.mlab.dot::after,.mlab.gdot::after{content:'';position:absolute;right:-2px;top:-2px;width:11px;height:11px;border-radius:50%;background:var(--rose);border:2px solid var(--surface)}
+.mset.live .mback{pointer-events:auto}
+/* etiketler görünmez düğmelerdir (ekran okuyucu ve öğretim için): yazı dilimin içinde canvas'tadır (kullanıcı: "yazılar sırıtmış, sığmamış"), dokunuşu dilim alır, yana kaydırma kesilmesin */
+.mlab{position:absolute;left:0;top:0;transform:translate(-50%,-50%);border:0;border-radius:15px;padding:0;background:none;color:transparent;font-size:1px;pointer-events:none}
+.mlab.dot::after,.mlab.gdot::after{content:'';position:absolute;right:-3px;top:-3px;width:12px;height:12px;border-radius:50%;background:var(--rose);border:2px solid var(--surface)}
 .mlab.gdot::after{background:#F4B63F}
 .mcen{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;pointer-events:none}
 .mcen .title{font-size:var(--mt,34px)}
@@ -885,16 +915,22 @@ html.calm #obFx .h b{display:none}
     </footer>
   </section>
 
-  <section class="scr dim" id="over" aria-label="Sonuç" aria-hidden="true">
-    <div class="card glass">
-      <p class="eyebrow rise" style="--i:0" id="ovTitle"></p>
-      <div class="big-score rise" style="--i:1" id="ovScore">0</div>
-      <p class="delta rise" style="--i:2" id="ovDelta"></p>
-      <p class="near-msg rise" style="--i:3" id="ovNear" hidden></p>
-      <p class="near-msg rise" style="--i:3;background:var(--lilac-soft)" id="ovJoker" hidden></p>
-      <div class="tip rise" style="--i:3" id="ovTip" hidden><span id="ovTipT"></span><button class="btn" id="ovTipBtn" type="button"></button></div>
-      <div class="stat-row rise" style="--i:4" id="ovStats"></div>
-      <div class="cont rise" style="--i:5" id="cont">
+  <section class="scr" id="over" aria-label="Sonuç" aria-hidden="true">
+    <div class="ovtop" id="ovTop"></div>
+    <div class="ovc" id="ovC"><p class="eyebrow" id="ovTitle"></p><div class="big-score" id="ovScore">0</div><p class="delta" id="ovDelta"></p></div>
+    <div class="ovch" id="ovCh"><p class="near-msg" id="ovNear" hidden></p><p class="ovcd" id="ovCd"></p></div>
+    <div class="ovsheet" id="ovSheet">
+      <i class="ovgrab" aria-hidden="true"></i>
+      <b class="ovhead" id="ovHead"></b>
+      <p class="ovline" id="ovLine"></p>
+      <div class="stat-row" id="ovStats"></div>
+      <button class="btn primary big" id="againBtn" type="button" data-i18n="again">Tekrar dene</button>
+      <div class="ovrow">
+        <button class="btn soft" id="bagBtn2" type="button" data-i18n="shop">Mağaza</button>
+        <button class="btn soft" id="homeBtn" type="button" data-i18n="home">Ana ekran</button>
+      </div>
+    </div>
+    <div class="cont" hidden id="cont">
         <div class="cont-head"><b data-i18n="contTitle">İkinci şans</b><span id="contSub"></span></div>
         <div class="cd" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="var(--track)" stroke-width="5"/><circle id="cdArc" cx="32" cy="32" r="28" fill="none" stroke="var(--btn)" stroke-width="5" stroke-linecap="round" stroke-dasharray="176" transform="rotate(-90 32 32)"/></svg><i class="pl"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="var(--on-btn)"/></svg></i></div>
         <div class="cont-actions" id="contActs">
@@ -902,19 +938,15 @@ html.calm #obFx .h b{display:none}
           <button class="btn" id="coinBtn" type="button"><span class="lbl" data-i18n="resume">Devam et</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><span id="coinCost">25</span></button>
         </div>
       </div>
-      <button class="btn primary big rise" style="--i:6" id="againBtn" type="button" data-i18n="again">Tekrar dene</button>
-      <div class="row2 rise" style="--i:7">
-        <button class="btn quiet" id="bagBtn2" type="button" data-i18n="shop">Mağaza</button>
-        <button class="btn quiet" id="homeBtn" type="button" data-i18n="home">Ana ekran</button>
-      </div>
-    </div>
   </section>
 
-  <section class="scr dim" id="pause" aria-label="Duraklatıldı" aria-hidden="true">
-    <div class="card glass">
-      <p class="eyebrow rise" style="--i:0" data-i18n="paused">Duraklatıldı</p>
-      <button class="btn primary big rise" style="--i:1" id="resumeBtn" type="button" data-i18n="resume">Devam et</button>
-      <button class="btn quiet rise" style="--i:2" id="pauseMenuBtn" type="button" data-i18n="toMenu">Menü</button>
+  <section class="scr" id="pause" aria-label="Duraklatıldı" aria-hidden="true">
+    <div class="pwin">
+      <p class="eyebrow" data-i18n="paused">Duraklatıldı</p>
+      <div class="ovrow">
+        <button class="btn primary" id="resumeBtn" type="button" data-i18n="resume">Devam et</button>
+        <button class="btn soft" id="pauseMenuBtn" type="button" data-i18n="toMenu">Menü</button>
+      </div>
     </div>
   </section>
 
@@ -1253,7 +1285,7 @@ try { LANG = pickLang((JSON.parse(localStorage.getItem('kilpayi.v1') || '{}') ||
 let SN = LANG === 'tr' ? 'sn' : 's';
 const STR = {
   tr: {
-    m_sure: 'Süreli', m_book: 'Defter', m_back: 'Geri', m_sureSub: 'Süre bitmeden en çok puan', m_bolum: 'Bölümler',
+    m_coins: '{n} altın', m_chance: '+{a} {u} · {n} {v} içinde', m_sure: 'Süreli', m_book: 'Defter', m_back: 'Geri', m_sureSub: 'Süre bitmeden en çok puan', m_bolum: 'Bölümler',
     title: 'Kıl payı', tagline: 'Süre bitmek üzereyken vur, puan ×3.', play: 'Oyna', best: 'En iyi', runs: 'Oyun', bestLvl: 'Seviye',
     zone: 'Son 1 sn: ×3', perfect: 'Mükemmel', near: 'Kıl payı ×3', miss: 'Iska', reverse: 'Ters yön', breath: 'Nefes al',
     tut1: 'Şeftali bölgedeyken dokun', tut2: 'Süre bitmek üzereyken vur: ×3',
@@ -1363,7 +1395,7 @@ const STR = {
     ic_sicak: 'Yayın sonu kızıl: sıcak|Tutarken yanarsın, süre erir|Yine de sonda bırak: ×2'
   },
   en: {
-    m_sure: 'Timed', m_book: 'Book', m_back: 'Back', m_sureSub: 'Score as much as you can before time runs out', m_bolum: 'Levels',
+    m_coins: '{n} coins', m_chance: '+{a}{u} · {n}{v} left', m_sure: 'Timed', m_book: 'Book', m_back: 'Back', m_sureSub: 'Score as much as you can before time runs out', m_bolum: 'Levels',
     title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs', bestLvl: 'Level',
     zone: 'Last 1 s: ×3', perfect: 'Perfect', near: 'Close call ×3', miss: 'Miss', reverse: 'Reversed', breath: 'Catch your breath',
     tut1: 'Tap when the pointer is in the peach zone', tut2: 'Hit it as time runs out: ×3',
@@ -1569,7 +1601,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.12.0';
+const VERSION = 'V0.12.1';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -2194,7 +2226,6 @@ const refreshMenu = () => {
   campEl.textContent = t('camp', { n: Math.min(save.camp, 11) });
   $('bagBtn').classList.toggle('gdot', shopDot());
   $('bookBtn').classList.toggle('dot', bookNew());
-  $('mSet2').querySelectorAll('.mlab').forEach(b => { b.querySelector('em').textContent = save.bests[b.getAttribute('data-m')] || ''; });
   placeMenu();
 };
 /* Hedef rozeti (V0.9.10): puanın yanında "/ 180"; 180 aşılacak rekordur (çerçeveli). Henüz rekor yoksa görünmez; rekor geçilince altın olur ve tik alır (V0.9.0'daki altın "En iyi" çipinin yerine). */
@@ -2640,7 +2671,11 @@ const relayout = snap => {
     const hb = $('menuHead').getBoundingClientRect().bottom - top;
     const ft = $('menuFoot').getBoundingClientRect().top - top;
     cy = (hb + ft) / 2;
-    r = Math.min(w * 0.31, (ft - hb) / 2 - 62);
+    r = Math.min(w * 0.355, (ft - hb) / 2 - 34);
+  } else if (G.mode === 'over' && OV.st === 'end') {
+    /* alt sayfanın üstünde kalan alana küçülür */
+    const st = $('ovSheet').offsetTop;
+    r = Math.min(w * 0.24, st / 2 - 44); cy = st / 2 + 6;
   } else {
     /* yukarıdan aşağı: HUD, kart / haber satırının yeri, halka, halkanın altında joker sırası */
     const hudB = (hudEl.offsetTop + hudEl.offsetHeight) || 140;
@@ -2736,7 +2771,7 @@ const start = (fromL, snap) => {
   save.bestL = Math.max(save.bestL, G.L);
   if (!snap) banner(t('bnLevel', { n: L0 }), L0 > 1 ? t('campRun') : '');
   spawnQuiet = true; spawnChallenge(!snap); spawnQuiet = false;
-  hide(menuEl); hide(overEl); hide(pauseEl); hideShop();
+  hide(menuEl); hide(overEl); hide(pauseEl); hideShop(); ovStage(''); app.classList.remove('ovr');
   app.classList.add('playing');
   hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
   toolsEl.classList.add('on');
@@ -2760,7 +2795,7 @@ const goMenu = () => {
   G.thT = 0; G.thDirty = true; G.banner = null; G.count = 0; G.card = null; G.tail = null; G.adv = null;
   G.practice = null; hide($('pracDone')); app.classList.remove('prac');
   G.ob = null; G.hold = ''; G.rw = null; G.obd = []; app.classList.remove('obr');
-  MN.lvl = 0; MN.hv = 0; MN.fly = null; MN.drag = null; MN.pend = false; menuSync();
+  MN.lvl = 0; MN.hv = 0; MN.fly = null; MN.drag = null; MN.pend = false; menuSync(); ovStage(''); app.classList.remove('ovr');
   hide(overEl); hide(pauseEl); hideShop();
   app.classList.remove('playing');
   hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
@@ -3325,43 +3360,27 @@ const overMood = () => {
 const showOver = () => {
   G.mode = 'over'; G.overAt = performance.now();
   const [mood, line] = overMood();
-  const ovT = $('ovTitle'); ovT.textContent = line; ovT.className = 'eyebrow rise' + (mood ? ' mood ' + mood : '');
-  const tipEl = $('ovTip');
-  let tk = '';
-  if (save.lvl !== 'rahat' && save.low >= 3 && !save.tips.easy) tk = 'easy';
-  else if (save.lvl === 'normal' && save.high >= 2 && !save.tips.hard) tk = 'hard';
-  else if (save.lvl === 'usta' && save.highU >= 2 && !save.tips.hell) tk = 'hell';
-  if (tk) {
-    save.tips[tk] = true; persist();
-    const to = tk === 'easy' ? (save.lvl === 'cehennem' ? 'usta' : 'rahat') : (tk === 'hard' ? 'usta' : 'cehennem');
-    $('ovTipT').textContent = t(tk === 'easy' ? 'tipEasy' : (tk === 'hard' ? 'tipHard' : 'tipHell'));
-    $('ovTipBtn').textContent = t(to === 'rahat' ? 'tipEasyBtn' : (to === 'usta' ? 'tipHardBtn' : 'tipHellBtn'));
-    tipEl.setAttribute('data-to', to); tipEl.hidden = false;
-  } else tipEl.hidden = true;
+  const ovT = $('ovTitle'); ovT.textContent = line; ovT.className = 'eyebrow' + (mood ? ' mood ' + mood : '');
+  $('ovHead').textContent = line; $('ovHead').classList.toggle('gold', mood === 'gold');
   countUp($('ovScore'), G.score, 600);
   const gold = G.newBest && G.score > 0 && G.n >= 10;
   $('ovScore').classList.toggle('gold', gold);
   if (gold && G.score >= CFG.recMin) spawnConf(150, { x0: 10, x1: view.w - 10, y0: -14, vx: 50, vy0: 70, vy1: 70, delay: 0.1, spread: 1.2, life: 3.2 });
   const d = $('ovDelta');
   d.hidden = G.score === 0;
-  if (G.newBest && G.score > 0) { d.textContent = t('newBest'); d.className = 'delta win rise' + (gold ? ' gold' : ''); }
-  else if (G.campRun) { d.textContent = t('campRun'); d.className = 'delta rise'; d.hidden = false; }
-  else { d.textContent = t('toBest', { n: Math.max(1, bestNow() - G.score) }); d.className = 'delta rise'; }
+  if (G.newBest && G.score > 0) { d.textContent = t('newBest'); d.className = 'delta win' + (gold ? ' gold' : ''); }
+  else if (G.campRun) { d.textContent = t('campRun'); d.className = 'delta'; d.hidden = false; }
+  else { d.textContent = t('toBest', { n: Math.max(1, bestNow() - G.score) }); d.className = 'delta'; }
   const nm = $('ovNear');
   if (G.nearMsg) { nm.textContent = G.nearMsg; nm.hidden = false; } else { nm.hidden = true; }
-  const jn = $('ovJoker'), spare = equipped().filter(id => save.tools[id].n > 0);
-  if (!G.usedAny && spare.length && G.n >= 8) {
-    const id = G.lastAdv && save.tools[G.lastAdv].n > 0 ? G.lastAdv : spare[0];
-    jn.textContent = t('unusedJ', { t: t('tool_' + id) }); jn.hidden = false;
-  } else jn.hidden = true;
   const coinIcon = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach);width:16px;height:16px"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg>';
   const isHell = save.lvl === 'cehennem';
   const chips = ['<span class="chip sm' + (isHell ? ' x' : '') + '">' + (isHell ? t('lv_cehennem') + ' · ' : '') + t('overLevel', { n: G.L }) + '</span>'];
-  if (G.near > 0) chips.push('<span class="chip sm">' + t('statNear') + ' <b>' + G.near + '</b></span>');
-  if (G.maxCombo >= 3) chips.push('<span class="chip sm">' + t('statCombo') + ' <b>' + G.maxCombo + '</b></span>');
   if (G.gain > 0) chips.push('<span class="chip sm">' + coinIcon + '<b>+' + G.gain + '</b></span>');
   const st = $('ovStats');
   st.innerHTML = chips.join(''); st.hidden = chips.length === 0;
+  $('ovTop').innerHTML = chips.join('');
+  $('ovLine').textContent = (d.hidden ? '' : d.textContent) + (G.nearMsg ? (d.hidden ? '' : ' · ') + G.nearMsg : '');
   const canCont = G.contN < CFG.contMax && G.n >= 3, cost = contCost(G.contN), adOk = G.contN < CFG.contAds;
   contEl.hidden = !canCont; contEl.classList.remove('fade');
   $('contSub').textContent = '+' + CFG.contTime + ' ' + SN + (G.contN >= CFG.contMax - 1 ? ' · ' + t('contLast') : (G.contN >= 1 ? ' · ' + t('contNth', { n: G.contN + 1 }) : ''));
@@ -3370,6 +3389,9 @@ const showOver = () => {
   $('adBtn').hidden = !adOk; contActsEl.classList.toggle('one', !adOk);
   contLeft = canCont ? CFG.contWait + 0.4 : 0; setCd();
   $('live').textContent = t('overSr', { n: G.score });
+  G.banner = null; G.reform = 0; app.classList.add('ovr');
+  if (G.burn) G.burn.ch = [];   /* çember dilimlerle geri gelirken yanan parçalar üstünde uçuşmasın; kor sürer */
+  ovStage(canCont ? 'ch' : 'end');
   show(overEl);
 };
 
@@ -3389,7 +3411,7 @@ const doContinue = (rewarded = false) => {
   if (g1) G.ang2 = norm(pinCenter(g1) - G.dir2 * 1.3);
   G.vel = NaN; G.vel2 = NaN;   /* ibre yeni yerinden hedef hızla başlar */
   G.gateT = 0;
-  hide(overEl);
+  hide(overEl); ovStage(''); app.classList.remove('ovr');
   toolsEl.classList.add('on');
   pop('+' + CFG.contTime + ' ' + SN, 'perfect');
   Snd.ui(); relayout(false); updateHud();
@@ -4148,7 +4170,7 @@ const warmVeilEl = $('warmVeil'), wvFill = $('wvFill');
 WARM.done = (save.warm | 0) >= WARM_EPOCH || !!window.NO_WARM;
 const warmOk = () => G.mode === 'menu' && !SS.open && !SS.closing && !document.hidden && !G.practice && menuEl.classList.contains('on') &&
   !settingsEl.classList.contains('on') && !bookEl.classList.contains('on') && !adEl.classList.contains('on') && !$('swap').classList.contains('on');
-const WARM_CARDS = ['settings', 'book', 'pause', 'over'];
+const WARM_CARDS = ['settings', 'book'];
 const warmVeil = on => {
   if (on) { warmVeilEl.classList.remove('out'); warmVeilEl.classList.add('on'); warmVeilEl.removeAttribute('aria-hidden'); wvFill.style.width = '0%'; }
   else if (warmVeilEl.classList.contains('on')) {
@@ -4418,10 +4440,11 @@ const update = (raw, elapsed = raw) => {
   G.clock += raw;
   const k = Math.min(1, raw * 9);
   view.cx += (view.tcx - view.cx) * k; view.cy += (view.tcy - view.cy) * k; view.r += (view.tr - view.r) * k;
+  menuStep(raw); ovStep(raw);
   /* Duraklatmada her şey donar: sayaçlar, tema geçişi, parçacıklar. */
   if (G.mode === 'pause') return;
   if (G.mode === 'play' && G.introQ.length && !G.holding && !G.practice) startIntro();
-  hellFx(raw); burnStep(raw); menuStep(raw);
+  hellFx(raw); burnStep(raw);
   if (G.tsT > 0) { G.tsT -= raw; if (G.tsT <= 0) G.tscale = 1; }
   const dt = raw * G.tscale;
 
@@ -4540,7 +4563,7 @@ const update = (raw, elapsed = raw) => {
   /* ikinci şans: 5 sn içinde karar; dükkân açıkken ya da reklam oynarken sayaç durur */
   if (G.mode === 'over' && contLeft > 0 && !contEl.hidden && !shopEl.classList.contains('on')) {
     contLeft -= elapsed;
-    if (contLeft <= 0) { contLeft = 0; contEl.classList.add('fade'); setTimeout(() => { contEl.hidden = true; contEl.classList.remove('fade'); }, 420); }
+    if (contLeft <= 0) { contLeft = 0; contEl.hidden = true; ovStage('end'); }
     setCd();
   }
 };
@@ -5575,14 +5598,15 @@ const render = () => {
 
   /* Cehennem: bütün çember (çentikler, hedefler, ibre) birlikte döner; etiket ve parçacıklar dönmeyen katmanda kalır */
   const bu = G.mode === 'dead' || G.mode === 'over' ? G.burn : null;
-  const clipR = bu && bu.t >= BURN.flame ? 0.01 : (G.reform < 1 ? R * 1.6 * easeOut(G.reform) + 0.01 : -1);
+  /* sonuç ekranı açılınca çember yeniden belirir, kor sürer */
+  const clipR = G.mode === 'dead' && bu && bu.t >= BURN.flame ? 0.01 : (G.reform < 1 ? R * 1.6 * easeOut(G.reform) + 0.01 : -1);
   if (clipR >= 0) { c.save(); c.beginPath(); c.arc(cx, cy, clipR, 0, TAU); c.clip(); }
   const hx = HX.s > 0.003 || HX.r !== 0;
   if (hx) { c.save(); c.translate(cx, cy); c.rotate(HX.r); c.translate(-cx, -cy); drawRot = HX.r; }
   const r0 = R + RW / 2 + 10;
   const iv = G.mode === 'menu' ? 0 : G.Ivis;
   c.lineCap = 'round'; c.strokeStyle = mixHex(P.tick, P.rose, 0.8 * iv);
-  const mfk = 1 - MN.mf;   /* kadran menüde çentik yok; oyuna geçerken belirir */
+  const mfk = 1 - Math.max(MN.mf, OV.k);   /* kadran menüde ve ikinci şansta çentik yok; oyuna geçerken belirir */
   for (let i = 0; i < 60 && mfk > 0.01; i++) {
     const a = i / 60 * TAU - HALF + HX.tr, long = i % 5 === 0, r1 = r0 + (long ? 13 + 5 * iv : 7 + 3 * iv), ca = Math.cos(a), sa = Math.sin(a);
     c.globalAlpha = (long ? 0.95 : 0.55 + 0.3 * iv) * mfk; c.lineWidth = (long ? 2.6 : 1.6) + 0.6 * iv;
@@ -5590,7 +5614,7 @@ const render = () => {
   }
   c.globalAlpha = 1;
 
-  c.lineCap = 'butt'; c.lineWidth = RW + (R * MENU_LW - RW) * MN.mf; c.strokeStyle = MN.hv > 0.5 ? 'rgba(255,255,255,.14)' : P.track;
+  c.lineCap = 'butt'; c.lineWidth = RW + (R * MENU_LW - RW) * Math.max(MN.mf, OV.k); c.strokeStyle = MN.hv > 0.5 ? 'rgba(255,255,255,.14)' : P.track;
   c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
   c.lineWidth = RW;
   if (two) { c.lineWidth = RW2; c.beginPath(); c.arc(cx, cy, R2, 0, TAU); c.stroke(); }
@@ -5600,7 +5624,7 @@ const render = () => {
     c.beginPath(); c.arc(cx, cy, two ? R2 - RW2 / 2 - 4 : R - RW / 2 - 4, 0, TAU); c.fill();
     c.globalAlpha = 1;
   }
-  if (G.mode !== 'menu' && !G.practice) {
+  if (G.mode !== 'menu' && G.mode !== 'over' && !G.practice) {
     /* sıvı çemberin dönüşünü izlemez (V0.9.6): döndürülmüş bağlamda ters yöne döndürülüp çizilir, yüzeyi hep yatay kalır */
     if (hx) { c.save(); c.translate(cx, cy); c.rotate(-HX.r); c.translate(-cx, -cy); }
     drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 0);
@@ -5616,8 +5640,8 @@ const render = () => {
   }
 
   const gk = easeOut(clamp(G.gateT / 0.25, 0, 1));
-  drawMenuRing(c, cx, cy, R);
-  const pins = G.mode === 'menu' ? MENU_PINS : G.pins;
+  drawMenuRing(c, cx, cy, R); drawOverRing(c, cx, cy, R);
+  const pins = G.mode === 'menu' || G.mode === 'over' ? MENU_PINS : G.pins;
   if (gk > 0) {
     let gi = 0;
     for (const p of pins) {
@@ -5665,7 +5689,7 @@ const render = () => {
   };
   if (G.mode !== 'menu') {
     if (G.practice) drawPracCenter(c, cx, cy, R, two);
-    else if (!bu || bu.t < 0.3) { if (bu) c.globalAlpha = clamp(1 - bu.t / 0.3, 0, 1); drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 1); }   /* yanınca kalan süre yazısı da solar */
+    else if (G.mode !== 'over' && (!bu || bu.t < 0.3)) { if (bu) c.globalAlpha = clamp(1 - bu.t / 0.3, 0, 1); drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 1); }   /* yanınca kalan süre yazısı da solar */
     c.globalAlpha = 1;
     if (two && G.lockLeft > 0 && G.mode === 'play') drawLockTimer(c, cx, cy, R);
     if (G.mode === 'count' && G.count > 0) drawCount(c, cx, cy, R);
@@ -5721,8 +5745,8 @@ app.addEventListener('pointerdown', e => {
   if (overlayOpen()) return;
   if (G.mode === 'play') tap(e.clientX - app.getBoundingClientRect().left);
   else if (G.mode === 'menu') menuDown(e);
-  else if (G.mode === 'over' && performance.now() - G.overAt > 700) start(G.startL);
-  else if (G.mode === 'pause') resume();
+  else if (G.mode === 'over') ovDown(e);
+  else if (G.mode === 'pause') { if (!(tg.closest && tg.closest('.pwin'))) resume(); }
   else if (G.mode === 'intro') skipIntro();
   else if (G.mode === 'hold') obHoldTap();
 });
@@ -5783,11 +5807,6 @@ $('swapYes').addEventListener('click', () => {
   toast(t('lvPicked', { l: t('lv_' + to) }));
 });
 $('swapNo').addEventListener('click', () => { Snd.unlock(); Snd.ui(); hide($('swap')); });
-$('ovTipBtn').addEventListener('click', () => {
-  const to = $('ovTip').getAttribute('data-to');
-  Snd.unlock(); Snd.ui(); setLevel(to); $('ovTip').hidden = true;
-  toast(t('lvPicked', { l: t('lv_' + to) }));
-});
 document.querySelectorAll('#menu .mlab').forEach(b => b.addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') menuGo(b.getAttribute('data-m')); }));
 $('mBack').addEventListener('click', () => { Snd.unlock(); Snd.ui(); menuBack(); });
 /* Kayıtlı oyun varken "Yeni oyun": önce sorar, 3,5 sn içinde ikinci dokunuşla silip başlar. */
@@ -5843,7 +5862,7 @@ const MENU_LW = 0.33, MENU_FLY = 0.16;
 const MENU1 = [{ id: 'bolum', a0: -70, a1: 70, c: [255, 142, 92], ic: 'M8 5l11 7-11 7z', fill: 1 }, { id: 'sure', a0: 70, a1: 165, c: [142, 123, 242], ic: 'M12 6.5a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM12 13.5V10M10 3h4M12 3v3.5' }, { id: 'store', a0: 165, a1: 235, c: [242, 183, 60], ic: 'M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8' }, { id: 'book', a0: 235, a1: 290, c: [192, 180, 248], ic: 'M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5zM5 17a3 3 0 0 1 3-3h10' }];
 const MENU2 = [{ id: 'rahat', a0: -45, a1: 45, c: [123, 200, 164] }, { id: 'normal', a0: 45, a1: 135, c: [142, 123, 242] }, { id: 'usta', a0: 135, a1: 225, c: [255, 167, 124] }, { id: 'cehennem', a0: 225, a1: 315, c: [240, 80, 60] }];
 MENU1.forEach(s => { s.path = new Path2D(s.ic); });
-const MN = { lvl: 0, hv: 0, hvW: -1, mf: 1, press: [0, 0, 0, 0], fly: null, drag: null, pend: false };
+const MN = { lvl: 0, hv: 0, hvW: -1, mf: 1, press: [0, 0, 0, 0], fly: null, drag: null, pend: false, txKey: '', fontOk: 0 };
 const DEG = Math.PI / 180;
 const menuSegs = () => (MN.lvl ? MENU2 : MENU1);
 const menuSync = () => {
@@ -5854,19 +5873,19 @@ const menuSync = () => {
   $('mSet1').classList.toggle('live', MN.hv <= 0.5); $('mSet2').classList.toggle('live', MN.hv > 0.5);
 };
 const placeMenu = () => {
-  const cx = view.tcx, cy = view.tcy, R = view.tr, W = view.w;
-  if (!(R > 0) || !W) return;
-  const rr = R + R * MENU_LW / 2 + 24;
+  const cx = view.tcx, cy = view.tcy, R = view.tr;
+  if (!(R > 0) || !view.w) return;
+  const lw = R * MENU_LW;
   const put = (S, box) => S.forEach(s => {
     const b = box.querySelector('[data-m="' + s.id + '"]');
     if (!b) return;
-    const m = (s.a0 + s.a1) / 2 * DEG, hw = b.offsetWidth / 2 + 6;
-    b.style.left = Math.round(clamp(cx + Math.sin(m) * rr, hw, W - hw)) + 'px'; b.style.top = Math.round(cy - Math.cos(m) * rr) + 'px';
+    const m = (s.a0 + s.a1) / 2 * DEG, st = b.style;
+    st.left = Math.round(cx + Math.sin(m) * R) + 'px'; st.top = Math.round(cy - Math.cos(m) * R) + 'px'; st.width = Math.round(lw * 1.7) + 'px'; st.height = Math.round(lw * 1.1) + 'px';
   });
   put(MENU1, $('mSet1')); put(MENU2, $('mSet2'));
   [$('mCenter'), $('mBack')].forEach(e => { e.style.left = cx + 'px'; e.style.top = cy + 'px'; });
   const m = $('menu').style; m.setProperty('--mt', Math.round(R * 0.26) + 'px'); m.setProperty('--mw', Math.round(R * 1.2) + 'px');
-  $('mHint').style.top = Math.round(cy + R + R * MENU_LW / 2 + 58) + 'px';
+  $('mHint').style.top = Math.round(cy + R + lw / 2 + 28) + 'px';
   const gl = $('mGlow').style; gl.setProperty('--mx', cx + 'px'); gl.setProperty('--my', cy + 'px');
 };
 const menuStep = raw => {
@@ -5944,11 +5963,51 @@ window.addEventListener('pointerup', e => {
   if (d.pick) menuGo(d.pick);
 });
 window.addEventListener('pointercancel', e => { if (MN.drag && e.pointerId === MN.drag.id) { MN.drag = null; MN.lvl = MN.hv > 0.5 ? 1 : 0; } });
+/* dilim yazısı ve ikonlar: harf harf kıvrık yazı her karede pahalı olurdu, bir kez saydam tuvale basılır (dil, boyut, rekor ya da yarım oyun değişince yeniden) */
+const menuLabel = s => (s.lb ? s.lb() : s.fill ? t(save.run ? 'resume' : 'm_bolum') : s.id === 'sure' ? t('m_sure') : s.id === 'store' ? t('shop') : s.id === 'book' ? t('m_book') : t('lv_' + s.id) + (save.bests[s.id] ? ' · ' + save.bests[s.id] : ''));
+const arcText = (g, str, r, mid, fs, room) => {
+  g.font = '600 ' + fs + 'px ' + FD;
+  let tot = g.measureText(str).width;
+  if (tot > room) { fs = Math.max(9, Math.floor(fs * room / tot)); g.font = '600 ' + fs + 'px ' + FD; tot = g.measureText(str).width; }
+  const up = Math.cos(mid) > -0.2;
+  let pre = 0;
+  for (const ch of str) {
+    const w = g.measureText(ch).width, a = up ? mid - tot / (2 * r) + (pre + w / 2) / r : mid + tot / (2 * r) - (pre + w / 2) / r;
+    g.save(); g.translate(Math.sin(a) * r, -Math.cos(a) * r); g.rotate(up ? a : a + Math.PI); g.fillText(ch, 0, 0); g.restore();
+    pre += w;
+  }
+  return tot;
+};
+const menuTextLayer = (S, R, size) => {
+  const cvs = document.createElement('canvas'), d = view.dpr;
+  cvs.width = cvs.height = Math.ceil(size * d);
+  const g = cvs.getContext('2d'), sc = R / 132, fs = Math.round(R * 0.125);
+  g.setTransform(d, 0, 0, d, size * d / 2, size * d / 2);
+  g.fillStyle = '#FFFFFF'; g.strokeStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  S.forEach(s => {
+    const m = (s.a0 + s.a1) / 2 * DEG, room = (s.a1 - s.a0) * DEG * R * 0.8, up = Math.cos(m) > -0.2, dir = up ? 1 : -1, str = menuLabel(s);
+    if (!s.path) { arcText(g, str, R, m, fs, room); return; }
+    g.font = '600 ' + fs + 'px ' + FD;
+    const tw = Math.min(room - 28 * sc, g.measureText(str).width), gap = (tw / 2 + 15 * sc) / R, ia = m - dir * gap;
+    arcText(g, str, R, m + dir * (11 * sc / R), fs, room - 28 * sc);
+    g.save(); g.translate(Math.sin(ia) * R - 11 * sc, -Math.cos(ia) * R - 11 * sc); g.scale(0.92 * sc, 0.92 * sc);
+    if (s.fill) g.fill(s.path); else { g.lineWidth = 2.2; g.lineJoin = 'round'; g.lineCap = 'round'; g.stroke(s.path); }
+    g.restore();
+  });
+  return cvs;
+};
+const menuText = R => {
+  const key = [LANG, Math.round(R), view.dpr, !!save.run, LEVELS.map(l => save.bests[l]).join(), MN.fontOk].join('|');
+  if (key === MN.txKey) return;
+  MN.txKey = key; MN.txR = R; MN.txS = R * 2.6;
+  MN.tx1 = menuTextLayer(MENU1, R, MN.txS); MN.tx2 = menuTextLayer(MENU2, R, MN.txS);
+};
+if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', () => { MN.fontOk = (MN.fontOk | 0) + 1; });
 /* parıltı için shadowBlur YOK: yazılımla çizen cihazda her karede pahalı; geniş ve saydam yay yeter */
 const drawMenuRing = (c, cx, cy, R) => {
   const k = MN.mf;
   if (k <= 0.01) return;
-  const lw = R * MENU_LW, sc = R / 132, n = norm(G.ang), hv = MN.hv;
+  const lw = R * MENU_LW, n = norm(G.ang), hv = MN.hv;
   for (let i = 0; i < 4; i++) {
     const p = MENU1[i], q = MENU2[i], a0 = (p.a0 + (q.a0 - p.a0) * hv) * DEG, a1 = (p.a1 + (q.a1 - p.a1) * hv) * DEG, m = (a0 + a1) / 2, w = a1 - a0 - 0.05;
     const col = 'rgb(' + p.c.map((v, j) => Math.round(v + (q.c[j] - v) * hv)).join(',') + ')', pr = MN.press[i], on = Math.abs(((n - m) % TAU + 1.5 * TAU) % TAU - TAU / 2) < w / 2;
@@ -5956,11 +6015,12 @@ const drawMenuRing = (c, cx, cy, R) => {
     c.lineCap = 'butt'; c.strokeStyle = col;
     if (on || pr > 0) { c.globalAlpha = k * (pr > 0 ? 0.28 : 0.2); c.lineWidth = lw + 12 + pr * 12; c.beginPath(); c.arc(cx, cy, R + pr * 4, s0, s1); c.stroke(); }
     c.globalAlpha = k; c.lineWidth = lw + pr * 10; c.beginPath(); c.arc(cx, cy, R + pr * 4, s0, s1); c.stroke();
-    if (hv < 0.98) {
-      c.save(); c.globalAlpha = k * (1 - hv); c.translate(cx + Math.sin(m) * R - 13 * sc, cy - Math.cos(m) * R - 13 * sc); c.scale(1.08 * sc, 1.08 * sc);
-      if (p.fill) { c.fillStyle = '#FFFFFF'; c.fill(p.path); } else { c.strokeStyle = '#FFFFFF'; c.lineWidth = 2.2; c.lineJoin = 'round'; c.lineCap = 'round'; c.stroke(p.path); }
-      c.restore();
-    }
+  }
+  if (G.mode === 'menu') menuText(view.tr);
+  if (MN.tx1) {
+    const S = MN.txS * R / MN.txR, tA = Math.max(0, 1 - hv * 2), tB = Math.max(0, hv * 2 - 1);
+    if (tA > 0.01) { c.globalAlpha = k * tA; c.drawImage(MN.tx1, cx - S / 2, cy - S / 2, S, S); }
+    if (tB > 0.01) { c.globalAlpha = k * tB; c.drawImage(MN.tx2, cx - S / 2, cy - S / 2, S, S); }
   }
   c.globalAlpha = 1;
 };
@@ -6003,6 +6063,102 @@ if (AppP) {
     });
   } catch (e) {}
 }
+/* ---------- oyun sonu: ikinci şans kadranı (V0.12.1) ----------
+   Kullanıcı: "her yer kadran olmasın, ama kadranın ikinci şans kısmı çok iyi". Çember yanar, dilimlerle geri gelir: Reklam izle, Tekrar, Ana ekran, altın; dıştaki çizgi süreyi gösterir. Süre bitince dilimler söner, kadran küçülür, alt sayfa gelir.
+   Dilim eylemleri #adBtn ve #coinBtn'i tıklar: ikinci şansın bütün kuralları (kota, süre, reklam yaşam döngüsü) tek yerde kalır. */
+const OV_RE = 'M4 12a8 8 0 1 0 2.5-5.8M4 4v5h5', OV_HOME = 'M4 11.5 12 5l8 6.5M6.5 10v9.5h11V10';
+const ovCost = () => contCost(G.contN);
+const OVS = {
+  ad: { id: 'ad', c: [142, 123, 242], fill: 1, path: MENU1[0].path, lb: () => t('watchAd') },
+  re: { id: 're', c: [255, 142, 92], path: new Path2D(OV_RE), lb: () => t('again') },
+  home: { id: 'home', c: [192, 180, 248], path: new Path2D(OV_HOME), lb: () => t('home') },
+  coin: { id: 'coin', c: [242, 183, 60], lb: () => t('m_coins', { n: ovCost() }) }
+};
+const OV = { st: '', k: 0, press: {}, fly: null, S: [], key: '', tx: null, txR: 1, txS: 1, px: -1 };
+const ovSegs = () => {
+  const adOk = G.contN < CFG.contAds, g = (o, a0, a1) => Object.assign({}, o, { a0, a1 });
+  return adOk ? [g(OVS.ad, -68, 68), g(OVS.re, 68, 165), g(OVS.home, 165, 235), g(OVS.coin, 235, 292)] : [g(OVS.coin, -80, 80), g(OVS.re, 80, 195), g(OVS.home, 195, 280)];
+};
+const ovStage = st => {
+  if (st === OV.st) return;
+  OV.st = st; OV.fly = null; OV.px = -1;
+  if (st === 'ch') OV.S = ovSegs();
+  if (st === 'end') G.overAt = performance.now();
+  overEl.classList.toggle('ch', st === 'ch'); overEl.classList.toggle('end', st === 'end');
+  relayout(false);
+};
+const ovStep = raw => {
+  const tg = G.mode === 'over' && OV.st === 'ch' ? 1 : 0;
+  if (OV.k !== tg) { OV.k = RM ? tg : OV.k + (tg - OV.k) * Math.min(1, raw * 9); if (Math.abs(OV.k - tg) < 0.01) OV.k = tg; }
+  for (const k in OV.press) if (OV.press[k] > 0) OV.press[k] = Math.max(0, OV.press[k] - raw * 2.6);
+  if (G.mode !== 'over') return;
+  HX.r = 0;
+  const f = OV.fly;
+  if (f) {
+    f.t += raw / MENU_FLY;
+    const e = Math.min(1, f.t);
+    G.ang = norm(f.from + f.d * (1 - (1 - e) * (1 - e)));
+    if (e >= 1) { OV.fly = null; ovHit(f); }
+  } else G.ang = norm(G.ang + 0.85 * raw);
+  /* puan kadranın ortasını izler; yalnız değişince yazılır */
+  const key = Math.round(view.cx) + ',' + Math.round(view.cy) + ',' + Math.round(view.r) + ',' + Math.ceil(contLeft);
+  if (key !== OV.px) {
+    OV.px = key;
+    const oc = $('ovC').style, m = overEl.style, R = view.r;
+    oc.left = view.cx + 'px'; oc.top = view.cy + 'px';
+    m.setProperty('--os', Math.round(R * (OV.st === 'end' ? 0.58 : 0.44)) + 'px'); m.setProperty('--ow', Math.round(R * 1.42) + 'px');
+    $('ovCh').style.top = Math.round(view.cy + R + R * MENU_LW / 2 + 22) + 'px';
+    if (OV.st === 'ch') $('ovCd').textContent = t('m_chance', { a: CFG.contTime, n: Math.ceil(contLeft), u: SN, v: SN });
+  }
+};
+const ovHit = f => {
+  const q = ptXY(view.cx, view.cy, G.ang, view.r), col = 'rgb(' + f.c.join(',') + ')';
+  burst(q[0], q[1], 22, [col, '#FFFFFF', P.peach], 190); fxRing(q[0], q[1], col, 60, 0.45);
+  Snd.tick(true); Platform.haptic('light');
+  if (f.id === 'ad') $('adBtn').click();
+  else if (f.id === 'coin') $('coinBtn').click();
+  else if (f.id === 're') start(G.startL);
+  else goMenu();
+};
+const ovGo = s => {
+  if (OV.fly) return;
+  OV.press[s.id] = 1;
+  const m = (s.a0 + s.a1) / 2 * DEG, d = ((m - G.ang) % TAU + 1.5 * TAU) % TAU - TAU / 2, f = { from: G.ang, d, t: 0, id: s.id, c: s.c };
+  if (RM) { G.ang = norm(m); ovHit(f); return; }
+  OV.fly = f;
+};
+const ovDown = e => {
+  if (OV.st === 'end') {
+    if (!(e.target.closest && e.target.closest('#ovSheet')) && performance.now() - G.overAt > 700) start(G.startL);
+    return;
+  }
+  if (OV.st !== 'ch' || performance.now() - G.overAt < 250) return;
+  const a = app.getBoundingClientRect(), dx = e.clientX - a.left - view.cx, dy = e.clientY - a.top - view.cy, d = Math.hypot(dx, dy), R = view.r;
+  if (d < R * (1 - MENU_LW / 2) || d > R * 1.5) return;
+  const q = (Math.atan2(dx, -dy) / DEG + 360) % 360, s = OV.S.find(g => (q - g.a0 + 720) % 360 <= g.a1 - g.a0);
+  if (s) ovGo(s);
+};
+const drawOverRing = (c, cx, cy, R) => {
+  const k = OV.k;
+  if (k <= 0.01 || !OV.S.length) return;
+  const lw = R * MENU_LW, n = norm(G.ang), poor = save.coins < ovCost();
+  OV.S.forEach(s => {
+    const m = (s.a0 + s.a1) / 2 * DEG, w = (s.a1 - s.a0) * DEG - 0.05, pr = OV.press[s.id] || 0, on = Math.abs(((n - m) % TAU + 1.5 * TAU) % TAU - TAU / 2) < w / 2;
+    const s0 = m - Math.PI / 2 - w / 2, s1 = m - Math.PI / 2 + w / 2;
+    c.lineCap = 'butt'; c.strokeStyle = 'rgb(' + (s.id === 'coin' && poor ? [176, 170, 196] : s.c).join(',') + ')';
+    if (on || pr > 0) { c.globalAlpha = k * (pr > 0 ? 0.28 : 0.2); c.lineWidth = lw + 12 + pr * 12; c.beginPath(); c.arc(cx, cy, R + pr * 4, s0, s1); c.stroke(); }
+    c.globalAlpha = k; c.lineWidth = lw + pr * 10; c.beginPath(); c.arc(cx, cy, R + pr * 4, s0, s1); c.stroke();
+  });
+  const key = [LANG, Math.round(R), view.dpr, MN.fontOk, ovCost(), G.contN < CFG.contAds].join('|');
+  if (key !== OV.key) { OV.key = key; OV.txR = R; OV.txS = R * 2.6; OV.tx = menuTextLayer(OV.S, R, OV.txS); }
+  const S = OV.txS * R / OV.txR;
+  c.globalAlpha = k; c.drawImage(OV.tx, cx - S / 2, cy - S / 2, S, S);
+  if (contLeft > 0 && G.mode === 'over') {
+    c.lineCap = 'round'; c.lineWidth = 5; c.strokeStyle = P.btn;
+    c.beginPath(); c.arc(cx, cy, R + lw / 2 + 9, -Math.PI / 2, -Math.PI / 2 + TAU * clamp(contLeft / CFG.contWait, 0, 1)); c.stroke();
+  }
+  c.globalAlpha = 1;
+};
 /* ---------- öğretim (V0.11.0, V0.11.1'de sıra yenilendi) ----------
    Kullanıcı: "yazı ile info vermek hangi çağda kaldı", sonra "joker kullanınca sıradaki öğrenme faslına geçsin, süre sıfırlanarak bitsin; Cehennem vb. seçmeyi ve kilit defterini de öğret; sıralamayı sen optimize et".
    Talimat yazısı yok; oyun durur, ince çizgi el nereye dokunulacağını gösterir, başka yere dokunulamaz. Sıra:
@@ -6226,11 +6382,12 @@ const obShow = tg => {
       /* geniş düğmede parmak yazının üstüne binmesin: sağ tarafına basar */
       const wide = r.width > 150 && r.height < 96, m = tg.m == null ? 6 : tg.m, cx = r.left - a.left, cy = r.top - a.top;
       hx = cx + r.width * (wide ? 0.78 : 0.5); hy = r.height > 110 ? cy + r.height * 0.34 : cy + r.height / 2;   /* uzun kartta (raftaki joker) adın üstüne binmesin: camına basar */
-      if (tg.el.classList.contains('mlab')) { hx = cx + r.width - 8; hy = cy + r.height - 6; }   /* menü etiketinde yazıyı kapatmasın: köşesine basar */
       /* spot düğmenin kendi şeklidir: köşe yarıçapı düğmeden gelir (mağaza ölçekli çizilir), pay ekranın dışına taşmaz */
       const scale = tg.el.offsetWidth ? r.width / tg.el.offsetWidth : 1, rad = obRad.endsWith('%') ? parseFloat(obRad) / 100 * Math.min(r.width, r.height) : (parseFloat(obRad) || 0) * scale;
       sx = Math.max(2, cx - m); sy = Math.max(2, cy - m); sw = Math.min(a.width - 2, cx + r.width + m) - sx; sh = Math.min(a.height - 2, cy + r.height + m) - sy;
       sr = Math.min(Math.max(rad, 10) + m, sw / 2, sh / 2);
+      /* menü dilimi: spot dilimin ortasında yuvarlak, parmak yazıyı kapatmasın diye kenarına basar */
+      if (tg.el.classList.contains('mlab')) { const d = r.height * 1.5, mx = cx + r.width / 2, my = cy + r.height / 2; sx = mx - d / 2; sy = my - d / 2; sw = sh = d; sr = d / 2; hx = mx + d * 0.3; hy = my + d * 0.34; }
     }
   } else if (tg) { hx = tg.x; hy = tg.y; sx = tg.x - tg.r; sy = tg.y - tg.r; sw = sh = tg.r * 2; sr = tg.r; }
   if (!tg) { if (obOn) { obOn = false; obEl.classList.remove('on', 'dim', 'no', 'flip'); obX = ''; } return; }

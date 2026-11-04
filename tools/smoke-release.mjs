@@ -33,7 +33,7 @@ T('ilk açılış: örtü hemen görünür', await w.eval('document.getElementBy
 let gone = false; for (let i = 0; i < 160 && !gone; i++) { await w.sleep(150); gone = await w.eval('!document.getElementById("warmVeil").classList.contains("on")'); }
 T('ilk açılış: ısınma bitip örtü kalktı', gone);
 T('ilk açılış sonrası kayıtta warm=1', await w.eval('JSON.parse(localStorage.getItem("kilpayi.v1")).warm===1'));
-T('ilk açılış sonrası menü açık ve dokunulabilir', await w.eval('(function(){var e=document.getElementById("playBtn"),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return document.getElementById("menu").classList.contains("on")&&h&&h.closest("#playBtn")})()'));
+T('ilk açılış sonrası menü açık ve dokunulabilir', await w.eval('(function(){var e=document.getElementById("setBtn"),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return document.getElementById("menu").classList.contains("on")&&h&&h.closest("#setBtn")})()'));
 await w.eval('document.getElementById("bagBtn").dispatchEvent(new MouseEvent("click",{bubbles:true}))'); await w.sleep(1800);
 T('ilk açılış sonrası mağaza açılır', await w.eval('document.getElementById("shop").classList.contains("on")&&document.querySelectorAll("#stHub .fc").length===4'));
 T('ilk açılış yolunda konsol hatası yok', w.logs.length === 0, w.logs);

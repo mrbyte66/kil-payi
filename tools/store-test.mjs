@@ -74,7 +74,8 @@ reset();S.tools.kron.n=5;for(i=0;i<30;i++)K.giftTool();T('hediye joker 5 üstün
 const FLOW = HEAD + `
 S.coins=5000;S.own={kron:1};S.slots=1;S.equip=['kron','','',''];S.tools.kron.n=1;K.persist();K.refreshStats();
 var hit=function(id){var r=$(id).getBoundingClientRect(),e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!e&&e.closest('button')===$(id)};
-T('mağaza kapalıyken menü düğmelerine (Mağaza, Ayarlar) dokunuş düğmeye gider: görünmez mağaza katmanı dokunuşu yakalamaz',hit('bagBtn')&&hit('setBtn')&&hit('playBtn'),[hit('bagBtn'),hit('setBtn'),hit('playBtn')]);
+var ringHit=function(){var v=K.view,e=document.elementFromPoint(v.cx,v.cy-v.r);return !!e&&$('menu').contains(e)};
+T('mağaza kapalıyken menü düğmelerine (Mağaza, Ayarlar) dokunuş düğmeye gider: görünmez mağaza katmanı dokunuşu yakalamaz',hit('setBtn')&&ringHit(),[hit('setBtn'),ringHit()]);
 K.openShop('menu');T('mağaza açıldı',$('shop').classList.contains('on'));
 await sleep(800);T('alttaki ekran belirme bitince saklandı',!$('menu').classList.contains('on'));
 T('4 dükkân',document.querySelectorAll('#stHub .fc').length===4);
@@ -137,6 +138,7 @@ const ANIM = HEAD + `
 // Telefonun "animasyonları kaldır" ayarı AÇIK taklit edilir (başsız Chrome prefers-reduced-motion: reduce bildirir); oyun buna bakmamalı.
 var html=document.documentElement;
 var hit=function(id){var r=$(id).getBoundingClientRect(),e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!e&&e.closest('button')===$(id)};
+var ringHit=function(){var v=K.view,e=document.elementFromPoint(v.cx,v.cy-v.r);return !!e&&$('menu').contains(e)};
 T('telefon "animasyonları kaldır" diyor (taklit)',K.SYS_RM===true);
 T('oyun yine de animasyonlu (varsayılan açık)',S.anim===true&&K.getRM()===false&&!html.classList.contains('calm'),[S.anim,K.getRM()]);
 T('ayarlarda açıklama: telefonda kapalı, oyun kendi ayarına bakar',(K.openSettings(),/burada açık/.test($('setRows').innerText)),$('setRows').innerText);K.closeSettings();
@@ -185,7 +187,7 @@ T('kaydırma: ilk dükkânda sağa fırlatınca taşmaz (uçta yaylanıp geri ot
 K.closeShop();T('çıkış: mağaza solarak kapanır (leaving)',$('shop').classList.contains('leaving')&&getComputedStyle($('shop')).animationName.indexOf('stFadeOut')>=0,getComputedStyle($('shop')).animationName);
 await sleep(120);var o2=+getComputedStyle($('shop')).opacity;T('çıkış yarıdayken mağaza yarı saydam',o2>0&&o2<1,o2);
 await sleep(500);T('çıkış bitti',!$('shop').classList.contains('on')&&$('menu').classList.contains('on'));
-T('çıkıştan sonra menü düğmelerine dokunuş düğmeye gider',hit('bagBtn')&&hit('playBtn'),[hit('bagBtn'),hit('playBtn')]);
+T('çıkıştan sonra halka ve Ayarlar dokunuşu alır',hit('setBtn')&&ringHit(),[hit('setBtn'),ringHit()]);
 // Ayarlar'dan animasyonları kapat: eski "sakin" davranış (anında geçiş)
 K.openSettings();click('#setRows [data-set="anim"]');
 T('anahtar kapandı: kayıt, sakin kip ve sınıf',S.anim===false&&K.getRM()===true&&html.classList.contains('calm')&&JSON.parse(localStorage.getItem('kilpayi.v1')).anim===false,[S.anim,K.getRM()]);
@@ -253,21 +255,21 @@ const WARMT = HEAD + `
 var veil=$('warmVeil'),sh=$('shop'),SS=K.SS,cs=getComputedStyle(sh);
 T('ilk açılışta örtü ilk andan itibaren görünür (save.warm yok)',veil.classList.contains('on')&&getComputedStyle(veil).display==='flex'&&S.warm===0,[veil.className,S.warm]);
 var under=function(sel){var e=document.querySelector(sel),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return h&&h.closest('#shop')?'MAĞAZA:'+h.className:(h&&h.closest('#warmVeil')?'ÖRTÜ':'ok')};
-T('örtü menü düğmelerini tutar (ısınırken yanlışlıkla oyun/mağaza açılmaz)',['#playBtn','#bagBtn','#setBtn'].every(function(s){return under(s)==='ÖRTÜ'}),['#playBtn','#bagBtn','#setBtn'].map(under));
+T('örtü menü düğmelerini tutar (ısınırken yanlışlıkla oyun/mağaza açılmaz)',['#setBtn'].every(function(s){return under(s)==='ÖRTÜ'}),['#setBtn'].map(under));
 var t0=Date.now();while(!K.WARM.on&&Date.now()-t0<9000)await sleep(100);
 T('ısınma menü hazır olunca başladı',K.WARM.on===true,Date.now()-t0);
 T('ısınırken mağaza görünmez ve dokunulamaz',sh.classList.contains('warm')&&!sh.classList.contains('on')&&cs.pointerEvents==='none'&&parseFloat(cs.opacity)<0.01&&cs.visibility==='visible',[sh.className,cs.opacity,cs.pointerEvents]);
 await sleep(900);
 T('ısınırken oda ve sokak gerçekten çiziliyor',document.querySelectorAll('#stHub .fc').length===4||document.querySelectorAll('#stShop .itm,#stShop .gf,#stShop .pch').length>0);
-var sawCards=false,maxFill=0;t0=Date.now();while(!(K.WARM.done&&!K.WARM.on)&&Date.now()-t0<25000){if($('settings').classList.contains('warm')&&$('pause').classList.contains('warm'))sawCards=true;maxFill=Math.max(maxFill,parseFloat($('wvFill').style.width)||0);await sleep(60)}
-T('cam kartlar (Ayarlar, Duraklat...) da ısındı',sawCards);
+var sawCards=false,maxFill=0;t0=Date.now();while(!(K.WARM.done&&!K.WARM.on)&&Date.now()-t0<25000){if($('settings').classList.contains('warm')&&$('book').classList.contains('warm'))sawCards=true;maxFill=Math.max(maxFill,parseFloat($('wvFill').style.width)||0);await sleep(60)}
+T('cam kartlar (Ayarlar, Kilit defteri) da ısındı',sawCards);
 T('ısınma bitti ve ilerleme çubuğu doldu',K.WARM.done===true&&K.WARM.on===false&&maxFill>=100,[maxFill,Date.now()-t0]);
 T('bitince save.warm yazıldı (sonraki açılışta çalışmaz)',S.warm===1&&JSON.parse(localStorage.getItem('kilpayi.v1')).warm===1,S.warm);
 await sleep(500);
 T('örtü soldu ve kalktı',!veil.classList.contains('on')&&getComputedStyle(veil).display==='none',[veil.className]);
 T('ısınma sonrası durum eski hâlinde',!sh.classList.contains('warm')&&!sh.classList.contains('wout')&&!sh.classList.contains('opening')&&SS.idx===0&&SS.shop==='alet'&&SS.view==='hub'&&SS.pos===0&&$('stHub').classList.contains('on')&&!$('stShop').classList.contains('on')&&$('stHub').innerHTML===''&&$('stShop').innerHTML===''&&$('stSheet').innerHTML===''&&!$('stScrim').classList.contains('on')&&!$('stBloom').classList.contains('on'),[sh.className,SS.idx,SS.shop,SS.view,SS.pos]);
 T('ısınma sonrası menü hâlâ menü, mağaza kapalı',G.mode==='menu'&&$('menu').classList.contains('on')&&getComputedStyle(sh).visibility==='hidden'&&!SS.open);
-T('ısınma sonrası menü düğmeleri dokunuşu alır',['#playBtn','#bagBtn','#setBtn'].every(function(s){return under(s)==='ok'}),['#playBtn','#bagBtn','#setBtn'].map(under));
+T('ısınma sonrası menü düğmeleri dokunuşu alır',['#setBtn'].every(function(s){return under(s)==='ok'}),['#setBtn'].map(under));
 $('bagBtn').click();await sleep(400);
 T('ısınma sonrası mağaza açılır',sh.classList.contains('on')&&$('stHub').querySelectorAll('.fc').length===4&&SS.view==='hub'&&SS.idx===0);
 T('ısınma bir kez çalışır, yeniden başlamaz',K.WARM.on===false&&K.WARM.done===true);
