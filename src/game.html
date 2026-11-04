@@ -97,12 +97,6 @@ html.calm .hfx{transition:none}
 .pausebtn:active{transform:scale(.92)}
 .pausebtn .ic{width:20px;height:20px}
 /* Kapalı test kartı (V0.9.11): bildirime dokununca "Gün n/17" ve 17 noktalı ilerleme */
-.tdays{margin:0;font-family:var(--font-display);font-weight:700;font-size:2.6rem;line-height:1;letter-spacing:-.02em;color:var(--ink)}
-.tdots{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;max-width:176px}
-.tdots i{display:block;width:12px;height:12px;border-radius:50%;background:var(--track)}
-.tdots i.on{background:var(--lilac)}
-.tdots i.now{background:var(--peach);box-shadow:0 0 0 3px var(--peach-soft)}
-.tmsg{margin:0;max-width:264px;text-align:center;font-weight:700;font-size:var(--fs-14);line-height:1.45;color:var(--ink-2)}
 .gauge-row{display:flex;align-items:center;gap:8px;min-height:26px}
 .gauge{position:relative;flex:1;height:10px;border-radius:var(--r-pill);background:var(--track);overflow:hidden}
 .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:var(--r-pill);background:var(--lilac);transition:width .3s var(--ease)}
@@ -732,6 +726,24 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop.warm *{pointer-events:none!important;animation-play-state:running!important}
 #shop.warm .stg{animation:stIn .85s cubic-bezier(.16,1,.3,1) backwards}
 #shop.warm.wout .stg{animation:stOut .36s cubic-bezier(.45,0,.8,.5) both}
+/* Öğretim (V0.11.0): ışık halkası oyuncunun dokunacağı yeri gösterir, çevresi kararır; katman dokunuşu tutmaz (dokunuşu window yakalaması süzer). Sakin kipte halka durur. */
+#app.obr #pauseBtn{visibility:hidden}
+#obFx{position:absolute;inset:0;z-index:390;display:none;pointer-events:none}
+#obFx.on{display:block}
+#obFx .d{position:absolute;inset:0;opacity:0;transition:opacity .22s;background:radial-gradient(var(--rx,60px) var(--ry,60px) at var(--x,50%) var(--y,50%),transparent 84%,rgba(42,35,71,.36) 100%)}
+#obFx.dim .d{opacity:1}
+#obFx .h{position:absolute;left:var(--x);top:var(--y);width:0;height:0}
+#obFx .h i,#obFx .h b{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;box-sizing:border-box;will-change:transform,opacity}
+#obFx .h i{background:rgba(255,255,255,.62);border:2.5px solid rgba(108,85,224,.85);box-shadow:0 0 12px rgba(108,85,224,.55);animation:obPress 1.25s ease-in-out infinite}
+#obFx .h b{border:3px solid rgba(108,85,224,.75);animation:obRing 1.25s ease-out infinite}
+@keyframes obPress{0%,100%{transform:scale(1)}18%,30%{transform:scale(.76)}50%{transform:scale(1)}}
+@keyframes obRing{0%,14%{transform:scale(.7);opacity:0}16%{opacity:1}64%,100%{transform:scale(2.2);opacity:0}}
+#obFx.el .h i{background:rgba(255,255,255,.22)}
+#obFx.no .h i{border-color:#FF5C85;background:rgba(255,255,255,.4);box-shadow:0 0 12px rgba(255,92,133,.55);animation:none}
+#obFx.no .h i::after{content:'';position:absolute;left:50%;top:-2px;bottom:-2px;width:4px;margin-left:-2px;border-radius:2px;background:#FF5C85;transform:rotate(45deg)}
+#obFx.no .h b{border-color:rgba(255,92,133,.75)}
+html.calm #obFx .h i{animation:none}
+html.calm #obFx .h b{animation:none;opacity:.7;transform:scale(1.4)}
 /* ilk açılış örtüsü (V0.10.0): mağaza ısınması yalnızca ilk açılışta, bu örtünün arkasında yapılır (açılış ekranının devamı gibi görünür); sonraki açılışlarda hiç çıkmaz */
 #warmVeil{position:absolute;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:0 40px;text-align:center;color:#fff;background:radial-gradient(120% 85% at 50% 30%,#B7A8FF 0,#6D58E0 50%,#2A1B80 100%);transition:opacity .28s ease}
 #warmVeil.on{display:flex}
@@ -921,16 +933,6 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
     </div>
   </section>
 
-  <section class="scr dim" id="testInfo" aria-label="Kapalı test" aria-hidden="true">
-    <div class="card glass">
-      <p class="eyebrow rise" style="--i:0" id="tiEye"></p>
-      <h2 class="tdays rise" style="--i:1" id="tiDay"></h2>
-      <div class="tdots rise" style="--i:2" id="tiDots" aria-hidden="true"></div>
-      <p class="tmsg rise" style="--i:3" id="tiMsg"></p>
-      <button class="btn primary big rise" style="--i:4" id="tiPlay" type="button"></button>
-      <button class="btn quiet rise" style="--i:5" id="tiClose" type="button" data-i18n="close">Kapat</button>
-    </div>
-  </section>
 
   <section class="scr dim" id="ad" aria-label="Reklam" aria-hidden="true">
     <div class="card glass">
@@ -941,6 +943,7 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
     </div>
   </section>
 
+  <div id="obFx" aria-hidden="true"><i class="d"></i><div class="h"><i></i><b></b></div></div>
   <div id="warmVeil" aria-hidden="true">
     <svg viewBox="18 18 72 72" aria-hidden="true"><defs><radialGradient id="wv_bez" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C9BEFF"/></radialGradient><radialGradient id="wv_glass" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#5A44C8"/><stop offset="1" stop-color="#2A1B80"/></radialGradient><linearGradient id="wv_liq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC48A"/><stop offset="1" stop-color="#FF6B3A"/></linearGradient><clipPath id="wv_clip"><circle cx="54" cy="52" r="22.5"/></clipPath></defs><circle cx="54" cy="52" r="31" fill="url(#wv_bez)"/><circle cx="54" cy="52" r="26.5" fill="#6D58E0"/><circle cx="54" cy="52" r="22.5" fill="url(#wv_glass)"/><g clip-path="url(#wv_clip)"><path d="M28 54C36 47 43 61 54 54S71 47 80 54V80H28Z" fill="url(#wv_liq)"/></g><path d="M54 52L66.7 37.9" stroke="#FFFFFF" stroke-width="3.8" stroke-linecap="round"/><circle cx="66.7" cy="37.9" r="4.6" fill="#FFFFFF"/><circle cx="66.7" cy="37.9" r="1.8" fill="#FF7D43"/><circle cx="54" cy="52" r="4.2" fill="#FFFFFF"/></svg>
     <p id="wvTxt" data-i18n="warmMsg"></p>
@@ -1231,10 +1234,6 @@ const STR = {
     notEnough: 'Yeterli coin yok. Reklam izleyerek devam edebilirsin.', coinShort: 'Yeterli coin yok.', sound: 'Ses', score: 'puan', pauseBtn: 'Duraklat',
     warmMsg: 'Oyun cihazına hazırlanıyor… (yalnızca ilk açılışta)',
     saveReset: 'Kayıt dosyası değiştirilmiş görünüyor, sıfırlandı.',
-    ntChan: 'Test bildirimleri', ntChanD: 'Kapalı test sürecindeki günlük duyurular', ntInfoT: 'Kapalı test başladı', ntInfoB: '{m} gün boyunca günde iki kez haber vereceğiz. Teşekkürler!', ntDayT: 'Kıl payı · Gün {d}/{m}',
-    ntA0: 'Günaydın! Test için teşekkürler. Bugün rekoru zorlayalım mı?', ntA1: 'Günaydın! Bir tur oynayıp kıl payı kurtulmaya ne dersin?', ntA2: 'Teşekkürler! Bugün kaç puan yapacaksın?', ntA3: 'Yeni gün, yeni rekor şansı. Bir tur oyna!', ntA4: 'Refleksler sabah daha keskin. Bir tur?', ntA5: 'Testimize katıldığın için teşekkürler! Bugün de bir tur oyna.',
-    ntB0: 'Bugün henüz oynamadın. Bir tur, kıl payı bile olsa!', ntB1: 'Rekorun seni bekliyor. Gel, bir tur oyna!', ntB2: 'Kısa bir mola mı? Bir tur Kıl payı iyi gider.', ntB3: 'Bugünün turunu unutma. Teşekkürler!', ntB4: 'Bir tur oyna, test sayacına bir gün daha ekle.', ntB5: 'İbre seni bekliyor. Bir tur oynar mısın?',
-    testT: 'Kapalı test', testDay: 'Gün {d}/{m}', testMsg: 'Testimize katıldığın için teşekkürler! Her gün birkaç tur oynaman bize çok yardımcı oluyor.', testOver: 'Test tamamlandı. Katıldığın için çok teşekkürler!', testPlay: 'Oyna', testToast: 'Gün {d}/{m} · Test için teşekkürler!',
     soundOn: 'Sesi kapat', soundOff: 'Sesi aç', vibOn: 'Titreşimi kapat', vibOff: 'Titreşimi aç', overSr: 'Süre bitti. Skor {n}.',
     play_aria: 'Oyun alanı',
     k_cift: 'Çift pim', k_kayan: 'Kayan pim', k_iki: 'İki halka',
@@ -1344,10 +1343,6 @@ const STR = {
     notEnough: 'Not enough coins. Watch an ad to keep going.', coinShort: 'Not enough coins.', sound: 'Sound', score: 'pts', pauseBtn: 'Pause',
     warmMsg: 'Getting the game ready for your device… (first launch only)',
     saveReset: 'Your save file looks modified, so it was reset.',
-    ntChan: 'Test notifications', ntChanD: 'Daily updates during the closed test', ntInfoT: 'Closed test started', ntInfoB: "We'll check in twice a day for {m} days. Thanks!", ntDayT: 'Close call · Day {d}/{m}',
-    ntA0: 'Good morning! Thanks for testing. Shall we chase the record today?', ntA1: 'Good morning! How about a round and a close call?', ntA2: 'Thank you! How many points will you score today?', ntA3: 'New day, new shot at the record. Play a round!', ntA4: 'Reflexes are sharper in the morning. One round?', ntA5: 'Thanks for joining our test! Play a round today too.',
-    ntB0: "You haven't played yet today. Just one round!", ntB1: 'Your record is waiting. Come play a round!', ntB2: 'Quick break? A round of Close call fits right in.', ntB3: "Don't forget today's round. Thank you!", ntB4: 'Play a round and add one more day to the test counter.', ntB5: 'The needle is waiting. Play a round?',
-    testT: 'Closed test', testDay: 'Day {d}/{m}', testMsg: 'Thanks for joining our test! A few rounds a day help us a lot.', testOver: 'Test complete. Thank you so much for joining!', testPlay: 'Play', testToast: 'Day {d}/{m} · Thanks for testing!',
     soundOn: 'Mute sound', soundOff: 'Unmute sound', vibOn: 'Turn vibration off', vibOff: 'Turn vibration on', overSr: 'Time is up. Score {n}.',
     play_aria: 'Play area',
     k_cift: 'Double pin', k_kayan: 'Sliding pin', k_iki: 'Twin rings',
@@ -1540,14 +1535,14 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.10.4';
+const VERSION = 'V0.11.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
   tools: { steto: { n: 0, l: 1 }, kron: { n: 1, l: 1 }, kalkan: { n: 0, l: 1 }, kum: { n: 0, l: 1 } },
   /* Mağaza (V0.9.2): açık jokerler, açık yuva sayısı, yuvalardaki jokerler, Otomatik joker yeteneği, Hediye (reklam) basamağı ve bekleme bitişi */
   own: { kron: 1 }, slots: 1, equip: ['kron', '', '', ''], autoOwn: false, gift: { n: 0, t0: 0 },
-  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, intro: {}, test: null, warm: 0, sg: 1, v: 3
+  unl: {}, seen: {}, tips: {}, low: 0, high: 0, highU: 0, camp: 1, bestL: 0, run: null, book: {}, intro: {}, warm: 0, ob: 0, obM: 0, sg: 1, v: 3
 };
 /* V0.10.4: hiçbir ekonomi alanı doğrulamadan canlı kayda aktarılmaz.
    İmzasız eski kayıtlar güvenilir bir geçiş kanıtı değildir; yalnız ayarlar korunur. */
@@ -1561,7 +1556,7 @@ const safeTree = (o, depth = 0) => {
 };
 const validSave = o => {
   if (!record(o) || !safeTree(o)) return false;
-  for (const k of ['coins', 'runs', 'low', 'high', 'highU', 'camp', 'bestL'])
+  for (const k of ['coins', 'runs', 'low', 'high', 'highU', 'camp', 'bestL', 'ob', 'obM'])
     if (o[k] !== undefined && (!bounded(o[k]) || !Number.isInteger(o[k]))) return false;
   for (const k of ['bests', 'tools', 'own', 'gift', 'unl', 'seen', 'tips', 'book', 'intro'])
     if (o[k] !== undefined && !record(o[k])) return false;
@@ -1571,6 +1566,9 @@ const validSave = o => {
   if (o.gift && ((!bounded(o.gift.n, 5) || !Number.isInteger(o.gift.n)) || (o.gift.t0 !== undefined && !bounded(o.gift.t0, 8640000000000000)))) return false;
   return true;
 };
+/* Öğretim (V0.11.0): yeni kurulumda save.ob aşamasıdır (0 = bitti ya da eski kayıt). Aşamalar kayıtlıdır; uygulama kapanırsa kaldığı yerden sürer. */
+const OB_ROUND = 1, OB_SHOP = 2, OB_PLAY = 3, OB_USE = 4, OB_PAUSE = 5;
+const OB_FRESH = (() => { try { return !localStorage.getItem('kilpayi.v1') && !window.NO_OB; } catch (e) { return false; } })();
 try {
   const raw = localStorage.getItem('kilpayi.v1');
   if (raw) {
@@ -1601,11 +1599,6 @@ save.v = 3; save.sg = 1;
 if (!save.book || typeof save.book !== 'object') save.book = {};
 if (!save.intro || typeof save.intro !== 'object') save.intro = {};
 if (!save.seen || typeof save.seen !== 'object') save.seen = {};
-/* Kapalı test (V0.9.11): ilk açılışta başlangıç günü ve saati kaydedilir; 17 günlük sayaç ve bildirimler buradan işler (güncellemede de, kayıt yoksa o an başlar). */
-if (!save.test || typeof save.test !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(save.test.d0 || '') || !(save.test.t0 > 0)) {
-  const n0 = new Date();
-  save.test = { d0: n0.getFullYear() + '-' + String(n0.getMonth() + 1).padStart(2, '0') + '-' + String(n0.getDate()).padStart(2, '0'), t0: n0.getTime() };
-}
 /* Kayıtlı oyun sürümü: 2 = V0.5.0 (yeni seviye süreleri ve olay listesi); eski sürümün yarım oyunu devam ettirilmez. */
 if (!save.run || typeof save.run !== 'object' || save.run.v !== 2) save.run = null;
 if (!save.bests || typeof save.bests !== 'object') save.bests = {};
@@ -1628,8 +1621,11 @@ TOOL_IDS.forEach(id => {
   s.n = clamp(s.n | 0, 0, 99); s.l = clamp(s.l | 0 || 1, 1, 3);
 });
 if (!save.own || typeof save.own !== 'object') save.own = { kron: 1 };
+/* yeni oyuncu 0 altın ve 0 jokerle başlar: 500 altını ilk turdan sonra alır, kronometreyi mağazada kendi açar. İlk ıska ve ilk tuzak bir kez bedava geri sarılır (obM bitleri); eski kayıtta ikisi de yoktur. */
+if (OB_FRESH) { save.ob = OB_ROUND; save.obM = 3; save.tut = true; save.own = {}; save.equip = ['', '', '', '']; save.tools.kron.n = 0; save.intro.tuzak = 1; }
+save.ob = clamp(save.ob | 0, 0, OB_PAUSE); save.obM = clamp(save.obM | 0, 0, 3);
 TOOL_IDS.forEach(id => { save.own[id] = save.own[id] ? 1 : 0; });
-if (!TOOL_IDS.some(id => save.own[id])) save.own.kron = 1;
+if (!TOOL_IDS.some(id => save.own[id]) && !save.ob) save.own.kron = 1;
 save.slots = clamp(save.slots | 0 || 1, 1, 4);
 save.autoOwn = !!save.autoOwn; if (!save.autoOwn) save.autoJ = false;
 if (!save.gift || typeof save.gift !== 'object') save.gift = { n: 0, t0: 0 };
@@ -1644,7 +1640,7 @@ const persist = () => { try { const body = JSON.stringify(save); localStorage.se
    Bir Normal oyun ≈ 85 coin kazandırır; açılışlar kasten pahalıdır (hepsi birkaç saatlik oyun).
    Stok en çok 5: bir sonraki jokerin fiyatı elindeki sayıyla ve joker seviyesiyle artar.
    Yükseltme, elindeki stoğun da yükselen değerini öder; böylece önce biriktirip sonra yükseltmek ya da önce yükseltip sonra biriktirmek toplamda aynı tutardır. */
-const JK_PRICE = { kron: 0, kalkan: 800, steto: 1500, kum: 2500 };
+const JK_PRICE = { kron: 300, kalkan: 800, steto: 1500, kum: 2500 };
 const SLOT_PRICE = [0, 0, 1200, 2400, 4000];
 const AUTO_PRICE = 4000, LIFE_PRICE = 2000;
 const STOCK_MAX = 5, STOCK_STEP = [1, 1.5, 2, 3, 4], LV_MUL = [1, 1.3, 1.6];
@@ -1716,7 +1712,7 @@ const buyUpgrade = id => {
 const unlockJoker = id => {
   if (save.own[id] || !spendCoins(JK_PRICE[id])) return false;
   save.own[id] = 1; save.tools[id].n = Math.max(save.tools[id].n, 1);
-  autoEquip(id); persist(); return true;
+  autoEquip(id); if (save.ob === OB_SHOP) { save.ob = OB_PLAY; obWait = performance.now() + 1000; } persist(); return true;
 };
 const buySlot = n => {
   if (n !== save.slots + 1 || n > 4 || !spendCoins(SLOT_PRICE[n])) return false;
@@ -2225,7 +2221,7 @@ const G = {
   pendingNew: '', pendingTw: '', pendingN: 0, firstOfKind: false, card: null, saveT: 0, hellAge: 0,
   chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0,
   intro: null, introQ: [], tail: null,
-  contN: 0, best0: 0, recDone: false, conf: [], recPill: null, tvis: 0
+  contN: 0, best0: 0, recDone: false, conf: [], recPill: null, tvis: 0, ob: null, hold: '', obT: 1.4, rw: null, obd: []
 };
 const view = { w: 0, h: 0, dpr: 1, cx: 0, cy: 0, r: 100, tcx: 0, tcy: 0, tr: 100, hudB: 0, dockTop: 0 };
 /* Dene kartının boyu (px) */
@@ -2670,7 +2666,7 @@ const validRun = o => {
   return true;
 };
 const snapRun = () => { const o = { v: 2, lvl: save.lvl }; RUN_KEYS.forEach(k => { o[k] = G[k]; }); return JSON.parse(JSON.stringify(o)); };
-const persistRun = () => { if (!G.practice && (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause' || G.mode === 'intro')) { save.run = snapRun(); persist(); } };
+const persistRun = () => { if (!G.practice && !G.ob && (G.mode === 'play' || G.mode === 'count' || G.mode === 'pause' || G.mode === 'intro')) { save.run = snapRun(); persist(); } };
 
 /* Yeni oyunun başlangıç durumu; Dene modu da aynısından yola çıkar. */
 const runState = L0 => ({
@@ -2686,7 +2682,7 @@ const runState = L0 => ({
     pendingNew: '', pendingTw: '', pendingN: 0, firstOfKind: false, card: null, saveT: 0, hellAge: 0,
     chal: { kind: 'tek', t: 0 }, holding: false, lockLeft: 0, vort: 0, tideC: null, craters: [], fxs: [], needCheck: false, practice: null, tun: null, emerge: 0,
     intro: null, introQ: [], tail: null,
-    contN: 0, best0: 0, recDone: false, conf: [], recPill: null, tvis: LV().startT
+    contN: 0, best0: 0, recDone: false, conf: [], recPill: null, tvis: LV().startT, ob: null, hold: '', obT: 1.4, rw: null, obd: []
 });
 
 const start = (fromL, snap) => {
@@ -2696,6 +2692,8 @@ const start = (fromL, snap) => {
   Snd.ui();
   Object.assign(G, runState(L0));
   G.best0 = bestNow();
+  if (save.ob === OB_PLAY) save.ob = OB_USE;
+  if (save.ob === OB_USE && !snap) G.time = G.tvis = OB_USE_T;   /* öğretim: süre az başlar, joker gerçekten işe yarasın */
   if (snap) {
     RUN_KEYS.forEach(k => { if (snap[k] !== undefined) G[k] = snap[k]; });
     const pi = jPhaseAt(G.jt);
@@ -2733,6 +2731,7 @@ const goMenu = () => {
   G.mode = 'menu'; G.ta = 1.0; G.hw = 0.45; G.dir = 1; G.gateT = 0; G.I = 0; G.kind = 'tek'; G.hint = null;
   G.thT = 0; G.thDirty = true; G.banner = null; G.count = 0; G.card = null; G.tail = null; G.adv = null;
   G.practice = null; hide($('pracDone')); app.classList.remove('prac');
+  G.ob = null; G.hold = ''; G.rw = null; G.obd = []; app.classList.remove('obr');
   hide(overEl); hide(pauseEl); hideShop();
   app.classList.remove('playing');
   hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
@@ -2808,6 +2807,7 @@ const tickGold = (p, dt) => {
 };
 const advance = wasRelief => {
   if (G.practice) { practiceStep(); return; }
+  if (G.ob) { obNext(); return; }
   if (G.pendingRev) {
     G.pendingRev = false;
     G.dir = -G.dir; G.revT = 0.8; pop(t('reverse'), 'rev'); Snd.rev();
@@ -2984,6 +2984,7 @@ const etaTo = (target, dir, ring) => {
 /* Dokunuş: hangi ibre hedefindeyse onu vurur. İki halkada ikisi birden hedefteyse hedefine daha yakın olan sayılır. */
 const tap = () => {
   if (G.mode !== 'play' || G.lock > 0) return;
+  if (G.ob && obIgnoreTap()) return;
   if (G.holding) return;
   /* tut-bırak: dokunuş basmaktır; yayın başında değilse ıska */
   const hp = G.pins.find(p => p.kind === 'hold' && !p.done);
@@ -3083,6 +3084,7 @@ const hit = (d, pin) => {
   G.scorePulse = 1; G.missRun = 0;
   G.perf = perfect ? G.perf + 1 : 0;
   const p = pinXY(pin);
+  if (G.ob) obDrops(p.x, p.y);
   const cols = pin.can ? [P.life, P.peach, P.lilac] : (tag === 'gold' || tag === 'lock' ? [GOLD, GOLD_L, '#FFFFFF', P.peach] : (near ? [P.rose, P['rose-soft'], P.peach] : (perfect ? [P['peach-deep'], P.peach, P.lilac] : [P.peach, P.lilac, P['peach-soft']])));
   burst(p.x, p.y, near ? 26 : (perfect ? 18 : 11) + (tag ? 10 : 0), cols, near ? 260 : 190);
   G.rips.push({ x: p.x, y: p.y, t: 0, max: near ? 0.7 : 0.5, r0: 10, r1: near ? 90 : 56, c: near ? P.rose : (tag === 'gold' || tag === 'lock' ? GOLD : P.peach) });
@@ -3157,9 +3159,10 @@ const revive = () => {
   G.rips.push({ x: view.cx, y: view.cy, t: 0, max: 0.8, r0: view.r * 0.3, r1: view.r * 1.3, c: P.life });
   Platform.track('life_saved', { level: G.L });
 };
-const lethal = () => { if (G.practice) { G.time = CFG.maxTime; return; } if (G.life) revive(); else die(); };
+const lethal = () => { if (G.practice) { G.time = CFG.maxTime; return; } if (G.ob) { obLethal(); return; } if (G.life) revive(); else die(); };
 
 const miss = () => {
+  const sn = obSnap();
   loseGold();
   if (G.practice) { pop(t('pracMiss'), 'miss'); Snd.ui(); return; }
   const pm = phaseMod(G.ph, G.L);
@@ -3173,10 +3176,12 @@ const miss = () => {
   shake(0.2); flash('rose', 0.14);
   scold(was);
   Snd.miss(); Platform.haptic('warn');
+  if (obTeach(1, sn)) return;
   if (G.time <= 0) lethal();
 };
 
 const trap = p => {
+  const sn = obSnap();
   loseGold();
   G.chal.fail = true;
   const pm = phaseMod(G.ph, G.L);
@@ -3197,13 +3202,14 @@ const trap = p => {
   if (p && p.fake) { G.chal.broken = true; pop(t('popChain'), 'miss'); }
   if (p && p.spook) { const q = pinXY(p); burst(q.x, q.y, 18, [P.rose, '#FFFFFF', '#FFC2D6'], 200); G.fxs.push({ type: 'reveal', a: p.c0, t: 0, max: 1.0, trap: true }); }
   if (was >= COMBO.tiers[0]) pop(pickLine('broke'), 'roast');
+  if (obTeach(2, sn)) return;
   if (G.time <= 0) { lethal(); return; }
   if (p && p.alarm) { pop(t('popAlarmReset'), 'roast'); spawnChallenge(false, G.kind); }
 };
 
 /* auto: otomatik joker ayarı açıkken oyun kendisi kullandı (V0.9.2): "akıllı hamle" puanı yok, yalnızca elle kullanım ödüllenir. */
 const useTool = (id, auto) => {
-  if (G.mode !== 'play') return;
+  if (G.mode !== 'play' && !(G.mode === 'hold' && G.hold === 'joker' && id === 'kron')) return;
   const s = save.tools[id];
   if (!s || !isEq(id)) return;
   if (s.n <= 0) { toast(t('toolEmpty')); return; }
@@ -3221,6 +3227,7 @@ const useTool = (id, auto) => {
   updateTools(); updateHud();
   const bb = toolsEl.querySelector('.tool[data-tool="' + id + '"]');
   if (bb) { bb.classList.remove('bump'); void bb.offsetWidth; bb.classList.add('bump'); }
+  if (save.ob === OB_USE) obUsed(bb);
   Platform.track('tool_use', { id, level: s.l, smart, auto: !!auto });
 };
 /* Akıllı joker: işe yarayacağı an parlar ve büyür; aynı anda yalnızca biri önerilir. Otomatik joker ayarı (save.autoJ) açıksa parladıktan AUTO_AT sn sonra kendiliğinden kullanılır;
@@ -3360,14 +3367,15 @@ const doContinue = (rewarded = false) => {
 };
 
 const pause = () => {
-  if ((G.mode !== 'play' && G.mode !== 'count' && G.mode !== 'intro')/*NOPAUSE*/) return;
+  if ((G.mode !== 'play' && G.mode !== 'count' && G.mode !== 'intro' && !(G.mode === 'hold' && G.hold === 'pause'))/*NOPAUSE*/) return;
   if (G.practice) { endPractice(true); return; }
+  if (G.ob) return;
   abortIntro();
-  G.mode = 'pause'; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
+  G.hold = ''; G.mode = 'pause'; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
   persistRun(); show(pauseEl);
 };
 /* Devam edince 3-2-1 geri sayım; sayaçlar (süre, seviye, cennet/cehennem) sayım bitene kadar donuk kalır. */
-const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'count'; G.count = 3; Snd.ui(); };
+const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'count'; G.count = 3; Snd.ui(); if (save.ob === OB_PAUSE) obFinish(); };
 
 /* ---------- mağaza: akşam çarşısı (V0.9.2) ----------
    Seçilen tasarım "Çarşı + halka ikonları": akşam sokağında dükkân dükkân gezilir, içeri girilir, ürünler kağıt fişle alınır.
@@ -4115,7 +4123,7 @@ const WARM = { on: false, done: false, keep: null, ok: 0, iv: 0, gen: 0, t0: 0 }
 const warmVeilEl = $('warmVeil'), wvFill = $('wvFill');
 WARM.done = (save.warm | 0) >= WARM_EPOCH || !!window.NO_WARM;
 const warmOk = () => G.mode === 'menu' && !SS.open && !SS.closing && !document.hidden && !G.practice && menuEl.classList.contains('on') &&
-  !settingsEl.classList.contains('on') && !bookEl.classList.contains('on') && !adEl.classList.contains('on') && !$('swap').classList.contains('on') && !$('testInfo').classList.contains('on');
+  !settingsEl.classList.contains('on') && !bookEl.classList.contains('on') && !adEl.classList.contains('on') && !$('swap').classList.contains('on');
 const WARM_CARDS = ['settings', 'book', 'pause', 'over'];
 const warmVeil = on => {
   if (on) { warmVeilEl.classList.remove('out'); warmVeilEl.classList.add('on'); warmVeilEl.removeAttribute('aria-hidden'); wvFill.style.width = '0%'; }
@@ -4418,9 +4426,9 @@ const update = (raw, elapsed = raw) => {
     else if (Math.ceil(G.count) !== n0) Snd.tick(false);
     updateHud();
   } else if (G.mode === 'play') {
-    const PR = G.practice, sl = G.slow > 0 ? G.slowMul : 1;
+    const PR = G.practice, OBR = G.ob, sl = (G.slow > 0 ? G.slowMul : 1) * (OBR ? obSlow() : 1);
     G.pt += dt;
-    if (!PR) {
+    if (!PR && !OBR) {
       G.jt += dt;
       applyEvents(false);
       const pi = jPhaseAt(G.jt), ph = tierPh(pi.ph);
@@ -4444,7 +4452,7 @@ const update = (raw, elapsed = raw) => {
       G.ang2 = norm(G.ang2 + G.vel2 * dt);
     }
     updateChal(dt);
-    if (PR) G.time = CFG.maxTime; else G.time -= elapsed * G.tscale * pm.drain * (LV().drain || 1);
+    if (PR) G.time = CFG.maxTime; else if (OBR) obDrain(raw); else G.time -= elapsed * G.tscale * pm.drain * (LV().drain || 1);
     if (G.slow > 0) G.slow -= raw;
     if (G.boostT > 0) G.boostT = Math.max(0, G.boostT - raw);
     if (G.narrow > 0) G.narrow = Math.max(0, G.narrow - raw);
@@ -4452,13 +4460,22 @@ const update = (raw, elapsed = raw) => {
     if (G.revT > 0) G.revT -= raw;
     G.gateT = Math.min(1, G.gateT + raw * 4);
     syncPrimary();
-    if (!PR) {
+    if (OBR) { if (G.time <= 0) { G.time = 0; lethal(); } }
+    else if (!PR) {
       updateAdvice(dt);
       G.saveT += raw; if (G.saveT > 5) { G.saveT = 0; persistRun(); }
       if (G.time < CFG.nearAt) { G.beep -= raw; if (G.beep <= 0) { G.beep = 0.24; Snd.warn(); } }
       if (G.time <= 0) { G.time = 0; lethal(); }
     }
     if (!PR && !G.recDone && !G.campRun && G.best0 >= CFG.recMin && G.score > G.best0) celebrateRecord();
+    obPlayStep(raw);
+    updateHud(); updateDock();
+  } else if (G.mode === 'hold') {
+    G.gateT = Math.min(1, G.gateT + raw * 4);
+    obHoldStep(raw);
+    updateHud(); updateDock();
+  } else if (G.mode === 'rw') {
+    obRwStep(raw);
     updateHud(); updateDock();
   } else if (G.mode === 'intro') {
     /* tanıtım: oyun donuk (süre, ibre, hedefler); gösteri dokunuşla ya da kendiliğinden biter, sonra 0,5 sn içinde gerçek pinler gelir ve oyun sürer */
@@ -4471,8 +4488,9 @@ const update = (raw, elapsed = raw) => {
   } else if (G.mode === 'dead') {
     G.deadT -= raw;
     updateHud(); updateDock();
-    if (G.deadT <= 0) showOver();
+    if (G.deadT <= 0) { if (G.ob) obAfterRound(); else showOver(); }
   }
+  if (G.obd.length) obDropStep(raw);
 
   const live = G.mode === 'play' || G.mode === 'count' || G.mode === 'dead' || G.mode === 'intro';
   if (G.banner && live) { G.banner.t += raw; if (G.banner.t > 2.0) G.banner = null; }
@@ -5329,7 +5347,7 @@ const drawDemoOver = (c, d, cx, cy, R) => {
   }
   drawDemoBar(c, d);
 };
-const introWanted = kind => /*NOINTRO*/ !G.practice && !!INTRO[kind] && !(save.intro && save.intro[kind]) && !((save.seen[kind] | 0) > 0);
+const introWanted = kind => /*NOINTRO*/ !G.practice && !G.ob && !!INTRO[kind] && !(save.intro && save.intro[kind]) && !((save.seen[kind] | 0) > 0);
 const queueIntro = kind => { if (introWanted(kind) && G.introQ.indexOf(kind) < 0) G.introQ.push(kind); };
 const dockDim = on => { if (toolsEl) toolsEl.classList.toggle('dim', on); };
 const startIntro = () => {
@@ -5675,6 +5693,7 @@ const render = () => {
   for (const f of G.fxs) {
     if (f.type === 'blast' && f.t < 0.26) { c.globalAlpha = 0.6 * (1 - f.t / 0.26); c.fillStyle = '#FFF1CC'; c.fillRect(0, 0, view.w, view.h); c.globalAlpha = 1; }
   }
+  drawObFx(c);
   if (G.flash > 0) {
     c.globalAlpha = Math.min(0.22, G.flash * 0.7);
     c.fillStyle = G.flashKind === 'rose' ? P.rose : P.peach;
@@ -5685,7 +5704,7 @@ const render = () => {
 };
 
 /* ---------- giriş ---------- */
-const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on') || bookEl.classList.contains('on') || $('swap').classList.contains('on') || settingsEl.classList.contains('on') || $('testInfo').classList.contains('on');
+const overlayOpen = () => shopEl.classList.contains('on') || adEl.classList.contains('on') || bookEl.classList.contains('on') || $('swap').classList.contains('on') || settingsEl.classList.contains('on');
 app.addEventListener('pointerup', () => { if (G.mode === 'play') release(); });
 app.addEventListener('pointercancel', () => { if (G.mode === 'play') release(); });
 app.addEventListener('pointerdown', e => {
@@ -5698,6 +5717,7 @@ app.addEventListener('pointerdown', e => {
   else if (G.mode === 'over' && performance.now() - G.overAt > 700) start(G.startL);
   else if (G.mode === 'pause') resume();
   else if (G.mode === 'intro') skipIntro();
+  else if (G.mode === 'hold') obHoldTap();
 });
 /* Joker düğmeleri: dokununca çalışır (V0.6.1). Yanlışlıkla basılmasın diye sıra ekranın altındadır ve halkayla arasında parmak boyunda boş alan vardır;
    o boşluğa dokunuşlar oyuna gider. */
@@ -5799,7 +5819,7 @@ campEl.addEventListener('click', () => { Snd.unlock(); start(save.camp); });
 $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
 $('resumeBtn').addEventListener('click', resume);
 $('bagBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
-$('pauseBtn').addEventListener('click', e => { Snd.unlock(); if (G.mode !== 'play' && G.mode !== 'count') return; Snd.ui(); Platform.haptic('light'); pause(); e.currentTarget.blur(); });
+$('pauseBtn').addEventListener('click', e => { Snd.unlock(); if (G.mode !== 'play' && G.mode !== 'count' && G.hold !== 'pause') return; Snd.ui(); Platform.haptic('light'); pause(); e.currentTarget.blur(); });
 $('bagBtn2').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'over') openShop('over'); });
 $('adBtn').addEventListener('click', () => {
   if (!canContinue(true)) return;
@@ -5819,72 +5839,6 @@ $('coinBtn').addEventListener('click', () => {
   persist(); refreshStats(); doContinue();
 });
 
-/* ---------- kapalı test bildirimleri (V0.9.11) ----------
-   Kullanıcı: "kapalı test için bildirim ekle, kapatılamasın (Ayarlar'da anahtarı yok); yüklenince 1 dk sonra bilgilendirme, sonra 17 gün boyunca günde iki kez (09:00 ve 16:30);
-   ilkine girilirse ikincisi gitmesin; ekrana gelsin (olmazsa bildirim çubuğu); tıklayınca Gün n/17 görünsün; kısa, teşekkür ve oynamaya teşvik."
-   Eklenti: @capacitor/local-notifications. Bildirimler işletim sistemi alarmıyla planlanır (uygulama kapalıyken de gelir, telefon açılınca eklenti yeniden planlar). Kanal önem düzeyi YÜKSEK: ekranın üstünde belirir (heads-up), olmazsa çubukta.
-   Tam zamanlı alarm KULLANILMAZ (isExactNotification: false): eklentinin varsayılanı "Alarmlar ve hatırlatıcılar" ayar ekranını açardı; yarım dakikalık sapma kabul. Android 13+ bildirim izni ilk açılışta menüde istenir.
-   Her açılışta/dönüşte testSync: o günün ikinci bildirimi iptal edilir (bugün girildi), geçmiş olanlar atlanır, kalanlar aynı kimliklerle yeniden planlanır (aynı kimlik eskisinin yerine geçer).
-   Kimlikler: 1 = bilgilendirme, 100+gün = sabah, 200+gün. Test bitince (17. günden sonra) plan boştur. Kaldırmak için: bu blok, #testInfo, save.test ve STR'deki nt/test satırları. */
-const TEST = { days: 17, slots: [[9, 0], [16, 30]], infoMs: 60000, chan: 'test', idInfo: 1, idA: 100, idB: 200, nA: 6, nB: 6 };
-const dayNo = d => Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
-const keyNo = k => { const p = String(k).split('-'); return Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); };
-const testDay = now => dayNo(now) - keyNo(save.test.d0) + 1;   /* takvim günü (yerel tarih; yaz saati kaymaz): 1..17, 17'den büyükse test bitti */
-const testPlan = (now, opened) => {
-  const d1 = testDay(now), items = [];
-  if (save.test.infoAt > now.getTime()) items.push({ id: TEST.idInfo, at: new Date(save.test.infoAt), kind: 'info', day: 1, slot: 0 });
-  for (let d = Math.max(1, d1); d <= TEST.days; d++) {
-    TEST.slots.forEach((sl, k) => {
-      const at = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (d - d1), sl[0], sl[1], 0);
-      if (at.getTime() <= now.getTime() || (d === d1 && k === 1 && opened)) return;   /* geçmiş ya da bugün zaten girilmiş (ikinci bildirim gitmez) */
-      items.push({ id: (k ? TEST.idB : TEST.idA) + d, at, kind: 'day', day: d, slot: k });
-    });
-  }
-  return { day: d1, over: d1 > TEST.days, items };
-};
-const testText = it => it.kind === 'info' ? { title: t('ntInfoT'), body: t('ntInfoB', { m: TEST.days }) }
-  : { title: t('ntDayT', { d: it.day, m: TEST.days }), body: t((it.slot ? 'ntB' : 'ntA') + ((it.day + (it.slot ? 2 : -1)) % (it.slot ? TEST.nB : TEST.nA))) };
-const testNotif = it => {
-  const x = testText(it);
-  return { id: it.id, title: x.title, body: x.body, channelId: TEST.chan, schedule: { at: it.at, allowWhileIdle: true }, isExactNotification: false, autoCancel: true, extra: { kind: it.kind, day: it.day } };
-};
-let testBusy = false;
-const testSync = async () => {
-  const LN = plugin('LocalNotifications');
-  if (!LN || testBusy) return;
-  testBusy = true;
-  try {
-    persist();
-    let perm = await LN.checkPermissions();
-    if (perm.display !== 'granted' && G.mode === 'menu') perm = await LN.requestPermissions();   /* Android 13+: sistem izin penceresi, yalnızca menüdeyken */
-    if (perm.display === 'granted') {
-      /* bilgilendirme bildirimi, izin verildiği andan 1 dk sonradır (izin penceresine geç cevap verilse de kaçmaz); bir kez belirlenir */
-      if (!(save.test.infoAt > 0)) { save.test.infoAt = Date.now() + TEST.infoMs; persist(); }
-      const plan = testPlan(new Date(), true);
-      await LN.createChannel({ id: TEST.chan, name: t('ntChan'), description: t('ntChanD'), importance: 4, visibility: 1, vibration: true });
-      const keep = {}, stale = [TEST.idInfo];
-      plan.items.forEach(x => { keep[x.id] = 1; });
-      for (let d = 1; d <= TEST.days; d++) stale.push(TEST.idA + d, TEST.idB + d);
-      const drop = stale.filter(id => !keep[id]).map(id => ({ id }));
-      if (drop.length) await LN.cancel({ notifications: drop });
-      if (plan.items.length) await LN.schedule({ notifications: plan.items.map(testNotif) });
-    }
-  } catch (e) { /* izin ya da eklenti hatası: bir sonraki açılışta yeniden denenir */ }
-  testBusy = false;
-};
-const closeTestInfo = () => { hide($('testInfo')); Snd.ui(); };
-/* Bildirime dokununca: menüdeysek kart (Gün n/17, 17 noktalı ilerleme, teşekkür), oyundaysak oyunu bölmeden kısa bildirim satırı */
-const showTestInfo = () => {
-  const day = testDay(new Date()), over = day > TEST.days, d = clamp(day, 1, TEST.days);
-  if (G.mode !== 'menu' || overlayOpen()) { toast(t('testToast', { d, m: TEST.days })); return; }
-  $('tiEye').textContent = t('testT'); $('tiDay').textContent = t('testDay', { d, m: TEST.days });
-  $('tiDots').innerHTML = Array.from({ length: TEST.days }, (_, i) => '<i class="' + (i + 1 < d || over ? 'on' : (i + 1 === d ? 'now' : '')) + '"></i>').join('');
-  $('tiMsg').textContent = over ? t('testOver') : (d === 1 ? t('ntInfoB', { m: TEST.days }) : t('testMsg'));
-  $('tiPlay').textContent = t('testPlay');
-  show($('testInfo')); Snd.ui();
-};
-$('tiClose').addEventListener('click', () => { Snd.unlock(); closeTestInfo(); });
-$('tiPlay').addEventListener('click', () => { Snd.unlock(); hide($('testInfo')); if (G.mode === 'menu') { if (save.run) resumeSaved(); else start(); } });
 
 /* ---------- açılış ---------- */
 applyI18n(); refreshLevel(); refreshStats();
@@ -5898,13 +5852,6 @@ if (document.fonts && document.fonts.load) {
 }
 setTimeout(() => relayout(true), 120);
 WARM.iv = setInterval(warmWatch, 650);
-{
-  const LNP = plugin('LocalNotifications');
-  if (LNP) { try { LNP.addListener('localNotificationActionPerformed', () => showTestInfo()); } catch (e) {} }
-  /* ilk açılışta sistem izin penceresi ısınma örtüsünün üstüne düşmesin: örtü kalkana kadar beklenir (en çok ~20 sn) */
-  { let n = 0; const kick = () => { if (warmVeilEl.classList.contains('on') && n++ < 40) setTimeout(kick, 500); else testSync(); }; setTimeout(kick, 1500); }
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) testSync(); });
-}
 const AppP = plugin('App'), StatusP = plugin('StatusBar');
 const bgIsDark = () => {
   const v = parseInt((P.bg || '#ffffff').slice(1), 16);
@@ -5921,7 +5868,6 @@ if (AppP) {
     AppP.addListener('backButton', () => {
       if (adEl.classList.contains('on')) return;
       if ($('swap').classList.contains('on')) { hide($('swap')); return; }
-      if ($('testInfo').classList.contains('on')) { closeTestInfo(); return; }
       if (settingsEl.classList.contains('on')) { closeSettings(); return; }
       if (G.practice) endPractice(true);
       else if (bookEl.classList.contains('on')) closeBook();
@@ -5934,6 +5880,213 @@ if (AppP) {
     });
   } catch (e) {}
 }
+/* ---------- öğretim (V0.11.0) ----------
+   Kullanıcı: "yazı ile info vermek hangi çağda kaldı", "öğrenmenin bi sonu yok mu". Yazı yok; oyun durur, ışık halkası nereye dokunulacağını gösterir, başka yere dokunulamaz. Sonu bellidir:
+   1 ilk tur (OB_ROUND): vuruş (ibre hedefte durur), yardım azalır, tuzak (ibre tuzakta durur, yasak halkası), süre biter ve çember yanar; 2 OB_SHOP: 500 altın, çanta, Aletler dükkânı, kronometre (300 altın);
+   3 OB_PLAY: mağazadan çıkış, Oyna; 4 OB_USE: süre azalınca oyun durur, kronometreye dokunulur; 5 OB_PAUSE: duraklat, Devam. Bitince save.ob = 0 ve oyun bir daha zorla bir şey göstermez.
+   Kalıcı olan yalnız obM: ilk ıska ve ilk tuzakta oyun yavaşlar, yeri işaretler, geri sarar ve ceza silinir (obTeach). Yeni kilitlerin ilk görüşü zaten Hayalet gösterinin işidir. */
+const OB_GIFT = 500, OB_T0 = 5, OB_FLOOR = 1.6, OB_USE_T = 3.4, OB_OM = [0.7, 0.75, 0.9, 0.9], OB_RATE = [0, 0, 0.35, 0.35, 3.2];
+const obEl = $('obFx');
+let obOn = false, obX = '', obT = null;
+const obRound = () => {
+  Object.assign(G, runState(1));
+  G.ob = { s: 0, h0: 0, tr: 0, ht: 0 };
+  G.mode = 'play'; G.time = G.tvis = OB_T0; G.dir = 1; G.best0 = 0;
+  G.thT = 0; thWx = 0; applyTheme(true);
+  hide(menuEl); hide(overEl); hide(pauseEl);
+  app.classList.add('playing', 'obr');
+  hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
+  toolsEl.classList.remove('on');
+  spawnChallenge(true);
+  G.omega *= OB_OM[0];
+  relayout(false); updateHud();
+};
+const obNext = () => {
+  const o = G.ob;
+  o.s++;
+  if (o.s >= 4) { G.pins = []; return; }
+  spawnChallenge(false, 'tek');
+  G.omega *= OB_OM[o.s];
+  if (o.s === 3) {
+    const g = G.pins[0];
+    g.c0 = ahead(G.ang, G.dir, 3.4);
+    G.pins.push({ kind: 'trap', tw: 'tuzak', ring: 0, c0: ahead(G.ang, G.dir, 1.5), amp: 0, f: 0, ph: 0, hw: Math.min(0.5, g.hw * 1.1), done: false });
+    G.chal.tw = 'tuzak';
+    syncPrimary();
+  }
+};
+const obInTarget = () => { const g = primaryPin(); return !!g && angd(G.ang, pinCenter(g)) <= pinHw(g); };
+const obIgnoreTap = () => G.ob.s >= 4 || (G.ob.s === 0 && !obInTarget());     /* ilk vuruştan önce ıska yok; süre biterken vurulacak bir şey yok */
+const obSlow = () => (G.ob.s === 1 && obInTarget() ? 0.35 : 1);
+const obDrain = raw => { const o = G.ob; G.time -= raw * OB_RATE[o.s]; if (o.s < 4) G.time = Math.max(OB_FLOOR, G.time); };
+const obLethal = () => {
+  if (G.ob.s < 4) { G.time = OB_FLOOR; return; }
+  G.mode = 'dead'; G.deadT = RM ? 0.6 : 0.85 * BURN.slow; G.tail = null;
+  startBurn(); shake(0.5); flash('rose', 0.3); Snd.over(); Platform.haptic('error');
+};
+const obAfterRound = () => {
+  save.ob = OB_SHOP; save.coins += OB_GIFT; persist();
+  G.reform = 0; goMenu();
+  const q = $('coinN').getBoundingClientRect(), a = app.getBoundingClientRect();
+  burst(q.left - a.left, q.top - a.top + q.height / 2, 26, [GOLD, GOLD_L, P.peach, '#FFFFFF'], 220);
+  Snd.fanfare(); Platform.haptic('medium');
+};
+const obUsed = bb => {
+  save.ob = OB_PAUSE; G.hold = ''; G.mode = 'play'; G.obT = 1.4; persist();
+  if (bb) { const q = bb.getBoundingClientRect(), a = app.getBoundingClientRect(); obDrops(q.left - a.left + q.width / 2, q.top - a.top + q.height / 2); }
+};
+const obFinish = () => {
+  save.ob = 0; persist();
+  burst(view.cx, view.cy, 40, [P.peach, P.lilac, GOLD, '#FFFFFF'], 300); Snd.fanfare(); Platform.haptic('medium');
+};
+/* ibre hedefin ortasına varınca ya da süre azalınca oyun durur (G.mode = 'hold'); halka G.hold'a göre yerini bulur */
+const obPlayStep = raw => {
+  const o = G.ob;
+  if (o) {
+    const g = primaryPin();
+    if (o.s === 0 && !o.h0 && g && sdiff(G.ang, pinCenter(g)) * G.dir >= -0.01 && angd(G.ang, pinCenter(g)) < 0.3) { o.h0 = 1; G.mode = 'hold'; G.hold = 'hit'; }
+    const tp = o.s === 3 && !o.tr && G.pins.find(p => p.kind === 'trap');
+    if (tp && sdiff(G.ang, tp.c0) * G.dir >= -0.01 && angd(G.ang, tp.c0) < 0.3) { o.tr = 1; o.ht = 1.6; G.mode = 'hold'; G.hold = 'trap'; }
+    return;
+  }
+  if (G.practice || !save.ob) return;
+  if (save.ob === OB_USE) {
+    if (!isEq('kron') || save.tools.kron.n <= 0) { save.ob = OB_PAUSE; persist(); return; }
+    if (G.time <= 2.4 || G.pt > 5) { G.mode = 'hold'; G.hold = 'joker'; }
+  } else if (save.ob === OB_PAUSE) {
+    G.obT -= raw;
+    if (G.obT <= 0) { G.mode = 'hold'; G.hold = 'pause'; }
+  }
+};
+const obHoldStep = raw => {
+  if (G.hold !== 'trap') return;
+  G.ob.ht -= raw;
+  if (G.ob.ht <= 0) { G.hold = ''; G.mode = 'play'; }
+};
+const obHoldTap = () => { if (G.hold !== 'hit') return; G.hold = ''; G.mode = 'play'; tap(); };
+/* İlk ıska ve ilk tuzak: oyun yavaşlar, dokunulan yer işaretlenir, ibre ve süre geri sarılır, ceza silinir. */
+const obSnap = () => (save.obM && !G.practice ? { time: G.time, combo: G.combo, perf: G.perf, missRun: G.missRun, adapt: G.adapt, mercy: G.mercy, narrow: G.narrow, coinsJ: G.coinsJ, fail: !!(G.chal && G.chal.fail), broken: !!(G.chal && G.chal.broken) } : null);
+const obTeach = (bit, sn) => {
+  if (!sn || !(save.obM & bit) || G.mode !== 'play') return false;
+  save.obM &= ~bit; persist();
+  G.rw = { st: 0, t: 0, sn, mark: G.ang, a: G.ang, a2: G.ang2, tm: G.time };
+  G.mode = 'rw';
+  return true;
+};
+const obRwStep = raw => {
+  const rw = G.rw;
+  if (!rw) { G.mode = 'play'; return; }
+  rw.t += raw;
+  if (rw.st === 0) {
+    if (!G.tun) G.ang = norm(G.ang + G.dir * G.omega * 0.1 * raw);
+    if (rw.t >= (RM ? 0.3 : 0.85)) { rw.st = 1; rw.t = 0; rw.a = G.ang; rw.a2 = G.ang2; rw.tm = G.time; }
+    return;
+  }
+  const k = Math.min(1, rw.t / (RM ? 0.2 : 0.7)), e = k * k * (3 - 2 * k), sn = rw.sn;
+  if (!G.tun) { G.ang = norm(rw.a - G.dir * 1.1 * e); if (G.kind === 'iki') G.ang2 = norm(rw.a2 - G.dir2 * 1.1 * e); }
+  G.time = rw.tm + (sn.time - rw.tm) * e;
+  if (k < 1) return;
+  G.combo = sn.combo; G.perf = sn.perf; G.missRun = sn.missRun; G.adapt = sn.adapt; G.mercy = sn.mercy; G.narrow = sn.narrow; G.coinsJ = sn.coinsJ;
+  if (G.chal) { G.chal.fail = sn.fail; G.chal.broken = sn.broken; }
+  G.vel = NaN; G.vel2 = NaN; G.rw = null; G.mode = 'play';
+};
+/* vuruşta damlalar hedeften kaba akar: sıvının neden yükseldiği görünsün */
+const obDrops = (x, y) => { if (RM) return; for (let i = 0; i < 14; i++) G.obd.push({ x, y, t: -i * 0.035, dx: rnd(-0.65, 0.65), c: i % 2 }); };
+const obDropStep = raw => { for (const d of G.obd) d.t += raw * 1.7; G.obd = G.obd.filter(d => d.t < 1); };
+const drawObFx = c => {
+  if (!G.obd.length && !G.rw) return;
+  const R = ringR(0), RW = Math.max(14, R * 0.2), rv = Math.max(12, R - RW / 2 - Math.max(4, R * 0.05)), top = view.cy + rv - 2 * rv * clamp(G.tvis / CFG.maxTime, 0, 1);
+  for (const d of G.obd) {
+    if (d.t < 0) continue;
+    const tx = view.cx + d.dx * rv, ty = top + 3, mx = (d.x + tx) / 2, my = Math.min(d.y, ty) - 20, u = 1 - d.t;
+    c.fillStyle = d.c ? P.peach : P['peach-deep'];
+    c.beginPath(); c.arc(u * u * d.x + 2 * u * d.t * mx + d.t * d.t * tx, u * u * d.y + 2 * u * d.t * my + d.t * d.t * ty, 4.5 - d.t * 1.5, 0, TAU); c.fill();
+  }
+  if (!G.rw) return;
+  const q = ptXY(view.cx, view.cy, G.rw.mark, R), s = RW * 0.3;
+  c.strokeStyle = P.rose; c.lineWidth = 5; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(q[0] - s, q[1] - s); c.lineTo(q[0] + s, q[1] + s); c.moveTo(q[0] + s, q[1] - s); c.lineTo(q[0] - s, q[1] + s); c.stroke();
+  if (RM || G.rw.st === 0) return;
+  c.fillStyle = 'rgba(108,85,224,.07)';
+  for (let y = 0; y < view.h; y += 13) c.fillRect(0, (y + G.clock * 350) % view.h, view.w, 4);
+  const iy = Math.max((view.hudB || 0) + 18, view.cy - R - RW / 2 - 26);
+  c.fillStyle = P.btn;
+  for (let i = 0; i < 2; i++) { const ox = view.cx + 11 - i * 23; c.beginPath(); c.moveTo(ox, iy - 14); c.lineTo(ox, iy + 14); c.lineTo(ox - 22, iy); c.closePath(); c.fill(); }
+};
+/* halkanın hedefi: { el } ya da { x, y, r, no } (ibre, tuzak) */
+let obWait = 0;
+const obTarget = () => {
+  const s = save.ob, m = G.mode;
+  if (WARM.on) return null;
+  if (m === 'hold') {
+    if (G.hold === 'hit' || G.hold === 'trap') {
+      const tp = G.hold === 'trap' && G.pins.find(p => p.kind === 'trap'), q = ptXY(view.cx, view.cy, tp ? tp.c0 : G.ang, ringR(0));
+      return { x: q[0], y: q[1], r: 62, no: !!tp };
+    }
+    return { el: G.hold === 'joker' ? toolsEl.querySelector('.tool[data-tool="kron"]') : $('pauseBtn') };
+  }
+  if (m === 'pause') return s === OB_PAUSE ? { el: $('resumeBtn') } : null;
+  if (SS.open && !SS.closing) {
+    if (SS.busy || shopEl.classList.contains('opening') || performance.now() < obWait) return null;
+    const sheet = stSheet.classList.contains('on');
+    if (s === OB_SHOP) {
+      if (sheet) return { el: stSheet.querySelector('[data-a="unl"]') };
+      if (SS.view === 'hub') return { el: stHub.querySelector('[data-a="gosel"]') };
+      return { el: SS.shop === 'alet' ? stShop.querySelector('.itm[data-k="kron"]') : stShop.querySelector('[data-a="back"]') };
+    }
+    if (s === OB_PLAY) {
+      if (sheet) return { el: stScrim };
+      return { el: SS.view === 'hub' ? stHub.querySelector('[data-a="close"]') : stShop.querySelector('[data-a="back"]') };
+    }
+    return null;
+  }
+  if (m === 'menu' && !SS.closing && menuEl.classList.contains('on')) {
+    if (s === OB_SHOP) return { el: $('bagBtn') };
+    if (s >= OB_PLAY) return { el: $('playBtn') };
+  }
+  return null;
+};
+/* zorunlu adımlarda halkanın gösterdiği yer dışındaki dokunuşlar oyuna ve mağazaya ulaşmaz */
+const obLock = () => {
+  const s = save.ob;
+  if (!s) return false;
+  if (s === OB_ROUND) return G.mode === 'menu';
+  if (s === OB_SHOP || s === OB_PLAY) return true;
+  return G.mode === 'menu' || G.mode === 'pause' || G.hold === 'joker' || G.hold === 'pause';
+};
+const obFilter = e => {
+  if (!obLock()) return;
+  const el = obT && obT.el;
+  if (el && e.target && el.contains(e.target)) return;
+  e.stopPropagation(); e.preventDefault();
+};
+window.addEventListener('pointerdown', obFilter, true);
+window.addEventListener('click', obFilter, true);
+const obShow = tg => {
+  obT = tg;
+  let x = 0, y = 0, rx = 0, ry = 0;
+  const a = app.getBoundingClientRect();
+  if (tg && tg.el) {
+    const r = tg.el.getBoundingClientRect();
+    if (!r.width) tg = null;
+    else { x = r.left - a.left + r.width / 2; y = r.top - a.top + r.height / 2; rx = Math.max(46, r.width / 2 + 16); ry = Math.max(46, r.height / 2 + 16); }
+  } else if (tg) { x = tg.x; y = tg.y; rx = ry = tg.r; }
+  if (!tg) { if (obOn) { obOn = false; obEl.classList.remove('on', 'dim', 'no', 'el'); obX = ''; } return; }
+  if (!obOn) { obOn = true; obEl.classList.add('on'); void obEl.offsetWidth; obEl.classList.add('dim'); }
+  obEl.classList.toggle('no', !!tg.no);
+  obEl.classList.toggle('el', !!tg.el);
+  const key = Math.round(x) + ',' + Math.round(y) + ',' + Math.round(rx) + ',' + Math.round(ry);
+  if (key === obX) return;
+  obX = key;
+  const st = obEl.style;
+  st.setProperty('--x', Math.round(x) + 'px'); st.setProperty('--y', Math.round(y) + 'px'); st.setProperty('--rx', Math.round(rx) + 'px'); st.setProperty('--ry', Math.round(ry) + 'px');
+};
+const obTick = () => {
+  if (!save.ob && !G.hold) { if (obOn || obT) obShow(null); return; }
+  if (save.ob === OB_ROUND && G.mode === 'menu' && !WARM.on && !document.hidden && (WARM.done || performance.now() > 6500)) { obRound(); return; }
+  obShow(obTarget());
+};
+
 /*DEBUG*/
 
 let last = 0;
@@ -5941,7 +6094,7 @@ const frame = ts => {
   if (!last) last = ts;
   const elapsed = Math.max(0, (ts - last) / 1000), raw = Math.min(0.05, elapsed); last = ts;
   if ((musicT += raw) > 0.3) { musicT = 0; try { Music.sync(); } catch (e) {} }
-  try { update(raw, elapsed); if (!shopEl.classList.contains('on') || shopEl.classList.contains('leaving')) render(); } catch (e) {
+  try { update(raw, elapsed); obTick(); if (!shopEl.classList.contains('on') || shopEl.classList.contains('leaving')) render(); } catch (e) {
     if (!frame.failed) { frame.failed = true; try { console.error('[kp] kare hatası', e && e.stack ? e.stack : e); } catch (x) {} }
   }
   requestAnimationFrame(frame);

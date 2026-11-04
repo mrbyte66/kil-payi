@@ -3,6 +3,23 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.11.0 — Oyun artık kendini yazısız öğretiyor (2026-11-04)
+
+- **Yeni oyuncu oynayarak öğrenir; talimat yazısı yok.** (Kullanıcı: "oyuna girenler nasıl oynanacağını anlamıyor", "yazı ile info vermek hangi çağda kaldı", "öğrenmenin bi sonu yok mu".) Oyun durur, ışık halkası dokunulacak yeri gösterir, başka yere dokunulamaz. Yaklaşık 1,5 dakikada biter ve bir daha gelmez:
+  1. **Vuruş:** ibre şeftalide durur, dokununca damlalar kaba akar, süre dolar. Sonraki iki vuruşta yardım azalıp kaybolur.
+  2. **Tuzak:** ibre pembede durur, üstünde yasak halkası çıkar.
+  3. **Süre biter:** kap boşalır, çember yanar. Kayıp sayılmaz.
+  4. **Mağaza:** ana ekranda 500 altın gelir; çanta, Alet çantası, kronometre kilidi (300 altın). 200 altın kalır.
+  5. **Joker:** Oyna'dan sonra süre azalınca oyun durur, kronometreye dokunulur, süre +4 sn dolar.
+  6. **Duraklat:** duraklat düğmesi ve Devam et.
+- **İlk ıska ve ilk tuzak bedava:** oyun yavaşlar, dokunduğun yeri işaretler, geri sarar, ceza silinir. İkisi de birer kez olur.
+- **Yeni oyuncu 0 jokerle başlar;** kronometre artık 300 altın. Eski oyuncular öğretimi görmez, jokerleri durur, 500 altın almaz.
+- Üstteki "Şeftali bölgedeyken dokun" yazısı yeni oyuncuda çıkmaz. Pembe tuzak ilk turda öğrenildiği için onun ilk görüş gösterisi de atlanır.
+- **Kapalı test bildirimleri kaldırıldı** (17 gün, günde 2 bildirim, Gün n/17 kartı, bildirim eklentisi ve izinleri): gerçek oyunculara gitmesin diye.
+- Yarıda kapatılırsa öğretim kaldığı yerden sürer (ilk tur baştan başlar, 500 altın iki kez verilmez).
+- Gerçek AdMob kimlikleri hâlâ bekliyor: uygulama Google test reklamlarıyla çalışıyor.
+- Teknik: `src/game.html` "öğretim" bloğu, `save.ob` ve `save.obM`, `tools/ob-test.mjs` (gerçek dokunuşla uçtan uca deneme).
+
 ## V0.10.4 — Kayıt ve ödül doğrulaması (2026-10-23)
 
 - İmzasız kayıtla para/ilerleme yükleme ve bozuk eski kayıtla sıfırlamayı atlatma yolları kapatıldı. Doğrulama ve geçiş canlı kayda aktarılmadan tamamlanıyor. Geçerli imzalı V0.10.3 kayıtları korunur; imzasız çok eski kayıtların ekonomisi sıfırlanır, temel kullanıcı tercihleri korunur.
