@@ -1,0 +1,39 @@
+/* Ortak: kapak görselleri ve ekran stilleri */
+import { readFileSync } from 'node:fs';
+export const ROOT = new URL('../../../', import.meta.url).pathname;
+const py = readFileSync(ROOT + 'tools/make-icon.py', 'utf8');
+const grab = n => py.match(new RegExp('^' + n + " = '''([\\s\\S]*?)'''", 'm'))[1];
+const DEFS = grab('DEFS'), FG = grab('FG');
+export const HEAD = `<!doctype html><meta charset=utf-8><link rel=stylesheet href="file://${ROOT}src/fonts/fonts.css"><style>*{box-sizing:border-box}body{margin:0;overflow:hidden;font-family:Fredoka,sans-serif;background-repeat:no-repeat!important}h1{margin:0;font-weight:700;color:#fff;letter-spacing:-1px}p{margin:0;font-family:Nunito,sans-serif;font-weight:800}</style>`;
+const P = (cx, cy, r, a) => [cx + Math.sin(a) * r, cy - Math.cos(a) * r];
+const arc = (cx, cy, r, a0, a1) => { const [x0, y0] = P(cx, cy, r, a0), [x1, y1] = P(cx, cy, r, a1); return `M${x0} ${y0}A${r} ${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1} ${y1}`; };
+const ticks = (cx, cy, R, c) => Array.from({ length: 60 }, (_, i) => { const a = i / 60 * Math.PI * 2, m = i % 5 === 0, [x0, y0] = P(cx, cy, R * 1.15, a), [x1, y1] = P(cx, cy, R * (m ? 1.27 : 1.21), a); return `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="${c}" stroke-width="${R * (m ? .018 : .012)}" stroke-linecap="round"/>`; }).join('');
+const sparks = (x, y, R) => { let h = ''; const c = ['#FFD9C5', '#FFA77C', '#FF7B3F', '#FFFFFF', '#FFE29A']; for (let i = 0; i < 34; i++) { const a = i * 2.4, d = R * (.1 + (i % 7) * .055), s = R * (.006 + (i % 4) * .007); h += `<circle cx="${x + Math.sin(a) * d}" cy="${y - Math.cos(a) * d}" r="${s}" fill="${c[i % 5]}" opacity="${1 - (i % 7) * .08}"/>`; } return h; };
+export const ring = ({ cx, cy, R, ang, t0, t1, hell, liquid = .62, burst = false }) => {
+  const lw = R * .19, tr = hell ? '#46252B' : '#E2DDF4', tk = hell ? '#8A5A50' : '#CFC5EC', mid = (t0 + t1) / 2, w = (t1 - t0) / 3;
+  const rv = R * .87, ly = cy + rv - rv * 2 * liquid, disc = hell ? '#2A1216' : '#FFFFFF', liq = hell ? '#B4493A' : '#BDB0F8', [hx, hy] = P(cx, cy, R, ang), [nx, ny] = P(cx, cy, R * .66, ang), id = 'c' + Math.round(cx) + Math.round(R);
+  return `${ticks(cx, cy, R, tk)}<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${tr}" stroke-width="${lw}"/>
+  <path d="${arc(cx, cy, R, t0 - .03, t1 + .03)}" fill="none" stroke="#FFD9C5" stroke-width="${lw * 1.22}"/><path d="${arc(cx, cy, R, t0, t0 + w)}" fill="none" stroke="#FFA77C" stroke-width="${lw}"/><path d="${arc(cx, cy, R, t0 + w, t0 + 2 * w)}" fill="none" stroke="#FF7B3F" stroke-width="${lw}"/><path d="${arc(cx, cy, R, t0 + 2 * w, t1)}" fill="none" stroke="#FFA77C" stroke-width="${lw}"/>
+  <clipPath id="${id}"><circle cx="${cx}" cy="${cy}" r="${rv}"/></clipPath><circle cx="${cx}" cy="${cy}" r="${rv}" fill="${disc}"/>
+  <path clip-path="url(#${id})" d="M${cx - rv} ${ly}Q${cx - rv / 2} ${ly - R * .05} ${cx} ${ly}T${cx + rv} ${ly}V${cy + rv}H${cx - rv}Z" fill="${liq}"/>
+  <circle cx="${cx}" cy="${cy}" r="${rv + R * .025}" fill="none" stroke="${hell ? '#6B3A3A' : '#DAD3F8'}" stroke-width="${R * .016}"/>
+  ${burst ? `<circle cx="${hx}" cy="${hy}" r="${R * .3}" fill="none" stroke="#FFD9C5" stroke-width="${R * .02}" opacity=".85"/>${sparks(hx, hy, R)}` : ''}
+  <line x1="${nx}" y1="${ny}" x2="${hx}" y2="${hy}" stroke="${hell ? '#FFF' : '#2A2347'}" stroke-width="${R * .03}" stroke-linecap="round"/><circle cx="${hx}" cy="${hy}" r="${R * .115}" fill="${hell ? '#FFF' : '#2A2347'}"/><circle cx="${hx}" cy="${hy}" r="${R * .04}" fill="${hell ? '#2A2347' : '#FFF'}"/>`;
+};
+const dial = (x, y, s) => `<svg x="${x}" y="${y}" width="${s}" height="${s}" viewBox="18 18 72 72"><defs>${DEFS}</defs>${FG}</svg>`;
+const page = (bg, svg, title, tag, tx = 58, ty = 138) => `${HEAD}<body><div style="width:1024px;height:500px;position:relative;overflow:hidden;background:${bg}"><svg width="1024" height="500" viewBox="0 0 1024 500" style="position:absolute;inset:0">${svg}</svg><div style="position:absolute;left:${tx}px;top:${ty}px;width:490px"><h1 style="font-size:${title.length > 8 ? 100 : 112}px;line-height:1;text-shadow:0 6px 30px #0006">${title}</h1><p style="margin-top:20px;font-size:32px;color:#FFD9BD;text-shadow:0 3px 14px #0006">${tag}</p></div>`;
+export const covers = (title, tag) => ({
+  K1: page('radial-gradient(90% 130% at 74% 50%,#B7A6FF 0%,#5B45D6 48%,#1D1158 100%)', `<circle cx="760" cy="250" r="330" fill="#fff" opacity=".07"/><circle cx="760" cy="250" r="270" fill="#fff" opacity=".08"/>${dial(540, 30, 440)}`, title, tag),
+  K2: page('radial-gradient(85% 150% at 88% 42%,#FF9A5C 0%,#8E3FB8 44%,#1F1062 100%)', ring({ cx: 840, cy: 270, R: 300, ang: -1.0, t0: -1.42, t1: -.62, burst: true, liquid: .5 }), title, tag),
+  K3: page('#150A14', `<defs><radialGradient id="a" cx="15%" cy="50%" r="90%"><stop offset="0" stop-color="#A995FF"/><stop offset=".6" stop-color="#5B45D6"/><stop offset="1" stop-color="#24166F"/></radialGradient><radialGradient id="b" cx="85%" cy="60%" r="75%"><stop offset="0" stop-color="#FF8A45"/><stop offset=".55" stop-color="#8A1F2B"/><stop offset="1" stop-color="#17080F"/></radialGradient><clipPath id="L"><polygon points="0,0 800,0 680,500 0,500"/></clipPath><clipPath id="H"><polygon points="800,0 1024,0 1024,500 680,500"/></clipPath></defs>
+    <rect width="1024" height="500" fill="url(#a)" clip-path="url(#L)"/><rect width="1024" height="500" fill="url(#b)" clip-path="url(#H)"/><g clip-path="url(#L)">${ring({ cx: 750, cy: 250, R: 178, ang: .9, t0: .55, t1: 1.3 })}</g><g clip-path="url(#H)">${ring({ cx: 750, cy: 250, R: 178, ang: .9, t0: .55, t1: 1.3, hell: true })}</g>`, title, tag)
+});
+const BG = { p: 'radial-gradient(120% 75% at 50% 0%,#A08FFF 0%,#5B45D6 48%,#24166F 100%)', h: 'radial-gradient(120% 75% at 50% 0%,#FF8A45 0%,#8A1F2B 48%,#17080F 100%)', i: 'radial-gradient(120% 75% at 50% 0%,#7C6BFF 0%,#3A2BA8 50%,#160C4D 100%)' };
+const K = 8 / 3;
+const cap = (h, s, c = 'center') => `<div style="position:absolute;left:60px;right:60px;top:76px;text-align:${c}"><h1 style="font-size:104px;line-height:1.05">${h}</h1><p style="margin-top:22px;font-size:45px;color:#FFD2B0">${s}</p></div>`;
+export const A = (R, n, bg, h, s) => `${HEAD}<body><div style="width:1080px;height:1920px;background:${BG[bg]};position:relative">${cap(h, s)}<img src="file://${R}/${n}.png" style="position:absolute;left:115px;top:440px;width:850px;height:1511px;border-radius:70px 70px 0 0;border:10px solid rgba(255,255,255,.28);box-shadow:0 40px 110px rgba(0,0,0,.5)">`;
+export const B = (R, n, bg, h, s, v) => { const D = 1200, z = D / (v[2] * K * 2.62), cx = v[0] * K * z, cy = v[1] * K * z;
+  return `${HEAD}<body><div style="width:1080px;height:1920px;background:${BG[bg]};position:relative;overflow:hidden">${cap(h, s)}<div style="position:absolute;left:-60px;top:560px;width:${D}px;height:${D}px;border-radius:50%;box-shadow:0 40px 120px rgba(0,0,0,.45);background:url(file://${R}/${n}.png);background-size:${1080 * z}px ${1920 * z}px;background-position:${D / 2 - cx}px ${D / 2 - cy}px"></div>`; };
+export const C = (R, n, bg, h, s, v) => { const D = 520, z = 2.4 * 900 / 1080, hx = (v[0] + Math.sin(v[3]) * v[2]) * K * z, hy = (v[1] - Math.cos(v[3]) * v[2]) * K * z;
+  return `${HEAD}<body><div style="width:1080px;height:1920px;background:${BG[bg]};position:relative;overflow:hidden">${cap(h, s, 'left')}<img src="file://${R}/${n}.png" style="position:absolute;left:170px;top:540px;width:860px;height:1529px;border-radius:70px;border:10px solid rgba(255,255,255,.28);box-shadow:0 40px 110px rgba(0,0,0,.5);transform:rotate(5deg)">
+  <div style="position:absolute;left:40px;top:1290px;width:${D}px;height:${D}px;border-radius:50%;border:12px solid #fff;box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 80px rgba(255,167,124,.5);background:url(file://${R}/${n}.png);background-size:${1080 * z}px ${1920 * z}px;background-position:${D / 2 - hx - 12}px ${D / 2 - hy - 12}px"></div>`; };
