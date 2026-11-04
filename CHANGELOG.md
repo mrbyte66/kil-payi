@@ -3,6 +3,15 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.13.0 — Tek Oyna, kısa öğretim, daha az tanıtım (2026-11-04)
+
+- **Ana ekranda tek Oyna.** Süreli ve Bölümler ayrımı kalktı; Bölümler modu şimdilik yayınlanmıyor, sonra değerlendirilecek. Halkada Oyna, Mağaza ve Defter var. Oyna'ya dokununca zorluk halkası açılır; yarım oyun varsa dilim "Devam et" olur ve doğrudan sürer.
+- **Öğretim çok kısaldı** (kullanıcı: "kime göstersem tıklayıp geçti"). Kalan: ilk tur, 500 altın, mağazadan zorunlu Kronometre. Sonra Oyna gerçek oyunu açar; süre azalınca oyun bir kez durur ve el jokeri gösterir. Duraklatma, kilit defteri ve zorluk seçimi öğretimi kalktı, ikinci deneme turu da yok.
+- **Yeni kilit tanıtımları azaldı.** Kilidin bir de cezalı ikizi varsa yalnızca cezalı olanın gösterisi çıkar, bir çift için tek gösteri. Gösteri kilit ilk geldiğinde çıkar, ikiz gelince tekrarlanmaz. İkizi olmayan kilitlerin (Işınlanma, Trafik, Bomba) gösterisi aynen kaldı.
+- Düzeltme: zorluk halkasındayken telefonun geri tuşu uygulamayı kapatmıyor, ana halkaya döndürüyor.
+- Yarım kalmış öğretimle güncelleyen oyuncu: mağaza adımındaysa kısa akıştan sürer, defter ya da zorluk adımındaysa öğretim biter.
+- Teknik: `MENU1`'de `gap` yer tutucu dilim (3 dilim 4 zorluğa dönüşür), `OB_JOKER` aşaması, `introOf`. `tools/ob-test.mjs` ve `tools/menu-test.mjs` yeni akışa göre yazıldı.
+
 ## V0.12.1 — Menü yazıları dilimlerin içinde, yeni oyun sonu ve duraklatma (2026-11-04)
 
 - **Menüde yazılar dilimlerin içine girdi** (kullanıcı: "yazılar sırıtmış, sığmamış"). Beyaz etiketler kalktı, isimler halkanın eğimine uyarak dilimin içinde yazıyor, yanında ikon var. Halka biraz büyüdü, dar ekranda taşma bitti. Süreli'de zorluğun yanında en iyi skor yazıyor.

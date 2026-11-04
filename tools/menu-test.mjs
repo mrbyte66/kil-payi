@@ -1,4 +1,4 @@
-/* Kadran menü (V0.12.0): GERÇEK dokunuşla (CDP touch) dilimler, etiketler, Süreli geçişi, kaydırma, yarım oyun. DEBUG=1 derlemesiyle çalışır (`DEBUG=1 ./build.sh`).
+/* Kadran menü (V0.12.0): GERÇEK dokunuşla (CDP touch) dilimler, etiketler, zorluk geçişi, kaydırma, yarım oyun. DEBUG=1 derlemesiyle çalışır (`DEBUG=1 ./build.sh`).
    Kullanım: node tools/menu-test.mjs [ekran görüntüsü klasörü] */
 import { launch } from './cdp.mjs';
 const root = new URL('..', import.meta.url).pathname, page = 'file://' + root + 'www/index.html';
@@ -27,7 +27,7 @@ const G = '__kp.G', M = '__kp.MN', S = '__kp.save';
 
 let b = await open({});
 await shot(b, 'm1-menu');
-const ids = ['playBtn', 'sureBtn', 'bagBtn', 'bookBtn', 'setBtn'];
+const ids = ['playBtn', 'bagBtn', 'bookBtn', 'setBtn'];
 T('yazılar halkanın içinde: halka ekrana sığar', await b.eval(`__kp.view.cx+__kp.view.r*1.17<innerWidth&&__kp.view.cx-__kp.view.r*1.17>0`));
 T('Ayarlar dokunulabilir, dilimlerin üstünde görünmez engel yok', await b.eval(`(()=>{const e=document.getElementById('setBtn'),r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2),v=__kp.view,p=document.elementFromPoint(v.cx,v.cy-v.r);return (h===e||e.contains(h))&&p&&document.getElementById('menu').contains(p)})()`));
 await b.touch(195, 790);
@@ -36,36 +36,39 @@ T('halkanın dışına dokunuş oyun başlatmaz', await b.eval(`${G}.mode==='men
 /* beklemek yok: ibre dilimin tam karşısındayken */
 await b.eval(`${G}.ang=(0+Math.PI)`);
 const t0 = Date.now(); await b.tapSlice(0);
-T('ibre karşıdayken bile hemen oyun başlar', await b.wait(`${G}.mode==='play'`, 600), Date.now() - t0 + ' ms');
+T('ibre karşıdayken bile Oyna hemen zorlukları açar', await b.wait(`${M}.lvl===1`, 600), Date.now() - t0 + ' ms');
+await b.wait(`${M}.hv===1`, 1500);
+await b.tapSlice(90);
+T('zorluk seçince oyun başlar', await b.wait(`${G}.mode==='play'`, 600));
 await b.sleep(700); await shot(b, 'm2-oyun');
 T('oyunda halka normal (dilimler sönük)', await b.eval(`${M}.mf<0.05`));
 await b.close();
 
 b = await open({});
-/* Süreli */
-await b.tapSlice(117);
-T('Süreli dilimi: halka zorluklara döner', await b.wait(`${M}.lvl===1`, 600));
+/* Oyna */
+await b.tapSlice(0);
+T('Oyna dilimi: halka zorluklara döner', await b.wait(`${M}.lvl===1`, 600));
 await b.sleep(120); await shot(b, 'm3-gecis');
 T('Cehennem katmanı kayıyor', await b.eval(`getComputedStyle(document.getElementById('mHell')).visibility==='visible'`));
-await b.wait(`${M}.hv===1`, 1500); await b.sleep(100); await shot(b, 'm4-sureli');
+await b.wait(`${M}.hv===1`, 1500); await b.sleep(100); await shot(b, 'm4-zorluk');
 const c = await b.center();
 await b.touch(c[0], c[1]);
 T('orta: Geri', await b.wait(`${M}.lvl===0&&${M}.hv===0`, 1500));
 T('Cehennem katmanı gizlendi', await b.eval(`getComputedStyle(document.getElementById('mHell')).visibility==='hidden'`));
 /* kaydırma */
 await b.touch(340, 760, 120);
-T('sola kaydırınca Süreli', await b.wait(`${M}.lvl===1&&${M}.hv===1`, 1500));
+T('sola kaydırınca zorluklar', await b.wait(`${M}.lvl===1&&${M}.hv===1`, 1500));
 await b.touch(60, 760, 300);
 T('sağa kaydırınca geri', await b.wait(`${M}.lvl===0&&${M}.hv===0`, 1500));
 /* zorluk seçimi */
-await b.tapSlice(117); await b.wait(`${M}.hv===1`, 1500);
+await b.tapSlice(0); await b.wait(`${M}.hv===1`, 1500);
 await b.tapSlice(90);
 T('Normal dilimi: oyun başlar', await b.wait(`${G}.mode==='play'&&${S}.lvl==='normal'`, 800));
 T('arka plan açığa döner', await b.wait(`${M}.hv===0`, 1500));
 await b.close();
 
 b = await open({});
-await b.tapSlice(117); await b.wait(`${M}.hv===1`, 1500);
+await b.tapSlice(0); await b.wait(`${M}.hv===1`, 1500);
 await b.tapSlice(270);
 T('Cehennem dilimi: Cehennem başlar', await b.wait(`${G}.mode==='play'&&${S}.lvl==='cehennem'`, 800));
 await b.sleep(900); await shot(b, 'm5-cehennem');
@@ -75,10 +78,10 @@ await b.close();
 
 b = await open({});
 /* Mağaza, Defter: dilim ve etiket */
-await b.tapSlice(200);
+await b.tapSlice(137);
 T('Mağaza dilimi', await b.wait(`__kp.SS.open`, 800));
 await b.eval(`__kp.closeShop()`); await b.sleep(800);
-await b.tapSlice(262);
+await b.tapSlice(232);
 T('Defter dilimi', await b.wait(`document.getElementById('book').classList.contains('on')`, 800));
 await b.eval(`document.getElementById('bookClose').click()`); await b.sleep(300);
 /* yarım oyun */
@@ -86,7 +89,11 @@ await b.eval(`__kp.start();__kp.G.score=42;__kp.persistRun()`);
 await b.eval(`document.getElementById('pauseMenuBtn').click()`); await b.sleep(500);
 T('yarım oyun: Devam et', await b.eval(`document.getElementById('playT').textContent==='Devam et'&&!document.getElementById('newBtn').hidden`), await b.eval(`document.getElementById('mSub').textContent`));
 await shot(b, 'm6-devam');
-await b.tapSlice(117); await b.wait(`${M}.hv===1`, 1500);
+await b.tapSlice(0);
+T('Devam et: zorluk sormadan sürer', await b.wait(`${G}.mode==='count'||${G}.mode==='play'`, 800));
+await b.eval(`__kp.persistRun()`);
+await b.goto(page); await b.sleep(900);
+await b.touch(340, 760, 120); await b.wait(`${M}.hv===1`, 1500);
 await b.tapSlice(180);
 T('başka zorluk: önce sorar', await b.wait(`document.getElementById('swap').classList.contains('on')`, 800));
 await b.eval(`document.getElementById('swapYes').click()`);
@@ -100,8 +107,8 @@ await shot(b, 'm7-kucuk');
 T('küçük ekran: halka ekrana sığar', await b.eval(`__kp.view.cx+__kp.view.r*1.17<innerWidth&&__kp.view.cx-__kp.view.r*1.17>0&&__kp.view.cy-__kp.view.r*1.17>0`));
 T('İngilizce başlık sığar', await b.eval(`document.querySelector('#mCenter .title').getBoundingClientRect().width<__kp.view.r*1.55`));
 await b.eval(`__kp.save.anim=false;__kp.applyMotion()`);
-await b.tapSlice(117);
-T('animasyon kapalı: Süreli hemen', await b.wait(`${M}.lvl===1&&${M}.hv===1`, 300));
+await b.tapSlice(0);
+T('animasyon kapalı: zorluklar hemen', await b.wait(`${M}.lvl===1&&${M}.hv===1`, 300));
 await b.tapSlice(0);
 T('animasyon kapalı: zorluk çalışır', await b.wait(`${G}.mode==='play'`, 300));
 T('konsol temiz', !b.logs.length, b.logs.join(' | '));

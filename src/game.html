@@ -894,8 +894,7 @@ html.calm #obFx .h b{display:none}
     </header>
     <div class="grow"></div>
     <div class="mset live" id="mSet1">
-      <button class="mlab" id="playBtn" type="button" data-m="bolum"><span id="playT"></span></button>
-      <button class="mlab" id="sureBtn" type="button" data-m="sure" data-i18n="m_sure">Süreli</button>
+      <button class="mlab" id="playBtn" type="button" data-m="play"><span id="playT"></span></button>
       <button class="mlab" id="bagBtn" type="button" data-m="store" data-i18n="shop">Mağaza</button>
       <button class="mlab" id="bookBtn" type="button" data-m="book" data-i18n="m_book">Defter</button>
       <div class="mcen" id="mCenter"><h1 class="title" data-i18n="title">Kıl payı</h1><small id="mSub"></small></div>
@@ -905,7 +904,7 @@ html.calm #obFx .h b{display:none}
       <button class="mlab" type="button" data-m="normal"><span data-i18n="lv_normal">Normal</span><em></em></button>
       <button class="mlab" type="button" data-m="usta"><span data-i18n="lv_usta">Usta</span><em></em></button>
       <button class="mlab" type="button" data-m="cehennem"><span data-i18n="lv_cehennem">Cehennem</span><em></em></button>
-      <button class="mcen mback" id="mBack" type="button"><b data-i18n="m_sure">Süreli</b><small data-i18n="m_back">Geri</small></button>
+      <button class="mcen mback" id="mBack" type="button"><b data-i18n="m_diff">Zorluk</b><small data-i18n="m_back">Geri</small></button>
       <p class="mhint" id="mHint" data-i18n="m_sureSub">Süre bitmeden en çok puan</p>
     </div>
     <footer class="menu-foot" id="menuFoot">
@@ -1285,7 +1284,7 @@ try { LANG = pickLang((JSON.parse(localStorage.getItem('kilpayi.v1') || '{}') ||
 let SN = LANG === 'tr' ? 'sn' : 's';
 const STR = {
   tr: {
-    m_coins: '{n} altın', m_chance: '+{a} {u} · {n} {v} içinde', m_sure: 'Süreli', m_book: 'Defter', m_back: 'Geri', m_sureSub: 'Süre bitmeden en çok puan', m_bolum: 'Bölümler',
+    m_coins: '{n} altın', m_chance: '+{a} {u} · {n} {v} içinde', m_diff: 'Zorluk', m_book: 'Defter', m_back: 'Geri', m_sureSub: 'Süre bitmeden en çok puan',
     title: 'Kıl payı', tagline: 'Süre bitmek üzereyken vur, puan ×3.', play: 'Oyna', best: 'En iyi', runs: 'Oyun', bestLvl: 'Seviye',
     zone: 'Son 1 sn: ×3', perfect: 'Mükemmel', near: 'Kıl payı ×3', miss: 'Iska', reverse: 'Ters yön', breath: 'Nefes al',
     tut1: 'Şeftali bölgedeyken dokun', tut2: 'Süre bitmek üzereyken vur: ×3',
@@ -1395,7 +1394,7 @@ const STR = {
     ic_sicak: 'Yayın sonu kızıl: sıcak|Tutarken yanarsın, süre erir|Yine de sonda bırak: ×2'
   },
   en: {
-    m_coins: '{n} coins', m_chance: '+{a}{u} · {n}{v} left', m_sure: 'Timed', m_book: 'Book', m_back: 'Back', m_sureSub: 'Score as much as you can before time runs out', m_bolum: 'Levels',
+    m_coins: '{n} coins', m_chance: '+{a}{u} · {n}{v} left', m_diff: 'Difficulty', m_book: 'Book', m_back: 'Back', m_sureSub: 'Score as much as you can before time runs out',
     title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs', bestLvl: 'Level',
     zone: 'Last 1 s: ×3', perfect: 'Perfect', near: 'Close call ×3', miss: 'Miss', reverse: 'Reversed', breath: 'Catch your breath',
     tut1: 'Tap when the pointer is in the peach zone', tut2: 'Hit it as time runs out: ×3',
@@ -1601,7 +1600,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.12.1';
+const VERSION = 'V0.13.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -1632,8 +1631,8 @@ const validSave = o => {
   if (o.gift && ((!bounded(o.gift.n, 5) || !Number.isInteger(o.gift.n)) || (o.gift.t0 !== undefined && !bounded(o.gift.t0, 8640000000000000)))) return false;
   return true;
 };
-/* Öğretim (V0.11.0): yeni kurulumda save.ob aşamasıdır (0 = bitti ya da eski kayıt). Aşamalar kayıtlıdır; uygulama kapanırsa kaldığı yerden sürer. */
-const OB_ROUND = 1, OB_SHOP = 2, OB_PLAY = 3, OB_BOOK = 4, OB_BOOK2 = 5, OB_LEVEL = 6, OB_LEVEL2 = 7, OB_GO = 8;
+/* Öğretim (V0.11.0, V0.13.0'da kısaldı): yeni kurulumda save.ob aşamasıdır (0 = bitti ya da eski kayıt). Aşamalar kayıtlıdır; uygulama kapanırsa kaldığı yerden sürer. 4-8 eski sürümün kalkan adımlarıdır. */
+const OB_ROUND = 1, OB_SHOP = 2, OB_PLAY = 3, OB_JOKER = 9;
 const OB_FRESH = (() => { try { return !localStorage.getItem('kilpayi.v1') && !window.NO_OB; } catch (e) { return false; } })();
 try {
   const raw = localStorage.getItem('kilpayi.v1');
@@ -1689,7 +1688,7 @@ TOOL_IDS.forEach(id => {
 if (!save.own || typeof save.own !== 'object') save.own = { kron: 1 };
 /* yeni oyuncu 0 altın ve 0 jokerle başlar: 500 altını ilk turdan sonra alır, kronometreyi mağazada kendi açar. İlk ıska ve ilk tuzak bir kez bedava geri sarılır (obM bitleri); eski kayıtta ikisi de yoktur. */
 if (OB_FRESH) { save.ob = OB_ROUND; save.obM = 3; save.tut = true; save.own = {}; save.equip = ['', '', '', '']; save.tools.kron.n = 0; save.intro.tuzak = 1; }
-save.ob = clamp(save.ob | 0, 0, OB_GO); save.obM = clamp(save.obM | 0, 0, 3);
+save.ob = clamp(save.ob | 0, 0, OB_JOKER); if (save.ob > OB_PLAY && save.ob < OB_JOKER) save.ob = 0; save.obM = clamp(save.obM | 0, 0, 3);
 TOOL_IDS.forEach(id => { save.own[id] = save.own[id] ? 1 : 0; });
 if (!TOOL_IDS.some(id => save.own[id]) && !save.ob) save.own.kron = 1;
 save.slots = clamp(save.slots | 0 || 1, 1, 4);
@@ -2219,7 +2218,7 @@ const closeBook = () => { hide(bookEl); show(menuEl); refreshStats(); Snd.ui(); 
 /* Menü: kayıtlı oyun varsa "Devam et" en büyük düğme olur. */
 const refreshMenu = () => {
   const has = !!save.run;
-  $('playT').textContent = t(has ? 'resume' : 'm_bolum');
+  $('playT').textContent = t(has ? 'resume' : 'play');
   $('mSub').textContent = has ? t('resumeSub', { lv: t('lv_' + save.run.lvl), n: save.run.L, p: Number(save.run.score || 0).toLocaleString(LANG === 'tr' ? 'tr-TR' : 'en-US') }) : t('best') + ' ' + bestNow();
   const nb = $('newBtn'); nb.hidden = !has; if (!nb.classList.contains('warn')) nb.textContent = t('newGame');
   campEl.hidden = has || save.camp <= 1;
@@ -2750,7 +2749,7 @@ const runState = L0 => ({
 
 const start = (fromL, snap) => {
   if (snap && !validRun(snap)) { save.run = null; persist(); return false; }
-  if (save.ob === OB_PLAY && !snap) { obRound(2); return; }   /* öğretimin ikinci turu: kayıt, coin ve rekor yok */
+  if (save.ob === OB_PLAY && !snap) save.ob = OB_JOKER;   /* ilk gerçek oyun: joker bir kez gösterilir */
   runEpoch++; if (activeReward) activeReward();
   const L0 = Number.isInteger(fromL) && fromL >= 1 && fromL <= 10000 ? fromL : 1;
   Snd.ui();
@@ -2778,7 +2777,6 @@ const start = (fromL, snap) => {
   updateHud(); relayout(false);   /* önce HUD güncellenir: önceki oyundan kalan joker çipleri halkanın boyunu etkilemesin */
   updateTools(); updateHud();
   Platform.track('run_start', { run: save.runs + 1, level: L0, resume: !!snap });
-  if (save.ob === OB_GO) obFinish();
 };
 /* Kayıtlı oyunu sürdür: durum geri yüklenir, 3-2-1 sayılır. */
 const resumeSaved = () => {
@@ -2812,7 +2810,6 @@ const syncPracDots = () => {
 };
 const startPractice = kind => {
   Snd.ui();
-  if (save.ob === OB_BOOK) { save.ob = OB_BOOK2; persist(); }
   Object.assign(G, runState(1));
   const tw = PRAC_TWIN[kind] || '';
   G.mode = 'play'; G.time = CFG.maxTime; G.dir = 1;
@@ -3292,7 +3289,7 @@ const useTool = (id, auto) => {
   updateTools(); updateHud();
   const bb = toolsEl.querySelector('.tool[data-tool="' + id + '"]');
   if (bb) { bb.classList.remove('bump'); void bb.offsetWidth; bb.classList.add('bump'); }
-  if (G.ob) obUsed(bb);
+  if (save.ob === OB_JOKER) { G.hold = ''; if (G.mode === 'hold') G.mode = 'play'; save.ob = 0; persist(); }   /* joker bir kez gösterilir: kendisi bassa da öğrenmiştir */
   Platform.track('tool_use', { id, level: s.l, smart, auto: !!auto });
 };
 /* Akıllı joker: işe yarayacağı an parlar ve büyür; aynı anda yalnızca biri önerilir. Otomatik joker ayarı (save.autoJ) açıksa parladıktan AUTO_AT sn sonra kendiliğinden kullanılır;
@@ -3419,7 +3416,7 @@ const doContinue = (rewarded = false) => {
 };
 
 const pause = () => {
-  if ((G.mode !== 'play' && G.mode !== 'count' && G.mode !== 'intro' && !(G.mode === 'hold' && G.hold === 'pause'))/*NOPAUSE*/) return;
+  if ((G.mode !== 'play' && G.mode !== 'count' && G.mode !== 'intro')/*NOPAUSE*/) return;
   if (G.practice) { endPractice(true); return; }
   if (G.ob && G.ob.r !== 2) return;
   abortIntro();
@@ -5381,7 +5378,9 @@ const drawDemoOver = (c, d, cx, cy, R) => {
   drawDemoBar(c, d);
 };
 const introWanted = kind => /*NOINTRO*/ !G.practice && !G.ob && !!INTRO[kind] && !(save.intro && save.intro[kind]) && !((save.seen[kind] | 0) > 0);
-const queueIntro = kind => { if (introWanted(kind) && G.introQ.indexOf(kind) < 0) G.introQ.push(kind); };
+/* kullanıcı: "çok fazla öğretme var, ikililerde yalnız cezalı olanı öğret" (V0.13.0): kilidin ilk görüşünde ikizinin sahnesi çıkar (sahne iyi kilidin işleyişini de gösterir), ikiz gelince bir daha çıkmaz; ikizsiz kilidin kendi sahnesi kalır */
+const introOf = kind => (kind !== 'tek' && INTRO[JTWIN[kind]] ? JTWIN[kind] : kind);
+const queueIntro = kind => { const k = introOf(kind); if (introWanted(k) && G.introQ.indexOf(k) < 0) G.introQ.push(k); };
 const dockDim = on => { if (toolsEl) toolsEl.classList.toggle('dim', on); };
 const startIntro = () => {
   const kind = G.introQ.shift(), sc = INTRO[kind];
@@ -5833,7 +5832,7 @@ $('againBtn').addEventListener('click', () => { Snd.unlock(); start(G.startL); }
 campEl.addEventListener('click', () => { Snd.unlock(); start(save.camp); });
 $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
 $('resumeBtn').addEventListener('click', resume);
-$('pauseBtn').addEventListener('click', e => { Snd.unlock(); if (G.mode !== 'play' && G.mode !== 'count' && G.hold !== 'pause') return; Snd.ui(); Platform.haptic('light'); pause(); e.currentTarget.blur(); });
+$('pauseBtn').addEventListener('click', e => { Snd.unlock(); if (G.mode !== 'play' && G.mode !== 'count') return; Snd.ui(); Platform.haptic('light'); pause(); e.currentTarget.blur(); });
 $('bagBtn2').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'over') openShop('over'); });
 $('adBtn').addEventListener('click', () => {
   if (!canContinue(true)) return;
@@ -5857,11 +5856,12 @@ $('coinBtn').addEventListener('click', () => {
 /* ---------- açılış ---------- */
 /* ---------- kadran menü (V0.12.0) ----------
    Kullanıcı seçimi "Kadran menü": halkanın dilimleri menüdür, ibre döner (dönüş süstür: "beklemek istemem"): dilime dokununca dilim anında tepki verir, ibre en kısa yoldan koşar, vuruş gibi patlar, sonra eylem.
-   Süreli: Cehennem katmanı (#mHell) yandan kayar (Üç dünya taslağında beğenildi), dilimler açı ve renkle dört zorluğa dönüşür; yana sürükleyince parmağı izler. Bölümler modu henüz yok: Bölümler dilimi bugünkü oyunu açar. */
+   Oyna (V0.13.0: Süreli ve Bölümler tek dilim; Bölümler modu sonraya kaldı): yarım oyun varsa sürer, yoksa Cehennem katmanı (#mHell) yandan kayar, dilimler açı ve renkle dört zorluğa dönüşür; yana sürükleyince parmağı izler.
+   Dilimler 4 → 4 dönüşür: 'gap' menüde genişliği sıfır olan yer tutucudur, zorlukta ikinci dilim ondan doğar. */
 const MENU_LW = 0.33, MENU_FLY = 0.16;
-const MENU1 = [{ id: 'bolum', a0: -70, a1: 70, c: [255, 142, 92], ic: 'M8 5l11 7-11 7z', fill: 1 }, { id: 'sure', a0: 70, a1: 165, c: [142, 123, 242], ic: 'M12 6.5a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM12 13.5V10M10 3h4M12 3v3.5' }, { id: 'store', a0: 165, a1: 235, c: [242, 183, 60], ic: 'M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8' }, { id: 'book', a0: 235, a1: 290, c: [192, 180, 248], ic: 'M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5zM5 17a3 3 0 0 1 3-3h10' }];
+const MENU1 = [{ id: 'play', a0: -85, a1: 85, c: [255, 142, 92], ic: 'M8 5l11 7-11 7z', fill: 1 }, { id: 'gap', a0: 85, a1: 85, c: [142, 123, 242] }, { id: 'store', a0: 85, a1: 190, c: [242, 183, 60], ic: 'M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8' }, { id: 'book', a0: 190, a1: 275, c: [192, 180, 248], ic: 'M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5zM5 17a3 3 0 0 1 3-3h10' }];
 const MENU2 = [{ id: 'rahat', a0: -45, a1: 45, c: [123, 200, 164] }, { id: 'normal', a0: 45, a1: 135, c: [142, 123, 242] }, { id: 'usta', a0: 135, a1: 225, c: [255, 167, 124] }, { id: 'cehennem', a0: 225, a1: 315, c: [240, 80, 60] }];
-MENU1.forEach(s => { s.path = new Path2D(s.ic); });
+MENU1.forEach(s => { if (s.ic) s.path = new Path2D(s.ic); });
 const MN = { lvl: 0, hv: 0, hvW: -1, mf: 1, press: [0, 0, 0, 0], fly: null, drag: null, pend: false, txKey: '', fontOk: 0 };
 const DEG = Math.PI / 180;
 const menuSegs = () => (MN.lvl ? MENU2 : MENU1);
@@ -5909,8 +5909,7 @@ const menuHit = f => {
   menuAct(f.id);
 };
 const menuAct = id => {
-  if (id === 'bolum') { if (save.run) resumeSaved(); else start(); }
-  else if (id === 'sure') { MN.lvl = 1; if (save.ob === OB_LEVEL) { save.ob = OB_LEVEL2; obWait = performance.now() + 1600; persist(); } }
+  if (id === 'play') { if (save.run) resumeSaved(); else if (save.ob === OB_PLAY) start(); else MN.lvl = 1; }   /* öğretimde ilk oyun doğrudan başlar */
   else if (id === 'store') openShop('menu');
   else if (id === 'book') openBook();
   else {
@@ -5931,7 +5930,7 @@ const menuGo = id => {
   if (RM) { G.ang = norm(m); menuHit(f); return; }
   MN.fly = f;
 };
-const menuBack = () => { MN.lvl = 0; if (save.ob === OB_LEVEL2) { save.ob = OB_GO; obWait = performance.now() + 500; persist(); } };
+const menuBack = () => { MN.lvl = 0; };
 /* dokunuş: 'c' orta, dilim kimliği ya da '' (halkanın dışı) */
 const menuPick = e => {
   const a = app.getBoundingClientRect(), dx = e.clientX - a.left - view.cx, dy = e.clientY - a.top - view.cy, d = Math.hypot(dx, dy), R = view.r;
@@ -5959,12 +5958,12 @@ window.addEventListener('pointerup', e => {
   MN.drag = null;
   if (G.mode !== 'menu') return;
   if (d.moved) { MN.lvl = MN.hv > 0.5 ? 1 : 0; return; }
-  if (d.pick === 'c') { if (MN.lvl) menuBack(); else menuGo('bolum'); return; }
+  if (d.pick === 'c') { if (MN.lvl) menuBack(); else menuGo('play'); return; }
   if (d.pick) menuGo(d.pick);
 });
 window.addEventListener('pointercancel', e => { if (MN.drag && e.pointerId === MN.drag.id) { MN.drag = null; MN.lvl = MN.hv > 0.5 ? 1 : 0; } });
 /* dilim yazısı ve ikonlar: harf harf kıvrık yazı her karede pahalı olurdu, bir kez saydam tuvale basılır (dil, boyut, rekor ya da yarım oyun değişince yeniden) */
-const menuLabel = s => (s.lb ? s.lb() : s.fill ? t(save.run ? 'resume' : 'm_bolum') : s.id === 'sure' ? t('m_sure') : s.id === 'store' ? t('shop') : s.id === 'book' ? t('m_book') : t('lv_' + s.id) + (save.bests[s.id] ? ' · ' + save.bests[s.id] : ''));
+const menuLabel = s => (s.lb ? s.lb() : s.fill ? t(save.run ? 'resume' : 'play') : s.id === 'store' ? t('shop') : s.id === 'book' ? t('m_book') : t('lv_' + s.id) + (save.bests[s.id] ? ' · ' + save.bests[s.id] : ''));
 const arcText = (g, str, r, mid, fs, room) => {
   g.font = '600 ' + fs + 'px ' + FD;
   let tot = g.measureText(str).width;
@@ -5985,6 +5984,7 @@ const menuTextLayer = (S, R, size) => {
   g.setTransform(d, 0, 0, d, size * d / 2, size * d / 2);
   g.fillStyle = '#FFFFFF'; g.strokeStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'middle';
   S.forEach(s => {
+    if (s.a1 <= s.a0) return;
     const m = (s.a0 + s.a1) / 2 * DEG, room = (s.a1 - s.a0) * DEG * R * 0.8, up = Math.cos(m) > -0.2, dir = up ? 1 : -1, str = menuLabel(s);
     if (!s.path) { arcText(g, str, R, m, fs, room); return; }
     g.font = '600 ' + fs + 'px ' + FD;
@@ -6010,6 +6010,7 @@ const drawMenuRing = (c, cx, cy, R) => {
   const lw = R * MENU_LW, n = norm(G.ang), hv = MN.hv;
   for (let i = 0; i < 4; i++) {
     const p = MENU1[i], q = MENU2[i], a0 = (p.a0 + (q.a0 - p.a0) * hv) * DEG, a1 = (p.a1 + (q.a1 - p.a1) * hv) * DEG, m = (a0 + a1) / 2, w = a1 - a0 - 0.05;
+    if (w <= 0) continue;
     const col = 'rgb(' + p.c.map((v, j) => Math.round(v + (q.c[j] - v) * hv)).join(',') + ')', pr = MN.press[i], on = Math.abs(((n - m) % TAU + 1.5 * TAU) % TAU - TAU / 2) < w / 2;
     const s0 = m - Math.PI / 2 - w / 2, s1 = m - Math.PI / 2 + w / 2;
     c.lineCap = 'butt'; c.strokeStyle = col;
@@ -6059,7 +6060,7 @@ if (AppP) {
       else if (G.mode === 'play' || G.mode === 'count') pause();
       else if (G.mode === 'pause') resume();
       else if (G.mode === 'over') goMenu();
-      else if (G.mode === 'menu') AppP.exitApp();
+      else if (G.mode === 'menu') { if (MN.lvl) menuBack(); else AppP.exitApp(); }
     });
   } catch (e) {}
 }
@@ -6159,34 +6160,32 @@ const drawOverRing = (c, cx, cy, R) => {
   }
   c.globalAlpha = 1;
 };
-/* ---------- öğretim (V0.11.0, V0.11.1'de sıra yenilendi) ----------
-   Kullanıcı: "yazı ile info vermek hangi çağda kaldı", sonra "joker kullanınca sıradaki öğrenme faslına geçsin, süre sıfırlanarak bitsin; Cehennem vb. seçmeyi ve kilit defterini de öğret; sıralamayı sen optimize et".
+/* ---------- öğretim (V0.11.0, V0.13.0'da kısaldı) ----------
+   Kullanıcı: "yazı ile info vermek hangi çağda kaldı", sonra "çok uzun oldu, kime göstersem tıklayıp geçti; duraklatma, defter, süreli öğretme; joker almak zorunlu kalsın, kullanımını ilk sefer göstersin".
    Talimat yazısı yok; oyun durur, ince çizgi el nereye dokunulacağını gösterir, başka yere dokunulamaz. Sıra:
-   1 OB_ROUND ilk tur (r 1): vuruş (ibre hedefte durur), yardım azalır, tuzak (ibre tuzakta durur, yasak işareti), süre biter ve çember yanar;
-   2 OB_SHOP: 500 altın, çanta, Alet çantası, kronometre (300 altın); 3 OB_PLAY: mağazadan çıkış, Oyna ve ikinci tur (r 2, kayıt ve coin yok): duraklat, Devam, süre azalınca joker, süre biter ve yanar;
-   4 OB_BOOK: kilit defteri, Çift pimi Dene; 5 OB_BOOK2: Deftere dön, Kapat; 6 OB_LEVEL: Cehennem; 7 OB_LEVEL2: Normal; 8 OB_GO: Oyna ve gerçek oyun. Sonra save.ob = 0, bir daha gelmez.
-   Kalıcı olan yalnız obM: ilk ıska ve ilk tuzakta oyun yavaşlar, yeri işaretler, geri sarar ve ceza silinir (obTeach). Yeni kilitlerin ilk görüşü zaten Hayalet gösterinin işidir.
-   Kullanıcı bir sonraki sürümde menüyü değiştirecek: o zaman bu akış yeniden yazılacak. */
-const OB_GIFT = 500, OB_T0 = 5, OB_FLOOR = 1.6, OB_R2_T = 4.5, OB_OM = [0.7, 0.75, 0.9, 0.9], OB_RATE1 = [0, 0, 0.35, 0.35, 3.2], OB_RATE2 = [0.8, 0.8, 0.8, 3.2];
+   1 OB_ROUND ilk tur: vuruş (ibre hedefte durur), yardım azalır, tuzak (ibre tuzakta durur, yasak işareti), süre biter ve çember yanar;
+   2 OB_SHOP: 500 altın, çanta, Alet çantası, kronometre (300 altın); 3 OB_PLAY: mağazadan çıkış, Oyna: gerçek oyun başlar;
+   9 OB_JOKER: gerçek oyunda süre azalınca oyun bir kez durur, el kronometreyi gösterir. Sonra save.ob = 0, bir daha gelmez.
+   Kalıcı olan yalnız obM: ilk ıska ve ilk tuzakta oyun yavaşlar, yeri işaretler, geri sarar ve ceza silinir (obTeach). Yeni kilitlerin ilk görüşü zaten Hayalet gösterinin işidir. */
+const OB_GIFT = 500, OB_T0 = 5, OB_FLOOR = 1.6, OB_OM = [0.7, 0.75, 0.9, 0.9], OB_RATE1 = [0, 0, 0.35, 0.35, 3.2], OB_JOKER_T = 3.5, OB_JOKER_AT = 7;
 const obEl = $('obFx');
 let obOn = false, obX = '', obT = null, obElLast = null, obRad = '0px', obWait = 0;
-const obEnding = () => G.ob.s >= (G.ob.r === 1 ? 4 : 3);   /* son aşama: hedef yok, süre hızla biter */
-const obRound = r => {
+const obEnding = () => G.ob.s >= 4;   /* son aşama: hedef yok, süre hızla biter */
+const obRound = () => {
   Object.assign(G, runState(1));
-  G.ob = { r, s: 0, h0: 0, tr: 0, ht: 0, st: 0, t: 0 };
-  G.mode = 'play'; G.time = G.tvis = r === 1 ? OB_T0 : OB_R2_T; G.dir = 1; G.best0 = 0;
+  G.ob = { s: 0, h0: 0, tr: 0, ht: 0 };
+  G.mode = 'play'; G.time = G.tvis = OB_T0; G.dir = 1; G.best0 = 0;
   G.thT = 0; thWx = 0; applyTheme(true);
   hide(menuEl); hide(overEl); hide(pauseEl);
-  app.classList.add('playing'); app.classList.toggle('obr', r === 1);
+  app.classList.add('playing', 'obr');
   hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
-  toolsEl.classList.toggle('on', r === 2);
+  toolsEl.classList.remove('on');
   spawnChallenge(true);
-  if (r === 1) G.omega *= OB_OM[0];
+  G.omega *= OB_OM[0];
   updateHud(); relayout(false); updateTools(); updateHud();
 };
 const obNext = () => {
   const o = G.ob;
-  if (o.r === 2) { if (!obEnding()) spawnChallenge(false, 'tek'); return; }
   o.s++;
   if (o.s >= 4) { G.pins = []; return; }
   spawnChallenge(false, 'tek');
@@ -6200,9 +6199,9 @@ const obNext = () => {
   }
 };
 const obInTarget = () => { const g = primaryPin(); return !!g && angd(G.ang, pinCenter(g)) <= pinHw(g); };
-const obIgnoreTap = () => obEnding() || (G.ob.r === 1 && G.ob.s === 0 && !obInTarget());     /* ilk vuruştan önce ıska yok; süre biterken vurulacak bir şey yok */
-const obSlow = () => (G.ob.r === 1 && G.ob.s === 1 && obInTarget() ? 0.35 : 1);
-const obDrain = raw => { const o = G.ob; G.time -= raw * (o.r === 1 ? OB_RATE1 : OB_RATE2)[o.s]; if (!obEnding()) G.time = Math.max(OB_FLOOR, G.time); };
+const obIgnoreTap = () => obEnding() || (G.ob.s === 0 && !obInTarget());     /* ilk vuruştan önce ıska yok; süre biterken vurulacak bir şey yok */
+const obSlow = () => (G.ob.s === 1 && obInTarget() ? 0.35 : 1);
+const obDrain = raw => { G.time -= raw * OB_RATE1[G.ob.s]; if (!obEnding()) G.time = Math.max(OB_FLOOR, G.time); };
 const obLethal = () => {
   if (!obEnding()) { G.time = OB_FLOOR; return; }
   G.mode = 'dead'; G.deadT = RM ? 0.6 : 0.85 * BURN.slow; G.tail = null;
@@ -6210,43 +6209,24 @@ const obLethal = () => {
   startBurn(); shake(0.5); flash('rose', 0.3); Snd.over(); Platform.haptic('error');
 };
 const obAfterRound = () => {
-  const first = G.ob.r === 1;
-  save.ob = first ? OB_SHOP : OB_BOOK;
-  if (first) save.coins += OB_GIFT;
+  save.ob = OB_SHOP;
+  save.coins += OB_GIFT;
   save.seen.tek = Math.max(save.seen.tek | 0, 1); save.seen.tuzak = Math.max(save.seen.tuzak | 0, 1);
   persist();
   G.reform = 0; goMenu();
-  if (!first) return;
   const q = $('coinN').getBoundingClientRect(), a = app.getBoundingClientRect();
   burst(q.left - a.left, q.top - a.top + q.height / 2, 26, [GOLD, GOLD_L, P.peach, '#FFFFFF'], 220);
   Snd.fanfare(); Platform.haptic('medium');
 };
-/* joker kullanılınca sıradaki bölüme geçilir: kısa bir süre sonra hedef kalkar, süre biter */
-const obUsed = bb => {
-  const o = G.ob;
-  if (o.r !== 2) return;
-  if (o.s === 1) { o.s = 2; o.t = 0; }
-  G.hold = ''; G.mode = 'play';
-  if (save.ob === OB_PLAY) { save.ob = OB_BOOK; persist(); }
-  if (bb) { const q = bb.getBoundingClientRect(), a = app.getBoundingClientRect(); obDrops(q.left - a.left + q.width / 2, q.top - a.top + q.height / 2); }
-};
-const obFinish = () => {
-  save.ob = 0; persist();
-  burst(view.cx, view.cy, 40, [P.peach, P.lilac, GOLD, '#FFFFFF'], 300); Snd.fanfare(); Platform.haptic('medium');
-};
 /* ibre hedefe varınca ya da sırası gelince oyun durur (G.mode = 'hold'); el G.hold'a göre yerini bulur */
-const obPlayStep = raw => {
-  const o = G.ob;
-  if (!o) return;
-  if (o.r === 2) {
-    if (o.s === 0) { if (G.pt > 1.6) { G.mode = 'hold'; G.hold = 'pause'; } }
-    else if (o.s === 1) {
-      o.st += raw;
-      if (!isEq('kron') || save.tools.kron.n <= 0) { o.s = 2; o.t = 0; }
-      else if (G.time <= 2.4 || o.st > 4) { G.mode = 'hold'; G.hold = 'joker'; }
-    } else if (o.s === 2) { o.t += raw; if (o.t > 1.5) { o.s = 3; G.pins = []; } }
+const obPlayStep = () => {
+  if (save.ob === OB_JOKER && !G.practice) {
+    if (!isEq('kron') || save.tools.kron.n <= 0) { save.ob = 0; persist(); }
+    else if (!G.holding && (G.time <= OB_JOKER_T || G.pt > OB_JOKER_AT)) { G.mode = 'hold'; G.hold = 'joker'; }
     return;
   }
+  const o = G.ob;
+  if (!o) return;
   const g = primaryPin();
   if (o.s === 0 && !o.h0 && g && sdiff(G.ang, pinCenter(g)) * G.dir >= -0.01 && angd(G.ang, pinCenter(g)) < 0.3) { o.h0 = 1; G.mode = 'hold'; G.hold = 'hit'; }
   const tp = o.s === 3 && !o.tr && G.pins.find(p => p.kind === 'trap');
@@ -6316,10 +6296,9 @@ const obTarget = () => {
       const tp = G.hold === 'trap' && G.pins.find(p => p.kind === 'trap'), q = ptXY(view.cx, view.cy, tp ? tp.c0 : G.ang, ringR(0));
       return { x: q[0], y: q[1], r: 62, no: !!tp };
     }
-    return G.hold === 'joker' ? { el: toolsEl.querySelector('.tool[data-tool="kron"]'), m: 10 } : { el: $('pauseBtn') };
+    return { el: toolsEl.querySelector('.tool[data-tool="kron"]'), m: 10 };
   }
-  if (m === 'pause') return G.ob ? { el: $('resumeBtn') } : null;
-  if (G.ob || performance.now() < obWait) return null;
+  if (s === OB_JOKER || G.ob || performance.now() < obWait) return null;
   if (SS.open && !SS.closing) {
     if (SS.busy || shopEl.classList.contains('opening')) return null;
     const sheet = stSheet.classList.contains('on');
@@ -6335,28 +6314,19 @@ const obTarget = () => {
     return null;
   }
   if (SS.closing) return null;
-  if (G.practice) return m === 'pracdone' ? { el: $('pdBack') } : null;
-  const book = bookEl.classList.contains('on');
-  if (s === OB_BOOK) return book ? { el: $('bookList').querySelector('[data-try="cift"]') } : { el: $('bookBtn'), m: 3 };
-  if (s === OB_BOOK2) {
-    if (book) return { el: $('bookClose') };
-    if (m === 'menu') { save.ob = OB_LEVEL; persist(); obWait = performance.now() + 400; }
-    return null;
-  }
   if (m !== 'menu' || !menuEl.classList.contains('on')) return null;
   if (s === OB_SHOP) return { el: $('bagBtn'), m: 3 };
-  if (s === OB_PLAY || s === OB_GO) return { el: $('playBtn') };
-  if (s === OB_LEVEL) return { el: $('sureBtn') };
-  if (s === OB_LEVEL2) { if (MN.lvl) return { el: $('mBack') }; save.ob = OB_GO; persist(); return null; }
+  if (s === OB_PLAY) return { el: $('playBtn') };
   return null;
 };
 /* zorunlu adımlarda elin gösterdiği yer dışındaki dokunuşlar oyuna ve mağazaya ulaşmaz; oyun ve Dene sürerken serbest */
 const obLock = () => {
-  if (G.ob) return G.hold === 'joker' || G.hold === 'pause' || G.mode === 'pause';
+  if (G.ob) return false;
   const s = save.ob;
   if (!s) return false;
   if (s === OB_ROUND) return G.mode === 'menu';
-  return !(G.practice && G.mode === 'play');
+  if (s === OB_JOKER) return G.hold === 'joker';
+  return true;
 };
 const obFilter = e => {
   if (!obLock()) return;
@@ -6374,7 +6344,6 @@ const obShow = tg => {
   if (tg && tg.el) {
     if (tg.el !== obElLast) {
       obElLast = tg.el; obRad = getComputedStyle(tg.el).borderTopLeftRadius;
-      if (tg.el.closest('#bookList')) tg.el.scrollIntoView({ block: 'center' });
     }
     const r = tg.el.getBoundingClientRect();
     if (!r.width) tg = null;
@@ -6402,7 +6371,7 @@ const obShow = tg => {
 };
 const obTick = () => {
   if (!save.ob && !G.ob) { if (obOn || obT) obShow(null); return; }
-  if (save.ob === OB_ROUND && G.mode === 'menu' && !WARM.on && !document.hidden && (WARM.done || performance.now() > 6500)) { obRound(1); return; }
+  if (save.ob === OB_ROUND && G.mode === 'menu' && !WARM.on && !document.hidden && (WARM.done || performance.now() > 6500)) { obRound(); return; }
   obShow(obTarget());
 };
 
