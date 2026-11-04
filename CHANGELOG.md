@@ -3,6 +3,17 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.12.0 — Yeni ana menü: Kadran menü (2026-11-04)
+
+- **Ana ekran baştan yazıldı** (kullanıcı: "karşılayan menü çok kötü", seçim "Kadran menü"). Halkanın kendisi menü: Bölümler, Süreli, Mağaza ve Defter dilimleri.
+- **Beklemek yok:** ibre dönmeye devam ediyor ama dilimi beklemen gerekmiyor. Dokunduğun an dilim tepki verir, ibre en kısa yoldan 0,16 saniyede koşar, vuruş gibi patlar. Etikete de dilime de dokunabilirsin; ortaya dokununca oyun başlar.
+- **Süreli:** Cehennem arka planı yandan kayarak gelir, halkanın dilimleri açı ve renk değiştirerek Rahat, Normal, Usta ve Cehennem olur, yanlarında en iyi skorlar yazar. Ortadaki Geri ya da ekranı yana kaydırmak geri getirir. Cehennem seçilirse oyun karanlık temada başlar.
+- **Mağaza artık saklı değil:** ana ekranda kendi dilimi var, alınabilecek bir şey varsa etiketinde işaret çıkar. Kilit defteri de öyle.
+- **Bölümler dilimi şimdilik bugünkü oyunu açar;** bölüm sistemi kuralları netleşince gelecek. Yarım oyun varsa etikette "Devam et" yazar, Yeni oyun düğmesi altta durur.
+- Ana ekrandan kalktı: joker sırası, zorluk şeridi, En iyi çipleri, üst simgeler (Mağaza, Defter), slogan ve Oyna düğmesi. Oyuna geçiş animasyonu aynen duruyor.
+- Öğretim yeni menüye bağlandı: el artık dilimlerin etiketlerini gösterir; seviye adımı Süreli halkasını açıp Geri ile dönüyor. Akışın uzunluğu henüz kısalmadı, bölüm sistemiyle yeniden yazılacak.
+- Teknik: `src/game.html` "kadran menü" bloğu (`MN`, `drawMenuRing`, `placeMenu`, `menuGo`), `#mHell` (bileşende kayar), `tools/menu-test.mjs` (gerçek dokunuş).
+
 ## V0.11.1 — Öğretim tamamlandı: el işareti, kilit defteri, seviye seçimi (2026-11-04)
 
 - **Işık halkası yerine ince çizgi el** (kullanıcı: "ışık halkası bazı yerlerde şık durmadı"). Geniş düğmelerde yazının üstüne binmez, düğmenin sağına basar; raftaki jokerde adın değil camın üstüne basar.

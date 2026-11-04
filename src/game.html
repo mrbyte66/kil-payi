@@ -726,6 +726,37 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop.warm *{pointer-events:none!important;animation-play-state:running!important}
 #shop.warm .stg{animation:stIn .85s cubic-bezier(.16,1,.3,1) backwards}
 #shop.warm.wout .stg{animation:stOut .36s cubic-bezier(.45,0,.8,.5) both}
+/* Kadran menü (V0.12.0): halka dilimleri canvas'ta (drawMenuRing), etiketler gerçek düğmeler (placeMenu konumlar). Süreli'de Cehennem katmanı bileşende kayar: tek kez çizilir, kare başına yalnız transform yazılır. */
+#menu{touch-action:none}
+.mset{position:absolute;inset:0;pointer-events:none}
+#mSet2{opacity:0}
+.mset.live .mlab,.mset.live .mback{pointer-events:auto}
+.mlab{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:5px;border:0;border-radius:15px;padding:8px 13px;background:var(--surface);color:var(--ink);font-family:var(--font-display);font-weight:600;font-size:var(--fs-16);box-shadow:0 4px 10px rgba(40,25,110,.14);white-space:nowrap;cursor:pointer}
+.mlab em{font-style:normal;color:#C2542A}
+.mlab em:empty{display:none}
+.mlab.dot::after,.mlab.gdot::after{content:'';position:absolute;right:-2px;top:-2px;width:11px;height:11px;border-radius:50%;background:var(--rose);border:2px solid var(--surface)}
+.mlab.gdot::after{background:#F4B63F}
+.mcen{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;pointer-events:none}
+.mcen .title{font-size:var(--mt,34px)}
+.mcen small{font-weight:800;font-size:var(--fs-14);color:var(--ink-2);max-width:var(--mw,160px)}
+.mback{border:0;background:none;color:#fff;cursor:pointer;padding:12px}
+.mback b{font-family:var(--font-display);font-weight:600;font-size:var(--mt,30px);line-height:1.05}
+.mback small{color:rgba(255,255,255,.78)}
+.mhint{position:absolute;left:0;right:0;margin:0;padding:0 24px;text-align:center;font-weight:800;font-size:var(--fs-14);color:#FFD2C2}
+#mGlow{position:absolute;left:var(--mx,50%);top:var(--my,50%);width:560px;height:560px;margin:-280px 0 0 -280px;background:radial-gradient(closest-side,rgba(142,123,242,.22),rgba(142,123,242,0));pointer-events:none;transition:opacity .3s}
+#app.playing #mGlow{opacity:0}
+#mHell{position:absolute;inset:0;visibility:hidden;transform:translateX(100%);will-change:transform;pointer-events:none;background:radial-gradient(120% 55% at 50% 102%,rgba(255,120,50,.55),rgba(255,120,50,0) 100%),linear-gradient(#2B0E1C,#4A1218 60%,#7A1E14)}
+#mHell.fo{transition:opacity .4s;opacity:0}
+#mHell svg{position:absolute;left:0;right:0;bottom:0;width:100%;height:36%}
+#mHell i{position:absolute;bottom:-6px;width:4px;height:4px;border-radius:50%;background:#FFAA5A;animation:mEmber 7s linear infinite}
+#mHell i:nth-of-type(1){left:12%;animation-delay:-1s}
+#mHell i:nth-of-type(2){left:30%;animation-delay:-4s;animation-duration:9s}
+#mHell i:nth-of-type(3){left:47%;animation-delay:-2.5s;animation-duration:6s}
+#mHell i:nth-of-type(4){left:64%;animation-delay:-5.5s}
+#mHell i:nth-of-type(5){left:78%;animation-delay:-3s;animation-duration:10s}
+#mHell i:nth-of-type(6){left:90%;animation-delay:-6.5s;animation-duration:8s}
+@keyframes mEmber{0%{transform:translateY(0);opacity:0}12%{opacity:.8}100%{transform:translateY(-62vh);opacity:0}}
+html.calm #mHell i{animation:none;opacity:0}
 /* Öğretim (V0.11.1): ince çizgi el dokunulacak yeri gösterir, çevresi düğmenin kendi şeklinde açık kalarak kararır (kullanıcı: "eliptik değil, butonun şeklinde"); katman dokunuşu tutmaz (dokunuşu window yakalaması süzer). Sakin kipte el durur. */
 #app.obr #pauseBtn{visibility:hidden}
 #obFx{position:absolute;inset:0;z-index:390;display:none;overflow:hidden;pointer-events:none}
@@ -787,6 +818,8 @@ html.calm #obFx .h b{display:none}
 <div id="app">
   <div class="amb" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="hfx" id="hfx" aria-hidden="true"></div>
+  <div id="mGlow" aria-hidden="true"></div>
+  <div id="mHell" aria-hidden="true"><svg viewBox="0 0 390 300" preserveAspectRatio="xMidYMax slice"><path d="M40 300l20-54-16-50 26-40M330 300l-20-64 24-50-18-50M190 300l-14-44 24-30" fill="none" stroke="rgba(255,150,70,.75)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <canvas id="cv" role="img" aria-label="Oyun alanı: kronometre kadranında dönen ibre ve şeftali renkli hedef bölge"></canvas>
 
   <div class="hud" id="hud" aria-hidden="true">
@@ -826,33 +859,26 @@ html.calm #obFx .h b{display:none}
     <header class="menu-head" id="menuHead">
       <div class="topbar rise" style="--i:0">
         <span class="chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--peach)"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><b id="coinN">0</b></span>
-        <span class="tb-right">
-          <button class="icon-btn" id="bagBtn" type="button" aria-label="Mağaza"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg></button>
-          <button class="icon-btn" id="bookBtn" type="button" aria-label="Kilit defteri"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5zM5 17a3 3 0 0 1 3-3h10"/></svg></button>
-          <button class="icon-btn" id="setBtn" type="button" aria-label="Ayarlar"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M4 7h8.5M17 7h3M4 17h3M11.5 17H20"/><circle class="s" cx="14.7" cy="7" r="2.3"/><circle class="s" cx="9.3" cy="17" r="2.3"/></svg></button>
-        </span>
+        <span class="tb-right"><button class="icon-btn" id="setBtn" type="button" aria-label="Ayarlar"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="s" d="M4 7h8.5M17 7h3M4 17h3M11.5 17H20"/><circle class="s" cx="14.7" cy="7" r="2.3"/><circle class="s" cx="9.3" cy="17" r="2.3"/></svg></button></span>
       </div>
-      <h1 class="title rise" style="--i:1" data-i18n="title">Kıl payı</h1>
-      <p class="tagline rise" style="--i:2" data-i18n="tagline">Süre bitmek üzereyken vur, puan ×3.</p>
     </header>
     <div class="grow"></div>
+    <div class="mset live" id="mSet1">
+      <button class="mlab" id="playBtn" type="button" data-m="bolum"><span id="playT"></span></button>
+      <button class="mlab" id="sureBtn" type="button" data-m="sure" data-i18n="m_sure">Süreli</button>
+      <button class="mlab" id="bagBtn" type="button" data-m="store" data-i18n="shop">Mağaza</button>
+      <button class="mlab" id="bookBtn" type="button" data-m="book" data-i18n="m_book">Defter</button>
+      <div class="mcen" id="mCenter"><h1 class="title" data-i18n="title">Kıl payı</h1><small id="mSub"></small></div>
+    </div>
+    <div class="mset" id="mSet2">
+      <button class="mlab" type="button" data-m="rahat"><span data-i18n="lv_rahat">Rahat</span><em></em></button>
+      <button class="mlab" type="button" data-m="normal"><span data-i18n="lv_normal">Normal</span><em></em></button>
+      <button class="mlab" type="button" data-m="usta"><span data-i18n="lv_usta">Usta</span><em></em></button>
+      <button class="mlab" type="button" data-m="cehennem"><span data-i18n="lv_cehennem">Cehennem</span><em></em></button>
+      <button class="mcen mback" id="mBack" type="button"><b data-i18n="m_sure">Süreli</b><small data-i18n="m_back">Geri</small></button>
+      <p class="mhint" id="mHint" data-i18n="m_sureSub">Süre bitmeden en çok puan</p>
+    </div>
     <footer class="menu-foot" id="menuFoot">
-      <div class="stat-row rise" style="--i:3">
-        <span class="chip"><span data-i18n="best">En iyi</span><b id="menuBest">0</b></span>
-        <span class="chip" id="menuLvlChip" hidden><span data-i18n="bestLvl">Seviye</span><b id="menuBestL">0</b></span>
-      </div>
-      <div class="bagrow rise" style="--i:3">
-        <div class="mjk" id="menuJk" role="group" aria-label="Çanta"></div>
-        <div class="capr"><span id="bagCap"></span><button class="lnk" id="bagShop" type="button"></button></div>
-      </div>
-      <div class="seg rise" style="--i:4" id="lvlSeg" role="radiogroup" aria-label="Zorluk">
-        <button type="button" role="radio" data-lvl="rahat" aria-checked="false" data-i18n="lv_rahat">Rahat</button>
-        <button type="button" role="radio" data-lvl="normal" aria-checked="true" data-i18n="lv_normal">Normal</button>
-        <button type="button" role="radio" data-lvl="usta" aria-checked="false" data-i18n="lv_usta">Usta</button>
-        <button type="button" role="radio" data-lvl="cehennem" aria-checked="false" data-i18n="lv_cehennem">Cehennem</button>
-      </div>
-      <p class="lvhint rise" style="--i:4" id="lvHint"></p>
-      <button class="btn primary big breathe rise" style="--i:5" id="playBtn" type="button"><span id="playT">Oyna</span><small id="playSub" hidden></small></button>
       <button class="btn quiet rise" style="--i:6" id="newBtn" type="button" hidden></button>
       <button class="btn quiet rise" style="--i:6" id="campBtn" type="button" hidden></button>
       <div class="ver rise" style="--i:7" id="ver"></div>
@@ -1227,6 +1253,7 @@ try { LANG = pickLang((JSON.parse(localStorage.getItem('kilpayi.v1') || '{}') ||
 let SN = LANG === 'tr' ? 'sn' : 's';
 const STR = {
   tr: {
+    m_sure: 'Süreli', m_book: 'Defter', m_back: 'Geri', m_sureSub: 'Süre bitmeden en çok puan', m_bolum: 'Bölümler',
     title: 'Kıl payı', tagline: 'Süre bitmek üzereyken vur, puan ×3.', play: 'Oyna', best: 'En iyi', runs: 'Oyun', bestLvl: 'Seviye',
     zone: 'Son 1 sn: ×3', perfect: 'Mükemmel', near: 'Kıl payı ×3', miss: 'Iska', reverse: 'Ters yön', breath: 'Nefes al',
     tut1: 'Şeftali bölgedeyken dokun', tut2: 'Süre bitmek üzereyken vur: ×3',
@@ -1336,6 +1363,7 @@ const STR = {
     ic_sicak: 'Yayın sonu kızıl: sıcak|Tutarken yanarsın, süre erir|Yine de sonda bırak: ×2'
   },
   en: {
+    m_sure: 'Timed', m_book: 'Book', m_back: 'Back', m_sureSub: 'Score as much as you can before time runs out', m_bolum: 'Levels',
     title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs', bestLvl: 'Level',
     zone: 'Last 1 s: ×3', perfect: 'Perfect', near: 'Close call ×3', miss: 'Miss', reverse: 'Reversed', breath: 'Catch your breath',
     tut1: 'Tap when the pointer is in the peach zone', tut2: 'Hit it as time runs out: ×3',
@@ -1541,7 +1569,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.11.1';
+const VERSION = 'V0.12.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -2102,7 +2130,6 @@ const applyI18n = () => {
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
   cv.setAttribute('aria-label', t('play_aria'));
   $('bagBtn').setAttribute('aria-label', t('shop')); $('setBtn').setAttribute('aria-label', t('setT')); $('pauseBtn').setAttribute('aria-label', t('pauseBtn'));
-  $('lvlSeg').setAttribute('aria-label', t('level'));
   toolsEl.setAttribute('aria-label', t('bag'));
   toolsEl.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-label', t('tool_' + b.getAttribute('data-tool'))));
   $('bookBtn').setAttribute('aria-label', t('bookT'));
@@ -2116,10 +2143,7 @@ const setLang = l => {
   applyI18n(); refreshLevel(); refreshStats();
   if (settingsEl.classList.contains('on')) renderSettings();
 };
-const refreshLevel = () => {
-  $('lvlSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', b.getAttribute('data-lvl') === save.lvl ? 'true' : 'false'));
-  $('lvHint').textContent = t('lvHint_' + save.lvl);
-};
+const refreshLevel = () => placeMenu();
 /* Dock'ta yalnızca yuvalardaki jokerler görünür, yuva sırasıyla. */
 let lastEquipKey = '';
 const updateTools = () => {
@@ -2163,15 +2187,15 @@ const closeBook = () => { hide(bookEl); show(menuEl); refreshStats(); Snd.ui(); 
 /* Menü: kayıtlı oyun varsa "Devam et" en büyük düğme olur. */
 const refreshMenu = () => {
   const has = !!save.run;
-  $('playT').textContent = t(has ? 'resume' : 'play');
-  const sub = $('playSub');
-  if (has) { sub.textContent = t('resumeSub', { lv: t('lv_' + save.run.lvl), n: save.run.L, p: Number(save.run.score || 0).toLocaleString(LANG === 'tr' ? 'tr-TR' : 'en-US') }); sub.hidden = false; } else sub.hidden = true;
-  $('playBtn').classList.toggle('two', has);
+  $('playT').textContent = t(has ? 'resume' : 'm_bolum');
+  $('mSub').textContent = has ? t('resumeSub', { lv: t('lv_' + save.run.lvl), n: save.run.L, p: Number(save.run.score || 0).toLocaleString(LANG === 'tr' ? 'tr-TR' : 'en-US') }) : t('best') + ' ' + bestNow();
   const nb = $('newBtn'); nb.hidden = !has; if (!nb.classList.contains('warn')) nb.textContent = t('newGame');
   campEl.hidden = has || save.camp <= 1;
   campEl.textContent = t('camp', { n: Math.min(save.camp, 11) });
-  renderBagRow();
+  $('bagBtn').classList.toggle('gdot', shopDot());
   $('bookBtn').classList.toggle('dot', bookNew());
+  $('mSet2').querySelectorAll('.mlab').forEach(b => { b.querySelector('em').textContent = save.bests[b.getAttribute('data-m')] || ''; });
+  placeMenu();
 };
 /* Hedef rozeti (V0.9.10): puanın yanında "/ 180"; 180 aşılacak rekordur (çerçeveli). Henüz rekor yoksa görünmez; rekor geçilince altın olur ve tik alır (V0.9.0'daki altın "En iyi" çipinin yerine). */
 const CHK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -2199,16 +2223,13 @@ const setCoinN = v => {
 };
 const refreshStats = () => {
   if (!SS.open) setCoinN(save.coins);
-  $('menuBest').textContent = String(bestNow());
-  $('menuLvlChip').hidden = save.bestL < 1;
-  $('menuBestL').textContent = String(Math.min(save.bestL, 10));
   paintBest();
   refreshMenu();
   updateTools();
 };
 
 /* ---------- oyun durumu ---------- */
-const MENU_PINS = [{ kind: 'gate', ring: 0, c0: 1.0, amp: 0, f: 0, ph: 0, hw: 0.45, done: false }];
+const MENU_PINS = [];
 const G = {
   mode: 'menu', clock: 0, pt: 0,
   time: 0, n: 0, score: 0, combo: 0, maxCombo: 0, near: 0,
@@ -2619,7 +2640,7 @@ const relayout = snap => {
     const hb = $('menuHead').getBoundingClientRect().bottom - top;
     const ft = $('menuFoot').getBoundingClientRect().top - top;
     cy = (hb + ft) / 2;
-    r = Math.min(w * 0.29, (ft - hb) / 2 - 54);
+    r = Math.min(w * 0.31, (ft - hb) / 2 - 62);
   } else {
     /* yukarıdan aşağı: HUD, kart / haber satırının yeri, halka, halkanın altında joker sırası */
     const hudB = (hudEl.offsetTop + hudEl.offsetHeight) || 140;
@@ -2639,6 +2660,7 @@ const relayout = snap => {
   view.hudB = G.mode === 'menu' ? 0 : (hudEl.offsetTop + hudEl.offsetHeight);
   view.tcx = cx; view.tcy = cy; view.tr = r;
   if (snap) { view.cx = cx; view.cy = cy; view.r = r; }
+  if (G.mode === 'menu') placeMenu();
 };
 const resize = () => {
   const b = app.getBoundingClientRect();
@@ -2738,6 +2760,7 @@ const goMenu = () => {
   G.thT = 0; G.thDirty = true; G.banner = null; G.count = 0; G.card = null; G.tail = null; G.adv = null;
   G.practice = null; hide($('pracDone')); app.classList.remove('prac');
   G.ob = null; G.hold = ''; G.rw = null; G.obd = []; app.classList.remove('obr');
+  MN.lvl = 0; MN.hv = 0; MN.fly = null; MN.drag = null; MN.pend = false; menuSync();
   hide(overEl); hide(pauseEl); hideShop();
   app.classList.remove('playing');
   hudEl.classList.remove('on'); hudEl.setAttribute('aria-hidden', 'true');
@@ -3915,15 +3938,9 @@ const goShop = id => {
   } else if (SS.shop !== id) swapShop(id);
 };
 /* satın alma sonrası: kayıt, menü, açık dükkân ve fiş yenilenir; değişen ürün sıçrar (o.pop), parıltı ürünün üstünde patlar (o.at) */
-const bagKeys = () => [0, 1, 2, 3].map(i => i >= save.slots ? 'x' : (save.equip[i] || '-'));
-const markBagPop = () => {
-  const cur = bagKeys();
-  if (SS.bagPrev) cur.forEach((k, i) => { if (SS.bagPrev[i] !== k && SS.menuPop.indexOf(i) < 0) SS.menuPop.push(i); });
-  SS.bagPrev = cur;
-};
 const stAfter = o => {
   SS.pop = o.pop || [];
-  persist(); markBagPop(); refreshStats();
+  persist(); refreshStats();
   renderHub();
   if (SS.view === 'shop') fillShop();
   if (o.sheet) itemSheet(o.k); else closeSheet();
@@ -3982,7 +3999,7 @@ const stAct = el => {
     const j = g('j'), i = +g('i'), quick = SS.quick, msg = j ? t('st_equipped', { n: t('tool_' + j) }) : t('st_slotCleared');
     const was = j ? save.equip.indexOf(j) : -1;
     setEquip(i, j); Snd.tool();
-    if (quick) { markBagPop(); closeShop(); toast(msg); } else stAfter({ msg, fx: !!j, pop: ['slot' + i].concat(was >= 0 && was !== i ? ['slot' + was] : []), at: '.pch[data-i="' + i + '"]' });
+    if (quick) { closeShop(); toast(msg); } else stAfter({ msg, fx: !!j, pop: ['slot' + i].concat(was >= 0 && was !== i ? ['slot' + was] : []), at: '.pch[data-i="' + i + '"]' });
   } else if (a === 'giftwait') stToast(t('st_giftWaitToast', { w: waitText(giftState().wait) }));
   else if (a === 'ad') {
     const gs = giftState();
@@ -4089,7 +4106,7 @@ const openShop = (from, opt) => {
   shopEl.classList.remove('leaving'); stBloom.classList.remove('on', 'out', 'rdy');
   show(shopEl); app.classList.add('shopping'); fitStore(); closeSheet();
   if (!RM) { shopEl.classList.add('opening'); stLater(() => shopEl.classList.remove('opening'), 1600); }
-  SS.bagPrev = bagKeys(); SS.menuPop = []; SS.pop = [];
+  SS.pop = [];
   SS.idx = opt.shop ? Math.max(0, SHOPS.findIndex(s => s.id === opt.shop)) : SS.idx;
   renderHub(false);
   if (opt.shop) { shopGo(opt.shop); if (opt.sheet) itemSheet(opt.sheet); else if (opt.chooser !== undefined) { chooser(opt.chooser); SS.quick = true; } }
@@ -4107,7 +4124,7 @@ const closeShop = () => {
   closeSheet(); stHub.classList.remove('zoom'); shopEl.classList.remove('opening'); stBloom.classList.remove('on', 'out', 'rdy');
   app.classList.remove('shopping', 'shopHid');
   if (shopFrom === 'over') show(overEl); else show(menuEl);
-  refreshStats(); SS.menuPop = [];
+  refreshStats();
   shopEl.classList.add('leaving');
   stLater(() => { hideShop(); shopEl.classList.remove('leaving'); SS.closing = false; stHub.innerHTML = ''; stShop.innerHTML = ''; stSheet.innerHTML = ''; relayout(false); }, RM ? 0 : 340);   /* V0.9.12: kapalı mağazanın 1200+ öğesi oyunda her tema geçişinde stil hesabını ağırlaştırıyordu */
   Snd.ui();
@@ -4235,20 +4252,6 @@ $('setRows').addEventListener('click', e => {
 $('setClose').addEventListener('click', closeSettings);
 
 /* menüdeki çanta satırı: dört yuva (dolu / boş / kilitli) ve Mağaza bağlantısı */
-const renderBagRow = () => {
-  let h = '';
-  for (let i = 0; i < 4; i++) {
-    const id = save.equip[i], lab = t('st_slotN', { n: i + 1 });
-    const pop = SS.menuPop.indexOf(i) >= 0 ? ' pop' : '';
-    if (i >= save.slots) h += '<button class="sl lk' + (i === save.slots ? ' new' : '') + '" type="button" data-slot="' + i + '" aria-label="' + lab + '">' + sGlyph('lock', 18, 'currentColor', 2.2) + '</button>';
-    else if (id) h += '<button class="sl' + (save.tools[id].n <= 0 ? ' zero' : '') + pop + '" type="button" data-slot="' + i + '" aria-label="' + t('tool_' + id) + ' ×' + save.tools[id].n + '">' + sGlyph(id, 22, 'currentColor', 2.2) + '<i>' + save.tools[id].n + '</i></button>';
-    else h += '<button class="sl em' + pop + '" type="button" data-slot="' + i + '" aria-label="' + lab + '">' + sGlyph('plus', 18, 'currentColor', 2.2) + '</button>';
-  }
-  $('menuJk').innerHTML = h;
-  $('bagCap').textContent = t('st_bagCap', { n: save.slots });
-  $('bagShop').textContent = t('st_bagShop');
-  $('bagBtn').classList.toggle('gdot', shopDot());
-};
 
 let lastScoreTxt = '', lastScoreK = '', lastCombo = '', lastFx = '', lastLvl = '', lastSect = '', lastLife = false, lastAdvDock = '';
 const updateHud = () => {
@@ -4418,12 +4421,12 @@ const update = (raw, elapsed = raw) => {
   /* Duraklatmada her şey donar: sayaçlar, tema geçişi, parçacıklar. */
   if (G.mode === 'pause') return;
   if (G.mode === 'play' && G.introQ.length && !G.holding && !G.practice) startIntro();
-  hellFx(raw); burnStep(raw);
+  hellFx(raw); burnStep(raw); menuStep(raw);
   if (G.tsT > 0) { G.tsT -= raw; if (G.tsT <= 0) G.tscale = 1; }
   const dt = raw * G.tscale;
 
   if (G.mode === 'menu') {
-    G.ang = norm(G.ang + 1.0 * dt);
+    if (!MN.fly) G.ang = norm(G.ang + 1.0 * dt);
     G.gateT = Math.min(1, G.gateT + raw * 2);
   } else if (G.mode === 'count') {
     const n0 = Math.ceil(G.count);
@@ -5579,15 +5582,17 @@ const render = () => {
   const r0 = R + RW / 2 + 10;
   const iv = G.mode === 'menu' ? 0 : G.Ivis;
   c.lineCap = 'round'; c.strokeStyle = mixHex(P.tick, P.rose, 0.8 * iv);
-  for (let i = 0; i < 60; i++) {
+  const mfk = 1 - MN.mf;   /* kadran menüde çentik yok; oyuna geçerken belirir */
+  for (let i = 0; i < 60 && mfk > 0.01; i++) {
     const a = i / 60 * TAU - HALF + HX.tr, long = i % 5 === 0, r1 = r0 + (long ? 13 + 5 * iv : 7 + 3 * iv), ca = Math.cos(a), sa = Math.sin(a);
-    c.globalAlpha = long ? 0.95 : 0.55 + 0.3 * iv; c.lineWidth = (long ? 2.6 : 1.6) + 0.6 * iv;
+    c.globalAlpha = (long ? 0.95 : 0.55 + 0.3 * iv) * mfk; c.lineWidth = (long ? 2.6 : 1.6) + 0.6 * iv;
     c.beginPath(); c.moveTo(cx + ca * r0, cy + sa * r0); c.lineTo(cx + ca * r1, cy + sa * r1); c.stroke();
   }
   c.globalAlpha = 1;
 
-  c.lineCap = 'butt'; c.lineWidth = RW; c.strokeStyle = P.track;
+  c.lineCap = 'butt'; c.lineWidth = RW + (R * MENU_LW - RW) * MN.mf; c.strokeStyle = MN.hv > 0.5 ? 'rgba(255,255,255,.14)' : P.track;
   c.beginPath(); c.arc(cx, cy, R, 0, TAU); c.stroke();
+  c.lineWidth = RW;
   if (two) { c.lineWidth = RW2; c.beginPath(); c.arc(cx, cy, R2, 0, TAU); c.stroke(); }
   const mult = (G.mode === 'play' || G.mode === 'dead' || G.mode === 'count' || G.mode === 'intro') && G.comboOn ? comboMult(G.combo) : 1;
   if (mult >= 2) {
@@ -5611,6 +5616,7 @@ const render = () => {
   }
 
   const gk = easeOut(clamp(G.gateT / 0.25, 0, 1));
+  drawMenuRing(c, cx, cy, R);
   const pins = G.mode === 'menu' ? MENU_PINS : G.pins;
   if (gk > 0) {
     let gi = 0;
@@ -5625,7 +5631,7 @@ const render = () => {
 
   const trail = mult >= 2 ? tierCol(mult) : P.lilac;
   const psc = ptrScale();
-  if (psc > 0.03) { c.globalAlpha = psc; drawPointer(c, cx, cy, R, RW, G.ang, G.dir, P.ink, trail, psc); c.globalAlpha = 1; }
+  if (psc > 0.03) { c.globalAlpha = psc; drawPointer(c, cx, cy, R, RW, G.ang, G.dir, MN.hv > 0.5 ? '#FFFFFF' : P.ink, trail, psc); c.globalAlpha = 1; if (MN.hv > 0.5) { const q = ptXY(cx, cy, G.ang, R); c.fillStyle = '#7A1E14'; c.beginPath(); c.arc(q[0], q[1], RW * 0.17, 0, TAU); c.fill(); } }
   if (two && !dm) { if (G.lockLeft > 0) c.globalAlpha = 0.4; drawPointer(c, cx, cy, R2, RW2, G.ang2, G.dir2, P.btn, trail); c.globalAlpha = 1; }
   if (G.mode === 'play') drawBoost(c, cx, cy, R, RW);
   if (G.holding && G.mode === 'play') {
@@ -5657,13 +5663,7 @@ const render = () => {
     const w = c.measureText(txt).width;
     if (w > maxW) c.font = '600 ' + Math.max(10, Math.floor(size * maxW / w)) + 'px ' + FD;
   };
-  if (G.mode === 'menu') {
-    const txt = String(bestNow());
-    c.fillStyle = P.ink; fitFont(txt, big, R * 1.5);
-    c.fillText(txt, cx, cy - R * 0.04);
-    c.fillStyle = P['ink-2']; c.font = '800 ' + Math.max(12, Math.round(R * 0.13)) + 'px ' + FB;
-    c.fillText(t('best'), cx, cy + R * 0.36);
-  } else {
+  if (G.mode !== 'menu') {
     if (G.practice) drawPracCenter(c, cx, cy, R, two);
     else if (!bu || bu.t < 0.3) { if (bu) c.globalAlpha = clamp(1 - bu.t / 0.3, 0, 1); drawTimeVessel(c, cx, cy, R, RW, R2, RW2, two, mult, 1); }   /* yanınca kalan süre yazısı da solar */
     c.globalAlpha = 1;
@@ -5720,7 +5720,7 @@ app.addEventListener('pointerdown', e => {
   if (tg.closest && (tg.closest('button') || tg.closest('#tools'))) return;
   if (overlayOpen()) return;
   if (G.mode === 'play') tap(e.clientX - app.getBoundingClientRect().left);
-  else if (G.mode === 'menu') { if (!save.run) start(); }
+  else if (G.mode === 'menu') menuDown(e);
   else if (G.mode === 'over' && performance.now() - G.overAt > 700) start(G.startL);
   else if (G.mode === 'pause') resume();
   else if (G.mode === 'intro') skipIntro();
@@ -5759,9 +5759,6 @@ const runPending = r => {
 };
 const doSetLevel = l => {
   save.lvl = l;
-  /* öğretim: Cehennem seçilince menü bir an Cehennem temasına geçer, sonra Normal'e dönülür */
-  if (save.ob === OB_LEVEL && l === 'cehennem') { save.ob = OB_LEVEL2; obWait = performance.now() + 1500; G.thT = 1; G.thDirty = true; }
-  else if (save.ob === OB_LEVEL2 && l === 'normal') { save.ob = OB_GO; obWait = performance.now() + 500; G.thT = 0; G.thDirty = true; }
   persist(); refreshLevel(); refreshStats();
   Platform.track('level', { level: l });
 };
@@ -5782,20 +5779,17 @@ $('swapYes').addEventListener('click', () => {
   Snd.unlock(); Snd.ui();
   const to = swapTo; hide($('swap'));
   save.run = null; persist(); doSetLevel(to);
+  if (MN.pend) { MN.pend = false; start(); }
   toast(t('lvPicked', { l: t('lv_' + to) }));
 });
 $('swapNo').addEventListener('click', () => { Snd.unlock(); Snd.ui(); hide($('swap')); });
-$('lvlSeg').addEventListener('click', e => {
-  const b = e.target.closest && e.target.closest('button[data-lvl]');
-  if (!b) return;
-  Snd.unlock(); Snd.ui(); setLevel(b.getAttribute('data-lvl'));
-});
 $('ovTipBtn').addEventListener('click', () => {
   const to = $('ovTip').getAttribute('data-to');
   Snd.unlock(); Snd.ui(); setLevel(to); $('ovTip').hidden = true;
   toast(t('lvPicked', { l: t('lv_' + to) }));
 });
-$('playBtn').addEventListener('click', () => { Snd.unlock(); if (save.run) resumeSaved(); else start(); });
+document.querySelectorAll('#menu .mlab').forEach(b => b.addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') menuGo(b.getAttribute('data-m')); }));
+$('mBack').addEventListener('click', () => { Snd.unlock(); Snd.ui(); menuBack(); });
 /* Kayıtlı oyun varken "Yeni oyun": önce sorar, 3,5 sn içinde ikinci dokunuşla silip başlar. */
 let newAsk = 0;
 $('newBtn').addEventListener('click', () => {
@@ -5805,7 +5799,6 @@ $('newBtn').addEventListener('click', () => {
   newAsk = performance.now(); nb.classList.add('warn'); nb.textContent = t('newSure'); Snd.ui();
   setTimeout(() => { if (newAsk && performance.now() - newAsk >= 3400) { newAsk = 0; nb.classList.remove('warn'); nb.textContent = t('newGame'); } }, 3500);
 });
-$('bookBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openBook(); });
 $('bookList').addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('button[data-try]');
   if (!b || G.mode !== 'menu') return;
@@ -5815,21 +5808,12 @@ $('pracEnd').addEventListener('click', () => { Snd.unlock(); Snd.ui(); endPracti
 $('pdAgain').addEventListener('click', () => { Snd.unlock(); if (G.practice) startPractice(G.practice.kind); });
 $('pdBack').addEventListener('click', () => { Snd.unlock(); Snd.ui(); endPractice(true); });
 $('bookClose').addEventListener('click', closeBook);
-$('menuJk').addEventListener('click', e => {
-  const b = e.target.closest && e.target.closest('button[data-slot]');
-  if (!b || G.mode !== 'menu') return;
-  Snd.unlock();
-  const i = +b.getAttribute('data-slot');
-  if (i < save.slots) openShop('menu', { shop: 'alet', chooser: i }); else openShop('menu', { shop: 'alet', sheet: 'slot' + (i + 1) });
-});
-$('bagShop').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
 $('setBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openSettings(); });
 $('pauseMenuBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); persistRun(); goMenu(); });
 $('againBtn').addEventListener('click', () => { Snd.unlock(); start(G.startL); });
 campEl.addEventListener('click', () => { Snd.unlock(); start(save.camp); });
 $('homeBtn').addEventListener('click', () => { Snd.unlock(); Snd.ui(); goMenu(); });
 $('resumeBtn').addEventListener('click', resume);
-$('bagBtn').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'menu') openShop('menu'); });
 $('pauseBtn').addEventListener('click', e => { Snd.unlock(); if (G.mode !== 'play' && G.mode !== 'count' && G.hold !== 'pause') return; Snd.ui(); Platform.haptic('light'); pause(); e.currentTarget.blur(); });
 $('bagBtn2').addEventListener('click', () => { Snd.unlock(); if (G.mode === 'over') openShop('over'); });
 $('adBtn').addEventListener('click', () => {
@@ -5852,6 +5836,134 @@ $('coinBtn').addEventListener('click', () => {
 
 
 /* ---------- açılış ---------- */
+/* ---------- kadran menü (V0.12.0) ----------
+   Kullanıcı seçimi "Kadran menü": halkanın dilimleri menüdür, ibre döner (dönüş süstür: "beklemek istemem"): dilime dokununca dilim anında tepki verir, ibre en kısa yoldan koşar, vuruş gibi patlar, sonra eylem.
+   Süreli: Cehennem katmanı (#mHell) yandan kayar (Üç dünya taslağında beğenildi), dilimler açı ve renkle dört zorluğa dönüşür; yana sürükleyince parmağı izler. Bölümler modu henüz yok: Bölümler dilimi bugünkü oyunu açar. */
+const MENU_LW = 0.33, MENU_FLY = 0.16;
+const MENU1 = [{ id: 'bolum', a0: -70, a1: 70, c: [255, 142, 92], ic: 'M8 5l11 7-11 7z', fill: 1 }, { id: 'sure', a0: 70, a1: 165, c: [142, 123, 242], ic: 'M12 6.5a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM12 13.5V10M10 3h4M12 3v3.5' }, { id: 'store', a0: 165, a1: 235, c: [242, 183, 60], ic: 'M5 8h14l-1 12H6L5 8zM9 8V6.5a3 3 0 0 1 6 0V8' }, { id: 'book', a0: 235, a1: 290, c: [192, 180, 248], ic: 'M5 4.5h10a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5zM5 17a3 3 0 0 1 3-3h10' }];
+const MENU2 = [{ id: 'rahat', a0: -45, a1: 45, c: [123, 200, 164] }, { id: 'normal', a0: 45, a1: 135, c: [142, 123, 242] }, { id: 'usta', a0: 135, a1: 225, c: [255, 167, 124] }, { id: 'cehennem', a0: 225, a1: 315, c: [240, 80, 60] }];
+MENU1.forEach(s => { s.path = new Path2D(s.ic); });
+const MN = { lvl: 0, hv: 0, hvW: -1, mf: 1, press: [0, 0, 0, 0], fly: null, drag: null, pend: false };
+const DEG = Math.PI / 180;
+const menuSegs = () => (MN.lvl ? MENU2 : MENU1);
+const menuSync = () => {
+  MN.hvW = MN.hv;
+  const hl = $('mHell');
+  if (!hl.classList.contains('fo')) { hl.style.visibility = MN.hv > 0.001 ? 'visible' : 'hidden'; hl.style.transform = 'translateX(' + ((1 - MN.hv) * 100).toFixed(2) + '%)'; }
+  $('mSet1').style.opacity = Math.max(0, 1 - MN.hv * 1.6); $('mSet2').style.opacity = Math.max(0, MN.hv * 1.6 - 0.6);
+  $('mSet1').classList.toggle('live', MN.hv <= 0.5); $('mSet2').classList.toggle('live', MN.hv > 0.5);
+};
+const placeMenu = () => {
+  const cx = view.tcx, cy = view.tcy, R = view.tr, W = view.w;
+  if (!(R > 0) || !W) return;
+  const rr = R + R * MENU_LW / 2 + 24;
+  const put = (S, box) => S.forEach(s => {
+    const b = box.querySelector('[data-m="' + s.id + '"]');
+    if (!b) return;
+    const m = (s.a0 + s.a1) / 2 * DEG, hw = b.offsetWidth / 2 + 6;
+    b.style.left = Math.round(clamp(cx + Math.sin(m) * rr, hw, W - hw)) + 'px'; b.style.top = Math.round(cy - Math.cos(m) * rr) + 'px';
+  });
+  put(MENU1, $('mSet1')); put(MENU2, $('mSet2'));
+  [$('mCenter'), $('mBack')].forEach(e => { e.style.left = cx + 'px'; e.style.top = cy + 'px'; });
+  const m = $('menu').style; m.setProperty('--mt', Math.round(R * 0.26) + 'px'); m.setProperty('--mw', Math.round(R * 1.2) + 'px');
+  $('mHint').style.top = Math.round(cy + R + R * MENU_LW / 2 + 58) + 'px';
+  const gl = $('mGlow').style; gl.setProperty('--mx', cx + 'px'); gl.setProperty('--my', cy + 'px');
+};
+const menuStep = raw => {
+  const inMenu = G.mode === 'menu', mfT = inMenu ? 1 : 0, tg = inMenu ? MN.lvl : 0;
+  if (MN.mf !== mfT) { MN.mf = RM ? mfT : MN.mf + (mfT - MN.mf) * Math.min(1, raw * 8); if (Math.abs(MN.mf - mfT) < 0.01) MN.mf = mfT; }
+  for (let i = 0; i < 4; i++) if (MN.press[i] > 0) MN.press[i] = Math.max(0, MN.press[i] - raw * 2.6);
+  if (!MN.drag && MN.hv !== tg) { MN.hv = RM ? tg : MN.hv + (tg - MN.hv) * Math.min(1, raw * 9); if (Math.abs(MN.hv - tg) < 0.003) MN.hv = tg; }
+  if (MN.hv !== MN.hvW) menuSync();
+  const f = MN.fly;
+  if (f) {
+    f.t += raw / MENU_FLY;
+    const e = Math.min(1, f.t);
+    G.ang = norm(f.from + f.d * (1 - (1 - e) * (1 - e)));
+    if (e >= 1) { MN.fly = null; menuHit(f); }
+  }
+};
+const menuHit = f => {
+  const q = ptXY(view.cx, view.cy, G.ang, view.r), col = 'rgb(' + f.c.join(',') + ')';
+  burst(q[0], q[1], 22, [col, '#FFFFFF', P.peach], 190); fxRing(q[0], q[1], col, 60, 0.45);
+  Snd.tick(true); Platform.haptic('light');
+  menuAct(f.id);
+};
+const menuAct = id => {
+  if (id === 'bolum') { if (save.run) resumeSaved(); else start(); }
+  else if (id === 'sure') { MN.lvl = 1; if (save.ob === OB_LEVEL) { save.ob = OB_LEVEL2; obWait = performance.now() + 1600; persist(); } }
+  else if (id === 'store') openShop('menu');
+  else if (id === 'book') openBook();
+  else {
+    /* zorluk: yarım kalan oyun başka kademedeyse önce sorulur (#swap), onaylanınca oyun başlar */
+    if (save.run && save.run.lvl === id) { resumeSaved(); return; }
+    if (save.run) { MN.pend = true; setLevel(id); return; }
+    if (id !== save.lvl) doSetLevel(id);
+    if (id === 'cehennem') { const hl = $('mHell'); hl.classList.add('fo'); setTimeout(() => { hl.classList.remove('fo'); menuSync(); }, 450); MN.hv = 0; }
+    start();
+  }
+};
+const menuGo = id => {
+  if (MN.fly || G.mode !== 'menu') return;
+  const S = menuSegs(), i = S.findIndex(s => s.id === id);
+  if (i < 0) return;
+  const s = S[i], m = (s.a0 + s.a1) / 2 * DEG, d = ((m - G.ang) % TAU + 1.5 * TAU) % TAU - TAU / 2, f = { from: G.ang, d, t: 0, id, c: s.c };
+  MN.press[i] = 1;
+  if (RM) { G.ang = norm(m); menuHit(f); return; }
+  MN.fly = f;
+};
+const menuBack = () => { MN.lvl = 0; if (save.ob === OB_LEVEL2) { save.ob = OB_GO; obWait = performance.now() + 500; persist(); } };
+/* dokunuş: 'c' orta, dilim kimliği ya da '' (halkanın dışı) */
+const menuPick = e => {
+  const a = app.getBoundingClientRect(), dx = e.clientX - a.left - view.cx, dy = e.clientY - a.top - view.cy, d = Math.hypot(dx, dy), R = view.r;
+  if (d < R * (1 - MENU_LW / 2)) return 'c';
+  if (d > R * 1.55) return '';
+  const q = (Math.atan2(dx, -dy) / DEG + 360) % 360, s = menuSegs().find(g => (q - g.a0 + 720) % 360 <= g.a1 - g.a0);
+  return s ? s.id : '';
+};
+const menuDown = e => {
+  const pick = menuPick(e), i = menuSegs().findIndex(s => s.id === pick);
+  if (i >= 0) MN.press[i] = 1;
+  MN.drag = { id: e.pointerId, x: e.clientX, hv0: MN.hv, moved: false, pick };
+};
+window.addEventListener('pointermove', e => {
+  const d = MN.drag;
+  if (!d || e.pointerId !== d.id) return;
+  const dx = e.clientX - d.x;
+  if (!d.moved && Math.abs(dx) < TAP_SLOP) return;
+  d.moved = true;
+  MN.hv = clamp(d.hv0 - dx / (view.w * 0.8), 0, 1);
+});
+window.addEventListener('pointerup', e => {
+  const d = MN.drag;
+  if (!d || e.pointerId !== d.id) return;
+  MN.drag = null;
+  if (G.mode !== 'menu') return;
+  if (d.moved) { MN.lvl = MN.hv > 0.5 ? 1 : 0; return; }
+  if (d.pick === 'c') { if (MN.lvl) menuBack(); else menuGo('bolum'); return; }
+  if (d.pick) menuGo(d.pick);
+});
+window.addEventListener('pointercancel', e => { if (MN.drag && e.pointerId === MN.drag.id) { MN.drag = null; MN.lvl = MN.hv > 0.5 ? 1 : 0; } });
+/* parıltı için shadowBlur YOK: yazılımla çizen cihazda her karede pahalı; geniş ve saydam yay yeter */
+const drawMenuRing = (c, cx, cy, R) => {
+  const k = MN.mf;
+  if (k <= 0.01) return;
+  const lw = R * MENU_LW, sc = R / 132, n = norm(G.ang), hv = MN.hv;
+  for (let i = 0; i < 4; i++) {
+    const p = MENU1[i], q = MENU2[i], a0 = (p.a0 + (q.a0 - p.a0) * hv) * DEG, a1 = (p.a1 + (q.a1 - p.a1) * hv) * DEG, m = (a0 + a1) / 2, w = a1 - a0 - 0.05;
+    const col = 'rgb(' + p.c.map((v, j) => Math.round(v + (q.c[j] - v) * hv)).join(',') + ')', pr = MN.press[i], on = Math.abs(((n - m) % TAU + 1.5 * TAU) % TAU - TAU / 2) < w / 2;
+    const s0 = m - Math.PI / 2 - w / 2, s1 = m - Math.PI / 2 + w / 2;
+    c.lineCap = 'butt'; c.strokeStyle = col;
+    if (on || pr > 0) { c.globalAlpha = k * (pr > 0 ? 0.28 : 0.2); c.lineWidth = lw + 12 + pr * 12; c.beginPath(); c.arc(cx, cy, R + pr * 4, s0, s1); c.stroke(); }
+    c.globalAlpha = k; c.lineWidth = lw + pr * 10; c.beginPath(); c.arc(cx, cy, R + pr * 4, s0, s1); c.stroke();
+    if (hv < 0.98) {
+      c.save(); c.globalAlpha = k * (1 - hv); c.translate(cx + Math.sin(m) * R - 13 * sc, cy - Math.cos(m) * R - 13 * sc); c.scale(1.08 * sc, 1.08 * sc);
+      if (p.fill) { c.fillStyle = '#FFFFFF'; c.fill(p.path); } else { c.strokeStyle = '#FFFFFF'; c.lineWidth = 2.2; c.lineJoin = 'round'; c.lineCap = 'round'; c.stroke(p.path); }
+      c.restore();
+    }
+  }
+  c.globalAlpha = 1;
+};
 applyI18n(); refreshLevel(); refreshStats();
 if (saveTampered) { persist(); setTimeout(() => toast(t('saveReset')), 1800); }   /* kurcalanmış kayıt sıfırlandı: yeniden imzala ve kısaca haber ver */
 resize();
@@ -6078,8 +6190,8 @@ const obTarget = () => {
   if (m !== 'menu' || !menuEl.classList.contains('on')) return null;
   if (s === OB_SHOP) return { el: $('bagBtn'), m: 3 };
   if (s === OB_PLAY || s === OB_GO) return { el: $('playBtn') };
-  if (s === OB_LEVEL) return { el: $('lvlSeg').querySelector('[data-lvl="cehennem"]'), m: 2 };
-  if (s === OB_LEVEL2) return { el: $('lvlSeg').querySelector('[data-lvl="normal"]'), m: 2 };
+  if (s === OB_LEVEL) return { el: $('sureBtn') };
+  if (s === OB_LEVEL2) { if (MN.lvl) return { el: $('mBack') }; save.ob = OB_GO; persist(); return null; }
   return null;
 };
 /* zorunlu adımlarda elin gösterdiği yer dışındaki dokunuşlar oyuna ve mağazaya ulaşmaz; oyun ve Dene sürerken serbest */
@@ -6094,6 +6206,7 @@ const obFilter = e => {
   if (!obLock()) return;
   const el = obT && obT.el;
   if (el && e.target && el.contains(e.target)) return;
+  if (el && e.type === 'pointerdown' && G.mode === 'menu' && el.getAttribute('data-m') && menuPick(e) === el.getAttribute('data-m')) return;   /* etiketin dilimi de sayılır */
   e.stopPropagation(); e.preventDefault();
 };
 window.addEventListener('pointerdown', obFilter, true);
@@ -6113,6 +6226,7 @@ const obShow = tg => {
       /* geniş düğmede parmak yazının üstüne binmesin: sağ tarafına basar */
       const wide = r.width > 150 && r.height < 96, m = tg.m == null ? 6 : tg.m, cx = r.left - a.left, cy = r.top - a.top;
       hx = cx + r.width * (wide ? 0.78 : 0.5); hy = r.height > 110 ? cy + r.height * 0.34 : cy + r.height / 2;   /* uzun kartta (raftaki joker) adın üstüne binmesin: camına basar */
+      if (tg.el.classList.contains('mlab')) { hx = cx + r.width - 8; hy = cy + r.height - 6; }   /* menü etiketinde yazıyı kapatmasın: köşesine basar */
       /* spot düğmenin kendi şeklidir: köşe yarıçapı düğmeden gelir (mağaza ölçekli çizilir), pay ekranın dışına taşmaz */
       const scale = tg.el.offsetWidth ? r.width / tg.el.offsetWidth : 1, rad = obRad.endsWith('%') ? parseFloat(obRad) / 100 * Math.min(r.width, r.height) : (parseFloat(obRad) || 0) * scale;
       sx = Math.max(2, cx - m); sy = Math.max(2, cy - m); sw = Math.min(a.width - 2, cx + r.width + m) - sx; sh = Math.min(a.height - 2, cy + r.height + m) - sy;
