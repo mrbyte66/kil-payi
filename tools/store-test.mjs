@@ -73,7 +73,6 @@ reset();S.tools.kron.n=5;for(i=0;i<30;i++)K.giftTool();T('hediye joker 5 üstün
 
 const FLOW = HEAD + `
 S.coins=5000;S.own={kron:1};S.slots=1;S.equip=['kron','','',''];S.tools.kron.n=1;K.persist();K.refreshStats();
-T('menüde 4 yuva düğmesi',document.querySelectorAll('#menuJk button.sl').length===4);
 var hit=function(id){var r=$(id).getBoundingClientRect(),e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!e&&e.closest('button')===$(id)};
 T('mağaza kapalıyken menü düğmelerine (Mağaza, Ayarlar) dokunuş düğmeye gider: görünmez mağaza katmanı dokunuşu yakalamaz',hit('bagBtn')&&hit('setBtn')&&hit('playBtn'),[hit('bagBtn'),hit('setBtn'),hit('playBtn')]);
 K.openShop('menu');T('mağaza açıldı',$('shop').classList.contains('on'));
@@ -107,7 +106,7 @@ K.openSettings();T('ayarlar 6 satır (müzik, ses, titreşim, animasyon, otomati
 click('#setRows [data-set="snd"]');T('ses kapandı',S.snd===false);click('#setRows [data-set="snd"]');T('ses açıldı',S.snd===true);
 click('#setRows [data-set="mus"]');T('müzik kapandı',S.music===false);click('#setRows [data-set="mus"]');T('müzik açıldı',S.music===true);
 click('#setRows [data-set="vib"]');T('titreşim kapandı',S.vib===false);click('#setRows [data-set="vib"]');click('#setRows [data-set="auto"]');T('ayarlardan otomatik açıldı',S.autoJ===true);K.closeSettings();
-click('#menuJk button[data-slot="0"]');T('menüden seçici (hızlı)',$('shop').classList.contains('on')&&K.SS.quick===true);
+K.openShop('menu',{shop:'alet',chooser:0});T('doğrudan seçici (hızlı)',$('shop').classList.contains('on')&&K.SS.quick===true);
 await sleep(300);click('#stSheet [data-a="eq"][data-j="kron"][data-i="0"]');await sleep(700);
 T('seçince menüye dönülür',!$('shop').classList.contains('on')&&$('menu').classList.contains('on')&&S.equip[0]==='kron'&&S.equip[1]==='kalkan',S.equip);
 K.start();var shown=[].slice.call(document.querySelectorAll('#tools .tool')).filter(function(b){return !b.classList.contains('off')}).map(function(b){return b.getAttribute('data-tool')});
@@ -214,13 +213,13 @@ T('müzik kırpmıyor (tepe < -6 dB) ve duyulur (RMS > -42 dB)',pk<0.5&&rms>0.00
 ` + TAIL;
 
 const LANG = HEAD + `
-T('telefon dili Türkçe: açılış Türkçe',K.getLang()==='tr'&&$('playT').textContent==='Oyna'&&S.lang==='',[K.getLang(),S.lang]);
+T('telefon dili Türkçe: açılış Türkçe',K.getLang()==='tr'&&$('playT').textContent==='Bölümler'&&S.lang==='',[K.getLang(),S.lang]);
 K.openSettings();
 T('dil satırı: Sistem, Türkçe, English',document.querySelectorAll('#setRows [data-lang]').length===3);
 click('#setRows [data-lang="en"]');
-T('English seçilince hemen İngilizce',K.getLang()==='en'&&S.lang==='en'&&$('playT').textContent==='Play'&&document.documentElement.lang==='en'&&document.title==='Close call'&&$('lvHint').textContent==='Balanced',[K.getLang(),$('playT').textContent]);
+T('English seçilince hemen İngilizce',K.getLang()==='en'&&S.lang==='en'&&$('playT').textContent==='Levels'&&document.documentElement.lang==='en'&&document.title==='Close call',[K.getLang(),$('playT').textContent]);
 T('ayarlar da İngilizce',/Music/.test($('setRows').innerText)&&/Language/.test($('setRows').innerText));
-click('#setRows [data-lang=""]');T('Sistem: telefonun diline döner',K.getLang()==='tr'&&S.lang===''&&$('playT').textContent==='Oyna');
+click('#setRows [data-lang=""]');T('Sistem: telefonun diline döner',K.getLang()==='tr'&&S.lang===''&&$('playT').textContent==='Bölümler');
 click('#setRows [data-lang="en"]');K.closeSettings();K.openShop('menu');await sleep(700);
 T('mağaza İngilizce',/Shop/.test(document.querySelector('#stHub .tt').innerText));K.closeShop();await sleep(600);
 ` + TAIL;
