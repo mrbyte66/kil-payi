@@ -13,10 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- AdMob uygulama kimliği: Google'ın herkese açık TEST kimliği. Yayından önce gerçek kimlikle değiştirilecek. -->
+        <!-- AdMob uygulama kimliği (gerçek). Reklam birimi oyunda: DEBUG derlemeleri test birimi, yayın gerçek birim kullanır. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-2220587987381043~9494348573" />
 
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"

@@ -3,6 +3,13 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.14.0 — Gerçek reklamlar (2026-11-04)
+
+- **AdMob bağlandı.** Yayın sürümü artık gerçek reklam ister. AdMob'da "Kıl payı" uygulaması ve ödüllü reklam birimi oluşturuldu.
+- **Avrupa izin penceresi.** Avrupa Ekonomik Alanı, Birleşik Krallık ve İsviçre'deki oyuncular reklamdan önce Google'ın izin penceresini görür. Kararını Ayarlar > Reklam gizlilik seçenekleri'nden değiştirebilir; bu satır yalnızca gereken ülkelerde çıkar.
+- **Zorluk halkasındaki Geri ipucu kalktı** (kullanıcı isteği).
+- Teknik: geliştirme derlemeleri Google'ın test reklam birimini kullanmaya devam eder. Yeni test: `tools/consent-test.mjs`. Gizlilik sayfasının yerel kopyasında bildirim bölümü kalktı, izin bilgisi eklendi.
+
 ## V0.13.1 — Öğretimde son dokunuşlar (2026-11-04)
 
 - **Oyna'yı artık el göstermiyor.** Dokunmayı oyuncu ilk turda öğrendi; mağazadan çıkınca ana ekran serbest.
