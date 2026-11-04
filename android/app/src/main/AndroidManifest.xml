@@ -41,6 +41,4 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Kapalı test bildirimleri (V0.9.11): eklentinin manifestinden gelen POST_NOTIFICATIONS ve RECEIVE_BOOT_COMPLETED kalır; tam zamanlı alarm izni kullanılmaz (isExactNotification: false), Play'de sorgu çıkmasın diye kaldırılır. -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:node="remove" />
 </manifest>

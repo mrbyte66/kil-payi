@@ -45,7 +45,7 @@ export const launch = async (o = {}) => {
   await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: reduceMotion ? 'reduce' : 'no-preference' }, { name: 'prefers-color-scheme', value: dark ? 'dark' : 'light' }] });
   if (lang) await send('Emulation.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36', acceptLanguage: lang, platform: 'Android' });
   const langScript = lang ? 'Object.defineProperty(navigator,"language",{get:function(){return ' + JSON.stringify(lang) + '}});Object.defineProperty(navigator,"languages",{get:function(){return [' + JSON.stringify(lang) + ']}});' : '';
-  await send('Page.addScriptToEvaluateOnNewDocument', { source: 'try{' + (o.warm ? '' : 'window.NO_WARM=true;') + langScript + seed + '}catch(e){}' });
+  await send('Page.addScriptToEvaluateOnNewDocument', { source: 'try{' + (o.warm ? '' : 'window.NO_WARM=true;') + (o.ob ? '' : 'window.NO_OB=true;') + langScript + seed + '}catch(e){}' });
   const api = {
     logs,
     send,
