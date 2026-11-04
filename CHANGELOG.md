@@ -3,6 +3,20 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.11.1 — Öğretim tamamlandı: el işareti, kilit defteri, seviye seçimi (2026-11-04)
+
+- **Işık halkası yerine ince çizgi el** (kullanıcı: "ışık halkası bazı yerlerde şık durmadı"). Geniş düğmelerde yazının üstüne binmez, düğmenin sağına basar; raftaki jokerde adın değil camın üstüne basar.
+- **Spot artık düğmenin kendi şeklinde** (kullanıcı: "eliptik değil, butonun şeklinde olsun"): hap düğmede hap, yuvarlak düğmede daire; küçük bir pay bırakır, ekrandan taşmaz, komşu düğmelerin üstüne binmez.
+- **Öğretimin sırası baştan kuruldu** (kullanıcı: "sıralamayı sen optimize et"):
+  1. **İlk tur:** vuruş, tuzak, süre biter, çember yanar.
+  2. **Mağaza:** 500 altın, çanta, Alet çantası, kronometre (300 altın), çıkış.
+  3. **İkinci tur:** duraklat, Devam et (3-2-1), süre azalınca joker. Joker kullanılınca süre sıfırlanır, çember yanar, ana ekrana dönülür. Bu tur kayda, coine ve rekora sayılmaz.
+  4. **Kilit defteri:** defter açılır, Çift pim denenir (3 vuruş, cezasız), Deftere dön, Kapat.
+  5. **Seviye seçimi:** Cehennem seçilir, ana ekran bir an Cehennem temasına geçer, sonra Normal'e dönülür.
+  6. **Oyna:** gerçek oyun başlar, öğretim biter.
+- İlk ıska ve ilk tuzakta bedava geri sarma aynen duruyor.
+- Teknik: `src/game.html` "öğretim" bloğu (`save.ob` 1-8, `G.ob.r` 1 ve 2), `tools/ob-test.mjs`.
+
 ## V0.11.0 — Oyun artık kendini yazısız öğretiyor (2026-11-04)
 
 - **Yeni oyuncu oynayarak öğrenir; talimat yazısı yok.** (Kullanıcı: "oyuna girenler nasıl oynanacağını anlamıyor", "yazı ile info vermek hangi çağda kaldı", "öğrenmenin bi sonu yok mu".) Oyun durur, ışık halkası dokunulacak yeri gösterir, başka yere dokunulamaz. Yaklaşık 1,5 dakikada biter ve bir daha gelmez:

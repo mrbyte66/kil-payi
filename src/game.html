@@ -726,24 +726,30 @@ html.calm #shop,html.calm #shop *{animation:none!important;transition:none!impor
 #shop.warm *{pointer-events:none!important;animation-play-state:running!important}
 #shop.warm .stg{animation:stIn .85s cubic-bezier(.16,1,.3,1) backwards}
 #shop.warm.wout .stg{animation:stOut .36s cubic-bezier(.45,0,.8,.5) both}
-/* Öğretim (V0.11.0): ışık halkası oyuncunun dokunacağı yeri gösterir, çevresi kararır; katman dokunuşu tutmaz (dokunuşu window yakalaması süzer). Sakin kipte halka durur. */
+/* Öğretim (V0.11.1): ince çizgi el dokunulacak yeri gösterir, çevresi düğmenin kendi şeklinde açık kalarak kararır (kullanıcı: "eliptik değil, butonun şeklinde"); katman dokunuşu tutmaz (dokunuşu window yakalaması süzer). Sakin kipte el durur. */
 #app.obr #pauseBtn{visibility:hidden}
-#obFx{position:absolute;inset:0;z-index:390;display:none;pointer-events:none}
+#obFx{position:absolute;inset:0;z-index:390;display:none;overflow:hidden;pointer-events:none}
 #obFx.on{display:block}
-#obFx .d{position:absolute;inset:0;opacity:0;transition:opacity .22s;background:radial-gradient(var(--rx,60px) var(--ry,60px) at var(--x,50%) var(--y,50%),transparent 84%,rgba(42,35,71,.36) 100%)}
+#obFx .d{position:absolute;left:var(--sx);top:var(--sy);width:var(--sw);height:var(--sh);border-radius:var(--sr);box-shadow:0 0 5px 200vmax rgba(42,35,71,.36);opacity:0;transition:opacity .22s}
 #obFx.dim .d{opacity:1}
-#obFx .h{position:absolute;left:var(--x);top:var(--y);width:0;height:0}
-#obFx .h i,#obFx .h b{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;box-sizing:border-box;will-change:transform,opacity}
-#obFx .h i{background:rgba(255,255,255,.62);border:2.5px solid rgba(108,85,224,.85);box-shadow:0 0 12px rgba(108,85,224,.55);animation:obPress 1.25s ease-in-out infinite}
-#obFx .h b{border:3px solid rgba(108,85,224,.75);animation:obRing 1.25s ease-out infinite}
-@keyframes obPress{0%,100%{transform:scale(1)}18%,30%{transform:scale(.76)}50%{transform:scale(1)}}
-@keyframes obRing{0%,14%{transform:scale(.7);opacity:0}16%{opacity:1}64%,100%{transform:scale(2.2);opacity:0}}
-#obFx.el .h i{background:rgba(255,255,255,.22)}
-#obFx.no .h i{border-color:#FF5C85;background:rgba(255,255,255,.4);box-shadow:0 0 12px rgba(255,92,133,.55);animation:none}
-#obFx.no .h i::after{content:'';position:absolute;left:50%;top:-2px;bottom:-2px;width:4px;margin-left:-2px;border-radius:2px;background:#FF5C85;transform:rotate(45deg)}
-#obFx.no .h b{border-color:rgba(255,92,133,.75)}
-html.calm #obFx .h i{animation:none}
-html.calm #obFx .h b{animation:none;opacity:.7;transform:scale(1.4)}
+#obFx .h{position:absolute;left:var(--hx);top:var(--hy);width:0;height:0}
+#obFx .h b{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;box-sizing:border-box;border:3px solid rgba(108,85,224,.8);will-change:transform,opacity;animation:obRing 1.25s ease-out infinite}
+#obFx .f{position:absolute;left:-24px;top:-8px;width:60px;height:60px;will-change:transform;transform-origin:40% 13%;animation:obTap 1.25s ease-in-out infinite}
+#obFx .f svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 6px rgba(42,35,71,.28))}
+#obFx .f path{fill:#fff;stroke:#6C55E0;stroke-width:.62;stroke-linejoin:round}
+@keyframes obTap{0%,50%,100%{transform:translate(9px,18px) rotate(-10deg)}18%,30%{transform:rotate(-10deg) scale(.95)}}
+@keyframes obRing{0%,14%{transform:scale(.6);opacity:0}16%{opacity:1}64%,100%{transform:scale(2.1);opacity:0}}
+#obFx.flip .f{left:-36px;transform-origin:60% 13%}
+#obFx.flip .f svg{transform:scaleX(-1)}
+#obFx .x{display:none;position:absolute;left:-38px;top:-38px;width:76px;height:76px;border-radius:50%;box-sizing:border-box;border:6px solid #FF5C85;box-shadow:0 0 0 2px rgba(255,255,255,.9),inset 0 0 0 2px rgba(255,255,255,.9)}
+#obFx .x::after{content:'';position:absolute;left:50%;top:-2px;bottom:-2px;width:6px;margin-left:-3px;border-radius:3px;background:#FF5C85;transform:rotate(45deg)}
+#obFx.no .x{display:block}
+#obFx.no .h b{display:none}
+#obFx.no .f{left:-12px;top:42px;transform-origin:40% 80%;animation:obWag .7s ease-in-out infinite}
+@keyframes obWag{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(12deg)}}
+html.calm #obFx .f{animation:none;transform:translate(6px,12px) rotate(-10deg)}
+html.calm #obFx.no .f{transform:none}
+html.calm #obFx .h b{display:none}
 /* ilk açılış örtüsü (V0.10.0): mağaza ısınması yalnızca ilk açılışta, bu örtünün arkasında yapılır (açılış ekranının devamı gibi görünür); sonraki açılışlarda hiç çıkmaz */
 #warmVeil{position:absolute;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:0 40px;text-align:center;color:#fff;background:radial-gradient(120% 85% at 50% 30%,#B7A8FF 0,#6D58E0 50%,#2A1B80 100%);transition:opacity .28s ease}
 #warmVeil.on{display:flex}
@@ -943,7 +949,7 @@ html.calm #obFx .h b{animation:none;opacity:.7;transform:scale(1.4)}
     </div>
   </section>
 
-  <div id="obFx" aria-hidden="true"><i class="d"></i><div class="h"><i></i><b></b></div></div>
+  <div id="obFx" aria-hidden="true"><i class="d"></i><div class="h"><b></b><i class="x"></i><span class="f"><svg viewBox="0 0 24 24"><path d="M8 13V4.5a1.5 1.5 0 0 1 3 0V9.5a1.5 1.5 0 0 1 3 0V10.5a1.5 1.5 0 0 1 3 0V11.5a1.5 1.5 0 0 1 3 0V16a6 6 0 0 1-6 6H12.2a6 6 0 0 1-5-2.7c-.3-.5-1.4-2.4-3.3-5.7a1.5 1.5 0 0 1 .5-2a1.9 1.9 0 0 1 2.3.3Z"/></svg></span></div></div>
   <div id="warmVeil" aria-hidden="true">
     <svg viewBox="18 18 72 72" aria-hidden="true"><defs><radialGradient id="wv_bez" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C9BEFF"/></radialGradient><radialGradient id="wv_glass" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#5A44C8"/><stop offset="1" stop-color="#2A1B80"/></radialGradient><linearGradient id="wv_liq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC48A"/><stop offset="1" stop-color="#FF6B3A"/></linearGradient><clipPath id="wv_clip"><circle cx="54" cy="52" r="22.5"/></clipPath></defs><circle cx="54" cy="52" r="31" fill="url(#wv_bez)"/><circle cx="54" cy="52" r="26.5" fill="#6D58E0"/><circle cx="54" cy="52" r="22.5" fill="url(#wv_glass)"/><g clip-path="url(#wv_clip)"><path d="M28 54C36 47 43 61 54 54S71 47 80 54V80H28Z" fill="url(#wv_liq)"/></g><path d="M54 52L66.7 37.9" stroke="#FFFFFF" stroke-width="3.8" stroke-linecap="round"/><circle cx="66.7" cy="37.9" r="4.6" fill="#FFFFFF"/><circle cx="66.7" cy="37.9" r="1.8" fill="#FF7D43"/><circle cx="54" cy="52" r="4.2" fill="#FFFFFF"/></svg>
     <p id="wvTxt" data-i18n="warmMsg"></p>
@@ -1535,7 +1541,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.11.0';
+const VERSION = 'V0.11.1';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -1567,7 +1573,7 @@ const validSave = o => {
   return true;
 };
 /* Öğretim (V0.11.0): yeni kurulumda save.ob aşamasıdır (0 = bitti ya da eski kayıt). Aşamalar kayıtlıdır; uygulama kapanırsa kaldığı yerden sürer. */
-const OB_ROUND = 1, OB_SHOP = 2, OB_PLAY = 3, OB_USE = 4, OB_PAUSE = 5;
+const OB_ROUND = 1, OB_SHOP = 2, OB_PLAY = 3, OB_BOOK = 4, OB_BOOK2 = 5, OB_LEVEL = 6, OB_LEVEL2 = 7, OB_GO = 8;
 const OB_FRESH = (() => { try { return !localStorage.getItem('kilpayi.v1') && !window.NO_OB; } catch (e) { return false; } })();
 try {
   const raw = localStorage.getItem('kilpayi.v1');
@@ -1623,7 +1629,7 @@ TOOL_IDS.forEach(id => {
 if (!save.own || typeof save.own !== 'object') save.own = { kron: 1 };
 /* yeni oyuncu 0 altın ve 0 jokerle başlar: 500 altını ilk turdan sonra alır, kronometreyi mağazada kendi açar. İlk ıska ve ilk tuzak bir kez bedava geri sarılır (obM bitleri); eski kayıtta ikisi de yoktur. */
 if (OB_FRESH) { save.ob = OB_ROUND; save.obM = 3; save.tut = true; save.own = {}; save.equip = ['', '', '', '']; save.tools.kron.n = 0; save.intro.tuzak = 1; }
-save.ob = clamp(save.ob | 0, 0, OB_PAUSE); save.obM = clamp(save.obM | 0, 0, 3);
+save.ob = clamp(save.ob | 0, 0, OB_GO); save.obM = clamp(save.obM | 0, 0, 3);
 TOOL_IDS.forEach(id => { save.own[id] = save.own[id] ? 1 : 0; });
 if (!TOOL_IDS.some(id => save.own[id]) && !save.ob) save.own.kron = 1;
 save.slots = clamp(save.slots | 0 || 1, 1, 4);
@@ -2687,13 +2693,12 @@ const runState = L0 => ({
 
 const start = (fromL, snap) => {
   if (snap && !validRun(snap)) { save.run = null; persist(); return false; }
+  if (save.ob === OB_PLAY && !snap) { obRound(2); return; }   /* öğretimin ikinci turu: kayıt, coin ve rekor yok */
   runEpoch++; if (activeReward) activeReward();
   const L0 = Number.isInteger(fromL) && fromL >= 1 && fromL <= 10000 ? fromL : 1;
   Snd.ui();
   Object.assign(G, runState(L0));
   G.best0 = bestNow();
-  if (save.ob === OB_PLAY) save.ob = OB_USE;
-  if (save.ob === OB_USE && !snap) G.time = G.tvis = OB_USE_T;   /* öğretim: süre az başlar, joker gerçekten işe yarasın */
   if (snap) {
     RUN_KEYS.forEach(k => { if (snap[k] !== undefined) G[k] = snap[k]; });
     const pi = jPhaseAt(G.jt);
@@ -2716,6 +2721,7 @@ const start = (fromL, snap) => {
   updateHud(); relayout(false);   /* önce HUD güncellenir: önceki oyundan kalan joker çipleri halkanın boyunu etkilemesin */
   updateTools(); updateHud();
   Platform.track('run_start', { run: save.runs + 1, level: L0, resume: !!snap });
+  if (save.ob === OB_GO) obFinish();
 };
 /* Kayıtlı oyunu sürdür: durum geri yüklenir, 3-2-1 sayılır. */
 const resumeSaved = () => {
@@ -2748,6 +2754,7 @@ const syncPracDots = () => {
 };
 const startPractice = kind => {
   Snd.ui();
+  if (save.ob === OB_BOOK) { save.ob = OB_BOOK2; persist(); }
   Object.assign(G, runState(1));
   const tw = PRAC_TWIN[kind] || '';
   G.mode = 'play'; G.time = CFG.maxTime; G.dir = 1;
@@ -3227,7 +3234,7 @@ const useTool = (id, auto) => {
   updateTools(); updateHud();
   const bb = toolsEl.querySelector('.tool[data-tool="' + id + '"]');
   if (bb) { bb.classList.remove('bump'); void bb.offsetWidth; bb.classList.add('bump'); }
-  if (save.ob === OB_USE) obUsed(bb);
+  if (G.ob) obUsed(bb);
   Platform.track('tool_use', { id, level: s.l, smart, auto: !!auto });
 };
 /* Akıllı joker: işe yarayacağı an parlar ve büyür; aynı anda yalnızca biri önerilir. Otomatik joker ayarı (save.autoJ) açıksa parladıktan AUTO_AT sn sonra kendiliğinden kullanılır;
@@ -3369,13 +3376,13 @@ const doContinue = (rewarded = false) => {
 const pause = () => {
   if ((G.mode !== 'play' && G.mode !== 'count' && G.mode !== 'intro' && !(G.mode === 'hold' && G.hold === 'pause'))/*NOPAUSE*/) return;
   if (G.practice) { endPractice(true); return; }
-  if (G.ob) return;
+  if (G.ob && G.ob.r !== 2) return;
   abortIntro();
   G.hold = ''; G.mode = 'pause'; G.holding = false; G.pins.forEach(p => { if (p.st === 'hold') p.st = 'wait'; });
   persistRun(); show(pauseEl);
 };
 /* Devam edince 3-2-1 geri sayım; sayaçlar (süre, seviye, cennet/cehennem) sayım bitene kadar donuk kalır. */
-const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'count'; G.count = 3; Snd.ui(); if (save.ob === OB_PAUSE) obFinish(); };
+const resume = () => { if (G.mode !== 'pause') return; hide(pauseEl); G.mode = 'count'; G.count = 3; Snd.ui(); if (G.ob && G.ob.s === 0) { G.ob.s = 1; G.ob.st = 0; } };
 
 /* ---------- mağaza: akşam çarşısı (V0.9.2) ----------
    Seçilen tasarım "Çarşı + halka ikonları": akşam sokağında dükkân dükkân gezilir, içeri girilir, ürünler kağıt fişle alınır.
@@ -5751,7 +5758,11 @@ const runPending = r => {
   return Math.max(0, runCoins(r.raw, r.near, r.coinsJ, lv) - (r.coinsGiven || 0));
 };
 const doSetLevel = l => {
-  save.lvl = l; persist(); refreshLevel(); refreshStats();
+  save.lvl = l;
+  /* öğretim: Cehennem seçilince menü bir an Cehennem temasına geçer, sonra Normal'e dönülür */
+  if (save.ob === OB_LEVEL && l === 'cehennem') { save.ob = OB_LEVEL2; obWait = performance.now() + 1500; G.thT = 1; G.thDirty = true; }
+  else if (save.ob === OB_LEVEL2 && l === 'normal') { save.ob = OB_GO; obWait = performance.now() + 500; G.thT = 0; G.thDirty = true; }
+  persist(); refreshLevel(); refreshStats();
   Platform.track('level', { level: l });
 };
 let swapTo = '';
@@ -5880,29 +5891,34 @@ if (AppP) {
     });
   } catch (e) {}
 }
-/* ---------- öğretim (V0.11.0) ----------
-   Kullanıcı: "yazı ile info vermek hangi çağda kaldı", "öğrenmenin bi sonu yok mu". Yazı yok; oyun durur, ışık halkası nereye dokunulacağını gösterir, başka yere dokunulamaz. Sonu bellidir:
-   1 ilk tur (OB_ROUND): vuruş (ibre hedefte durur), yardım azalır, tuzak (ibre tuzakta durur, yasak halkası), süre biter ve çember yanar; 2 OB_SHOP: 500 altın, çanta, Aletler dükkânı, kronometre (300 altın);
-   3 OB_PLAY: mağazadan çıkış, Oyna; 4 OB_USE: süre azalınca oyun durur, kronometreye dokunulur; 5 OB_PAUSE: duraklat, Devam. Bitince save.ob = 0 ve oyun bir daha zorla bir şey göstermez.
-   Kalıcı olan yalnız obM: ilk ıska ve ilk tuzakta oyun yavaşlar, yeri işaretler, geri sarar ve ceza silinir (obTeach). Yeni kilitlerin ilk görüşü zaten Hayalet gösterinin işidir. */
-const OB_GIFT = 500, OB_T0 = 5, OB_FLOOR = 1.6, OB_USE_T = 3.4, OB_OM = [0.7, 0.75, 0.9, 0.9], OB_RATE = [0, 0, 0.35, 0.35, 3.2];
+/* ---------- öğretim (V0.11.0, V0.11.1'de sıra yenilendi) ----------
+   Kullanıcı: "yazı ile info vermek hangi çağda kaldı", sonra "joker kullanınca sıradaki öğrenme faslına geçsin, süre sıfırlanarak bitsin; Cehennem vb. seçmeyi ve kilit defterini de öğret; sıralamayı sen optimize et".
+   Talimat yazısı yok; oyun durur, ince çizgi el nereye dokunulacağını gösterir, başka yere dokunulamaz. Sıra:
+   1 OB_ROUND ilk tur (r 1): vuruş (ibre hedefte durur), yardım azalır, tuzak (ibre tuzakta durur, yasak işareti), süre biter ve çember yanar;
+   2 OB_SHOP: 500 altın, çanta, Alet çantası, kronometre (300 altın); 3 OB_PLAY: mağazadan çıkış, Oyna ve ikinci tur (r 2, kayıt ve coin yok): duraklat, Devam, süre azalınca joker, süre biter ve yanar;
+   4 OB_BOOK: kilit defteri, Çift pimi Dene; 5 OB_BOOK2: Deftere dön, Kapat; 6 OB_LEVEL: Cehennem; 7 OB_LEVEL2: Normal; 8 OB_GO: Oyna ve gerçek oyun. Sonra save.ob = 0, bir daha gelmez.
+   Kalıcı olan yalnız obM: ilk ıska ve ilk tuzakta oyun yavaşlar, yeri işaretler, geri sarar ve ceza silinir (obTeach). Yeni kilitlerin ilk görüşü zaten Hayalet gösterinin işidir.
+   Kullanıcı bir sonraki sürümde menüyü değiştirecek: o zaman bu akış yeniden yazılacak. */
+const OB_GIFT = 500, OB_T0 = 5, OB_FLOOR = 1.6, OB_R2_T = 4.5, OB_OM = [0.7, 0.75, 0.9, 0.9], OB_RATE1 = [0, 0, 0.35, 0.35, 3.2], OB_RATE2 = [0.8, 0.8, 0.8, 3.2];
 const obEl = $('obFx');
-let obOn = false, obX = '', obT = null;
-const obRound = () => {
+let obOn = false, obX = '', obT = null, obElLast = null, obRad = '0px', obWait = 0;
+const obEnding = () => G.ob.s >= (G.ob.r === 1 ? 4 : 3);   /* son aşama: hedef yok, süre hızla biter */
+const obRound = r => {
   Object.assign(G, runState(1));
-  G.ob = { s: 0, h0: 0, tr: 0, ht: 0 };
-  G.mode = 'play'; G.time = G.tvis = OB_T0; G.dir = 1; G.best0 = 0;
+  G.ob = { r, s: 0, h0: 0, tr: 0, ht: 0, st: 0, t: 0 };
+  G.mode = 'play'; G.time = G.tvis = r === 1 ? OB_T0 : OB_R2_T; G.dir = 1; G.best0 = 0;
   G.thT = 0; thWx = 0; applyTheme(true);
   hide(menuEl); hide(overEl); hide(pauseEl);
-  app.classList.add('playing', 'obr');
+  app.classList.add('playing'); app.classList.toggle('obr', r === 1);
   hudEl.classList.add('on'); hudEl.removeAttribute('aria-hidden');
-  toolsEl.classList.remove('on');
+  toolsEl.classList.toggle('on', r === 2);
   spawnChallenge(true);
-  G.omega *= OB_OM[0];
-  relayout(false); updateHud();
+  if (r === 1) G.omega *= OB_OM[0];
+  updateHud(); relayout(false); updateTools(); updateHud();
 };
 const obNext = () => {
   const o = G.ob;
+  if (o.r === 2) { if (!obEnding()) spawnChallenge(false, 'tek'); return; }
   o.s++;
   if (o.s >= 4) { G.pins = []; return; }
   spawnChallenge(false, 'tek');
@@ -5916,47 +5932,57 @@ const obNext = () => {
   }
 };
 const obInTarget = () => { const g = primaryPin(); return !!g && angd(G.ang, pinCenter(g)) <= pinHw(g); };
-const obIgnoreTap = () => G.ob.s >= 4 || (G.ob.s === 0 && !obInTarget());     /* ilk vuruştan önce ıska yok; süre biterken vurulacak bir şey yok */
-const obSlow = () => (G.ob.s === 1 && obInTarget() ? 0.35 : 1);
-const obDrain = raw => { const o = G.ob; G.time -= raw * OB_RATE[o.s]; if (o.s < 4) G.time = Math.max(OB_FLOOR, G.time); };
+const obIgnoreTap = () => obEnding() || (G.ob.r === 1 && G.ob.s === 0 && !obInTarget());     /* ilk vuruştan önce ıska yok; süre biterken vurulacak bir şey yok */
+const obSlow = () => (G.ob.r === 1 && G.ob.s === 1 && obInTarget() ? 0.35 : 1);
+const obDrain = raw => { const o = G.ob; G.time -= raw * (o.r === 1 ? OB_RATE1 : OB_RATE2)[o.s]; if (!obEnding()) G.time = Math.max(OB_FLOOR, G.time); };
 const obLethal = () => {
-  if (G.ob.s < 4) { G.time = OB_FLOOR; return; }
+  if (!obEnding()) { G.time = OB_FLOOR; return; }
   G.mode = 'dead'; G.deadT = RM ? 0.6 : 0.85 * BURN.slow; G.tail = null;
+  toolsEl.classList.remove('on');
   startBurn(); shake(0.5); flash('rose', 0.3); Snd.over(); Platform.haptic('error');
 };
 const obAfterRound = () => {
-  save.ob = OB_SHOP; save.coins += OB_GIFT; persist();
+  const first = G.ob.r === 1;
+  save.ob = first ? OB_SHOP : OB_BOOK;
+  if (first) save.coins += OB_GIFT;
+  save.seen.tek = Math.max(save.seen.tek | 0, 1); save.seen.tuzak = Math.max(save.seen.tuzak | 0, 1);
+  persist();
   G.reform = 0; goMenu();
+  if (!first) return;
   const q = $('coinN').getBoundingClientRect(), a = app.getBoundingClientRect();
   burst(q.left - a.left, q.top - a.top + q.height / 2, 26, [GOLD, GOLD_L, P.peach, '#FFFFFF'], 220);
   Snd.fanfare(); Platform.haptic('medium');
 };
+/* joker kullanılınca sıradaki bölüme geçilir: kısa bir süre sonra hedef kalkar, süre biter */
 const obUsed = bb => {
-  save.ob = OB_PAUSE; G.hold = ''; G.mode = 'play'; G.obT = 1.4; persist();
+  const o = G.ob;
+  if (o.r !== 2) return;
+  if (o.s === 1) { o.s = 2; o.t = 0; }
+  G.hold = ''; G.mode = 'play';
+  if (save.ob === OB_PLAY) { save.ob = OB_BOOK; persist(); }
   if (bb) { const q = bb.getBoundingClientRect(), a = app.getBoundingClientRect(); obDrops(q.left - a.left + q.width / 2, q.top - a.top + q.height / 2); }
 };
 const obFinish = () => {
   save.ob = 0; persist();
   burst(view.cx, view.cy, 40, [P.peach, P.lilac, GOLD, '#FFFFFF'], 300); Snd.fanfare(); Platform.haptic('medium');
 };
-/* ibre hedefin ortasına varınca ya da süre azalınca oyun durur (G.mode = 'hold'); halka G.hold'a göre yerini bulur */
+/* ibre hedefe varınca ya da sırası gelince oyun durur (G.mode = 'hold'); el G.hold'a göre yerini bulur */
 const obPlayStep = raw => {
   const o = G.ob;
-  if (o) {
-    const g = primaryPin();
-    if (o.s === 0 && !o.h0 && g && sdiff(G.ang, pinCenter(g)) * G.dir >= -0.01 && angd(G.ang, pinCenter(g)) < 0.3) { o.h0 = 1; G.mode = 'hold'; G.hold = 'hit'; }
-    const tp = o.s === 3 && !o.tr && G.pins.find(p => p.kind === 'trap');
-    if (tp && sdiff(G.ang, tp.c0) * G.dir >= -0.01 && angd(G.ang, tp.c0) < 0.3) { o.tr = 1; o.ht = 1.6; G.mode = 'hold'; G.hold = 'trap'; }
+  if (!o) return;
+  if (o.r === 2) {
+    if (o.s === 0) { if (G.pt > 1.6) { G.mode = 'hold'; G.hold = 'pause'; } }
+    else if (o.s === 1) {
+      o.st += raw;
+      if (!isEq('kron') || save.tools.kron.n <= 0) { o.s = 2; o.t = 0; }
+      else if (G.time <= 2.4 || o.st > 4) { G.mode = 'hold'; G.hold = 'joker'; }
+    } else if (o.s === 2) { o.t += raw; if (o.t > 1.5) { o.s = 3; G.pins = []; } }
     return;
   }
-  if (G.practice || !save.ob) return;
-  if (save.ob === OB_USE) {
-    if (!isEq('kron') || save.tools.kron.n <= 0) { save.ob = OB_PAUSE; persist(); return; }
-    if (G.time <= 2.4 || G.pt > 5) { G.mode = 'hold'; G.hold = 'joker'; }
-  } else if (save.ob === OB_PAUSE) {
-    G.obT -= raw;
-    if (G.obT <= 0) { G.mode = 'hold'; G.hold = 'pause'; }
-  }
+  const g = primaryPin();
+  if (o.s === 0 && !o.h0 && g && sdiff(G.ang, pinCenter(g)) * G.dir >= -0.01 && angd(G.ang, pinCenter(g)) < 0.3) { o.h0 = 1; G.mode = 'hold'; G.hold = 'hit'; }
+  const tp = o.s === 3 && !o.tr && G.pins.find(p => p.kind === 'trap');
+  if (tp && sdiff(G.ang, tp.c0) * G.dir >= -0.01 && angd(G.ang, tp.c0) < 0.3) { o.tr = 1; o.ht = 1.6; G.mode = 'hold'; G.hold = 'trap'; }
 };
 const obHoldStep = raw => {
   if (G.hold !== 'trap') return;
@@ -6013,8 +6039,7 @@ const drawObFx = c => {
   c.fillStyle = P.btn;
   for (let i = 0; i < 2; i++) { const ox = view.cx + 11 - i * 23; c.beginPath(); c.moveTo(ox, iy - 14); c.lineTo(ox, iy + 14); c.lineTo(ox - 22, iy); c.closePath(); c.fill(); }
 };
-/* halkanın hedefi: { el } ya da { x, y, r, no } (ibre, tuzak) */
-let obWait = 0;
+/* elin hedefi: { el } ya da { x, y, r, no } (ibre, tuzak) */
 const obTarget = () => {
   const s = save.ob, m = G.mode;
   if (WARM.on) return null;
@@ -6023,11 +6048,12 @@ const obTarget = () => {
       const tp = G.hold === 'trap' && G.pins.find(p => p.kind === 'trap'), q = ptXY(view.cx, view.cy, tp ? tp.c0 : G.ang, ringR(0));
       return { x: q[0], y: q[1], r: 62, no: !!tp };
     }
-    return { el: G.hold === 'joker' ? toolsEl.querySelector('.tool[data-tool="kron"]') : $('pauseBtn') };
+    return G.hold === 'joker' ? { el: toolsEl.querySelector('.tool[data-tool="kron"]'), m: 10 } : { el: $('pauseBtn') };
   }
-  if (m === 'pause') return s === OB_PAUSE ? { el: $('resumeBtn') } : null;
+  if (m === 'pause') return G.ob ? { el: $('resumeBtn') } : null;
+  if (G.ob || performance.now() < obWait) return null;
   if (SS.open && !SS.closing) {
-    if (SS.busy || shopEl.classList.contains('opening') || performance.now() < obWait) return null;
+    if (SS.busy || shopEl.classList.contains('opening')) return null;
     const sheet = stSheet.classList.contains('on');
     if (s === OB_SHOP) {
       if (sheet) return { el: stSheet.querySelector('[data-a="unl"]') };
@@ -6040,19 +6066,29 @@ const obTarget = () => {
     }
     return null;
   }
-  if (m === 'menu' && !SS.closing && menuEl.classList.contains('on')) {
-    if (s === OB_SHOP) return { el: $('bagBtn') };
-    if (s >= OB_PLAY) return { el: $('playBtn') };
+  if (SS.closing) return null;
+  if (G.practice) return m === 'pracdone' ? { el: $('pdBack') } : null;
+  const book = bookEl.classList.contains('on');
+  if (s === OB_BOOK) return book ? { el: $('bookList').querySelector('[data-try="cift"]') } : { el: $('bookBtn'), m: 3 };
+  if (s === OB_BOOK2) {
+    if (book) return { el: $('bookClose') };
+    if (m === 'menu') { save.ob = OB_LEVEL; persist(); obWait = performance.now() + 400; }
+    return null;
   }
+  if (m !== 'menu' || !menuEl.classList.contains('on')) return null;
+  if (s === OB_SHOP) return { el: $('bagBtn'), m: 3 };
+  if (s === OB_PLAY || s === OB_GO) return { el: $('playBtn') };
+  if (s === OB_LEVEL) return { el: $('lvlSeg').querySelector('[data-lvl="cehennem"]'), m: 2 };
+  if (s === OB_LEVEL2) return { el: $('lvlSeg').querySelector('[data-lvl="normal"]'), m: 2 };
   return null;
 };
-/* zorunlu adımlarda halkanın gösterdiği yer dışındaki dokunuşlar oyuna ve mağazaya ulaşmaz */
+/* zorunlu adımlarda elin gösterdiği yer dışındaki dokunuşlar oyuna ve mağazaya ulaşmaz; oyun ve Dene sürerken serbest */
 const obLock = () => {
+  if (G.ob) return G.hold === 'joker' || G.hold === 'pause' || G.mode === 'pause';
   const s = save.ob;
   if (!s) return false;
   if (s === OB_ROUND) return G.mode === 'menu';
-  if (s === OB_SHOP || s === OB_PLAY) return true;
-  return G.mode === 'menu' || G.mode === 'pause' || G.hold === 'joker' || G.hold === 'pause';
+  return !(G.practice && G.mode === 'play');
 };
 const obFilter = e => {
   if (!obLock()) return;
@@ -6064,26 +6100,38 @@ window.addEventListener('pointerdown', obFilter, true);
 window.addEventListener('click', obFilter, true);
 const obShow = tg => {
   obT = tg;
-  let x = 0, y = 0, rx = 0, ry = 0;
+  let hx = 0, hy = 0, sx = 0, sy = 0, sw = 0, sh = 0, sr = 0;
   const a = app.getBoundingClientRect();
   if (tg && tg.el) {
+    if (tg.el !== obElLast) {
+      obElLast = tg.el; obRad = getComputedStyle(tg.el).borderTopLeftRadius;
+      if (tg.el.closest('#bookList')) tg.el.scrollIntoView({ block: 'center' });
+    }
     const r = tg.el.getBoundingClientRect();
     if (!r.width) tg = null;
-    else { x = r.left - a.left + r.width / 2; y = r.top - a.top + r.height / 2; rx = Math.max(46, r.width / 2 + 16); ry = Math.max(46, r.height / 2 + 16); }
-  } else if (tg) { x = tg.x; y = tg.y; rx = ry = tg.r; }
-  if (!tg) { if (obOn) { obOn = false; obEl.classList.remove('on', 'dim', 'no', 'el'); obX = ''; } return; }
+    else {
+      /* geniş düğmede parmak yazının üstüne binmesin: sağ tarafına basar */
+      const wide = r.width > 150 && r.height < 96, m = tg.m == null ? 6 : tg.m, cx = r.left - a.left, cy = r.top - a.top;
+      hx = cx + r.width * (wide ? 0.78 : 0.5); hy = r.height > 110 ? cy + r.height * 0.34 : cy + r.height / 2;   /* uzun kartta (raftaki joker) adın üstüne binmesin: camına basar */
+      /* spot düğmenin kendi şeklidir: köşe yarıçapı düğmeden gelir (mağaza ölçekli çizilir), pay ekranın dışına taşmaz */
+      const scale = tg.el.offsetWidth ? r.width / tg.el.offsetWidth : 1, rad = obRad.endsWith('%') ? parseFloat(obRad) / 100 * Math.min(r.width, r.height) : (parseFloat(obRad) || 0) * scale;
+      sx = Math.max(2, cx - m); sy = Math.max(2, cy - m); sw = Math.min(a.width - 2, cx + r.width + m) - sx; sh = Math.min(a.height - 2, cy + r.height + m) - sy;
+      sr = Math.min(Math.max(rad, 10) + m, sw / 2, sh / 2);
+    }
+  } else if (tg) { hx = tg.x; hy = tg.y; sx = tg.x - tg.r; sy = tg.y - tg.r; sw = sh = tg.r * 2; sr = tg.r; }
+  if (!tg) { if (obOn) { obOn = false; obEl.classList.remove('on', 'dim', 'no', 'flip'); obX = ''; } return; }
   if (!obOn) { obOn = true; obEl.classList.add('on'); void obEl.offsetWidth; obEl.classList.add('dim'); }
   obEl.classList.toggle('no', !!tg.no);
-  obEl.classList.toggle('el', !!tg.el);
-  const key = Math.round(x) + ',' + Math.round(y) + ',' + Math.round(rx) + ',' + Math.round(ry);
+  obEl.classList.toggle('flip', hx + 40 > a.width);
+  const key = [hx, hy, sx, sy, sw, sh, sr].map(Math.round).join();
   if (key === obX) return;
   obX = key;
-  const st = obEl.style;
-  st.setProperty('--x', Math.round(x) + 'px'); st.setProperty('--y', Math.round(y) + 'px'); st.setProperty('--rx', Math.round(rx) + 'px'); st.setProperty('--ry', Math.round(ry) + 'px');
+  const st = obEl.style, px = v => Math.round(v) + 'px';
+  st.setProperty('--hx', px(hx)); st.setProperty('--hy', px(hy)); st.setProperty('--sx', px(sx)); st.setProperty('--sy', px(sy)); st.setProperty('--sw', px(sw)); st.setProperty('--sh', px(sh)); st.setProperty('--sr', px(sr));
 };
 const obTick = () => {
-  if (!save.ob && !G.hold) { if (obOn || obT) obShow(null); return; }
-  if (save.ob === OB_ROUND && G.mode === 'menu' && !WARM.on && !document.hidden && (WARM.done || performance.now() > 6500)) { obRound(); return; }
+  if (!save.ob && !G.ob) { if (obOn || obT) obShow(null); return; }
+  if (save.ob === OB_ROUND && G.mode === 'menu' && !WARM.on && !document.hidden && (WARM.done || performance.now() > 6500)) { obRound(1); return; }
   obShow(obTarget());
 };
 
