@@ -3,6 +3,13 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V0.13.1 — Öğretimde son dokunuşlar (2026-11-04)
+
+- **Oyna'yı artık el göstermiyor.** Dokunmayı oyuncu ilk turda öğrendi; mağazadan çıkınca ana ekran serbest.
+- **Zorluk halkası ilk açılınca** el kısa süre ortadaki Geri düğmesini gösterir. Oyunu durdurmaz, dokunuş çalışır, bir daha çıkmaz.
+- Oyna ilk oyunda da zorluk halkasını açar. Joker, hangi zorluk seçilirse seçilsin ilk oyunda bir kez gösterilir.
+- Teknik: `obBackHint`, `save.tips.ringBack`; `OB_PLAY` ana ekrana dönünce `OB_JOKER` olur.
+
 ## V0.13.0 — Tek Oyna, kısa öğretim, daha az tanıtım (2026-11-04)
 
 - **Ana ekranda tek Oyna.** Süreli ve Bölümler ayrımı kalktı; Bölümler modu şimdilik yayınlanmıyor, sonra değerlendirilecek. Halkada Oyna, Mağaza ve Defter var. Oyna'ya dokununca zorluk halkası açılır; yarım oyun varsa dilim "Devam et" olur ve doğrudan sürer.

@@ -51,9 +51,16 @@ T('Oyna dilimi: halka zorluklara döner', await b.wait(`${M}.lvl===1`, 600));
 await b.sleep(120); await shot(b, 'm3-gecis');
 T('Cehennem katmanı kayıyor', await b.eval(`getComputedStyle(document.getElementById('mHell')).visibility==='visible'`));
 await b.wait(`${M}.hv===1`, 1500); await b.sleep(100); await shot(b, 'm4-zorluk');
+const hintOn = `document.getElementById('obFx').classList.contains('on')`;
+T('ilk açılış: el ortadaki Geri', await b.wait(hintOn, 500));
+await shot(b, 'm4b-geri');
+T('kısa süre sonra kendiliğinden kapanır', await b.wait(`!${hintOn}`, 4300));
 const c = await b.center();
 await b.touch(c[0], c[1]);
 T('orta: Geri', await b.wait(`${M}.lvl===0&&${M}.hv===0`, 1500));
+await b.tapSlice(0); await b.wait(`${M}.hv===1`, 1500); await b.sleep(150);
+T('ikinci açılışta el yok', !(await b.eval(hintOn)));
+await b.touch(c[0], c[1]); await b.wait(`${M}.hv===0`, 1500);
 T('Cehennem katmanı gizlendi', await b.eval(`getComputedStyle(document.getElementById('mHell')).visibility==='hidden'`));
 /* kaydırma */
 await b.touch(340, 760, 120);
