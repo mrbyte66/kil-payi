@@ -1331,7 +1331,7 @@ const STR = {
     tool_steto: 'Steteskop', tool_kron: 'Kronometre', tool_kalkan: 'Kalkan', tool_kum: 'Kum saati',
     d_steto: '{n} sn boyunca hedefler %40 geniş', d_kron: 'Süreye +{n} sn', d_kalkan: 'Sonraki {n} hata cezasız, seri bozulmaz', d_kum: 'İbre {n} sn %35 yavaşlar',
     toolEmpty: 'Stokta yok. Mağazadan alabilirsin.', gotCoins: '+{n} coin',
-    shop: 'Mağaza', setT: 'Ayarlar', setSnd: 'Ses efektleri', setMus: 'Müzik', setVib: 'Titreşim', setAnim: 'Animasyonlar', setAnimSub: 'Geçişler, konfeti ve ekran hareketleri', setAnimSys: 'Telefonunda kapalı; burada açık kalır', setAutoLock: 'Yetenekler dükkânında açılır', setLang: 'Dil', setLangSub: 'Telefonun diline göre: {l}', setLangPick: 'Seçtiğin dil', setLangSys: 'Sistem',
+    shop: 'Mağaza', setPriv: 'Reklam gizlilik seçenekleri', setT: 'Ayarlar', setSnd: 'Ses efektleri', setMus: 'Müzik', setVib: 'Titreşim', setAnim: 'Animasyonlar', setAnimSub: 'Geçişler, konfeti ve ekran hareketleri', setAnimSys: 'Telefonunda kapalı; burada açık kalır', setAutoLock: 'Yetenekler dükkânında açılır', setLang: 'Dil', setLangSub: 'Telefonun diline göre: {l}', setLangPick: 'Seçtiğin dil', setLangSys: 'Sistem',
     st_title: 'Mağaza', st_sub: 'Dükkânları gez', st_back: 'Geri',
     st_n_alet: 'Alet çantası', st_n_yet: 'Yetenekler', st_n_gor: 'Görünüm', st_n_hed: 'Hediye',
     st_s_alet: 'Alet', st_s_yet: 'Yetenek', st_s_gor: 'Görünüm', st_s_hed: 'Hediye',
@@ -1441,7 +1441,7 @@ const STR = {
     tool_steto: 'Stethoscope', tool_kron: 'Stopwatch', tool_kalkan: 'Shield', tool_kum: 'Hourglass',
     d_steto: 'Targets 40% wider for {n} s', d_kron: '+{n} s on the clock', d_kalkan: 'Next {n} mistakes are free, streak stays', d_kum: 'Pointer 35% slower for {n} s',
     toolEmpty: 'Out of stock. Get more in the shop.', gotCoins: '+{n} coins',
-    shop: 'Shop', setT: 'Settings', setSnd: 'Sound effects', setMus: 'Music', setVib: 'Vibration', setAnim: 'Animations', setAnimSub: 'Transitions, confetti and screen motion', setAnimSys: 'Off on your phone; stays on here', setAutoLock: 'Unlock it in the Skills shop', setLang: 'Language', setLangSub: 'Follows your phone: {l}', setLangPick: 'Your choice', setLangSys: 'System',
+    shop: 'Shop', setPriv: 'Ad privacy options', setT: 'Settings', setSnd: 'Sound effects', setMus: 'Music', setVib: 'Vibration', setAnim: 'Animations', setAnimSub: 'Transitions, confetti and screen motion', setAnimSys: 'Off on your phone; stays on here', setAutoLock: 'Unlock it in the Skills shop', setLang: 'Language', setLangSub: 'Follows your phone: {l}', setLangPick: 'Your choice', setLangSys: 'System',
     st_title: 'Shop', st_sub: 'Take a stroll', st_back: 'Back',
     st_n_alet: 'Toolbag', st_n_yet: 'Skills', st_n_gor: 'Looks', st_n_hed: 'Gift',
     st_s_alet: 'Tools', st_s_yet: 'Skills', st_s_gor: 'Looks', st_s_hed: 'Gift',
@@ -1600,7 +1600,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V0.13.1';
+const VERSION = 'V0.14.0';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -2041,9 +2041,10 @@ document.addEventListener('visibilitychange', () => Music.sync());
 /* ---------- platform köprüsü: web'de demo, Android'de gerçek reklam/titreşim ---------- */
 const CAP = window.Capacitor;
 const NATIVE = !!(CAP && CAP.isNativePlatform && CAP.isNativePlatform());
-const ADS = { test: true, rewardedId: 'ca-app-pub-3940256099942544/5224354917' };
 /* Sahte reklam (3 sn ilerleme çubuğu, sonra ödül) yalnızca tarayıcıda ve testlerde içindir: build.sh yayın derlemesinde bu bayrağı false yapar (V0.10.3, güvenlik raporu "reklam gösterilmeden ödül") */
 const DEMO_ADS = /*DEMOADS*/true;
+/* yayın derlemesi gerçek reklam birimini kullanır (V0.14.0); DEBUG derlemeleri ve testler Google'ın test birimini: geliştirirken gerçek reklam isteği gitmez */
+const ADS = { test: DEMO_ADS, rewardedId: DEMO_ADS ? 'ca-app-pub-3940256099942544/5224354917' : 'ca-app-pub-2220587987381043/1974951209' };
 const plugins = {};
 const plugin = name => {
   if (!NATIVE) return null;
@@ -2053,7 +2054,29 @@ const plugin = name => {
   return plugins[name];
 };
 let adMobReady = null, activeReward = null, runEpoch = 0;
-const adMobInit = A => adMobReady || (adMobReady = A.initialize({ initializeForTesting: ADS.test }).then(() => true, () => { adMobReady = null; return false; }));
+/* AB/BK izni (UMP, V0.14.0): reklamdan önce sorulur; pencereyi Google gösterir, yalnızca gereken ülkede çıkar. Geri çekme yolu Ayarlar'dadır (adPrivacy). Sorgu başarısızsa (çevrimdışı) oyun sürer, sonra yeniden denenir.
+   adGate: pencere gelecekse öğretim onun altında başlamasın */
+let adConsentP = null, adPrivacy = false, adGate = NATIVE, adForm = false;
+const adConsent = A => adConsentP || (adConsentP = (async () => {
+  let ok = true;
+  try {
+    let i = await A.requestConsentInfo();
+    if (i.isConsentFormAvailable && i.status === 'REQUIRED') { adForm = true; i = await A.showConsentForm(); }
+    adPrivacy = i.privacyOptionsRequirementStatus === 'REQUIRED';
+    ok = i.canRequestAds !== false;
+    if (!ok) adConsentP = null;
+  } catch (e) { adConsentP = null; }
+  adGate = false; adForm = false;
+  return ok;
+})());
+const adMobInit = A => adMobReady || (adMobReady = adConsent(A).then(ok => {
+  if (!ok) { adMobReady = null; return false; }
+  return A.initialize({ initializeForTesting: ADS.test }).then(() => true, () => { adMobReady = null; return false; });
+}));
+if (NATIVE) {
+  const A = plugin('AdMob');
+  if (A) { setTimeout(() => adConsent(A), 600); setTimeout(() => { if (!adForm) adGate = false; }, 6000); } else adGate = false;
+}
 
 const Platform = {
   native: NATIVE,
@@ -4248,6 +4271,7 @@ const renderSettings = () => {
   const opts = [['', t('setLangSys')], ['tr', 'Türkçe'], ['en', 'English']];
   h += '<div class="srow lang">' + setIcon('globe') + '<b>' + t('setLang') + '<small>' + (save.lang ? t('setLangPick') : t('setLangSub', { l: SYS_LANG === 'tr' ? 'Türkçe' : 'English' })) + '</small></b><div class="lseg" role="radiogroup" aria-label="' + t('setLang') + '">' +
     opts.map(o => '<button type="button" role="radio" aria-checked="' + (save.lang === o[0] ? 'true' : 'false') + '" data-lang="' + o[0] + '">' + o[1] + '</button>').join('') + '</div></div>';
+  if (adPrivacy) h += '<button type="button" class="srow" data-set="privacy">' + setIcon('globe') + '<b>' + t('setPriv') + '</b></button>';
   $('setRows').innerHTML = h;
   $('setVer').textContent = t('title') + ' · ' + VERSION;
 };
@@ -4265,6 +4289,7 @@ $('setRows').addEventListener('click', e => {
   else if (k === 'vib') { save.vib = !save.vib; persist(); renderSettings(); Snd.ui(); Platform.haptic('medium'); }
   else if (k === 'anim') { save.anim = !save.anim; applyMotion(); persist(); renderSettings(); Snd.ui(); }
   else if (k === 'auto') { save.autoJ = !save.autoJ; persist(); renderSettings(); Snd.ui(); }
+  else if (k === 'privacy') { const A = plugin('AdMob'); if (A) A.showPrivacyOptionsForm().catch(() => {}); }
   else if (k === 'autoLock') { hide(settingsEl); if (G.mode === 'menu') openShop('menu', { shop: 'yet' }); }
 });
 $('setClose').addEventListener('click', closeSettings);
@@ -6165,7 +6190,6 @@ const drawOverRing = (c, cx, cy, R) => {
    1 OB_ROUND ilk tur: vuruş (ibre hedefte durur), yardım azalır, tuzak (ibre tuzakta durur, yasak işareti), süre biter ve çember yanar;
    2 OB_SHOP: 500 altın, çanta, Alet çantası, kronometre (300 altın); 3 OB_PLAY: mağazadan çıkış (V0.13.1: dokunmayı ilk tur öğretti, Oyna'yı el göstermez, ana ekran serbest);
    9 OB_JOKER: ilk gerçek oyunda süre azalınca oyun bir kez durur, el kronometreyi gösterir. Sonra save.ob = 0, bir daha gelmez.
-   Zorluk halkası ilk açılınca el kısa süre ortadaki Geri'yi gösterir (obBackHint, save.tips.ringBack): oyunu durdurmaz, dokunuşu yutmaz.
    Kalıcı olan yalnız obM: ilk ıska ve ilk tuzakta oyun yavaşlar, yeri işaretler, geri sarar ve ceza silinir (obTeach). Yeni kilitlerin ilk görüşü zaten Hayalet gösterinin işidir. */
 const OB_GIFT = 500, OB_T0 = 5, OB_FLOOR = 1.6, OB_OM = [0.7, 0.75, 0.9, 0.9], OB_RATE1 = [0, 0, 0.35, 0.35, 3.2], OB_JOKER_T = 3.5, OB_JOKER_AT = 7;
 const obEl = $('obFx');
@@ -6356,7 +6380,6 @@ const obShow = tg => {
       sx = Math.max(2, cx - m); sy = Math.max(2, cy - m); sw = Math.min(a.width - 2, cx + r.width + m) - sx; sh = Math.min(a.height - 2, cy + r.height + m) - sy;
       sr = Math.min(Math.max(rad, 10) + m, sw / 2, sh / 2);
       /* menü dilimi: spot dilimin ortasında yuvarlak, parmak yazıyı kapatmasın diye kenarına basar */
-      if (tg.el === $('mBack')) { const d = view.r * (1 - MENU_LW / 2) * 2 - 8; sx = view.cx - d / 2; sy = view.cy - d / 2; sw = sh = d; sr = d / 2; hx = view.cx + d * 0.16; hy = view.cy + d * 0.27; }
       if (tg.el.classList.contains('mlab')) { const d = r.height * 1.5, mx = cx + r.width / 2, my = cy + r.height / 2; sx = mx - d / 2; sy = my - d / 2; sw = sh = d; sr = d / 2; hx = mx + d * 0.3; hy = my + d * 0.34; }
     }
   } else if (tg) { hx = tg.x; hy = tg.y; sx = tg.x - tg.r; sy = tg.y - tg.r; sw = sh = tg.r * 2; sr = tg.r; }
@@ -6370,21 +6393,9 @@ const obShow = tg => {
   const st = obEl.style, px = v => Math.round(v) + 'px';
   st.setProperty('--hx', px(hx)); st.setProperty('--hy', px(hy)); st.setProperty('--sx', px(sx)); st.setProperty('--sy', px(sy)); st.setProperty('--sw', px(sw)); st.setProperty('--sh', px(sh)); st.setProperty('--sr', px(sr));
 };
-/* zorluk halkası ilk açılınca: ortadaki düğme Geri'dir. Bir kez, kısa süre; ilk dokunuş kapatır ve dokunuş işini görür */
-const OB_BACK_MS = 3500;
-let obBackT = 0;
-const obBackHint = () => {
-  const ok = G.mode === 'menu' && MN.lvl === 1 && menuEl.classList.contains('on') && !SS.open && !WARM.on && !settingsEl.classList.contains('on');
-  if (!obBackT && !save.tips.ringBack && ok && MN.hv === 1 && !MN.drag) { save.tips.ringBack = 1; persist(); obBackT = performance.now() + OB_BACK_MS; }
-  if (obBackT && (!ok || performance.now() > obBackT)) obBackT = 0;
-  return obBackT ? { el: $('mBack') } : null;
-};
-window.addEventListener('pointerdown', () => { obBackT = 0; }, true);
 const obTick = () => {
-  const bk = obBackHint();
-  if (bk) { obShow(bk); return; }
   if (!save.ob && !G.ob) { if (obOn || obT) obShow(null); return; }
-  if (save.ob === OB_ROUND && G.mode === 'menu' && !WARM.on && !document.hidden && (WARM.done || performance.now() > 6500)) { obRound(); return; }
+  if (save.ob === OB_ROUND && G.mode === 'menu' && !WARM.on && !adGate && !document.hidden && (WARM.done || performance.now() > 6500)) { obRound(); return; }
   obShow(obTarget());
 };
 

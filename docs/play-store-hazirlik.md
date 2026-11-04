@@ -56,3 +56,8 @@ Uygulama: ad "Close Call", varsayılan dil English (United States), Oyun, Ücret
 - Kapalı test (Test et ve yayınla > Kapalı test) etkin; testçiler Google Grubu üzerinden. V0.10.0 AAB'si (`dist/kil-payi-v0.10.0.aab`, versionCode 27) yeni sürüm olarak yüklenir (Sürüm oluştur > aynı kanal; 14 günlük sayaç sıfırlanmaz). Sürüm notu örneği: "Ana ekran donması düzeltildi; ilk açılışta kısa bir hazırlık ekranı var; güvenlik iyileştirmeleri."
 - Play'in "kod karartma" önerisi R8 ile karşılandı; AAB içindeki eşleme dosyasını (proguard.map) Play Console kendisi alır, ayrıca yüklemek gerekmez.
 - Kapalı testçiler V0.9.14'ten V0.10.0'a Play üzerinden güncellenir; ilk açılışta bir kez "Oyun cihazına hazırlanıyor" ekranı görürler.
+
+## AdMob durumu (V0.14.0, 2026-11-04)
+
+- Hesap onaylı, uygulama "Kıl payı" (`ca-app-pub-2220587987381043~9494348573`), ödüllü birim (`ca-app-pub-2220587987381043/1974951209`), Avrupa izin mesajı yayında. Emülatörde izin penceresi, geri çekme ve ödüllü reklam ("Test Ad" etiketiyle) denendi.
+- Kalan: oyun Play'de yayınlanınca AdMob'da uygulamayı mağazaya bağla (inceleme birkaç gün), `app-ads.txt` (geliştirici alan adı gerekir), Play Console Veri güvenliği formu ve gizlilik sayfasının yayındaki kopyası (`docs/gizlilik/index.html` güncel, herkese açık `mrbyte66/kilpayi-gizlilik` deposuna gönderilmedi).
