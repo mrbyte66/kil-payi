@@ -1,4 +1,4 @@
-/* Öğretim (V0.11.0) uçtan uca denemesi: yeni kurulum, GERÇEK dokunuşla (CDP touch) ilk tur, mağaza, joker, duraklat. DEBUG=2 ile derler (duraklatma açık), sonunda DEBUG=1'e döner.
+/* Öğretim (V0.11.0) uçtan uca denemesi: yeni kurulum, GERÇEK dokunuşla (CDP touch) ilk tur, mağaza, ilk gerçek oyunda joker. DEBUG=2 ile derler (duraklatma açık), sonunda DEBUG=1'e döner.
    Kullanım: node tools/ob-test.mjs [ekran görüntüsü klasörü] */
 import { execSync } from 'node:child_process';
 import { launch } from './cdp.mjs';
@@ -100,88 +100,50 @@ await b.sleep(200); await shot('12-acildi');
 await tapEl(`document.querySelector('#stShop [data-a="back"]')`);
 T('el mağazadan çıkış', await wait(tgIs('[data-a="close"]'), 4000));
 await tapEl(`document.querySelector('#stHub [data-a="close"]')`);
-T('el Bölümler', await wait(tgIs('#playBtn'), 4000));
+T('el Oyna', await wait(tgIs('#playBtn'), 4000));
 await b.sleep(900); await shot('13-oyna');
 await tapEl(`document.getElementById('bagBtn')`);
 await b.sleep(350);
-T('Bölümler dışı kilitli', await b.eval(`!${K}.SS.open&&${G}.mode==='menu'`));
+T('Oyna dışı kilitli', await b.eval(`!${K}.SS.open&&${G}.mode==='menu'`));
+const runs0 = await b.eval(`${S}.runs`);
 await tapEl(`document.getElementById('playBtn')`);
 await b.sleep(350);
-/* --- ikinci tur: duraklat, joker, süre biter --- */
-T('ikinci tur başlar (kayıt yok)', await wait(`${G}.ob&&${G}.ob.r===2&&${S}.run===null`, 2000));
-const runs0 = await b.eval(`${S}.runs`);
-T('oyun durur, el duraklatta', await wait(`${G}.mode==='hold'&&${G}.hold==='pause'`, 4000));
-await b.sleep(300); await shot('14-duraklat');
-await touch(195, 500);
-T('başka dokunuş sayılmaz', await b.eval(`${G}.mode==='hold'`));
-await tapEl(`document.getElementById('pauseBtn')`);
-T('duraklatıldı', await b.eval(`${G}.mode==='pause'`));
-T('el Devam', await wait(tgIs('#resumeBtn'), 1000));
-await b.sleep(500); await shot('15-devam');
-T('spot düğmenin şeklinde (hap, 6 px pay)', await b.eval(`(()=>{const r=document.getElementById('resumeBtn').getBoundingClientRect(),d=document.querySelector('#obFx .d').getBoundingClientRect(),c=getComputedStyle(document.querySelector('#obFx .d'));return Math.abs(d.width-r.width-12)<2&&Math.abs(d.height-r.height-12)<2&&Math.abs(d.left-r.left+6)<2&&parseFloat(c.borderTopLeftRadius)>=d.height/2-1})()`));
-await tapEl(`document.getElementById('pauseMenuBtn')`);
-T('Menü kilitli', await b.eval(`${G}.mode==='pause'`));
-await tapEl(`document.getElementById('resumeBtn')`);
-T('Devam: 3-2-1', await b.eval(`${G}.mode==='count'&&${G}.ob.s===1`));
-T('oyun durur, el kronometrede', await wait(`${G}.mode==='hold'&&${G}.hold==='joker'`, 9000));
-await b.sleep(300); await shot('16-joker');
+/* --- ilk gerçek oyun: joker bir kez gösterilir --- */
+T('Oyna: zorluk sormadan gerçek oyun başlar', await b.eval(`${G}.mode==='play'&&!${G}.ob&&${S}.ob===9&&${S}.lvl==='normal'&&${K}.MN.lvl===0`));
+T('gerçek oyun sayılır', await b.eval(`${S}.runs>=${runs0}&&!!${G}.pins.length`));
+T('oyun durur, el kronometrede', await wait(`${G}.mode==='hold'&&${G}.hold==='joker'`, 15000));
+await b.sleep(300); await shot('14-joker');
+T('spot düğmenin şeklinde (10 px pay)', await b.eval(`(()=>{const r=document.querySelector('.tool[data-tool="kron"]').getBoundingClientRect(),d=document.querySelector('#obFx .d').getBoundingClientRect();return Math.abs(d.width-r.width-20)<3&&Math.abs(d.height-r.height-20)<3})()`));
 await touch(195, 500);
 T('başka dokunuş sayılmaz', await b.eval(`${G}.mode==='hold'&&${S}.tools.kron.n===1`));
+await tapEl(`document.getElementById('pauseBtn')`);
+T('duraklat kilitli', await b.eval(`${G}.mode==='hold'`));
 const t3 = await b.eval(`${G}.time`);
 await tapEl(`document.querySelector('.tool[data-tool="kron"]')`);
-T('joker: süre +4, stok 0, sıradaki bölüm', await b.eval(`${G}.mode==='play'&&${S}.tools.kron.n===0&&${S}.ob===4&&${G}.time>${t3}+3.5`), await b.eval(`${G}.time`));
-await b.sleep(150); await shot('17-joker-damla');
-T('süre biter, çember yanar', await wait(`${G}.mode==='dead'`, 6000));
-T('sonuç ekranı yok, ana ekran', await wait(`${G}.mode==='menu'&&${S}.ob===4`, 6000) && await b.eval(`!document.getElementById('over').classList.contains('on')`));
-T('kayıt, coin ve oyun sayısı değişmedi', await b.eval(`${S}.runs===${runs0}&&${S}.coins===200&&${S}.run===null`));
-/* --- kilit defteri --- */
-T('el kilit defterinde', await wait(tgIs('#bookBtn'), 3000));
-await b.sleep(900); await shot('18-defter');
-await tapEl(`document.getElementById('playBtn')`);
-await b.sleep(350);
-T('Bölümler kilitli', await b.eval(`${G}.mode==='menu'`));
-await tapEl(`document.getElementById('bookBtn')`);
-await b.sleep(350);
-T('defter açıldı, el Çift pim Dene', await wait(tgIs('[data-try="cift"]'), 2000));
-await b.sleep(500); await shot('19-defter-dene');
-await tapEl(`document.querySelector('#bookList [data-try="cift"]')`);
-T('Dene başladı (serbest)', await b.eval(`!!${G}.practice&&${S}.ob===5`));
-await b.sleep(400); await shot('20-dene');
-for (let i = 0; i < 40 && (await b.eval(`${G}.mode==='play'`)); i++) { await wait(`${K}.obInTarget&&${G}.mode==='play'&&!!${K}.primaryPin()&&${K}.obInTarget()||${G}.mode!=='play'`, 6000); if (await b.eval(`${G}.mode==='play'`)) await touch(195, 700); }
-T('Dene bitti, el Deftere dön', await wait(tgIs('#pdBack'), 2000));
-await b.sleep(400); await shot('21-dene-bitti');
-await tapEl(`document.getElementById('pdAgain')`);
-T('Tekrar dene kilitli', await b.eval(`${G}.mode==='pracdone'`));
-await tapEl(`document.getElementById('pdBack')`);
-T('el Kapat', await wait(tgIs('#bookClose'), 2000));
-await tapEl(`document.getElementById('bookClose')`);
-/* --- seviye seçimi: Süreli halkası, Geri --- */
-T('el Süreli', await wait(tgIs('#sureBtn'), 3000));
-await b.sleep(900); await shot('22-seviye');
-await tapEl(`document.getElementById('bagBtn')`);
-T('başka dilim kilitli', await b.eval(`!${K}.SS.open&&${K}.MN.lvl===0`));
-await tapEl(`document.getElementById('sureBtn')`);
-T('Süreli açıldı', await wait(`${K}.MN.lvl===1&&${S}.ob===7`, 1000));
-await b.sleep(900); await shot('23-cehennem');
-T('el Geri', await wait(tgIs('#mBack'), 3000));
-await tapEl(`document.querySelector('#mSet2 [data-m="cehennem"]')`);
-T('zorluk kilitli', await b.eval(`${G}.mode==='menu'&&${S}.lvl==='normal'`));
-await tapEl(`document.getElementById('mBack')`);
-T('Geri: halka döndü', await b.eval(`${K}.MN.lvl===0&&${S}.ob===8`));
-T('el son kez Bölümler', await wait(tgIs('#playBtn'), 3000));
-await b.sleep(600); await shot('24-oyna');
-/* yarıda kapanma: son adımda da kaldığı yerden */
-await b.goto(page + '?ob=5'); await b.sleep(500);
-T('yeniden açılış: son adım sürer', await wait(tgIs('#playBtn'), 3000) && await b.eval(`${S}.ob===8&&${S}.coins===200`));
-await tapEl(`document.getElementById('playBtn')`);
-await b.sleep(350);
-T('öğretim bitti, gerçek oyun', await b.eval(`${S}.ob===0&&${G}.mode==='play'&&!${G}.ob`));
-await b.sleep(200); await shot('25-bitti');
+T('joker: süre arttı, stok 0, öğretim bitti, oyun sürer', await b.eval(`${G}.mode==='play'&&${S}.tools.kron.n===0&&${S}.ob===0&&${G}.time>${t3}`), await b.eval(`${G}.time`));
+await b.sleep(200); await shot('15-joker-sonrasi');
 T('el kapandı', await wait(`!document.getElementById('obFx').classList.contains('on')`, 1000));
+T('duraklat artık serbest', await (async () => { await tapEl(`document.getElementById('pauseBtn')`); return b.eval(`${G}.mode==='pause'`); })());
 await b.goto(page + '?ob=3'); await b.sleep(500);
 T('yeniden açılış: öğretim dönmez', await b.eval(`${S}.ob===0&&${G}.mode==='menu'&&!document.getElementById('obFx').classList.contains('on')`));
 await tapEl(`document.getElementById('bagBtn')`);
 T('bitince mağaza serbest', await wait(`${K}.SS.open`, 1500));
+await b.eval(`${K}.closeShop()`); await b.sleep(700);
+/* joker sırası: kendisi basarsa da biter; ölürse sonraki oyuna kalır, menü kilitlenmez */
+await b.eval(`${S}.run=null;${S}.ob=9;${S}.tools.kron.n=1;${K}.start()`);
+await b.eval(`${K}.useTool('kron')`);
+T('elle joker: öğretim biter, durma olmaz', await b.eval(`${S}.ob===0&&${G}.mode==='play'`));
+await b.eval(`${S}.ob=9;${S}.tools.kron.n=1;${K}.die()`);
+await wait(`${G}.mode==='over'`, 6000);
+T('ölünce joker sırası kalır, kilit yok', await b.eval(`${S}.ob===9`) && !(await b.eval(`document.getElementById('obFx').classList.contains('on')`)));
+await b.eval(`${S}.ob=0;${S}.run=null;${K}.goMenu()`); await b.sleep(300);
+/* ilk görüş: ikililerde yalnız cezalı olan */
+const q = k => b.eval(`(()=>{${G}.introQ.length=0;${S}.intro={};${S}.seen={};${K}.queueIntro('${k}');const r=${G}.introQ.join();${G}.introQ.length=0;return r})()`);
+T('kayan: kendi değil, tuzaklı olanı', (await q('kayan')) === 'kayanT');
+T('tutbirak: sıcak yayı (basılı tutmayı da gösterir)', (await q('tutbirak')) === 'sicak');
+T('ikiz gelince de kendi sahnesi', (await q('kayanT')) === 'kayanT');
+T('ikizsiz kilit kendi sahnesi', (await q('isin')) === 'isin' && (await q('bomba')) === 'bomba' && (await q('trafik')) === 'trafik');
+T('ikiz gösterildiyse ne kilitte ne ikizde tekrar', await b.eval(`(()=>{${G}.introQ.length=0;${S}.intro={kayanT:1};${S}.seen={};${K}.queueIntro('kayan');${K}.queueIntro('kayanT');const r=${G}.introQ.length;return r===0})()`));
 T('konsol temiz', !b.logs.length, b.logs.join(' | '));
 /* eski oyuncu (V0.10.4 kaydı: ob alanı yok): öğretim görmez, kronometresi ve parası durur */
 const old = await b.eval(`(()=>{const o=JSON.parse(JSON.stringify(${S}));delete o.ob;delete o.obM;o.coins=777;o.own={kron:1};o.tools.kron.n=2;o.equip=['kron','','',''];o.run=null;const body=JSON.stringify(o);return body.slice(0,-1)+',"sig":"'+${K}.sigOf(body)+'"}'})()`);

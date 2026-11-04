@@ -29,8 +29,8 @@ android {
         applicationId "com.mrbytestudio.kilpayi"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 35
-        versionName "0.12.1"
+        versionCode 36
+        versionName "0.13.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField 'String', 'ASSET_SHA256', "\"${kpAssetSha()}\""
         buildConfigField 'String', 'KP_A', "\"${kpKeyProps.getProperty('a', '')}\""

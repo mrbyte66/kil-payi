@@ -215,13 +215,13 @@ T('müzik kırpmıyor (tepe < -6 dB) ve duyulur (RMS > -42 dB)',pk<0.5&&rms>0.00
 ` + TAIL;
 
 const LANG = HEAD + `
-T('telefon dili Türkçe: açılış Türkçe',K.getLang()==='tr'&&$('playT').textContent==='Bölümler'&&S.lang==='',[K.getLang(),S.lang]);
+T('telefon dili Türkçe: açılış Türkçe',K.getLang()==='tr'&&$('playT').textContent==='Oyna'&&S.lang==='',[K.getLang(),S.lang]);
 K.openSettings();
 T('dil satırı: Sistem, Türkçe, English',document.querySelectorAll('#setRows [data-lang]').length===3);
 click('#setRows [data-lang="en"]');
-T('English seçilince hemen İngilizce',K.getLang()==='en'&&S.lang==='en'&&$('playT').textContent==='Levels'&&document.documentElement.lang==='en'&&document.title==='Close call',[K.getLang(),$('playT').textContent]);
+T('English seçilince hemen İngilizce',K.getLang()==='en'&&S.lang==='en'&&$('playT').textContent==='Play'&&document.documentElement.lang==='en'&&document.title==='Close call',[K.getLang(),$('playT').textContent]);
 T('ayarlar da İngilizce',/Music/.test($('setRows').innerText)&&/Language/.test($('setRows').innerText));
-click('#setRows [data-lang=""]');T('Sistem: telefonun diline döner',K.getLang()==='tr'&&S.lang===''&&$('playT').textContent==='Bölümler');
+click('#setRows [data-lang=""]');T('Sistem: telefonun diline döner',K.getLang()==='tr'&&S.lang===''&&$('playT').textContent==='Oyna');
 click('#setRows [data-lang="en"]');K.closeSettings();K.openShop('menu');await sleep(700);
 T('mağaza İngilizce',/Shop/.test(document.querySelector('#stHub .tt').innerText));K.closeShop();await sleep(600);
 ` + TAIL;
