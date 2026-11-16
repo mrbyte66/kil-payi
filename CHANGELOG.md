@@ -3,6 +3,54 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V1.0.16 — Genişlik ve hız sınırı (2026-11-16, deneme)
+
+- **Şeftali hiçbir bölümde 50°'yi geçmez, ibre hiçbir zaman 105 °/sn'nin altına inmez.** Diğer ayarlar aynı.
+- Yedekteki beş kilit (Tut-bırak, Trafik, Sabır, Ritim, Yön) oyunun hiçbir hesabında yok; laboratuvarda "Yedekte" sayfasında saklanıyor.
+
+## V1.0.15 — 55 bölüm, Kasa'da yön değiştirme (2026-11-16, deneme)
+
+- **Daha az, daha sağlam bölüm:** Tut-bırak, Trafik, Sabır, Ritim ve Yön kilitleri V2 ile güncellenerek gelecek; şimdilik oyunda yoklar ve başka bölümlerin karışımlarında da çıkmazlar. 11 kilit, 55 bölüm; numaralar boşluksuz.
+- **Ani'nin adı Şipşak oldu.**
+- **Kasa'da ibre yön değiştirir:** Orta'dan itibaren ibre birkaç saniyede bir, kısa bir uyarıdan sonra ters döner (eski Yön kilidinin özelliği).
+- **Şeftali de her vuruşta daralır:** hız gibi genişlik de bölüm boyunca düzgün değişir (başta geniş, sonda dar); hız artışı biraz yumuşatıldı, toplam zorluk aynı kaldı.
+- 55 bölümün hepsi yeniden ayarlandı.
+
+## V1.0.14 — İbre düzgün hızlanıyor (2026-11-16, deneme)
+
+- **Ani hızlanma kalktı:** Bölümler'de ibre artık kısım sınırlarında birden hızlanmıyor; vurduğun her pimle biraz hızlanır. Başta yavaş, orta ve son kısımların başında belirlenen hızlardan geçerek bölüm sonunda en hızlıya ulaşır.
+- Bütün bölümlerin şeftali genişliği bu yeni hızla yeniden ayarlandı.
+- Laboratuvar: "Bölüm içinde hız" dört noktalı oldu; Bölüm kurgusundaki "Kısım içinde hızlanma" ve "Ani hız" ayarları kalktı.
+- **Numaralı pimler:** 1, 2, 3 halkaya rastgele sırayla dizilir; önceki vurulmadan sonraki kilitli kalır (vurulamaz).
+- **Kayan kilit:** inciler kayan hedefle birlikte kayar; iki hedef birbirinin üstünden geçmez (engel geçebilir).
+- **Trafik:** sarı çok kısa yanar ve sarıdayken vuruş hata sayılır.
+- **Sabır:** altını vurunca dalga bitmez, kalan hedefler de vurulur; yan hedef engelin üstüne çıkmaz.
+- **Gelgit:** bandın üstünde hedef, engel ya da girdap olmaz; hedef çoğu zaman bandın hemen ardında gelir.
+- **Değirmen:** kanatlar gelgit bandında ve girdaptan geçerken ibre gibi hızlanır.
+- **Can kalp oldu:** üç kalp; can gidince kalp ikiye kırılır.
+- Laboratuvar: parça gücü "Zorluk: Kolay / Orta / Usta / Usta++ / Cehennem" diye yazılır.
+
+## V1.0.13 — Bölümler yeniden ayarlandı (2026-11-16, deneme)
+
+- **İbre daha hızlı:** Bölümler'de ortalama hız yaklaşık %45 arttı (sıkıcı yavaşlık kalktı). Bölüm başında hız düşük, sonuna doğru yükselir; can genelde sona yakın biter, "bir daha" dedirtir.
+- **Her 3 dalgada +1 can** (önceden 5). Kolay bölümler 40 saniye.
+- **Zorluk düzgün artıyor:** 80 bölümün her birinin şeftali genişliği ayrı ayrı ayarlandı; ilk denemede canı biten oyuncu Kolay'dan Cehennem'e eşit adımlarla artar, reklamın en çok izlendiği bölüm Cehennem'dir.
+- **Kolay biraz zorlaştı** (iyi oyuncular sıkılıyordu).
+- **Kilit ayarları:** Ritim notaları 2/3/4/5/5, Trafik ışığı 1,4 sn'den 0,8 sn'ye düzgün kısalır, Ani'nin uyarı süresi 0,8 sn'den 0,5 sn'ye iner.
+- **Üst üste binme düzeltildi:** girdabın ve ışınlanma kapısının üstüne pim ya da tuzak düşmez.
+- **Gizli yardım** artık deneme başına sayılır (1 kayıpta biraz, 3 kayıpta daha çok genişler) ve ikinci şanstan sonra aynı denemede değişmez.
+- Düzeltme: en geniş şeftaliye dayanan bölümlerde ibre hızı ters ayarlanıyordu (Kasa 1).
+
+## V1.0.12 — Tek inci demeti (2026-11-13, deneme)
+
+- **İnciler artık uçuşmuyor:** vurulan şeftalinin yerinde küçük bir ışık olarak bekler; dalganın son hedefi vurulunca hepsi birlikte hızlıca kaba iner (her dalgada tek demet, tek sıçrama). Kap da dalga dalga yükselir.
+
+## V1.0.11 — Beş yeni kilit ve üst üste binme düzeltmesi (2026-11-12, deneme)
+
+- **Bölümler'e beş kilit eklendi:** Değirmen (dönen kollar, uçları tuzak), Yön değiştir (her vuruşta ibre ters döner), Ani (hedef ibre yaklaşınca çakar), Nabız (ibre kalp gibi atar), İki halka (tek ibre köprüden iç halkaya geçer). Artık 16 kilidin hepsi oynanıyor.
+- **Gizli tuzak kalmadı:** tuzak bir hedefin altına düşmüyor, Bölümler'de tuzaklar hedeflerin üstünde çizilir.
+- Ayar Laboratuvarı'na Bölüm kurgusu, canlı ayar ve analiz eklendi (yalnız geliştirme derlemesinde).
+
 ## V1.0.0 — İlk üretim sürümü (2026-11-04)
 
 - Play Store üretimine çıkacak ilk sürüm. Oyun V0.14.0 ile aynı; yalnızca sürüm adı değişti.

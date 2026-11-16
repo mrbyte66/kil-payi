@@ -35,6 +35,7 @@
     let t = 0, taps = 0, miss = 0, curChal = null, prevPh = G.ph, prevL = G.L;
     sigmaT = sigmaT * Math.exp(gauss(opt.jitter == null ? 0.25 : opt.jitter));
     const lapse = opt.lapse == null ? 0.01 + sigmaT * 0.15 : opt.lapse, aimE = () => gauss(sigmaT * (Math.random() < lapse ? 3 : 1)) + (G.kind === 'isin' ? gauss(opt.isinExtra == null ? 0.02 : opt.isinExtra) : 0);
+    const lead = opt.lead || 0;  /* sn: kaba adımda (dt) vuruşun hep geç kalmasını dengeler (laboratuvarın İdealist oyuncusu) */
     const goldP = Math.max(0.15, Math.min(0.85, 0.95 - sigmaT * 6.5)), lightMis = sigmaT * 1.2;
     const seed = p => { if (p._aim === undefined) { p._aim = aimE(); p._aim2 = aimE() * 1.2; p._armed = false; } };
     while (G.mode === 'play' && t < tmax) {
@@ -48,7 +49,7 @@
       if (G.chal !== curChal) {
         if (curChal) { const sx = stat(curChal.kind); sx.ch++; sx.dur += curChal.t; }
         curChal = G.chal;
-        if (window.__logChal) window.__chalLog.push({ L: G.L, ph: G.ph, time: G.time, hw: G.hw, kind: G.kind });
+        if (window.__logChal) window.__chalLog.push({ L: G.L, ph: G.ph, time: G.time, hw: G.hw, om: G.omega, kind: G.kind });
       }
       if (G.mode !== 'play') break;
       /* tut-bırak: basılıyken bırakma anını bekle */
@@ -57,7 +58,7 @@
         if (hp) {
           seed(hp);
           const rel = k.holdRel(hp), om = G.omega * (G.slow > 0 ? G.slowMul : 1) * k.ptrFactor();
-          if ((hp.len - rel) / om <= -hp._aim2) { k.release(); hp._aim = aimE(); hp._aim2 = aimE() * 1.2; hp._armed = false; }
+          if ((hp.len - rel) / om <= -hp._aim2 + lead) { k.release(); hp._aim = aimE(); hp._aim2 = aimE() * 1.2; hp._armed = false; }
         }
         continue;
       }
@@ -79,8 +80,9 @@
           const pin = G.pins.find(q => q.kind === 'portal' && q.portal === 'in'), at = sgn(c - G.ang, G.dir);
           if (at > 0 && pin && nrm((pin.c0 - G.ang) * G.dir) < at) continue;
         }
+        if (p.ani && !p.ani.on) continue;   /* Ani: çakmadan görünmez, bot da göremez */
         seed(p);
-        const ring = p.ring ? 1 : 0;
+        const ring = p.ring && !(G.bl && G.bl.br) ? 1 : 0;   /* İki halka (şerit): tek ibre, iç halkadaki hedef de aynı ibreyle */
         const a = ring ? G.ang2 : G.ang, dir = ring ? G.dir2 : G.dir;
         /* hedefin üstünde öncelikli tuzak varsa hedefin açıkta kalan parçasını hedefle (yeterince genişse) */
         let off = 0;
@@ -94,17 +96,18 @@
         }
         if (Number.isNaN(off)) continue;
         const e = eta(c + off, ring), ahead = sgn(c + off - a, dir);
+        if (G.bl && (G.bl.tags.includes('yon') || G.bl.tags.includes('kyon')) && ahead < -(gh + 0.08)) { p._armed = false; p._aim = aimE(); continue; }   /* Yön değiştir: ters dönünce arkada kalan hedef "yeni geçti" sanılmasın */
         if (ahead > 0.15) p._armed = true;
         if (!p._armed) continue;
         if (e < bestEta) { best = p; bestEta = e; bestOff = off; }
       }
       if (!best) continue;
-      if (bestEta > -best._aim) continue;
+      if (bestEta > -best._aim + lead) continue;
       const ring = best.ring ? 1 : 0, a = ring ? G.ang2 : G.ang;
       const gc = best.kind === 'hold' ? best.c0 : k.pinCenter(best), gh = best.kind === 'hold' ? best.hw : k.pinHw(best);
       const inGate = ad(a, gc) <= gh + 0.05;
       /* trafik ışığı: kırmızıya vurma (yeni oyuncular ara sıra yanılır) */
-      if (best.light && !best.green && Math.random() > lightMis) { best._armed = false; best._aim = aimE(); continue; }
+      if (best.light && (!best.green || (G.bl && G.chal.light && G.chal.light.warn)) && Math.random() > lightMis) { best._armed = false; best._aim = aimE(); continue; }
       const danger = G.pins.some(p => (p.kind === 'trap' && k.pinHw(p) > 0 && ad(G.ang, k.pinCenter(p)) <= k.pinHw(p) + 0.03 && (p.prio || !inGate)) ||
         (p.kind === 'lockpin' && !p.open && !p.done && best !== p && ad(G.ang, p.c0) <= p.hw + 0.03 && !inGate));
       if (danger && Math.random() < trapAvoid) { best._armed = false; best._aim = aimE(); continue; }
