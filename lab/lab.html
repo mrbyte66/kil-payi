@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ayar Laboratuvarı</title>
+<!-- Kıl payı · AYAR LABORATUVARI (kullanıcı 2026-11-12: "Oyunu her zaman burdan yöneteceğiz, seninle anlaşabilme arayüzümüz").
+     Kaynak lab/lab.html; DEBUG derlemesinde build.sh www/lab.html yapar (yayına girmez). Sayfalar: Oyun fiziği, Oyun tasarımı, Görünüm,
+     Oyuncular, Analiz, Fikirler, Ayarlar. Solda gerçek oyun (index.html?lab) seçili bölümü oynar; gizli çerçevede (#meas) bot tohumlu ölçer.
+     Analiz: koşular sanal canla kaydedilir (hata olayları), can/hasar/ikinci şans/yıldız hesapla yeniden oynatılır, reklam ve bırakma
+     kararları ayarlanabilir davranış modeliyle (S.B, oyuncu tipleri S.PS) tohumlu Monte Carlo. Kullanıcı ayarları localStorage 'kp-lab',
+     ölçümler 'kp-lab-meas'. Önerilen değerler = oyunun kendi değerleri (açılışta okunur). -->
+<style>
+:root{--bg:#17132d;--sf:#221d42;--sf2:#2e2757;--ln:#3a3268;--ink:#f3f0ff;--ink2:#b6acdf;--ink3:#8076b0;--lil:#8e7bf2;--pea:#ff8e5c;--gold:#f2b73c;--ok:#7bc8a4;--bad:#f0657a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,select{font:inherit;color:inherit;cursor:pointer}
+.hd{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--ln)}
+.top{display:flex;align-items:center;gap:14px;padding:9px 16px 0;flex-wrap:wrap}
+.top h1{font-size:16px;margin:0;font-weight:800;white-space:nowrap}
+.top h1 span{color:var(--pea)}
+.nav{display:flex;gap:2px;flex-wrap:wrap}
+.nav button{border:0;background:transparent;padding:7px 11px 9px;border-bottom:3px solid transparent;color:var(--ink2);font-weight:600}
+.nav button.on{color:var(--ink);border-bottom-color:var(--pea)}
+.ctx{display:flex;align-items:center;gap:10px;padding:7px 16px;flex-wrap:wrap;border-top:1px solid rgba(58,50,104,.6)}
+.ctx.off{display:none}
+.ctx select,.sel{background:var(--sf2);border:1px solid var(--ln);border-radius:9px;padding:4px 8px;color:var(--ink)}
+.steps{display:flex;gap:3px;flex-wrap:wrap}
+.steps i{width:14px;height:6px;border-radius:3px;background:var(--ln);cursor:pointer}
+.steps i.on{background:var(--pea)} .steps i.done{background:var(--lil)}
+.chips{display:flex;gap:5px;flex:1;flex-wrap:wrap}
+.chips button{border:0;border-radius:11px;padding:4px 10px;background:var(--sf2);line-height:1.15;font-size:13px;text-align:left}
+.chips button small{display:block;color:var(--ink3);font-size:10.5px}
+.chips button.on{background:var(--lil);color:#fff} .chips button.on small{color:#e6e0ff}
+.btn{border:0;border-radius:999px;padding:8px 15px;background:var(--sf2);font-weight:600;white-space:nowrap}
+.btn:hover{filter:brightness(1.12)} .btn:disabled{opacity:.4;cursor:default}
+.btn.pri{background:var(--pea);color:#2a1408}
+.btn.sm{padding:5px 11px;font-size:12.5px}
+.btn.ghost{background:transparent;border:1px solid var(--ln)}
+.main{display:grid;grid-template-columns:minmax(250px,340px) 1fr;gap:16px;padding:14px 16px}
+.main.np{grid-template-columns:1fr}.main.np .phone{display:none}
+.phone{position:sticky;top:112px;align-self:start}
+.phone .fr{width:100%;aspect-ratio:9/18.5;border-radius:26px;overflow:hidden;border:6px solid var(--sf2);background:#000}
+.phone iframe{width:100%;height:100%;border:0;display:block}
+.pc{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--ink2)}
+.panel{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--sf);border-radius:16px;padding:12px 15px}
+.card.pgoff{display:none}
+.card>header{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.card>header h2{font-size:14.5px;margin:0;flex:1}
+.card>header .chev{color:var(--ink3);transition:transform .2s}
+.card.closed>header .chev{transform:rotate(-90deg)}
+.card.closed>.body{display:none}
+.card .body{margin-top:8px}
+h3.sec{font-size:13px;margin:14px 0 4px;color:var(--ink2);font-weight:700}
+p.d{margin:0 0 8px;color:var(--ink2);font-size:13px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center}
+.row{display:grid;grid-template-columns:190px 1fr 74px 68px;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(58,50,104,.5)}
+.row:last-child{border-bottom:0}
+.row.hid{opacity:.45}
+.row label{color:var(--ink2);font-size:13px;line-height:1.25}
+.row label small{display:block;color:var(--ink3);font-size:11px}
+.row input[type=range]{width:100%;accent-color:var(--pea)}
+.rw{position:relative;display:flex;align-items:center}.rw input{position:relative}
+.rw::before,.rw::after{content:'';position:absolute;top:50%;height:10px;margin-top:-5px;border-radius:5px;pointer-events:none;z-index:2;background:repeating-linear-gradient(45deg,rgba(240,101,122,.8) 0 3px,rgba(240,101,122,.15) 3px 6px)}
+.rw::before{left:0;width:var(--a)}.rw::after{left:var(--b);right:0}.rw.hit::before,.rw.hit::after{background:rgba(240,101,122,.95)}
+input[type=number],.row select{width:74px;background:var(--sf2);border:1px solid var(--ln);border-radius:8px;color:var(--ink);padding:4px 6px}
+.row .ic{display:flex;gap:2px;justify-content:flex-end}
+.row .ic button{border:0;background:transparent;color:var(--ink3);width:22px;height:22px;border-radius:6px;font-size:13px;line-height:1}
+.row .ic button:hover{background:var(--sf2);color:var(--ink)}
+.row.mod label{color:var(--ink)} .row.mod label::after{content:" •";color:var(--pea)}
+.row .pair{display:flex;gap:6px} .row .pair input{width:56px}
+.sub{font-size:12px;color:var(--ink3);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12.5px}
+th,td{padding:5px 5px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--ink3);font-weight:600;font-size:11.5px}
+tr.on td{background:rgba(142,123,242,.16)}
+td input[type=number]{width:62px;padding:3px 5px}
+.tw{overflow-x:auto}
+.up{color:var(--pea)} .warn{color:var(--bad)} .okc{color:var(--ok)} .amb{color:var(--gold)}
+.note{font-size:12px;color:var(--ink3);margin-top:6px}
+.gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}
+.g{background:var(--sf2);border-radius:12px;padding:8px 10px}
+.g b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.g b small{display:inline;font-size:12px;color:var(--ink3);font-weight:500}
+.g small{color:var(--ink3);font-size:11.5px;display:block}
+.g i{display:block;height:5px;border-radius:3px;background:var(--ln);margin-top:5px;overflow:hidden}
+.g i em{display:block;height:100%;background:var(--lil)}
+.ob{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--ln);min-width:120px}.ob.big{height:28px;border-radius:10px;margin-top:8px}
+.ob em{display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:800;color:#17132d;white-space:nowrap;overflow:hidden}
+.obl{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px 14px;margin-top:8px;font-size:12.5px}.obl i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}.obl small{display:block;color:var(--ink3);margin-left:15px}
+.card2{background:var(--sf2);border-radius:12px;padding:10px 12px;margin-top:8px}
+.g.big{grid-column:span 2;background:linear-gradient(135deg,#3b2f72,#2e2757)}
+.g.big b{font-size:30px}
+.badge{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--ln);color:var(--ink2)}
+.badge.st{background:rgba(242,183,60,.2);color:var(--gold)}
+.prog{height:6px;border-radius:3px;background:var(--ln);overflow:hidden;flex:1;min-width:120px;max-width:300px}
+.prog em{display:block;height:100%;width:0;background:var(--pea);transition:width .15s}
+.chk{display:grid;grid-template-columns:22px 1fr;gap:6px;font-size:12.5px;padding:3px 0;color:var(--ink2)}
+.chk b{font-weight:800}
+.honest{border-left:3px solid var(--gold);background:rgba(242,183,60,.08);padding:8px 11px;border-radius:0 10px 10px 0;font-size:12.5px;color:var(--ink2);margin-top:10px}
+.advice{background:var(--sf2);border-radius:12px;padding:9px 12px;margin-top:8px;font-size:13px}
+.advice li{margin:2px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.idea{background:var(--sf2);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.idea .pic{background:#1b1636;display:flex;justify-content:center;padding:8px 0}
+.idea .pic svg{width:150px;height:100px}
+.idea .bd{padding:9px 12px 11px;display:flex;flex-direction:column;gap:4px;flex:1}
+.idea h4{font-size:13.5px;margin:0}
+.idea .oz{color:var(--ink2);font-size:12.5px;margin:0}
+.idea details{font-size:12px;color:var(--ink3)} .idea details summary{cursor:pointer;color:var(--lil)}
+.idea .meta{font-size:11.5px;color:var(--ink3);display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:auto;padding-top:4px}
+.idea.hid{opacity:.5}
+.tag{font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.flt{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.flt button{border:1px solid var(--ln);background:transparent;border-radius:999px;padding:3px 10px;font-size:12px;color:var(--ink2)}
+.flt button.on{background:var(--lil);color:#fff;border-color:var(--lil)}
+textarea{width:100%;height:80px;background:var(--sf2);border:1px solid var(--ln);border-radius:10px;color:var(--ink);font:11.5px/1.4 ui-monospace,monospace;padding:8px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--sf2);border:1px solid var(--ln);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast.on{opacity:1}
+.phone .fr{position:relative}
+.dnote{position:absolute;left:8px;right:8px;top:8px;background:rgba(23,19,45,.88);border:1px solid var(--pea);border-radius:12px;padding:7px 10px;font-size:12px;line-height:1.35;color:var(--ink);opacity:0;transition:opacity .25s;pointer-events:none}
+.dnote.on{opacity:1} .dnote b{color:var(--pea)}
+.hk{border:0;border-radius:999px;padding:5px 11px;font-weight:800;font-size:12.5px;background:var(--sf2)}
+.hk small{font-weight:600;margin-left:4px}
+.tl{display:block;width:100%;height:auto;margin:4px 0 6px}
+.phs{display:flex;gap:6px;margin:8px 0}
+.phs button{flex:1;border:0;border-radius:11px;padding:7px;background:var(--sf2);font-weight:700}
+.phs button small{display:block;font-weight:500;color:var(--ink3);font-size:11px}
+.phs button.on{background:var(--lil);color:#fff}.phs button.on small{color:#e6e0ff}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.tg{display:inline-flex;align-items:center;gap:5px;background:var(--sf2);border:1px solid var(--ln);border-radius:999px;padding:3px 4px 3px 10px;font-size:12.5px}
+.tg select{background:var(--bg);border:1px solid var(--ln);border-radius:999px;color:var(--ink);font-size:11.5px;padding:1px 4px}
+.tg button{border:0;background:transparent;color:var(--ink3);width:20px;height:20px;border-radius:50%}
+.tg button:hover{background:var(--bad);color:#fff}
+.tg.off{opacity:.45}
+.dx{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:8px}
+.dxc{background:var(--sf2);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:54px 1fr;gap:10px;border-left:4px solid var(--ln)}
+.dxc.bad{border-left-color:var(--bad)}.dxc.warn{border-left-color:var(--gold)}.dxc.ok{border-left-color:var(--ok)}
+.dxc svg{width:54px;height:54px}
+.dxc h4{margin:0 0 2px;font-size:13.5px}.dxc p{margin:0 0 6px;font-size:12px;color:var(--ink2)}
+.hist{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hrow{display:flex;gap:8px;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(58,50,104,.5)}
+.hrow>b{min-width:70px;text-align:right;font-variant-numeric:tabular-nums}
+.anc{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.mdl{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,12,30,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.mdl.on{display:flex}
+.mbox{background:var(--sf);border:1px solid var(--ln);border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.mbox .pic{background:#1b1636;display:flex;justify-content:center;padding:14px 0}
+.mbox .pic svg{width:300px;height:200px;max-width:90%}
+.mbox .in{padding:14px 18px 18px}
+.mbox h3{margin:0 0 6px;font-size:18px}
+.mbox p{color:var(--ink2);font-size:13.5px;line-height:1.5}
+.idea{cursor:pointer}
+@media (max-width:780px){.hist{grid-template-columns:1fr}}
+@media (max-width:780px){.main{grid-template-columns:1fr}.phone{position:static;max-width:300px;margin:0 auto}.row{grid-template-columns:120px 1fr 60px 64px}.two{grid-template-columns:1fr}.g.big{grid-column:span 1}}
+</style>
+</head>
+<body>
+<div class="hd">
+  <div class="top"><h1>Ayar <span>Laboratuvarı</span></h1><nav class="nav" id="nav"></nav></div>
+  <div class="ctx" id="ctx">
+    <select id="stepSel" title="Anket adımı (kilit)"></select>
+    <div class="steps" id="steps"></div>
+    <div class="chips" id="tabs"></div>
+    <button class="hk" id="hk" data-pg="ana" title="Bu bölümün kanca puanı (Analiz)">Kanca –</button>
+    <button class="btn sm" id="prev">‹</button>
+    <button class="btn sm pri" id="next">Onayla ›</button>
+  </div>
+</div>
+<div class="main" id="main">
+  <div class="phone">
+    <div class="fr"><iframe id="game" title="Oyun önizlemesi"></iframe><div class="dnote" id="dnote"></div></div>
+    <div class="pc">Kim oynasın <select class="sel" id="aim"></select><input type="number" id="aimMs" min="0" max="300" step="1" title="zamanlama hatası (ms)" style="width:64px"></div>
+    <div class="pc"><label style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="imm"> can bitmesin</label><button class="btn sm" id="again">Yeniden başlat</button><button class="btn sm ghost" id="rLv" title="Bu bölümü önerilene döndür">Bölümü sıfırla</button><button class="btn sm ghost" id="rStep" title="Bu adımın 5 bölümünü önerilene döndür">5 bölümü sıfırla</button></div>
+  </div>
+  <div class="panel" id="panel"></div>
+</div>
+<iframe id="meas" title="ölçüm" style="position:absolute;width:390px;height:844px;left:-5000px;top:0;border:0"></iframe>
+<div class="toast" id="toast"></div>
+<div class="mdl" id="mod"><div class="mbox" id="mbox"></div></div>
+<script>
+const $ = id => document.getElementById(id);
+const TIER = ['Kolay', 'Orta', 'Usta', 'Usta++', 'Cehennem'], R2D = 180 / Math.PI;
+const fr = $('game'), mf = $('meas');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const fmt = (v, d) => Number(v).toFixed(d).replace('.', ',');
+const cp = o => JSON.parse(JSON.stringify(o));
+const iv = (v, a, b) => clamp(Math.round(v), a, b);
+let K = null, S = null, REC = null, step = 0, lv = 1, groups = [], gIdx = {}, restartT = 0, winT = 0, IDEAS = [];
+const toast = m => { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1800); };
+
+/* ---------- sayfalar ---------- */
+const PAGES = [['fizik', 'Oyun fiziği'], ['kurgu', 'Bölüm kurgusu'], ['tasarim', 'Oyun tasarımı'], ['gorunum', 'Görünüm'], ['oyuncu', 'Oyuncular'], ['ana', 'Analiz'], ['fikir', 'Fikirler'], ['yedek', 'Yedekte'], ['ayar', 'Ayarlar']];
+const NOPHONE = { ana: 1, fikir: 1, ayar: 1 }, NOCTX = { fikir: 1, ayar: 1 };
+
+/* ---------- oyuncu tipleri ve davranış modeli (önerilenler) ---------- */
+/* sg: zamanlama hatası (sn), av: tuzaktan kaçınma, pay: nüfus payı %, ad: reklam eğilimi, pat: sabır, need: zorluk ihtiyacı,
+   tg: hedef kitle ağırlığı (kanca ve teşhis bu tipi ne kadar önemsesin: refleks oyununun asıl kitlesi orta-usta arası; çok acemiyi memnun etmek için asıl kitleyi sıkmayalım) */
+const PS0 = [
+  { id: 'ideal', nm: 'İdealist', sg: 0, av: 1, pay: 0, ad: 0, pat: 0, need: 1, tg: 0 },
+  { id: 'kusursuz', nm: 'Kusursuz', sg: 0.012, av: 1, pay: 1, ad: -0.3, pat: 0.6, need: 1, tg: 0.4 },
+  { id: 'pro', nm: 'Pro', sg: 0.02, av: 1, pay: 4, ad: -0.2, pat: 0.5, need: 0.9, tg: 0.7 },
+  { id: 'usta', nm: 'Usta', sg: 0.03, av: 0.95, pay: 10, ad: 0, pat: 0.4, need: 0.8, tg: 1 },
+  { id: 'iyi', nm: 'İyi', sg: 0.05, av: 0.9, pay: 20, ad: 0.1, pat: 0.2, need: 0.6, tg: 1 },
+  { id: 'orta', nm: 'Orta', sg: 0.08, av: 0.75, pay: 35, ad: 0.2, pat: 0, need: 0.4, tg: 1 },
+  { id: 'acemi', nm: 'Acemi', sg: 0.10, av: 0.65, pay: 20, ad: 0.1, pat: -0.3, need: 0.25, tg: 0.45 },
+  { id: 'yeni', nm: 'Yeni başlayan', sg: 0.12, av: 0.5, pay: 10, ad: -0.1, pat: -0.6, need: 0.15, tg: 0.15 }
+];
+/* önerilenler sektör kaynaklarına göre (Analiz › Gerçeklik çapası): ödüllü reklam teklif kabulü %35-70, bölüm başına kaçak en çok %20 */
+const B0 = { gauss: 1, tgt: 1, skMu: 65, skSd: 0.45, sdAd: 0.9, sdPat: 0.7, adBase: 0.40, kProg: 2.0, kInv: 0.6, kStreak: 0.25, kFat: 0.35, fill: 0.92, adLen: 30, coinP: 0.05, adShift: 0,
+  quit: 0.12, kEarly: 1.2, kQS: 0.45, maxAtt: 8, boreMiss: 3, tW0: 0.20, tW1: 0.40, tQ: 0.15, tB: 0.20, tK: 0.45,
+  /* basamağa göre hedefler (Kolay → Cehennem doğrusal): ilk denemede canı biten, reklam izleyen, bırakan; tDrift: her kilit grubunda biraz daha zor */
+  tF1: 0.22, tF5: 0.62, tDrift: 0.003, tWa1: 0.09, tWa5: 0.35, tQ1: 0.04, tQ5: 0.28,
+  eCPM: 4, sessions: 2.2, sessMin: 5, blShare: 0.6, players: 5000, churn: 0.5, sens: 0.6 };
+
+/* ---------- adımlar ---------- */
+const STEPS = () => [{ g: 0, t: 'Bölüm merdiveni (Tek ve çift)', d: 'Düz pimde 5 basamağın hızı ve genişliği: 1. Kolay → 5. Cehennem. Bu merdiven bütün kilitlerin temeli.' }]
+  .concat(groups.slice(1).map(x => ({ g: x.g, t: x.name + ' kilidi', d: x.name + ': her bölüm, merdivendeki aynı basamak kadar zor olmalı.' })))
+  .concat([{ g: -1, t: 'Son: efektler, yüzde ve özet', d: 'Ortadaki yüzde, dönen ışık ve diğer efektler.' }]);
+const curG = () => { const st = STEPS()[step]; return st && st.g >= 0 ? st.g : 0; };
+const curN = () => curG() * 5 + lv;
+const idOf = n => K.blId(n);
+
+/* ---------- değer tanımları (tek kayıt: etiket, aralık, okuma, yazma) ---------- */
+const P_ = (k, ad, sub, u, min, max, st, get, set) => ({ k, ad, sub, u, min, max, st, get, set });
+const physDefs = () => [
+  P_('lv.om', 'İbre hızı', 'bütün kilitlerde bu basamak', '°/sn', 30, 300, 1, s => Math.round(s.P.om[lv - 1] * R2D), (s, v) => { s.P.om[lv - 1] = v / R2D; }),
+  P_('lv.wd', 'Şeftali genişliği', 'düz pim, bu basamak', '°', () => S.P.wMin, () => S.P.wMax, 0.5, s => s.P.wd[lv - 1], (s, v) => { s.P.wd[lv - 1] = v; }),
+  P_('lv.c', 'Kilit katsayısı c', 'yalnız bu kilidin bu bölümü', '×', 0.3, 3.5, 0.01, s => s.KF[idOf(curN())] || 1, (s, v) => { s.KF[idOf(curN())] = v; })
+];
+const lenDefs = () => [
+  P_('lv.t', 'Bölüm süresi', 'dalga sayısını belirler', 'sn', 10, 150, 1, s => s.P.t[lv - 1], (s, v) => { s.P.t[lv - 1] = v; }),
+  { k: 'lv.size', ad: 'Dalga başına pim', sub: 'en az · en çok', pair: true, min: 1, max: 6, st: 1, get: s => s.P.size[lv - 1].slice(), set: (s, v) => { s.P.size[lv - 1] = v; } }
+];
+/* birbirine bağlı ayarlar: kaydırıcı taralı bölgeye geçemez (eşitleyip uyarmak yerine) */
+const capd = (d, f, t) => Object.assign(d, { cap: f, capT: t });
+const limDefs = () => [
+  capd(P_('lim.wMin', 'En dar şeftali', 'bütün bölümlerde hedef bundan dar olmaz', '°', 2, 60, 0.5, s => s.P.wMin, (s, v) => { s.P.wMin = v; }), () => [2, S.P.wMax], 'en geniş şeftaliden büyük olamaz'),
+  P_('lim.omMin', 'En yavaş ibre', 'bütün bölümlerde ibre bundan yavaş dönmez', '°/sn', 30, 300, 1, s => s.P.omMin, (s, v) => { s.P.omMin = v; }),
+  capd(P_('lim.wMax', 'En geniş şeftali', 'bütün bölümlerde hedef bundan geniş olmaz', '°', 2, 90, 0.5, s => s.P.wMax, (s, v) => { s.P.wMax = v; }), () => [S.P.wMin, 90], 'en dar şeftaliden küçük olamaz'),
+  P_('lim.gap', 'Pimler arası en az boşluk', '', '°', 0, 40, 1, s => s.P.gap, (s, v) => { s.P.gap = v; })
+];
+const PHM_NM = ['Bölüm başında', 'Orta kısım başında', 'Son kısım başında', 'Bölüm sonunda'];
+const phmDefs = () => PHM_NM.map((x, i) => P_('adv.phm' + i, 'İbre hızı: ' + x.toLowerCase(), i ? '' : 'basamak hızının çarpanı; aradaki her vuruşta hız düzgün artar', '×', 0.4, 2, 0.01, s => s.P.phm[i], (s, v) => { s.P.phm[i] = v; }))
+  .concat(PHM_NM.map((x, i) => P_('adv.pwm' + i, 'Şeftali genişliği: ' + x.toLowerCase(), i ? '' : 'basamak genişliğinin çarpanı; aradaki her vuruşta düzgün daralır', '×', 0.4, 2, 0.01, s => s.P.pwm[i], (s, v) => { s.P.pwm[i] = v; })));
+const lifeDefs = () => [
+  P_('adv.lives', 'Can', 'en çok 3 (gösterge)', '', 1, 3, 1, s => s.P.lives, (s, v) => { s.P.lives = v; }),
+  capd(P_('adv.dmg0', 'Küçük hata can kaybı', 'ıska, sabır, kırmızı ışık', 'can', 1, 3, 1, s => s.P.dmg[0], (s, v) => { s.P.dmg[0] = v; }), () => [1, S.P.dmg[1]], 'büyük hatadan çok can götüremez'),
+  capd(P_('adv.dmg1', 'Büyük hata can kaybı', 'tuzağa basma', 'can', 1, 3, 1, s => s.P.dmg[1], (s, v) => { s.P.dmg[1] = v; }), () => [S.P.dmg[0], 3], 'küçük hatadan az can götüremez'),
+  P_('adv.regen', 'Kaç dalgada bir +1 can', '0 = yok', 'dalga', 0, 20, 1, s => s.P.regen, (s, v) => { s.P.regen = v; })
+];
+const contDefs = () => [
+  P_('adv.cont', 'İkinci şans hakkı', 'bir denemede en çok', 'kez', 0, 5, 1, s => s.P.cont, (s, v) => { s.P.cont = v; }),
+  P_('adv.contAds', 'Reklamla ikinci şans', 'sonrakiler altınla', 'kez', 0, 5, 1, s => s.P.contAds, (s, v) => { s.P.contAds = v; }),
+  P_('adv.contL', 'İkinci şansta can', '0 = tam can', 'can', 0, 3, 1, s => s.P.contL, (s, v) => { s.P.contL = v; })
+];
+const helpDefs = () => [
+  capd(P_('adv.helpAt0', 'Yardım 1 başlar', 'üst üste kayıp sayısı', 'kayıp', 1, 8, 1, s => s.P.helpAt[0], (s, v) => { s.P.helpAt[0] = v; }), () => [1, S.P.helpAt[1] - 1], 'Yardım 2\'den önce başlamalı'),
+  capd(P_('adv.help0', 'Yardım 1 genişlik', S.P.helpAt[0] + ' kayıptan sonra', '×', 1, 1.6, 0.01, s => s.P.help[0], (s, v) => { s.P.help[0] = v; }), () => [1, Math.min(1.6, S.P.help[1])], 'Yardım 2\'den geniş olamaz'),
+  capd(P_('adv.helpAt1', 'Yardım 2 başlar', 'üst üste kayıp sayısı', 'kayıp', 2, 9, 1, s => s.P.helpAt[1], (s, v) => { s.P.helpAt[1] = v; }), () => [S.P.helpAt[0] + 1, 9], 'Yardım 1\'den sonra başlamalı'),
+  capd(P_('adv.help1', 'Yardım 2 genişlik', S.P.helpAt[1] + ' kayıptan sonra', '×', 1, 2, 0.01, s => s.P.help[1], (s, v) => { s.P.help[1] = v; }), () => [S.P.help[0], 2], 'Yardım 1\'den dar olamaz')
+];
+const rewDefs = () => [
+  capd(P_('adv.star0', '3 yıldız için en çok hata', '', 'hata', 0, 20, 1, s => s.P.star[0], (s, v) => { s.P.star[0] = v; }), () => [0, S.P.star[1]], '2 yıldızın sınırından çok olamaz'),
+  capd(P_('adv.star1', '2 yıldız için en çok hata', '', 'hata', 0, 20, 1, s => s.P.star[1], (s, v) => { s.P.star[1] = v; }), () => [S.P.star[0], 20], '3 yıldızın sınırından az olamaz'),
+  P_('lv.gold', 'Bölüm altını', 'bu basamak', 'altın', 0, 500, 1, s => s.P.gold[lv - 1], (s, v) => { s.P.gold[lv - 1] = v; }),
+  P_('adv.goldG', 'Kilit başına ek altın', 'grup × bu', 'altın', 0, 20, 1, s => s.P.goldG, (s, v) => { s.P.goldG = v; }),
+  P_('adv.cd', 'Sonraki bölüme geri sayım', '', 'sn', 0.5, 10, 0.5, s => s.P.cd, (s, v) => { s.P.cd = v; })
+];
+const PCT_TH = ['Büyük sayı', 'Yüzeyde küçük', 'Dalga kesri', 'Alt rozet'];
+const fxDefs = () => [
+  P_('fx.sweep', 'Dalga sonu dönen ışık', '0 kapalı, 1 eski', '', 0, 1, 0.05, s => s.P.fx.sweep, (s, v) => { s.P.fx.sweep = v; }),
+  P_('fx.pulse', 'Vuruşta halka parıltısı', '', '', 0, 1, 0.05, s => s.P.fx.pulse, (s, v) => { s.P.fx.pulse = v; }),
+  P_('fx.shatter', 'Pim parçalanması', '0 kapalı', '', 0, 1, 1, s => s.P.fx.shatter, (s, v) => { s.P.fx.shatter = v; }),
+  P_('fx.drop', 'İlerleme damlası', '0 kapalı', '', 0, 1, 1, s => s.P.fx.drop, (s, v) => { s.P.fx.drop = v; }),
+  P_('fx.pct', 'Ortada doluluk yüzdesi', '0 kapalı, 1 açık', '', 0, 1, 1, s => (s.P.pct ? 1 : 0), (s, v) => { s.P.pct = !!v; }),
+  { k: 'fx.pctTheme', ad: 'Yüzde teması', sel: PCT_TH, get: s => s.P.pctTheme | 0, set: (s, v) => { s.P.pctTheme = v; } }
+];
+const B_ = (q, ad, sub, u, min, max, st) => P_('b.' + q, ad, sub, u, min, max, st, s => s.B[q], (s, v) => { s.B[q] = v; });
+const adDefs = () => [
+  B_('adBase', 'Temel izleme olasılığı', 'ortada yanan, sıradan oyuncu', '', 0.01, 0.99, 0.01),
+  B_('kProg', 'Sona yakınlık etkisi', 'sona yakın yanan daha çok izler', '', 0, 5, 0.05),
+  B_('kInv', 'Emek etkisi', 'denemeye harcanan süre ÷ reklam süresi', '', 0, 3, 0.05),
+  B_('kStreak', 'Takılma etkisi', 'üst üste kayıp başına', '', 0, 1.5, 0.05),
+  B_('kFat', 'Reklam yorgunluğu', 'bu bölümde izlenen reklam başına', '', 0, 2, 0.05),
+  B_('fill', 'Reklam dolum oranı', 'reklamın gerçekten gelme payı', '', 0, 1, 0.01),
+  B_('adLen', 'Reklam süresi', '', 'sn', 5, 90, 1),
+  B_('coinP', 'Altınla devam olasılığı', 'reklamı izlemeyen', '', 0, 1, 0.01),
+  B_('adShift', 'Genel reklam eğilimi kaydırma', '+ daha istekli, − daha isteksiz', '', -2, 2, 0.05)
+];
+const quitDefs = () => [
+  B_('quit', 'Temel bırakma olasılığı', 'kayıptan sonra', '', 0.01, 0.9, 0.01),
+  B_('kEarly', 'Erken yanma etkisi', 'başta yanan daha çok bırakır', '', 0, 4, 0.05),
+  B_('kQS', 'Üst üste kayıp etkisi', 'kayıp başına', '', 0, 2, 0.05),
+  B_('maxAtt', 'En çok deneme', 'sonra kesin bırakır', 'kez', 1, 20, 1)
+];
+const goalDefs = () => [
+  B_('tF1', 'Hedef: ilk denemede canı biten · 1. Kolay', 'aradaki basamaklar doğrusal', '', 0, 1, 0.01),
+  B_('tF5', 'Hedef: ilk denemede canı biten · 5. Cehennem', '', '', 0, 1, 0.01),
+  B_('tDrift', 'Her kilit grubunda ek zorluk', 'canı biten oranına eklenir (grup başına)', '', 0, 0.03, 0.001),
+  B_('tWa1', 'Hedef: reklam izleyen · 1. Kolay', 'bandın ortası', '', 0, 1, 0.01),
+  B_('tWa5', 'Hedef: reklam izleyen · 5. Cehennem', 'en çok reklam Cehennem\'de', '', 0, 1, 0.01),
+  B_('tQ1', 'Hedef: bırakan en çok · 1. Kolay', '', '', 0, 1, 0.01),
+  B_('tQ5', 'Hedef: bırakan en çok · 5. Cehennem', '', '', 0, 1, 0.01),
+  B_('tB', 'Hedef: sıkılan en çok', 'bütün bölümler', '', 0, 1, 0.01),
+  B_('tK', 'Hedef: kıl payı en az', 'canın bittiği anların son %40\'ta olan payı (bir daha hissi)', '', 0, 1, 0.01)
+];
+/* bölümün hedefleri: basamağa göre doğrusal (Kolay → Cehennem) */
+const goal = n => { const B = S.B, g = Math.floor((n - 1) / 5), u = ((n - 1) % 5) / 4, L = (a, b) => a + (b - a) * u, F = clamp(L(B.tF1, B.tF5) + B.tDrift * g, 0, 0.98), W = L(B.tWa1, B.tWa5);
+  return { F, F0: Math.max(0, F - 0.06), F1: F + 0.06, W, W0: Math.max(0, W - 0.06), W1: W + 0.08, Q: L(B.tQ1, B.tQ5), Bo: B.tB, K: B.tK != null ? B.tK : 0.45 }; };
+const popDefs = () => [
+  B_('players', 'Aktif oyuncu', 'günlük', 'kişi', 100, 200000, 100),
+  B_('sessions', 'Günde oturum', 'oyuncu başına', 'kez', 0.5, 10, 0.1),
+  B_('sessMin', 'Oturum uzunluğu', '', 'dk', 1, 30, 0.5),
+  B_('blShare', 'Bölümler payı', 'oyun süresinin', '', 0, 1, 0.05),
+  B_('eCPM', 'eCPM', '1000 gösterim geliri', '$', 0.5, 30, 0.5),
+  B_('churn', 'Bırakan kalıcı gider', 'bırakma başına', '', 0, 1, 0.05),
+  B_('sens', 'Belirsizlik bandı', 'reklam eğilimi ±', '', 0, 2, 0.05)
+];
+/* ---------- bölüm kurgusu (BL_OV): kısımlar, eklenen/çıkarılan parçalar, kısma özel ayarlar ---------- */
+const PH_NM = ['Baş', 'Orta', 'Son'];
+const ovOf = n => S && S.OV && S.OV[idOf(n)];
+const phTags = (g, k) => { const o = ovOf(g * 5 + k); return o ? o.ph.map(p => p.t) : K.blPhases(g, k).map(p => p.t); };
+/* motorun gerçekten bildiği parçalar (blSpawn ve tür kurucular); diğerleri planda var, motoru yok */
+const TAG_OK = ['kyon', 'tek', 'cift', 'uc3', 'dar', 'tuzak', 'tuzak2', 'tuzakk', 'kayan', 'kayan2', 'kayanT', 'nefes', 'nefes2', 'diken', 'hayalet', 'hayalet2', 'hayaletT', 'kasa', 'alarm', 'tut', 'sicak', 'trafik', 'sabir', 'curuk', 'gelgit', 'girdap', 'ritim', 'sahte', 'isin', 'degirmen', 'deg3', 'hizkanat', 'degk', 'yon', 'yonk', 'ani', 'yakin', 'nabiz', 'nabizk', 'serit', 'seritk'];
+const TAG_NM = { kyon: 'Yön değiştirme', tek: 'Düz pim', cift: 'Çift pim', uc3: 'Üçlü hedef', dar: 'Dar hedef (×0,9)', tuzak: 'Tuzak', tuzak2: '2 ek tuzak', tuzakk: 'Kayan tuzaklar', kayan: 'Kayan hedef', kayan2: 'Ters kayanlar', kayanT: 'Kayan tuzak ikizi', nefes: 'Nefes alan hedef', nefes2: 'Sırayla nefes', diken: 'Diken', hayalet: 'Hayalet', hayalet2: 'Farklı hayaletler', hayaletT: 'Hayalet tuzak', kasa: 'Kasa', alarm: 'Alarm', tut: 'Tut-bırak', sicak: 'Sıcak bölge', trafik: 'Trafik ışığı', sabir: 'Sabır', curuk: 'Çürük', gelgit: 'Gelgit', girdap: 'Girdap', ritim: 'Ritim', sahte: 'Sahte nota', isin: 'Işınlanma', karisik: 'Karışık kasa', hizisik: 'Hızlı ışık', sonanda: 'Son anda', sabir2: 'Çift sabır', kaybant: 'Kayan bant', ritim2: 'Çift ritim', isin2: 'Çift ışınlanma', donen: 'Dönen çember', donen2: 'Hızlı dönen çember', yayilan: 'Yayılan çember', nefesc: 'Nefes alan çember', ayna: 'Ayna', degirmen: 'Değirmen kanatları', deg3: 'Üç kanat', hizkanat: 'Hız değiştiren kanat', degk: 'Ters dönen kanat', yon: 'Yön değiştir', yonk: 'Kendiliğinden ters dönme', ani: 'Şipşak hedef', yakin: 'Daha yakında çakan', yalanci: 'Yalancı şimşek', nabiz: 'Nabız', nabizk: 'Fazladan atış', serit: 'İki halka köprüsü', seritk: 'Köprüsüz geçiş', kilitli: 'Kilitli halka' };
+const tagNm = x => TAG_NM[x] || (K && K.STR.tr['k_' + x]) || x;
+const tagKind = x => K && Object.keys(K.BL_MCAT).find(kd => K.BL_MCAT[kd].tags.includes(x));
+const allTags = () => { const st = new Set(); for (let n = 1; n <= K.BL_N; n++) { if (K.blSoon(n)) continue; const { g, k } = K.blGK(n); K.blPhases(g, k).forEach(p => p.t.forEach(x => st.add(x))); } ['donen', 'donen2', 'yayilan', 'nefesc', 'ayna', 'uc3'].forEach(x => st.add(x)); return [...st].filter(x => x !== 'yon cift' && x !== 'hayalet cift'); };
+const ovDef0 = n => { const { g, k } = K.blGK(n); return { ph: K.blPhases(g, k).map(p => ({ t: p.t.slice(), om: 1, wd: 1, lv: {} })), cut: [1 / 3, 2 / 3] }; };
+const OVP = () => S.ui.ovPh | 0;
+const O_ = (k, ad, sub, u, min, max, st, get, set, rec) => ({ k, ad, sub, u, min, max, st, get: s => { const o = s.OV && s.OV[idOf(curN())]; return o ? get(o) : rec; }, set: (s, v) => set(ovEnsure(s), v) });
+/* kurguda bir şeye dokununca bölüm kendiliğinden özel kurguya geçer (ayrı 'özelleştir' adımı yok) */
+const ovEnsure = (s = S) => { const id = idOf(curN()); if (!s.OV[id]) s.OV[id] = ovDef0(curN()); return s.OV[id]; };
+const ovDefs = () => [
+  O_('ov.cut0', 'Baş kısmı biter', 'bölümün yüzde kaçında', '%', 5, 90, 1, o => Math.round(o.cut[0] * 100), (o, v) => { o.cut[0] = v / 100; }, 33),
+  O_('ov.cut1', 'Orta kısım biter', 'bölümün yüzde kaçında', '%', 10, 98, 1, o => Math.round(o.cut[1] * 100), (o, v) => { o.cut[1] = v / 100; }, 67),
+];
+/* kısma özel değerler: bölümün herhangi bir ayarı bu kısımda başka değer alır (motor: BL_OV ph[i].set, blPS / blMv) */
+const OVS = () => {
+  const L = lv - 1, P = S.P, o = { om: { ad: 'İbre taban hızı (kısmın başı ve sonu bununla çarpılır)', u: '°/sn', min: 30, max: 300, st: 1, b: () => Math.round(P.om[L] * R2D), to: v => v / R2D, fr: v => Math.round(v * R2D) },
+    wd: { ad: 'Şeftali genişliği', u: '°', min: () => P.wMin, max: () => P.wMax, st: 0.5, b: () => P.wd[L] },
+    size: { ad: 'Dalga başına pim', u: '', pair: 1, min: 1, max: 6, st: 1, b: () => P.size[L].slice() },
+    gap: { ad: 'Pimler arası en az boşluk', u: '°', min: 0, max: 40, st: 1, b: () => P.gap } };
+  const kinds = new Set(mechKinds(curG(), lv)); ovView().ph.forEach(p => p.t.forEach(x => { const kd = tagKind(x); if (kd) kinds.add(kd); }));
+  kinds.forEach(kd => Object.entries(K.BL_MCAT[kd].p).forEach(([q, d]) => { o['m.' + kd + '.' + q] = { ad: d.ad, grp: K.BL_MCAT[kd].ad, u: d.u, min: d.min, max: d.max, st: d.st, b: () => S.M[kd][q][L] }; }));
+  return o;
+};
+const ovView = () => ovOf(curN()) || ovDef0(curN());
+const ovsDefs = () => {
+  const o = ovOf(curN()); if (!o) return [];
+  const ph = OVP(), set = o.ph[ph].set || {}, all = OVS(), id = idOf(curN());
+  return Object.keys(set).filter(k => all[k]).map(key => {
+    const x = all[key], to = x.to || (v => v), fr = x.fr || (v => v);
+    const get = s => { const v = s.OV && s.OV[id] && s.OV[id].ph[ph].set && s.OV[id].ph[ph].set[key]; return v != null ? (x.pair ? v.slice() : fr(v)) : x.b(); };
+    return { k: 'ovs.' + key, ad: PH_NM[ph] + ' · ' + (x.grp ? x.grp + ': ' : '') + x.ad, sub: 'bölümün kendi değeri: ' + JSON.stringify(x.b()).replace(/[\[\]]/g, '').replace(',', '-'), u: x.u, min: x.min, max: x.max, st: x.st, pair: x.pair, base: x.b, ovs: key,
+      get, set: (s, v) => { const ps = ovEnsure(s).ph[ph]; ps.set = ps.set || {}; ps.set[key] = x.pair ? [iv(v[0], 1, 6), iv(Math.max(v[0], v[1]), 1, 6)] : to(v); } };
+  });
+};
+/* kurgunun dalga dalga hız (°/sn) ve genişlik (°) eğrisi: motorun blPlan hesabının aynısı */
+const ovCurve = n => {
+  const { g, k } = K.blGK(n), e = eff(g, k), W = K.blWaves(n, k), o = ovOf(n), c = o ? o.cut : [1 / 3, 2 / 3], out = [], X = [0, c[0], c[1], 1];
+  const ste = i => { const st = o && o.ph[i].set || {}; return st.om != null || st.wd != null ? eff(g, k, st) : e; };
+  const base = i => ste(i).om * R2D * (o ? o.ph[i].om : 1), b2 = base(2), A = [base(0) * S.P.phm[0], base(1) * S.P.phm[1], b2 * S.P.phm[2], b2 * S.P.phm[3]];
+  const omAt = x => { const i = x < c[0] ? 0 : x < c[1] ? 1 : 2, u = clamp((x - X[i]) / Math.max(1e-6, X[i + 1] - X[i]), 0, 1); return Math.max(S.P.omMin || 0, A[i] + (A[i + 1] - A[i]) * u); };
+  for (let w = 0; w <= W; w++) {
+    const ph = Math.min(2, w < W * c[0] ? 0 : w < W * c[1] ? 1 : 2), last = w === W;
+    const wu = w / W, wi = wu < c[0] ? 0 : wu < c[1] ? 1 : 2, wk = clamp((wu - X[wi]) / Math.max(1e-6, X[wi + 1] - X[wi]), 0, 1), pw = S.P.pwm[wi] + (S.P.pwm[wi + 1] - S.P.pwm[wi]) * wk;
+    out.push({ ph, om: omAt(wu), wd: Math.min(S.P.wMax, ste(ph).wd * (o ? o.ph[ph].wd : 1) * pw), end: last });
+  }
+  out.A = A;
+  return out;
+};
+const timelineSvg = n => {
+  const cv = ovCurve(n), W = cv.length, X = i => 30 + i / Math.max(1, W - 1) * 540, mo = Math.max(...cv.map(x => x.om)) * 1.15, mw = Math.max(...cv.map(x => x.wd)) * 1.15;
+  const o = ovOf(n), c = o ? o.cut : [1 / 3, 2 / 3], col = ['#8e7bf2', '#ff8e5c', '#f0657a'], sel = OVP();
+  let h = `<svg class="tl" viewBox="0 0 600 170">`;
+  [0, 1, 2].forEach(i => { const a = [0, c[0], c[1]][i], b = [c[0], c[1], 1][i], x0 = 30 + a * 540, x1 = 30 + b * 540; h += `<rect data-a="ovsel" data-k="${i}" x="${x0}" y="10" width="${Math.max(2, x1 - x0)}" height="130" rx="8" fill="${col[i]}" opacity="${i === sel ? 0.22 : 0.08}" style="cursor:pointer"/><text x="${(x0 + x1) / 2}" y="26" font-size="12" font-weight="800" fill="${col[i]}" text-anchor="middle">${PH_NM[i]}</text>`; });
+  h += `<polyline points="${cv.map((x, i) => X(i) + ',' + (140 - x.wd / mw * 100)).join(' ')}" fill="none" stroke="#7bc8a4" stroke-width="2" stroke-dasharray="5 4"/>`;
+  h += `<polyline points="${cv.map((x, i) => X(i) + ',' + (140 - x.om / mo * 100)).join(' ')}" fill="none" stroke="#f3f0ff" stroke-width="2.5"/>`;
+  h += `<text x="30" y="160" font-size="10.5" fill="#b6acdf">1. dalga</text><text x="570" y="160" font-size="10.5" fill="#b6acdf" text-anchor="end">bitiş (${W - 1} dalga)</text><text x="300" y="160" font-size="10.5" fill="#f3f0ff" text-anchor="middle">— hız ${cv.A.map(Math.round).join(' → ')} °/sn, her vuruşta düzgün   <tspan fill="#7bc8a4">- - genişlik ${fmt(cv[0].wd, 1)}→${fmt(cv[W - 1].wd, 1)}°</tspan></text></svg>`;
+  return h;
+};
+const renderKur = () => {
+  const n = curN(), o = ovOf(n), v = ovView(), ph = OVP(), tags = v.ph[ph].t, pl = v.ph[ph].lv;
+  let h = `<p class="d">Bölüm ${n}: ${gIdx[curG()] ? gIdx[curG()].name : ''} ${lv}. ${TIER[lv - 1]}. Bölüm üç kısımdan oluşur (Baş, Orta, Son). Üstten bir kısım seç: o kısma parça ekle ya da çıkar, bölümün <b>herhangi bir ayarını</b> yalnız o kısım için değiştir (hız, genişlik, pim sayısı, kilit ayarları). Değişiklik soldaki oyunda o kısımdan başlayarak hemen oynar.</p>`;
+  h += timelineSvg(n);
+  h += `<div class="phs">${[0, 1, 2].map(i => { const ns = Object.keys(v.ph[i].set || {}).length; return `<button data-a="ovsel" data-k="${i}" class="${i === ph ? 'on' : ''}">${PH_NM[i]}<small>${v.ph[i].t.length} parça${ns ? ' · ' + ns + ' özel ayar' : ''}</small></button>`; }).join('')}</div>`;
+  const lvSel = x => { const kd = tagKind(x); if (!kd) return ''; const v = pl[kd] || 0; return `<select data-ovlv="${kd}" title="Bu parça hangi zorlukta davransın (Kolay, Orta, Usta, Usta++, Cehennem)"><option value="0" ${v ? '' : 'selected'}>Zorluk: ${TIER[lv - 1]} (bu bölümünki)</option>${[1, 2, 3, 4, 5].map(i => `<option value="${i}" ${v === i ? 'selected' : ''}>Zorluk: ${TIER[i - 1]}</option>`).join('')}</select>`; };
+  h += `<div class="sub">${PH_NM[ph]} kısmındaki parçalar</div><div class="tags">${tags.map(x => `<span class="tg ${TAG_OK.includes(x) ? '' : 'off'}" title="${TAG_OK.includes(x) ? '' : 'motoru henüz yok: etkisiz'}">${tagNm(x)}${lvSel(x)}<button data-a="ovdel" data-k="${x}" title="Çıkar">✕</button></span>`).join('') || '<span class="note">Boş: düz pim oynar</span>'}</div>`;
+  const add = allTags().filter(x => !tags.includes(x));
+  h += `<div class="acts"><select class="sel" id="ovAdd">${add.filter(x => TAG_OK.includes(x)).map(x => `<option value="${x}">${tagNm(x)}</option>`).join('')}<optgroup label="Motoru henüz yok">${add.filter(x => !TAG_OK.includes(x)).map(x => `<option value="${x}" disabled>${tagNm(x)}</option>`).join('')}</optgroup></select><select class="sel" id="ovAddLv"><option value="0">Zorluk: ${TIER[lv - 1]} (bu bölümünki)</option>${[1, 2, 3, 4, 5].map(i => `<option value="${i}">Zorluk: ${TIER[i - 1]}</option>`).join('')}</select><button class="btn sm pri" data-a="ovadd">+ Ekle</button></div>`;
+  const all = OVS(), have = (v.ph[ph].set) || {}, opts = Object.entries(all).filter(([q]) => have[q] == null);
+  let og = ''; const optH = opts.map(([q, x]) => { const g2 = x.grp || 'Bölüm'; const o2 = (g2 !== og ? (og ? '</optgroup>' : '') + `<optgroup label="${g2}">` : '') + `<option value="${q}">${x.ad}</option>`; og = g2; return o2; }).join('') + (og ? '</optgroup>' : '');
+  h += `<div class="sub">${PH_NM[ph]} kısmına özel ayarlar</div>` + (ovsDefs().map(rowHTML).join('') || `<p class="note">Bu kısım bölümün ayarlarını kullanıyor. Aşağıdan bir ayar seçip ekle: yalnız ${PH_NM[ph]} kısmında geçerli olur.</p>`) +
+    (opts.length ? `<div class="acts"><select class="sel" id="ovsAdd">${optH}</select><button class="btn sm pri" data-a="ovsadd">+ ${PH_NM[ph]} kısmında değiştir</button></div>` : '');
+  h += '<div class="sub">Kısım sınırları</div>' + ovDefs().map(rowHTML).join('');
+  const cv = ovCurve(n).filter(x => x.ph === ph && !x.end);
+  if (cv.length) h += `<p class="note">${PH_NM[ph]} kısmı: ${cv.length} dalga, hız ${Math.round(ovCurve(n).A[ph])}→${Math.round(ovCurve(n).A[ph + 1])} °/sn (her vuruşta düzgün), şeftali ${fmt(cv[0].wd, 1)}°.</p>`;
+  return h + `<div class="acts"><button class="btn sm" data-a="ovplay">${PH_NM[ph]} kısmını oynat</button>${o ? '<button class="btn sm ghost" data-a="ovoff">Hazır kurguya döndür</button>' : '<span class="note" style="margin:0">Hazır kurgu kullanılıyor; bir şey değiştirince bu bölüme özel olur.</span>'}</div>`;
+};
+/* bu bölümdeki kilitler: bölümün etiketlerinden BL_MCAT türleri */
+const mechKinds = (g, k) => {
+  const tags = new Set(); phTags(g, k).forEach(t => t.forEach(x => tags.add(x)));
+  return Object.keys(K.BL_MCAT).filter(kd => K.BL_MCAT[kd].tags.some(x => tags.has(x)));
+};
+const mechDefs = () => mechKinds(curG(), lv).flatMap(kd => Object.entries(K.BL_MCAT[kd].p).map(([q, d]) => ({
+  k: 'm.' + kd + '.' + q, grp: K.BL_MCAT[kd].ad, ad: d.ad, u: d.u, min: d.min, max: d.max, st: d.st,
+  get: s => s.M[kd][q][lv - 1], set: (s, v) => { s.M[kd][q][lv - 1] = v; }
+})));
+/* kartlar: pg sayfa, c kimlik (kapalı/açık hafızası), defs satırlar; özel kartların gövdesi kendi çizicisinden */
+const SECS = [
+  { pg: 'fizik', c: 'lv', t: () => (gIdx[curG()] ? gIdx[curG()].name : '') + ' · ' + lv + '. bölüm (' + TIER[lv - 1] + ')', defs: physDefs, eff: 1 },
+  { pg: 'fizik', c: 'mech', t: () => 'Kilit ayarları', d: 'Bu bölümde görünen her kilit için ayrı ayar; yalnız bu basamağa uygulanır, Süreli etkilenmez.', defs: mechDefs, empty: 'Bu bölümde özel ayarı olan kilit yok (düz pim ve çift pim).' },
+  { pg: 'fizik', c: 'lim', t: () => 'Sınırlar', d: 'Bütün bölümler için şeftali genişliği sınırları ve pim aralığı. Kaydırınca soldaki oyunda iki hedef bu genişliklerle durur.', defs: limDefs, pre: () => limSvg() },
+  { pg: 'fizik', c: 'phm', t: () => 'Bölüm içinde hız ve genişlik', d: 'Dört noktanın arasında, vurduğun her pimle ibre biraz hızlanır ve şeftali biraz daralır: kısım sınırında ani sıçrama yok.', defs: phmDefs },
+  { pg: 'kurgu', c: 'kur', t: () => 'Bölüm kurgusu · ' + lv + '. bölüm', sp: 'kur' },
+  { pg: 'fizik', c: 'tab', t: () => (gIdx[curG()] ? gIdx[curG()].name : '') + ': 5 bölüm yan yana', sp: 'tab' },
+  { pg: 'tasarim', c: 'len', t: () => 'Uzunluk ve kalabalık · ' + lv + '. bölüm', defs: lenDefs },
+  { pg: 'tasarim', c: 'life', t: () => 'Can ve hasar', d: 'Bütün bölümler. Can ve hasar değişince ölçüm yenilenmez: analiz hemen hesaplanır.', defs: lifeDefs },
+  { pg: 'tasarim', c: 'cont', t: () => 'İkinci şans', d: 'Yanınca önce reklam, reklam hakkı bitince altın (25, 50, 100...).', defs: contDefs },
+  { pg: 'tasarim', c: 'help', t: () => 'Gizli yardım', d: 'Aynı bölümü üst üste kaybedene görünmeden genişlik.', defs: helpDefs },
+  { pg: 'tasarim', c: 'rew', t: () => 'Yıldız ve ödül', d: 'İkinci şans kullanan 1 yıldız alır.', defs: rewDefs },
+  { pg: 'gorunum', c: 'fx', t: () => 'Efektler ve görünüm', defs: fxDefs },
+  { pg: 'oyuncu', c: 'ps', t: () => 'Oyuncu tipleri', sp: 'ps' },
+  { pg: 'oyuncu', c: 'bg', t: () => 'Nüfus dağılımı (çan eğrisi)', d: 'Oyuncuların zamanlama hatası log-normal bir çan eğrisine uyar (refleks süreleri böyle dağılır). Açıkken tiplerin nüfus payı bu eğriden hesaplanır; her sanal oyuncunun reklam eğilimi ve sabrı da tipin çevresinde normal dağılımla değişir.', defs: () => gaussDefs(), pre: () => bellSvg() },
+  { pg: 'oyuncu', c: 'bad', t: () => 'Reklam kararı', d: 'Yanınca ikinci şans reklamını izleme olasılığını belirleyen terimler (lojistik denklem; Analiz sayfasında açık yazılı).', defs: adDefs },
+  { pg: 'oyuncu', c: 'bq', t: () => 'Bırakma kararı', d: 'Kaybedince oyuncunun bölümü bırakma olasılığı.', defs: quitDefs },
+  { pg: 'oyuncu', c: 'bb', t: () => 'Sıkılma ve hedefler', d: 'Kanca puanının hedef bantları.', defs: goalDefs },
+  { pg: 'oyuncu', c: 'bn', t: () => 'Nüfus ve para', d: 'Oyuncu sayısı projeksiyonu (Analiz sayfasının altında).', defs: popDefs },
+  { pg: 'ana', c: 'ana', t: () => 'Analiz: reklam ve kanca', sp: 'ana' },
+  { pg: 'fikir', c: 'idea', t: () => 'Fikir panosu', sp: 'idea' },
+  { pg: 'yedek', c: 'yedek', t: () => 'Yedekte bekleyen bölümler', d: 'V2 ile güncellenerek gelecek kilitler. Oyunda, karışımlarda, ölçümde ve ayarlarda yoklar; yalnız burada saklanıyor.', sp: 'yedek' },
+  { pg: 'ayar', c: 'set', t: () => 'Ayarlar ve dışa aktarma', sp: 'set' }
+];
+const gaussDefs = () => [
+  B_('gauss', 'Çan eğrisini kullan', '0 = tablodaki paylar', '', 0, 1, 1),
+  B_('tgt', 'Kancayı hedef kitleye göre hesapla', '1 = tiplerin hedef ağırlığıyla; 0 = bütün nüfus eşit önemde', '', 0, 1, 1),
+  B_('skMu', 'Ortanca oyuncu', 'zamanlama hatası', 'ms', 20, 150, 1),
+  B_('skSd', 'Yayılım', 'log ölçekte; büyük = daha farklı oyuncular', '', 0.1, 1.2, 0.01),
+  B_('sdAd', 'Reklam eğilimi farkı', 'oyuncudan oyuncuya (logit)', '', 0, 2, 0.05),
+  B_('sdPat', 'Sabır farkı', 'oyuncudan oyuncuya (logit)', '', 0, 2, 0.05)
+];
+const allDefs = () => SECS.filter(x => x.defs).flatMap(x => x.defs()).concat(ovDefs(), ovsDefs());
+const val = f => (typeof f === 'function' ? f() : f);
+
+/* ---------- tutarlılık ---------- */
+const normalize = (s, changed) => {
+  const P = s.P;
+  if (!Array.isArray(P.phm) || P.phm.length !== 4) P.phm = REC.P.phm.slice();   /* eski 3 kısımlı hız dalgası → 4 noktalı doğrusal hız */
+  if (!Array.isArray(P.pwm) || P.pwm.length !== 4) P.pwm = REC.P.pwm.slice();
+  P.phm = P.phm.map(v => clamp(v, 0.4, 2)); P.pwm = P.pwm.map(v => clamp(v, 0.4, 2));
+  P.wMin = clamp(P.wMin, 2, 60); P.wMax = clamp(P.wMax, 2, 90);
+  if (P.wMin > P.wMax) { if (changed === 'lim.wMax') P.wMin = P.wMax; else P.wMax = P.wMin; }
+  P.wd = P.wd.map(w => clamp(w, P.wMin, P.wMax));
+  P.size = P.size.map(([a, b]) => { a = iv(a, 1, 6); b = iv(b, 1, 6); if (a > b) { if (changed === 'size-hi') a = b; else b = a; } return [a, b]; });
+  P.lives = iv(P.lives, 1, 3); P.regen = iv(P.regen, 0, 20); P.cont = iv(P.cont, 0, 5);
+  P.help[0] = clamp(P.help[0], 1, 1.6); P.help[1] = clamp(P.help[1], 1, 2);
+  if (P.help[1] < P.help[0]) { if (changed === 'adv.help1') P.help[0] = P.help[1]; else P.help[1] = P.help[0]; }
+  P.om = P.om.map(o => clamp(o, 30 / R2D, 300 / R2D)); P.t = P.t.map(t => clamp(t, 10, 150));
+  P.dmg = [iv(P.dmg[0], 1, 3), iv(P.dmg[1], 1, 3)];
+  if (P.dmg[0] > P.dmg[1]) { if (changed === 'adv.dmg1') P.dmg[0] = P.dmg[1]; else P.dmg[1] = P.dmg[0]; }
+  P.star = [iv(P.star[0], 0, 20), iv(P.star[1], 0, 20)];
+  if (P.star[0] > P.star[1]) { if (changed === 'adv.star1') P.star[0] = P.star[1]; else P.star[1] = P.star[0]; }
+  P.helpAt = [iv(P.helpAt[0], 1, 8), iv(P.helpAt[1], 2, 9)];
+  if (P.helpAt[0] >= P.helpAt[1]) { if (changed === 'adv.helpAt1') P.helpAt[0] = P.helpAt[1] - 1; else P.helpAt[1] = P.helpAt[0] + 1; }
+  P.contAds = iv(P.contAds, 0, 5); P.contL = iv(P.contL, 0, 3); if (P.contL > P.lives) P.contL = P.lives;
+  P.gold = P.gold.map(g => iv(g, 0, 500)); P.goldG = clamp(P.goldG, 0, 20); P.cd = clamp(P.cd, 0.5, 10);
+  for (const id in s.KF) s.KF[id] = clamp(s.KF[id], 0.3, 3.5);   /* tools/bl-opt.mjs ile aynı aralık */
+  (s.PS || []).forEach(p => { p.tg = clamp(p.tg != null ? +p.tg : 1, 0, 1); });
+  /* eski kurgu: kısım hız/genişlik katı → kısma özel değer (sayıyla görünsün) */
+  for (const id in s.OV || {}) { const L = (+id.slice(-1) || 1) - 1; s.OV[id].ph.forEach(p => { p.set = p.set || {};
+    if (p.om && p.om !== 1) { p.set.om = (p.set.om != null ? p.set.om : P.om[L]) * p.om; p.om = 1; }
+    if (p.wd && p.wd !== 1) { p.set.wd = (p.set.wd != null ? p.set.wd : P.wd[L]) * p.wd; p.wd = 1; }
+    if (p.set.wd != null) p.set.wd = clamp(p.set.wd, P.wMin, P.wMax); if (p.set.om != null) p.set.om = clamp(p.set.om, 30 / R2D, 300 / R2D); if (p.set.gap != null) p.set.gap = clamp(p.set.gap, 0, 40); }); }
+  for (const kd in s.M) if (!K.BL_MCAT[kd]) delete s.M[kd];   /* yedekteki kilitlerin eski kayıtlı ayarları atılır */
+  for (const id in s.KF) if (REC && REC.KF[id] == null) delete s.KF[id];
+  for (const kd in s.M) for (const q in s.M[kd]) { const d = K.BL_MCAT[kd].p[q]; s.M[kd][q] = s.M[kd][q].map(v => clamp(v, d.min, d.max)); }
+  const B = s.B;
+  B.adBase = clamp(B.adBase, 0.01, 0.99); B.quit = clamp(B.quit, 0.01, 0.9); B.fill = clamp(B.fill, 0, 1); B.coinP = clamp(B.coinP, 0, 1);
+  B.maxAtt = iv(B.maxAtt, 1, 20); B.adLen = clamp(B.adLen, 5, 90); B.players = clamp(Math.round(B.players), 100, 1e6); B.boreMiss = clamp(B.boreMiss, 0.5, 15);
+  ['tW0', 'tW1', 'tQ', 'tB', 'tK', 'blShare', 'churn', 'tF1', 'tF5', 'tWa1', 'tWa5', 'tQ1', 'tQ5'].forEach(q => { B[q] = clamp(B[q], 0, 1); }); B.tDrift = clamp(B.tDrift, 0, 0.03);
+  if (B.tW0 > B.tW1) { if (changed === 'b.tW1') B.tW0 = B.tW1; else B.tW1 = B.tW0; }
+  B.gauss = B.gauss ? 1 : 0; B.tgt = B.tgt === 0 ? 0 : 1; B.skMu = clamp(B.skMu, 20, 150); B.skSd = clamp(B.skSd, 0.1, 1.2);
+  for (const id in s.OV) { const o = s.OV[id]; o.cut[0] = clamp(o.cut[0], 0.05, 0.9); o.cut[1] = clamp(o.cut[1], o.cut[0] + 0.05, 0.98); delete o.ramp; delete o.imp; o.ph.forEach(p => { p.om = clamp(p.om, 0.5, 1.8); p.wd = clamp(p.wd, 0.5, 1.8); }); }
+  s.PS.forEach(p => { p.sg = clamp(p.sg, 0, 0.3); p.av = clamp(p.av, 0, 1); p.pay = clamp(p.pay, 0, 100); p.need = clamp(p.need, 0, 1); if (p.id === 'ideal') { p.sg = 0; p.av = 1; } });
+};
+
+/* ---------- oyunla bağlantı ---------- */
+const kp = () => fr.contentWindow && fr.contentWindow.__kp;
+const apply = w => {
+  const k = w && w.__kp; if (!k || !S) return;
+  Object.assign(k.BL_P, cp(S.P));
+  for (const id in S.KF) if (k.BL_KF[id]) k.BL_KF[id][1] = S.KF[id];
+  for (const kd in S.M) for (const q in S.M[kd]) k.BL_M[kd][q] = S.M[kd][q].slice();
+  for (const id in k.BL_OV) delete k.BL_OV[id];
+  Object.assign(k.BL_OV, cp(S.OV || {}));
+};
+const save = () => { try { localStorage.setItem('kp-lab', JSON.stringify(S)); } catch (e) {} };
+const exportJson = () => { const o = cp(S); delete o.ui; delete o.H; return JSON.stringify(o); };
+/* önizleme: o = { fv: üst üste kayıp (gizli yardım), ph: kısımdan başla } */
+let demoHold = 0;
+const start = (o = {}) => {
+  const k = kp(); if (!k) return;
+  apply(fr.contentWindow);
+  const n = curN(); if (k.blSoon(n)) return;
+  demoHold = 0; k.save.bl.f = {}; if (o.fv) k.save.bl.f[idOf(n)] = o.fv; k.blStart(n); winT = 0;
+  if (o.ph > 0) { const B = k.G.bl, c = (ovOf(n) || {}).cut || [1 / 3, 2 / 3]; B.wave = Math.ceil(B.waves * c[o.ph - 1]); k.G.pins = []; k.spawn(true); }
+};
+/* ayar değişince önizleme o ayarın etkisini gösterir; telefonun üstünde kısa açıklama */
+const note = (h, ms = 4500) => { const d = $('dnote'); d.innerHTML = h; d.classList.add('on'); clearTimeout(note.t); note.t = setTimeout(() => d.classList.remove('on'), ms); };
+let demoT = 0;
+const demo = k => { clearTimeout(demoT); demoT = setTimeout(() => runDemo(k), 260); };
+const runDemo = key => {
+  const k = kp(); if (!k || !S) return;
+  const P = S.P, n = curN(), e = eff(curG(), lv), G = k.G;
+  if (/^adv\.help/.test(key)) {
+    const i = /1$/.test(key) ? 1 : 0, f = P.helpAt[i], hf = P.help[i];
+    start({ fv: f });
+    note(`<b>Gizli yardım ${i + 1}</b>: oyuncu bu bölümü üst üste <b>${f}</b> kez kaybetmiş gibi oynuyor. Şeftali ${fmt(e.wd, 1)}° yerine <b>${fmt(e.wd * hf, 1)}°</b> (×${fmt(hf, 2)}); oyuncu fark etmez.`);
+  } else if (/^adv\.(lives|dmg|regen)/.test(key)) {
+    start(); note(`<b>${P.lives} can</b> · ıska −${P.dmg[0]} · tuzak −${P.dmg[1]}${P.regen ? ' · her ' + P.regen + ' dalgada +1 can' : ' · can yenilenmez'}. Üstteki kalplere bak.`);
+  } else if (/^adv\.cont/.test(key)) {
+    start(); demoHold = 1;
+    setTimeout(() => { if (!G.bl) return; for (let i = 0; i < 6 && G.mode === 'play'; i++) k.blHurt(2); }, 700);
+    note(`<b>İkinci şans</b>: bir denemede ${P.cont} hak; ilk ${Math.min(P.contAds, P.cont)} reklamla, sonrası altınla (25, 50…). Devam edince <b>${P.contL ? Math.min(P.contL, P.lives) : P.lives} can</b>.`, 6000);
+    setTimeout(() => { demoHold = 0; }, 6000);
+  } else if (/^adv\.(star|cd|goldG)|^lv\.gold/.test(key)) {
+    start(); demoHold = 1;
+    const miss = /star1/.test(key) ? P.star[1] : /star0/.test(key) ? P.star[0] : 0, st = miss <= P.star[0] ? 3 : miss <= P.star[1] ? 2 : 1;
+    setTimeout(() => { const B = G.bl; if (!B) return; B.miss = miss; B.wave = B.waves - 1; k.blWaveDone(); }, 600);
+    note(`<b>Bölüm sonu</b>: ${miss} hata → <b>${'★'.repeat(st)}</b> · ${P.gold[lv - 1] + P.goldG * curG()} altın · ${fmt(P.cd, 1)} sn sonra sonraki bölüm.`, 6000);
+    setTimeout(() => { demoHold = 0; }, 6500);
+  } else if (/^adv\.phm(\d)/.test(key)) {
+    const i = +key.slice(-1); start({ ph: Math.min(2, i) }); const A = ovCurve(n).A; note(`<b>${PHM_NM[i]}</b> hız ×${fmt(P.phm[i], 2)} = ${Math.round(A[i])} °/sn · bölüm boyunca ${A.map(Math.round).join(' → ')} °/sn, arada her vuruşta düzgün.`);
+  } else if (/^ov\./.test(key)) {
+    const ph = key === 'ov.cut1' ? 2 : key === 'ov.cut0' ? 1 : OVP(); S.ui.ovPh = key.startsWith('ov.cut') ? ph : OVP();
+    start({ ph }); const cv = ovCurve(n).filter(x => x.ph === ph && !x.end);
+    if (cv.length) note(`<b>${PH_NM[ph]} kısmı</b> (${cv.length} dalga): hız ${Math.round(ovCurve(n).A[ph])}→${Math.round(ovCurve(n).A[ph + 1])} °/sn (her vuruşta düzgün) · şeftali ${fmt(cv[0].wd, 1)}°.`);
+  } else if (/^lim\.w/.test(key)) {
+    start(); demoHold = 1;
+    setTimeout(() => {
+      const gs = G.pins.filter(p => p.kind === 'gate'); if (!gs.length) return;
+      const g0 = Object.assign(gs[0], { hw: P.wMin / R2D / 2, amp: 0, br: null, thw: null, ghost: null, ani: null }), g1 = Object.assign({}, g0, { hw: P.wMax / R2D / 2 });
+      const TW = 2 * Math.PI, nm = x => ((x % TW) + TW) % TW; g0.c0 = nm(G.ang + G.dir * 1.6); g1.c0 = nm(G.ang + G.dir * 3.9);
+      G.pins = [g0, g1];
+    }, 350);
+    setTimeout(() => { demoHold = 0; }, 7000);
+    note(`İbrenin önündeki ilk hedef <b>en dar ${fmt(P.wMin, 1)}°</b>, ikincisi <b>en geniş ${fmt(P.wMax, 1)}°</b>. Bu bölümün hızında ibre en darın içinde <b>${Math.round(P.wMin / (e.om * R2D) * 1000)} ms</b> kalır.`, 7000);
+  } else if (/^ovs\./.test(key)) {
+    start({ ph: OVP() }); const d = defByKey(key); if (d) note(`<b>${PH_NM[OVP()]} kısmı</b>: ${d.ad.replace(/^.*· /, '')} <b>${JSON.stringify(d.get(S)).replace(/[\[\]]/g, '').replace(',', '-')}${d.u ? ' ' + d.u : ''}</b> (bölümün kendi değeri ${JSON.stringify(d.base()).replace(/[\[\]]/g, '').replace(',', '-')}). Oyun o kısımdan başlıyor.`, 4000);
+  } else if (/^lv\.(om|wd|c)$/.test(key)) {
+    start(); note(`Şeftali <b>${fmt(e.wd, 1)}°</b> · hız <b>${Math.round(e.om * R2D)} °/sn</b> → ibre hedefte <b>${fmt(e.tau * 1000, 0)} ms</b> kalır.`);
+  } else if (/^m\./.test(key)) {
+    start(); note(`<b>${(defByKey(key) || {}).ad || ''}</b> değişti; ${lv}. bölüm baştan oynuyor.`, 3000);
+  } else start();
+};
+const restartSoon = () => { clearTimeout(restartT); restartT = setTimeout(start, 250); };
+/* önizleme oynatıcısı: seçili oyuncu tipinin zamanlama hatasıyla oynar (İdealist tam ortadan) */
+const gauss = s => { let u = 0; while (!u) u = Math.random(); return s * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random()); };
+const aimSg = () => { const a = S.ui.aim; if (a === 'ozel') return (S.ui.aimMs || 0) / 1000; const p = S.PS.find(x => x.id === a); return p ? p.sg : 0.08; };
+const autoTick = () => {
+  const k = kp(); if (!k || !S || S.ui.aim === 'ben') return;
+  if (demoHold) { const G = k.G; if (G.bl && G.mode === 'play' && G.bl.lives > 0) { /* gösterim sürerken bot oynamaz */ } return; }
+  const G = k.G; if (!G.bl) return;
+  if (G.mode === 'blwin') { if (++winT > 110) start(); return; }
+  if (G.mode === 'over' || G.mode === 'dead') { if (++winT > 70) start(); return; }
+  if (G.mode !== 'play') return;
+  if (S.ui.imm !== false) G.bl.lives = Math.max(G.bl.lives, 1);
+  if (G.holding) { const hp = G.pins.find(p => p.kind === 'hold' && p.st === 'hold'); if (hp && k.holdRel(hp) >= hp.len + (hp._lab || 0) * G.omega - 0.02) k.release(); return; }
+  if (G.tun) return;
+  const sg = aimSg();
+  for (const p of G.pins) {
+    if (p.done || (p.ring && !(G.bl.br)) || (p.ani && !p.ani.on)) continue;
+    if (G.bl.br && ((p.ring | 0) !== (G.bl.lk > 0.5 ? 1 : 0) || (G.bl.lk > 0.02 && G.bl.lk < 0.98))) continue;
+    let c, hw;
+    if (p.kind === 'gate') { if (p.locked || (p.gold && (p.wait || p.gone)) || (p.light && !p.green)) continue; c = k.pinCenter(p); hw = k.pinHw(p); }
+    else if (p.kind === 'hold') { c = p.c0; hw = p.hw; }
+    else if (p.kind === 'lockpin') { if (!p.open) continue; c = p.c0; hw = p.hw; }
+    else continue;
+    if (p._lab === undefined) p._lab = sg ? gauss(sg) : 0;
+    const d = k.sdiff(G.ang, c) * G.dir - p._lab * G.omega;
+    if (hw > 0 && d > -0.03 && d < 0.03) { k.tap(); p._lab = undefined; return; }
+  }
+};
+
+/* ---------- satırlar ---------- */
+const isMod = d => JSON.stringify(d.get(S)) !== JSON.stringify(d.get(REC));
+const rowHTML = d => {
+  if (S.ui.deleted[d.k]) return '';
+  const hid = !!S.ui.hidden[d.k]; if (hid && !S.ui.showHidden) return '';
+  const v = d.get(S);
+  let ctl;
+  if (d.sel) ctl = `<select data-k="${d.k}" data-f="sel" style="grid-column:span 2;width:100%">${d.sel.map((x, i) => `<option value="${i}" ${i === v ? 'selected' : ''}>${i} · ${x}</option>`).join('')}</select>`;
+  else if (d.pair) ctl = `<div class="pair" style="grid-column:span 2"><input type="number" data-k="${d.k}" data-f="lo" min="${d.min}" max="${d.max}" step="1" value="${v[0]}"><input type="number" data-k="${d.k}" data-f="hi" min="${d.min}" max="${d.max}" step="1" value="${v[1]}"></div>`;
+  else if (d.cap) { const mn = val(d.min), mx = val(d.max), [lo, hi] = d.cap(), pa = x => clamp((x - mn) / (mx - mn), 0, 1) * 100; ctl = `<div class="rw" style="--a:${pa(lo)}%;--b:${pa(hi)}%" title="Taralı bölge: ${d.capT}"><input type="range" data-k="${d.k}" data-f="r" min="${mn}" max="${mx}" step="${d.st}" value="${v}"></div><input type="number" data-k="${d.k}" data-f="n" min="${lo}" max="${hi}" step="${d.st}" value="${+Number(v).toFixed(3)}">`; }
+  else ctl = `<input type="range" data-k="${d.k}" data-f="r" min="${val(d.min)}" max="${val(d.max)}" step="${d.st}" value="${v}"><input type="number" data-k="${d.k}" data-f="n" min="${val(d.min)}" max="${val(d.max)}" step="${d.st}" value="${+Number(v).toFixed(3)}">`;
+  return `<div class="row ${hid ? 'hid' : ''} ${isMod(d) ? 'mod' : ''}"><label>${d.ad}${d.u ? ' (' + d.u + ')' : ''}${d.sub ? '<small>' + d.sub + '</small>' : ''}</label>${ctl}<div class="ic"><button title="Önerilen: ${JSON.stringify(d.get(REC))}" data-a="rec" data-k="${d.k}">↺</button><button title="${hid ? 'Göster' : 'Gizle'}" data-a="hide" data-k="${d.k}">${hid ? '◉' : '◌'}</button><button title="Sil" data-a="del" data-k="${d.k}">✕</button></div></div>`;
+};
+const defByKey = k => allDefs().find(d => d.k === k);
+/* ayar değişince: fizik değiştiyse önizleme yeniden başlar; analiz yalnız hesapla güncellenir (ölçüm eskiyse rozet çıkar) */
+const changed = () => { save(); if (S.ui.pg === 'ana' && typeof renderAna === 'function') renderAna(); if (typeof histSoon === 'function') histSoon(); };
+const noteChg = (k, d) => { const v = d.get(S); S.ui.chg = S.ui.chg || {}; S.ui.chg[k] = d.ad + ' ' + (Array.isArray(v) ? v.join('-') : +Number(v).toFixed(2)); };
+const setVal = (k, v, how) => {
+  const d = defByKey(k); if (!d) return;
+  if (d.pair) { const cur = d.get(S); if (how === 'lo') cur[0] = v; else cur[1] = v; d.set(S, cur); normalize(S, how === 'hi' ? 'size-hi' : 'size-lo'); }
+  else { d.set(S, v); normalize(S, k); }
+  noteChg(k, d); changed(); render(); if (!k.startsWith('b.')) demo(k);
+};
+let softT = 0;
+const setValSoft = (k, v, how) => {
+  const d = defByKey(k); if (!d) return;
+  if (d.pair) { const cur = d.get(S); if (how === 'lo') cur[0] = v; else cur[1] = v; d.set(S, cur); normalize(S, how === 'hi' ? 'size-hi' : 'size-lo'); } else { d.set(S, v); normalize(S, k); }
+  noteChg(k, d); save(); clearTimeout(softT); softT = setTimeout(() => { changed(); render(); }, 140); if (!k.startsWith('b.')) demo(k);
+};
+/* ENTER'sız: kaydırıcı da kutu da yazdıkça uygular (yazılan kutunun kartı yeniden çizilmez, odak kaybolmaz) */
+document.addEventListener('input', e => {
+  const t = e.target, f = t.dataset.f;
+  if (t.dataset.ps) { if (t.value === '' || !isFinite(+t.value)) return; const p = S.PS.find(x => x.id === t.dataset.ps), q = t.dataset.q; p[q] = q === 'sg' ? +t.value / 1000 : +t.value; normalize(S); save(); clearTimeout(softT); softT = setTimeout(() => { changed(); render(); }, 200); return; }
+  if (!t.dataset.k) return;
+  const cd = (f === 'r' || f === 'n') && t.value !== '' && defByKey(t.dataset.k);
+  if (cd && cd.cap) { const [lo, hi] = cd.cap(), v0 = +t.value, v1 = f === 'r' ? clamp(v0, lo, hi) : Math.min(v0, hi);   /* kutuda yazarken alt sınır çıkışta uygulanır */ if (v1 !== v0) { t.value = v1; const w = t.closest('.row') && t.closest('.row').querySelector('.rw'); if (w) { w.classList.add('hit'); clearTimeout(w._t); w._t = setTimeout(() => w.classList.remove('hit'), 350); } } }
+  if (f === 'r') { const n = t.parentNode.querySelector('[data-f="n"]'); if (n) n.value = t.value; setValSoft(t.dataset.k, +t.value); }
+  else if (f === 'n' || f === 'lo' || f === 'hi') { if (t.value === '' || !isFinite(+t.value)) return; if (f === 'n') { const r = t.parentNode.querySelector('[data-f="r"]'); if (r) r.value = t.value; } setValSoft(t.dataset.k, +t.value, f); }
+});
+document.addEventListener('change', e => {
+  const t = e.target, k = t.dataset.k;
+  if (t.dataset.ps) { t.blur(); render(); return; }
+  if (t.dataset.ovlv) { const o = ovOf(curN()); if (o) { const v = +t.value; if (v) o.ph[OVP()].lv[t.dataset.ovlv] = v; else delete o.ph[OVP()].lv[t.dataset.ovlv]; changed(); render(); demo('ov.lv'); } return; }
+  if (!k) return;
+  if (t.dataset.f === 'n') { const d = defByKey(k); if (d && d.cap && t.value !== '') { const [lo, hi] = d.cap(); t.value = clamp(+t.value, lo, hi); } setVal(k, +t.value); }
+  else if (t.dataset.f === 'lo' || t.dataset.f === 'hi') setVal(k, +t.value, t.dataset.f);
+  else if (t.dataset.f === 'sel') setVal(k, +t.value);
+  else if (t.dataset.f === 'r') render();
+});
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-a],[data-l],[data-i],[data-pg],.card>header'); if (!t) return;
+  if (t.matches('.card>header')) { const c = t.parentNode; c.classList.toggle('closed'); S.ui.closed[c.dataset.c] = c.classList.contains('closed'); save(); return; }
+  if (t.dataset.pg) { $('mod').classList.remove('on'); S.ui.pg = t.dataset.pg; save(); render(); scrollTo(0, 0); return; }
+  if (t.dataset.l) { lv = +t.dataset.l; render(); start(); return; }
+  if (t.dataset.i) { step = +t.dataset.i; S.step = step; save(); render(); start(); return; }
+  const a = t.dataset.a, k = t.dataset.k;
+  if ((a === 'rec' || a === 'del') && k && k.startsWith('ovs.')) { const ps = ovEnsure().ph[OVP()]; if (ps.set) delete ps.set[k.slice(4)]; changed(); render(); start({ ph: OVP() }); toast(a === 'rec' ? 'Bölümün kendi değerine döndü' : 'Kısma özel ayar kaldırıldı'); return; }
+  if (a === 'rec') { const d = defByKey(k); d.set(S, cp(d.get(REC))); normalize(S, k); changed(); render(); restartSoon(); toast('Önerilen değere döndü'); }
+  else if (a === 'rsec') { const sc = SECS.find(x => x.c === k); sc.defs().forEach(d => d.set(S, cp(d.get(REC)))); normalize(S); changed(); render(); restartSoon(); toast(sc.t() + ': önerilene döndü'); }
+  else if (a === 'rps') { S.PS = cp(REC.PS); changed(); render(); toast('Oyuncu tipleri önerilene döndü'); }
+  else if (a === 'hide') { if (S.ui.hidden[k]) delete S.ui.hidden[k]; else S.ui.hidden[k] = 1; save(); render(); }
+  else if (a === 'del') { S.ui.deleted[k] = (defByKey(k) || {}).ad || k; save(); render(); toast('Silindi: Ayarlar sayfasından geri alınabilir'); }
+  else if (a === 'undel') { delete S.ui.deleted[k]; save(); render(); }
+  else if (a === 'ihide') { if (S.ui.ih[k]) delete S.ui.ih[k]; else S.ui.ih[k] = 1; save(); render(); }
+  else if (a === 'idel') { $('mod').classList.remove('on'); S.ui.id[k] = 1; save(); render(); toast('Fikir silindi: altta geri alınabilir'); }
+  else if (a === 'iundel') { delete S.ui.id[k]; save(); render(); }
+  else if (a === 'iflt') { S.ui.iflt = k; save(); render(); }
+  else if (a === 'ovsel') { S.ui.ovPh = +k; save(); render(); start({ ph: +k }); }
+  else if (a === 'ovon') { S.OV[idOf(curN())] = ovDef0(curN()); changed(); render(); toast('Bu bölüm artık özel kurguda'); }
+  else if (a === 'ovoff') { if (!sure('ovoff', 'Bu bölüm hazır kurguya dönecek')) return; delete S.OV[idOf(curN())]; changed(); render(); start(); toast('Hazır kurguya döndü'); }
+  else if (a === 'ovplay') start({ ph: OVP() });
+  else if (a === 'ovdel') { const o = ovEnsure(); if (o) { o.ph[OVP()].t = o.ph[OVP()].t.filter(x => x !== k); changed(); render(); start({ ph: OVP() }); note(`<b>${tagNm(k)}</b> ${PH_NM[OVP()]} kısmından çıkarıldı.`, 3000); } }
+  else if (a === 'ovsadd') { const q = $('ovsAdd').value, x = OVS()[q]; if (x) { const ps = ovEnsure().ph[OVP()]; ps.set = ps.set || {}; ps.set[q] = x.pair ? x.b() : (x.to ? x.to(x.b()) : x.b()); S.ui.chg = S.ui.chg || {}; S.ui.chg['ovs' + q] = PH_NM[OVP()] + ': ' + x.ad + ' özel'; changed(); render(); demo('ovs.' + q); } }
+  else if (a === 'ovadd') { const o = ovEnsure(), x = $('ovAdd').value, L = +$('ovAddLv').value; if (o && x) { o.ph[OVP()].t.push(x); const kd = tagKind(x); if (kd && L) o.ph[OVP()].lv[kd] = L; changed(); render(); start({ ph: OVP() }); note(`<b>${tagNm(x)}</b> ${PH_NM[OVP()]} kısmına eklendi${L ? ' (güç ' + L + ')' : ''}.`, 3500); } }
+  else if (a === 'iopen') openIdea(k);
+  else if (a === 'mclose') $('mod').classList.remove('on');
+  else if (typeof anaClick === 'function') anaClick(a, k, t);
+});
+
+/* ---------- sıfırlama ---------- */
+const resetLevel = (g, k1) => {
+  const L = k1 - 1, id = idOf(g * 5 + k1);
+  if (g === 0 || STEPS()[step].g === 0) { S.P.om[L] = REC.P.om[L]; S.P.wd[L] = REC.P.wd[L]; S.P.size[L] = REC.P.size[L].slice(); S.P.t[L] = REC.P.t[L]; S.P.gold[L] = REC.P.gold[L]; }
+  if (REC.KF[id] != null) S.KF[id] = REC.KF[id];
+  mechKinds(g, k1).forEach(kd => { for (const q in S.M[kd]) S.M[kd][q][L] = REC.M[kd][q][L]; });
+};
+$('rLv').onclick = () => { resetLevel(curG(), lv); normalize(S); changed(); render(); start(); toast(lv + '. bölüm önerilen değerlere döndü'); };
+$('rStep').onclick = () => { for (let i = 1; i <= 5; i++) resetLevel(curG(), i); normalize(S); changed(); render(); start(); toast('Bu adımın 5 bölümü önerilen değerlere döndü'); };
+
+/* ---------- çizim ---------- */
+const eff = (g, k1, st = {}) => {
+  const P = S.P, id = idOf(g * 5 + k1), c = S.KF[id] || 1, rc = Math.sqrt(c), want = (st.wd != null ? st.wd : P.wd[k1 - 1]) * rc, wd = clamp(want, P.wMin, P.wMax), om = (st.om != null ? st.om : P.om[k1 - 1]) / rc * (wd / want);
+  return { c, wd, om, tau: wd / R2D / om, clamped: Math.abs(want - wd) > 1e-6 };
+};
+const buildPanel = () => {
+  $('panel').innerHTML = SECS.map(x => `<section class="card" data-c="${x.c}" data-p="${x.pg}"><header><h2 id="h-${x.c}"></h2><span class="chev">▾</span></header><div class="body">${x.d ? '<p class="d">' + x.d + '</p>' : ''}<div id="b-${x.c}"></div>${x.defs && x.c !== 'mech' ? `<div class="acts"><button class="btn sm ghost" data-a="rsec" data-k="${x.c}">Bu kartı önerilene döndür</button></div>` : ''}</div></section>`).join('');
+  $('nav').innerHTML = PAGES.map(([p, ad]) => `<button data-pg="${p}">${ad}</button>`).join('');
+};
+/* sınırlar: gerçek halka oranında en dar ve en geniş şeftali, bölüm hızında ibrenin içinde kaldığı süre */
+const limSvg = () => {
+  const P = S.P, e = eff(curG(), lv), om = e.om * R2D, ms = w => Math.round(w / om * 1000), cx = [80, 240];
+  const arc = (x, w, col) => { const a = arcP(46, -w / 2, w / 2, x, 66); return `<circle cx="${x}" cy="66" r="46" fill="none" stroke="#3a3268" stroke-width="12"/><path d="${a}" stroke="${col}" stroke-width="12" fill="none"/><line x1="${x}" y1="66" x2="${x}" y2="${66 - 40}" stroke="#f3f0ff" stroke-width="2.5" stroke-linecap="round" opacity=".55"/><circle cx="${x}" cy="66" r="3.5" fill="#f3f0ff"/>`; };
+  const hit = [1, 2, 3, 4, 5].filter(i => eff(curG(), i).clamped);
+  return `<svg class="tl" viewBox="0 0 320 150" style="max-width:420px">${arc(cx[0], P.wMin, '#8e7bf2')}${arc(cx[1], P.wMax, '#ff8e5c')}
+    ${T(cx[0], 132, 12, 'En dar ' + fmt(P.wMin, 1) + '°', '#b6acdf')}${T(cx[0], 146, 10, 'ibre ' + ms(P.wMin) + ' ms içinde', '#8076b0', 600)}
+    ${T(cx[1], 132, 12, 'En geniş ' + fmt(P.wMax, 1) + '°', '#ff8e5c')}${T(cx[1], 146, 10, 'ibre ' + ms(P.wMax) + ' ms içinde', '#8076b0', 600)}</svg>
+    <p class="note">Halkalar oyundaki oranla çizildi (bütün halka 360°). Süreler bu bölümün hızında (${Math.round(om)} °/sn): ibrenin şeftalinin içinde kaldığı zaman, yani oyuncunun dokunma payı.${hit.length ? ' <span class="amb">Sınıra dayanan bölüm: ' + hit.map(i => curG() * 5 + i).join(', ') + ' (kalan zorluk hızdan alınır).</span>' : ''}</p>`;
+};
+const renderRows = x => {
+  const ds = x.defs(); let h = x.pre ? x.pre() : '', last = '';
+  ds.forEach(d => { if (d.grp && d.grp !== last) { h += `<div class="sub">${d.grp}</div>`; last = d.grp; } h += rowHTML(d); });
+  if (!ds.length && x.empty) h = '<p class="note">' + x.empty + '</p>';
+  if (x.eff) {
+    const e = eff(curG(), lv);
+    h += `<div class="note">Oyunda: genişlik <b>${fmt(e.wd, 1)}°</b>${e.clamped ? ' <span class="amb">(sınıra dayandı, kalan pay hızdan)</span>' : ''} · hız <b>${fmt(e.om * R2D, 0)}°/sn</b> · pencere <b>${fmt(e.tau, 3)} sn</b> · dalga <b>${K ? K.blWaves(curN(), lv) : '-'}</b></div>`;
+  }
+  return h;
+};
+const renderTab = () => {
+  const g = curG(), rows = [1, 2, 3, 4, 5].map(i => eff(g, i));
+  return '<div class="tw"><table><tr><th>Bölüm</th><th>Hız °/sn</th><th>Genişlik °</th><th>c</th><th>Pencere</th><th>İlk denemede canı biten</th><th>Hedef</th></tr>' + rows.map((r, i) => {
+    const n = g * 5 + i + 1, G0 = goal(n), sx = typeof simLevel === 'function' && MEAS[n] ? simLevel(n, S.P, S.B) : null, f = sx && sx.pop ? 1 - sx.pop.first : null;
+    return `<tr class="${i + 1 === lv ? 'on' : ''}"><td>${i + 1}. ${TIER[i]}</td><td>${fmt(r.om * R2D, 0)}</td><td>${fmt(r.wd, 1)}${r.clamped ? '<span class="amb">*</span>' : ''}</td><td>${fmt(r.c, 2)}</td><td>${fmt(r.tau, 3)} sn</td><td class="${f == null ? '' : f >= G0.F0 && f <= G0.F1 ? 'okc' : 'warn'}">${f == null ? '<span class="note">ölçülmedi</span>' : pc(f)}</td><td>${pc(G0.F)}</td></tr>`;
+  }).join('') + '</table></div><p class="note">Pencere = ibrenin şeftalide kaldığı süre (genişlik ÷ hız). Zorluğun ölçüsü: hedef kitlenin ilk denemede canının bitme oranı; Kolay → Cehennem doğrusal artmalı (hedefler Oyuncular › Sıkılma ve hedefler). c = bu kilidin pencere katsayısı (önerilenler <code>tools/bl-calib.mjs</code> ölçümünden). * = genişlik sınıra dayandı, kalan pay hızdan.</p>';
+};
+const renderPS = () => {
+  const sum = S.PS.reduce((a, p) => a + p.pay, 0);
+  const inp = (p, q, v, st, dis) => `<input type="number" data-ps="${p.id}" data-q="${q}" step="${st}" value="${v}" ${dis ? 'disabled' : ''}>`;
+  return '<p class="d">Bot bu tiplerle oynar. Zamanlama hatası ve tuzaktan kaçınma ölçümü değiştirir (yeniden ölç); diğerleri yalnız davranış modelidir, anında hesaplanır. <b>İdealist hiç hata yapmaz</b> (üst sınır, nüfusta yok); <b>Kusursuz</b> insanın en iyisi, nadiren hata yapar.</p><div class="tw"><table><tr><th>Tip</th><th>Zamanlama hatası ms</th><th>Tuzaktan kaçınma</th><th>Nüfus %</th><th>Hedef ağırlığı</th><th>Reklam eğilimi</th><th>Sabır</th><th>Zorluk ihtiyacı</th></tr>' +
+    S.PS.map(p => `<tr><td>${p.nm}</td><td>${inp(p, 'sg', Math.round(p.sg * 1000), 1, p.id === 'ideal')}</td><td>${inp(p, 'av', p.av, 0.05, p.id === 'ideal')}</td><td>${inp(p, 'pay', p.pay, 1)}</td><td>${inp(p, 'tg', p.tg != null ? p.tg : 1, 0.05, p.id === 'ideal')}</td><td>${inp(p, 'ad', p.ad, 0.05)}</td><td>${inp(p, 'pat', p.pat, 0.05)}</td><td>${inp(p, 'need', p.need, 0.05)}</td></tr>`).join('') +
+    `</table></div><p class="note">Nüfus payları toplamı <b class="${Math.abs(sum - 100) > 0.5 ? 'amb' : 'okc'}">%${fmt(sum, 0)}</b>${Math.abs(sum - 100) > 0.5 ? ' (100 değil: hesaplarda toplamına bölünerek oranlanır)' : ''}. Reklam eğilimi ve sabır, denklemlere eklenen kaydırmadır (0 = sıradan; + daha istekli / daha sabırlı). Zorluk ihtiyacı: kolay geçince sıkılma eğilimi (0-1). <b>Hedef ağırlığı</b>: kanca puanı ve teşhis bu tipi ne kadar önemsesin (1 = asıl kitle, 0 = hiç). Varsayılan: orta, iyi ve usta asıl kitle; acemi ve yeni başlayanı memnun etmek için asıl kitleyi sıkmayalım. Gelir projeksiyonu yine gerçek nüfusla hesaplanır.</p><div class="acts"><button class="btn sm ghost" data-a="rps">Tipleri önerilene döndür</button></div>`;
+};
+const renderSet = () => {
+  const dl = Object.entries(S.ui.deleted);
+  return `<p class="d">Bitince Claude'a "laboratuvardaki ayarları oyuna al" de; ayarlar tarayıcıda saklanıyor. Önerilen değerler = oyunun şu anki değerleri.</p>
+  <div class="acts"><label class="note" style="display:flex;gap:5px;align-items:center;margin:0"><input type="checkbox" id="showHid" ${S.ui.showHidden ? 'checked' : ''}> gizlenenleri göster</label></div>
+  <div class="acts"><button class="btn sm" id="copy">Ayarları kopyala</button><button class="btn sm ghost" id="rAll">Hepsini önerilene döndür</button><button class="btn sm ghost" id="rMeas">Ölçümleri sil</button></div>
+  <div class="note">${dl.length ? 'Silinen ayarlar: ' + dl.map(([k, ad]) => `<button class="btn sm ghost" data-a="undel" data-k="${k}">${ad} ↶</button>`).join(' ') : 'Silinen ayar yok.'}</div>
+  <textarea id="json" readonly>${exportJson().replace(/</g, '&lt;')}</textarea>`;
+};
+const render = () => {
+  const pg = S.ui.pg || 'fizik', st = STEPS()[step], g = curG();
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.pg === pg));
+  $('main').classList.toggle('np', !!NOPHONE[pg]); $('ctx').classList.toggle('off', !!NOCTX[pg]);
+  $('stepSel').innerHTML = STEPS().map((x, i) => `<option value="${i}" ${i === step ? 'selected' : ''}>${i + 1}/${STEPS().length} · ${x.t}</option>`).join('');
+  $('steps').innerHTML = STEPS().map((x, i) => `<i class="${i === step ? 'on' : (S.ok && S.ok[i] ? 'done' : '')}" title="${x.t}" data-i="${i}"></i>`).join('');
+  $('tabs').innerHTML = [1, 2, 3, 4, 5].map(i => `<button data-l="${i}" class="${i === lv ? 'on' : ''}">${i}. ${TIER[i - 1]}<small>Bölüm ${g * 5 + i}</small></button>`).join('');
+  $('prev').disabled = step === 0;
+  $('next').textContent = step === STEPS().length - 1 ? 'Bitir' : 'Onayla ›';
+  $('next').title = st.d;
+  SECS.forEach(x => {
+    const c = document.querySelector(`.card[data-c="${x.c}"]`), on = x.pg === pg;
+    c.classList.toggle('pgoff', !on); c.classList.toggle('closed', !!S.ui.closed[x.c]);
+    if (!on) return;
+    $('h-' + x.c).textContent = x.t();
+    const ae = document.activeElement, body = $('b-' + x.c);
+    if (ae && body.contains(ae) && (ae.tagName === 'INPUT') && ae.type !== 'checkbox') {   /* yazılan/kaydırılan satır yerinde kalır, kartın geri kalanı (çizim, bağlı kaydırıcılar) canlı güncellenir */
+      if (!x.defs) return;
+      const tmp = document.createElement('div'); tmp.innerHTML = renderRows(x);
+      if (tmp.children.length !== body.children.length) return;
+      [...body.children].forEach((c, i) => { if (!c.contains(ae)) c.replaceWith(tmp.children[i].cloneNode(true)); });
+      return;
+    }
+    if (x.defs) $('b-' + x.c).innerHTML = renderRows(x);
+    else if (x.sp === 'tab') $('b-tab').innerHTML = renderTab();
+    else if (x.sp === 'ps') $('b-ps').innerHTML = renderPS();
+    else if (x.sp === 'kur') $('b-kur').innerHTML = renderKur();
+    else if (x.sp === 'set') $('b-set').innerHTML = renderSet();
+    else if (x.sp === 'yedek') $('b-yedek').innerHTML = renderYedek();
+    else if (x.sp === 'ana' && typeof renderAna === 'function') renderAna();
+    else if (x.sp === 'idea' && typeof renderIdeas === 'function') renderIdeas();
+  });
+  if (typeof hookBadge === 'function') hookBadge();
+  $('aim').innerHTML = S.PS.map(p => `<option value="${p.id}">${p.nm} (${Math.round(p.sg * 1000)} ms)</option>`).join('') + '<option value="ozel">Özel (ms)</option><option value="ben">Ben oynayayım</option>';
+  $('aim').value = S.ui.aim; $('aimMs').style.display = S.ui.aim === 'ozel' ? '' : 'none'; $('aimMs').value = S.ui.aimMs; $('imm').checked = S.ui.imm !== false;
+};
+
+/* ---------- üst çubuk ve ayarlar ---------- */
+$('stepSel').onchange = () => { step = +$('stepSel').value; lv = 1; S.step = step; save(); render(); start(); };
+$('prev').onclick = () => { if (step > 0) { step--; lv = 1; S.step = step; save(); render(); start(); } };
+$('next').onclick = () => { S.ok = S.ok || {}; S.ok[step] = 1; if (step < STEPS().length - 1) { step++; lv = 1; toast('Onaylandı'); } else toast('Bitti: Claude\'a "laboratuvardaki ayarları oyuna al" de'); S.step = step; save(); render(); start(); };
+$('aim').onchange = () => { S.ui.aim = $('aim').value; save(); render(); start(); };
+$('aimMs').onchange = () => { S.ui.aimMs = clamp(+$('aimMs').value, 0, 300); save(); };
+$('imm').onchange = () => { S.ui.imm = $('imm').checked; save(); };
+$('again').onclick = start;
+$('panel').addEventListener('change', e => { if (e.target.id === 'showHid') { S.ui.showHidden = e.target.checked; save(); render(); } });
+$('panel').addEventListener('click', e => {
+  const id = e.target.id;
+  if (id === 'copy') { const j = $('json'); j.value = exportJson(); j.select(); try { navigator.clipboard.writeText(j.value); } catch (er) { document.execCommand('copy'); } toast('Kopyalandı'); }
+  else if (id === 'rAll') { if (!sure('rAll', 'Bütün değerler önerilene dönecek (gizle/sil seçimlerin ve fikir panosu korunur)')) return; const ui = S.ui, H = S.H; S = cp(REC); S.ui = ui; S.H = H; S.step = step; changed(); render(); start(); toast('Hepsi önerilen değerlere döndü'); }
+  else if (id === 'rMeas' && typeof MEAS === 'object') { if (!sure('rMeas', 'Bütün ölçümler silinecek')) return; for (const n in MEAS) delete MEAS[n]; saveMeas(); render(); toast('Ölçümler silindi'); }
+});
+/* ================= ANALİZ: ölçüm (gerçek oyun kodu) + yeniden oynatma + oturum modeli ================= */
+const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const hashS = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+const logit = p => Math.log(p / (1 - p)), sig = x => 1 / (1 + Math.exp(-x));
+/* yuvarlama yalan söylemesin: %0,3 '%0' değil '<%1', %99,8 '%100' değil '>%99' */
+const pc = v => v > 0 && v < 0.005 ? '<%1' : v < 1 && v > 0.995 ? '>%99' : '%' + Math.round(v * 100);
+/* Türkçe ek: %62'si, %30'u, %65'i (sayının okunuşuna göre) */
+const pcS = v => { const t = pc(v), n = +t.replace(/\D/g, ''), O = ['ı', 'i', 'si', 'ü', 'ü', 'i', 'sı', 'si', 'i', 'u'], T = ['', 'u', 'si', 'u', 'ı', 'si', 'ı', 'i', 'i', 'ı']; return t + "'" + (n >= 100 ? 'ü' : n % 10 ? O[n % 10] : n ? T[n / 10] : 'ı'); };
+const ci = (p, N) => N ? 1.96 * Math.sqrt(Math.max(p * (1 - p), 0) / N) : 0;
+const nf = v => Math.round(v).toLocaleString('tr-TR');
+let MEAS = {}; try { MEAS = JSON.parse(localStorage.getItem('kp-lab-meas') || '{}') || {}; } catch (e) { MEAS = {}; }
+const saveMeas = () => { try { localStorage.setItem('kp-lab-meas', JSON.stringify(MEAS)); } catch (e) { toast('Ölçümler tarayıcıya sığmadı (yalnız bu oturumda kalır)'); } };
+const MS = { busy: false, done: 0, total: 1 }, SIMC = new Map();
+/* nüfus: zamanlama hatası log-normal (refleks süreleri sağa çarpık dağılır); tip payı = komşu tiplerle ortak sınırlar arasındaki olasılık */
+const erf = x => { const t = 1 / (1 + 0.3275911 * Math.abs(x)), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; };
+const lnCdf = (ms, B) => ms <= 0 ? 0 : 0.5 * (1 + erf((Math.log(ms) - Math.log(B.skMu)) / (B.skSd * Math.SQRT2)));
+const popW = () => {
+  const B = S.B, o = {};
+  if (!B.gauss) { S.PS.forEach(p => { o[p.id] = p.pay; }); return o; }
+  const ps = S.PS.filter(p => p.id !== 'ideal').sort((a, b) => a.sg - b.sg); o.ideal = 0;
+  ps.forEach((p, i) => { const lo = i ? Math.sqrt(ps[i - 1].sg * p.sg) * 1000 : 0, hi = i < ps.length - 1 ? Math.sqrt(p.sg * ps[i + 1].sg) * 1000 : Infinity; o[p.id] = 100 * ((hi === Infinity ? 1 : lnCdf(hi, B)) - lnCdf(lo, B)); });
+  return o;
+};
+const bellSvg = () => {
+  const B = S.B, w = popW(), X = ms => 20 + ms / 200 * 560, pdf = ms => Math.exp(-((Math.log(ms) - Math.log(B.skMu)) ** 2) / (2 * B.skSd ** 2)) / (ms * B.skSd);
+  const tw = S.PS.reduce((a, p) => a + (w[p.id] || 0) * (p.tg != null ? p.tg : 1), 0) / 100;
+  const pts = []; let mx = 0; for (let ms = 1; ms <= 200; ms += 2) { const v = pdf(ms); mx = Math.max(mx, v); pts.push([ms, v]); }
+  let h = `<svg class="tl" viewBox="0 0 600 160"><path d="M${X(1)} 125 ${pts.map(([m, v]) => 'L' + X(m).toFixed(1) + ' ' + (125 - v / mx * 85).toFixed(1)).join(' ')} L${X(200)} 125Z" fill="#8e7bf2" fill-opacity="${B.gauss ? 0.28 : 0.08}" stroke="#8e7bf2" stroke-width="2"/>`;
+  S.PS.filter(p => p.id !== 'ideal').forEach((p, i) => { const x = X(p.sg * 1000); h += `<line x1="${x}" y1="${i % 2 ? 30 : 18}" x2="${x}" y2="125" stroke="#ff8e5c" stroke-dasharray="3 3" opacity=".7"/><text x="${x}" y="${i % 2 ? 26 : 14}" font-size="10" fill="#f3f0ff" text-anchor="middle">${p.nm} <tspan fill="#ff8e5c" font-weight="800">%${Math.round(w[p.id])}</tspan>${B.tgt !== 0 ? `<tspan fill="#7bc8a4"> →%${Math.round(tw ? w[p.id] * (p.tg != null ? p.tg : 1) / tw * 100 : 0)}</tspan>` : ''}</text>`; });
+  [0, 50, 100, 150, 200].forEach(v => { h += `<text x="${X(v)}" y="140" font-size="10" fill="#8076b0" text-anchor="middle">${v} ms</text>`; });
+  return h + `<text x="300" y="155" font-size="10" fill="#b6acdf" text-anchor="middle">zamanlama hatası (sola = isabetli) · ${B.gauss ? 'paylar bu eğriden' : 'eğri kapalı: tablodaki paylar'}${B.tgt !== 0 ? ' · <tspan fill="#7bc8a4">→ kancadaki ağırlık</tspan>' : ''}</text></svg>`;
+};
+/* ölçümü etkileyen her şeyin özeti: değişirse ölçüm "eski" sayılır (silinmez) */
+const physHash = n => {
+  const g = Math.floor((n - 1) / 5), k1 = (n - 1) % 5 + 1, L = k1 - 1, P = S.P, m = {};
+  mechKinds(g, k1).forEach(kd => { for (const q in S.M[kd]) m[kd + '.' + q] = S.M[kd][q][L]; });
+  return hashS(JSON.stringify([P.om[L], P.wd[L], P.size[L], P.t[L], P.wMin, P.wMax, P.gap, P.omMin, P.phm, P.pwm, P.help, P.helpAt, S.KF[idOf(n)] || 1, m, S.PS.map(p => [p.id, p.sg, p.av]), S.OV[idOf(n)] || 0])).toString(36);
+};
+const poolOf = (m, id, pl) => { const ps = m.ps[id]; if (!ps) return []; let p = ps.pools[pl]; while (typeof p === 'number') p = ps.pools[p]; return p || []; };
+const measReady = new Promise(res => { mf.onload = () => { const w = mf.contentWindow; w.requestAnimationFrame = () => 0; const sc = w.document.createElement('script'); sc.src = 'lab-bot.js'; sc.onload = res; w.document.body.appendChild(sc); }; });
+/* bir koşu: tohumlu, SANAL CAN (oyuncu ölmez, her hata olay olarak yazılır: [dalga, büyük mü, sn]) */
+const runOne = (w, k, n, ps, fv, seed) => {
+  const G = k.G, I = ps.id === 'ideal', e = [];
+  w.Math.random = mulberry(seed);
+  apply(w); k.BL_P.dmg = [1, 2];
+  let t0 = 0, lm = 0, W = 0, lw = 0;
+  const opt = I ? { jitter: 0, lapse: 0, isinExtra: 0, lead: 1 / 480 } : {};
+  opt.setup = () => { k.save.bl.f = {}; if (fv) k.save.bl.f[k.blId(n)] = fv; k.blStart(n); t0 = G.clock; G.bl.lives = 99; lm = G.bl.miss; W = G.bl.waves; };
+  opt.stop = () => {
+    const B = G.bl; if (!B) return false; lw = B.wave;
+    const d = B.miss - lm;
+    if (d > 0) { const t = Math.round((G.clock - t0) * 100) / 100, sm = d % 2; if (sm) e.push([B.wave, 0, t]); for (let j = 0; j < (d - sm) / 2; j++) e.push([B.wave, 1, t]); lm = B.miss; }
+    B.lives = 99; return false;
+  };
+  w.runBot(ps.sg, ps.av, 1, 400, I ? 1 / 240 : 1 / 60, opt);
+  const r = { w: W, d: Math.round((G.clock - t0) * 100) / 100, h: G.n | 0, e, x: G.mode === 'blwin' ? 1 : 0, fw: lw };
+  k.goMenu(); return r;
+};
+/* onay: uygulamanın tarayıcısı confirm() penceresini göstermiyor (hep hayır sayıyor); ikinci basış onaylar */
+const SURE = {};
+const sure = (k, msg) => { const now = Date.now(); if (SURE[k] && now - SURE[k] < 4000) { delete SURE[k]; return true; } SURE[k] = now; toast(msg + ': onaylamak için 4 saniye içinde yine bas'); return false; };
+const updProg = () => { const p = $('mprog'), c = $('mcur'); if (p) p.firstChild.style.width = Math.round(100 * MS.done / Math.max(1, MS.total)) + '%'; if (c) c.textContent = 'ölçülüyor… Bölüm ' + (MS.cur || '') + ' · %' + Math.round(100 * MS.done / Math.max(1, MS.total)); };
+const measureLevels = async ns => {
+  if (MS.busy) return toast('Ölçüm sürüyor');
+  MS.busy = true; MS.stop = false; render();
+  await measReady;
+  const w = mf.contentWindow, k = w.__kp, N = S.ui.prec || 12;
+  ns = ns.filter(n => !k.blSoon(n));
+  MS.total = ns.length * S.PS.reduce((a, p) => a + (p.id === 'ideal' ? 6 : N * 2), 0); MS.done = 0;
+  let last = performance.now();
+  try {
+    for (const n of ns) {
+      if (MS.stop) break;
+      MS.cur = n;
+      const P = S.P, out = { h: physHash(n), N, ps: {}, at: Date.now() }, fv = [0, P.helpAt[0], P.helpAt[1]], prevF = [1, 1, P.help[0]];
+      for (const ps of S.PS) {
+        const I = ps.id === 'ideal', pools = [];
+        out.ps[ps.id] = { pools };
+        for (let pl = 0; pl < 3; pl++) {
+          /* yardım havuzu: yardım genişletmiyorsa ya da oyuncu zaten temiz geçiyorsa bir öncekine eşlenir */
+          const fac = pl ? P.help[pl - 1] : 1;
+          if (pl && (I || Math.abs(fac - prevF[pl]) < 1e-6 || passRate(poolOf(out, ps.id, 0), P) > 0.9)) { pools.push(pl - 1); MS.done += Math.ceil(N / 2); continue; }
+          const M = I ? 6 : pl ? Math.ceil(N / 2) : N, runs = [];
+          for (let i = 0; i < M; i++) {
+            runs.push(runOne(w, k, n, ps, fv[pl], hashS(n + '|' + ps.id + '|' + pl + '|' + i))); MS.done++;
+            if (performance.now() - last > 40) { updProg(); await new Promise(r => setTimeout(r, 0)); last = performance.now(); }
+          }
+          pools.push(runs);
+        }
+      }
+      MEAS[n] = out; saveMeas(); SIMC.clear(); recHist(n, true); render();
+    }
+  } finally { MS.busy = false; MS.done = MS.total; render(); }
+  toast('Ölçüm bitti');
+};
+/* yeniden oynatma: oyunun can kuralları birebir (blHurt, blWaveDone yenilenme, blContinue, blWin yıldız) */
+const replay = (run, P, onDie) => {
+  let lives = P.lives, miss = 0, cw = 0, cont = 0;
+  const regenTo = wv => { while (cw < wv) { cw++; if (P.regen > 0 && cw < run.w && cw % P.regen === 0 && lives < P.lives) lives++; } };
+  for (const ev of run.e) {
+    regenTo(ev[0]);
+    const d = P.dmg[ev[1]]; miss += d; lives -= d;
+    if (lives <= 0) {
+      const pr = run.w ? ev[0] / run.w : 0;
+      if (onDie && onDie(pr, ev[2])) { cont++; lives = P.contL > 0 ? Math.min(P.contL, P.lives) : P.lives; }
+      else return { win: false, pr, t: ev[2], miss, cont };
+    }
+  }
+  if (!run.x) return { win: false, pr: run.w ? run.fw / run.w : 0, t: run.d, miss, cont, stuck: true };
+  return { win: true, pr: 1, t: run.d, miss, cont, stars: cont ? 1 : miss <= P.star[0] ? 3 : miss <= P.star[1] ? 2 : 1 };
+};
+const passRate = (runs, P) => runs.length ? runs.filter(r => replay(r, P).win).length / runs.length : 0;
+const passOf = n => {
+  const m = MEAS[n]; if (!m) return null;
+  const f = id => m.ps[id] ? Math.round(passRate(poolOf(m, id, 0), S.P) * 100) : '-';
+  return `%${f('orta')} / %${f('iyi')}${m.h !== physHash(n) ? ' <span class="amb" title="ayar değişti, eski ölçüm">⟳</span>' : ''}`;
+};
+/* oturum modeli: tip başına sanal oyuncular bölümü geçene ya da bırakana kadar dener (tohumlu) */
+const simLevel = (n, P, B, adShift = 0, seedX = 0, nocache) => {
+  const m = MEAS[n]; if (!m) return null;
+  const key = nocache ? '' : JSON.stringify([n, m.at, P, B, S.PS, adShift, seedX]);
+  if (key && SIMC.has(key)) return SIMC.get(key);
+  const g = Math.floor((n - 1) / 5), k1 = (n - 1) % 5 + 1, res = { ps: {} };
+  for (const ps of S.PS) {
+    if (!m.ps[ps.id]) continue;
+    const pool = pl => poolOf(m, ps.id, pl), rnd = mulberry(hashS('sim|' + n + '|' + ps.id + '|' + seedX)), NP = ps.id === 'ideal' ? 300 : 1500;
+    const r0 = pool(0), ev = r0.reduce((s, r) => s + r.e.length, 0), hh = r0.reduce((s, r) => s + r.h, 0);
+    const st = { NP, N: r0.length, pass: 0, quit: 0, first: 0, ads: 0, watchers: 0, offers: 0, bored: 0, flow: 0, wPass: 0, att: 0, min: 0, stars: 0, gold: 0, deaths: Array(10).fill(0), stuck: 0, missRate: ev / Math.max(1, ev + hh), clean: passRate(r0, P) };
+    const gz = () => Math.sqrt(-2 * Math.log(rnd() || 1e-12)) * Math.cos(2 * Math.PI * rnd());
+    for (let j = 0; j < NP; j++) {
+      let f = 0, att = 0, adsS = 0, mins = 0, watched = false, won = false;
+      const uA = ps.ad + B.sdAd * gz(), uP = ps.pat + B.sdPat * gz();   /* bu oyuncunun kendi eğilimi ve sabrı */
+      for (;;) {
+        att++;
+        const runs = pool(f >= P.helpAt[1] ? 2 : f >= P.helpAt[0] ? 1 : 0), run = runs[(rnd() * runs.length) | 0];
+        let adsL = 0, contU = 0;
+        const r = replay(run, P, (pr, t) => {
+          st.deaths[Math.min(9, (pr * 10) | 0)]++;
+          if (contU >= P.cont) return false;
+          if (adsL < Math.min(P.contAds, P.cont) && rnd() < B.fill) {
+            st.offers++;
+            const p = sig(logit(B.adBase) + B.kProg * (pr - 0.5) * 2 + B.kInv * Math.log((t + 5) / B.adLen) + B.kStreak * Math.min(f, 4) - B.kFat * adsS + uA + B.adShift + adShift);
+            if (rnd() < p) { adsL++; adsS++; contU++; st.ads++; watched = true; mins += B.adLen / 60; return true; }
+          }
+          if (rnd() < B.coinP) { contU++; return true; }
+          return false;
+        });
+        mins += r.t / 60; if (r.stuck) st.stuck++;
+        if (r.win) {
+          st.pass++; won = true; st.stars += r.stars; st.gold += P.gold[k1 - 1] + P.goldG * g;
+          let bored = false;
+          if (att === 1 && !r.cont) { st.first++; const ne = run.e.length; if (rnd() < ps.need * (ne === 0 ? 1 : ne === 1 ? 0.35 : 0)) { bored = true; st.bored++; } }   /* sıkılma: ilk denemede hiç ya da bir kez hata yapmadan geçen */
+          if (!bored && att <= 3) st.flow++;
+          break;
+        }
+        f = Math.min(9, f + 1);
+        const q = sig(logit(B.quit) + B.kEarly * (0.5 - r.pr) * 2 + B.kQS * f - uP);
+        if (att >= B.maxAtt || rnd() < q) { st.quit++; break; }
+      }
+      st.att += att; st.min += mins; if (watched) { st.watchers++; if (won) st.wPass++; }
+    }
+    res.ps[ps.id] = st;
+  }
+  /* nüfus: tiplerin payıyla ağırlıklı (İdealist payı 0, yalnız üst sınır). pop = hedef kitle (pay × hedef ağırlığı): kanca, teşhis, ekranlar; all = gerçek nüfus: gelir projeksiyonu */
+  const agg = wts => {
+    const Wp = S.PS.filter(p => wts[p.id] > 0 && res.ps[p.id]), tw = Wp.reduce((a, p) => a + wts[p.id], 0); if (!(tw > 0)) return null;
+    const wm = f => Wp.reduce((a, p) => a + wts[p.id] / tw * f(res.ps[p.id]), 0);
+    const pop = { first: wm(x => x.first / x.NP), pass: wm(x => x.pass / x.NP), quit: wm(x => x.quit / x.NP), watch: wm(x => x.watchers / x.NP), adsPP: wm(x => x.ads / x.NP), offPP: wm(x => x.offers / x.NP),
+      bored: wm(x => x.bored / x.NP), flow: wm(x => x.flow / x.NP), wPass: wm(x => x.wPass / x.NP), att: wm(x => x.att / x.NP), minPP: wm(x => x.min / x.NP), starsT: wm(x => x.stars / x.NP), gold: wm(x => x.gold / x.NP),
+      missRate: wm(x => x.missRate), N: Math.min(...Wp.map(p => res.ps[p.id].N)), hist: [], w: Object.fromEntries(Wp.map(p => [p.id, wts[p.id] / tw])) };
+    for (let i = 0; i < 10; i++) pop.hist.push(wm(x => x.deaths[i] / x.NP));
+    const hs = pop.hist.reduce((a, b) => a + b, 0); pop.histN = pop.hist.map(v => hs ? v / hs : 0);
+    pop.hard = Math.max(0, pop.pass - pop.flow - pop.bored); pop.stars = pop.pass ? pop.starsT / pop.pass : 0;   /* yıldız: yalnız geçenlerin ortalaması */
+    pop.accept = pop.offPP ? pop.adsPP / pop.offPP : 0;
+    pop.adsPerMin = pop.minPP ? pop.adsPP / pop.minPP : 0; pop.quitPerMin = pop.minPP ? pop.quit / pop.minPP : 0;
+    return pop;
+  };
+  const real = popW(); res.all = agg(real);
+  res.pop = B.tgt === 0 ? res.all : agg(Object.fromEntries(S.PS.map(p => [p.id, (real[p.id] || 0) * (p.tg != null ? p.tg : 1)])));
+  if (key) { if (SIMC.size > 300) SIMC.clear(); SIMC.set(key, res); }
+  return res;
+};
+/* hedef bandı: içinde 1; dışında sürekli ve yumuşak düşer (hedefin kendisi kadar dışarıda 0,25, iki katı kadar 0,06): uçurum yok, tek kusurlu hedef yine puanı belirgin çeker */
+const band = (v, lo, hi) => v < lo ? Math.exp(-1.386 * (lo - v) / Math.max(lo, 0.05)) : v > hi ? Math.exp(-1.386 * (v - hi) / Math.max(hi, 0.1)) : 1;
+/* kıl payı: canın bittiği anların bölümün son %40'ında olan payı (sona yakın yanan "bir daha" der, reklamla devam etmeye isteklidir; erken yanan bırakır) */
+const lateOf = r => r.histN.slice(6).reduce((a, b) => a + b, 0);
+/* kanca: 5 hedefin geometrik ortalaması (tek bir kusurlu hedef puanı çökertir); zorluk basamağın bandında olmalı: kolay bölüm yüksek puan alamaz */
+const hookScore = (r, n) => { const G0 = goal(n), late = lateOf(r), sD = band(1 - r.first, G0.F0, G0.F1), sW = band(r.watch, G0.W0, G0.W1), sQ = band(r.quit, 0, G0.Q), sB = band(r.bored, 0, G0.Bo), sK = band(late, G0.K, 1);
+  return { v: Math.round(100 * Math.pow(sD * sW * sQ * sB * sK, 0.2)), sD, sW, sQ, sB, sK, late, G: G0 }; };
+/* kancanın güven payı: ölçülen koşular yeniden örneklenir (bootstrap), puan her örnekte yeniden hesaplanır; ± = örneklerin yayılımı (2 sd) */
+const CIC = new Map();
+const hookCI = n => {
+  const m = MEAS[n]; if (!m) return null;
+  const key = JSON.stringify([n, m.at, S.P, S.B, S.PS]); if (CIC.has(key)) return CIC.get(key);
+  const vs = [], rnd = mulberry(hashS('ci|' + n));
+  for (let b = 0; b < 10; b++) {
+    const mm = cp(m); for (const id in mm.ps) mm.ps[id].pools = mm.ps[id].pools.map(pl => Array.isArray(pl) ? pl.map(() => pl[(rnd() * pl.length) | 0]) : pl);
+    MEAS[n] = mm; try { const q = simLevel(n, S.P, S.B, 0, 100 + b, true); if (q && q.pop) vs.push(hookScore(q.pop, n).v); } finally { MEAS[n] = m; }
+  }
+  const mu = vs.reduce((a, b) => a + b, 0) / vs.length, sd = Math.sqrt(vs.reduce((a, b) => a + (b - mu) ** 2, 0) / Math.max(1, vs.length - 1)), o = { pm: Math.round(2 * sd), lo: Math.min(...vs), hi: Math.max(...vs) };
+  if (CIC.size > 100) CIC.clear(); CIC.set(key, o); return o;
+};
+const groupPop = adShift => {
+  let ads = 0, min = 0, quit = 0, c = 0;
+  for (let i = 1; i <= 5; i++) { const s = simLevel(curG() * 5 + i, S.P, S.B, adShift), a = s && s.all; if (a) { ads += a.adsPP; min += a.minPP; quit += a.quit; c++; } }   /* gelir: gerçek nüfus */
+  return c && min ? { c, adsPerMin: ads / min, quitPerMin: quit / min } : null;
+};
+const proj = (gp, B, players) => { const min = players * B.sessions * B.sessMin * B.blShare, views = min * gp.adsPerMin, rev = views * B.eCPM / 1000; return { min, views, rev, mon: rev * 30, lost: min * gp.quitPerMin * B.churn }; };
+/* tutarlılık denetimleri: gerçekten hesaplanır; kırmızı = hata ya da bulgu, sarı = örneklem payı içinde şüpheli */
+const runChecks = n => {
+  const m = MEAS[n], out = [], add = (st, t) => out.push([st, t]);
+  const a = simLevel(n, S.P, S.B, 0, 0, true), b = simLevel(n, S.P, S.B, 0, 0, true);
+  add(JSON.stringify(a) === JSON.stringify(b) ? 'ok' : 'bad', 'Aynı ayar + aynı tohum → aynı sonuç');
+  add(Object.values(a.ps).every(x => x.pass + x.quit === x.NP && x.flow + x.bored <= x.pass && x.wPass <= x.watchers) ? 'ok' : 'bad', 'Her sanal oyuncu tek bir gruba düşüyor (keyifle, zorlanarak, sıkılarak geçti ya da bıraktı; toplam %100)');
+  add(Object.values(a.ps).every(x => x.pass || !x.stars) ? 'ok' : 'bad', 'Geçen yoksa yıldız da yok (yıldız yalnız geçenlerden)');
+  const z = [simLevel(n, Object.assign(cp(S.P), { cont: 0 }), S.B, 0, 0, true), simLevel(n, S.P, Object.assign(cp(S.B), { fill: 0 }), 0, 0, true), simLevel(n, Object.assign(cp(S.P), { contAds: 0 }), S.B, 0, 0, true)];
+  add(z.every(r => Object.values(r.ps).every(x => x.ads === 0)) ? 'ok' : 'bad', 'İkinci şans, reklam dolumu ya da reklam hakkı 0 iken reklam 0');
+  if (m.ps.ideal) {
+    const runs = poolOf(m, 'ideal', 0), er = runs.reduce((s, r) => s + r.e.length, 0), un = runs.filter(r => !r.x).length;
+    if (er || un) add('bad', `BULGU: İdealist ${runs.length} koşuda ${er} hata yaptı${un ? ', ' + un + ' koşuyu bitiremedi' : ''}. Bölüm kusursuz zamanlamayla bile geçilemiyor olabilir (tuzak hedefin üstünde, sıkışık pim) ya da bot bu kilidi bilmiyor: telefonda bak.`);
+    else add(a.ps.ideal.pass === a.ps.ideal.NP && a.ps.ideal.ads === 0 ? 'ok' : 'bad', `İdealist ${runs.length} koşuda hiç hata yapmadı; hep geçti, reklam izlemedi`);
+  }
+  const all = S.PS.filter(p => p.id !== 'ideal').flatMap(p => poolOf(m, p.id, 0)), p0 = passRate(all, S.P);
+  const pL = passRate(all, Object.assign(cp(S.P), { lives: S.P.lives + 1 })), pD = passRate(all, Object.assign(cp(S.P), { dmg: S.P.dmg.map(d => d + 1) }));
+  add(pL >= p0 ? 'ok' : 'bad', `Can +1 olunca geçme azalmıyor (${pc(p0)} → ${pc(pL)})`);
+  add(pD <= p0 ? 'ok' : 'bad', `Hasar +1 olunca geçme artmıyor (${pc(p0)} → ${pc(pD)})`);
+  const ord = S.PS.filter(p => p.id !== 'ideal' && m.ps[p.id]).sort((x, y) => x.sg - y.sg), bads = [];
+  for (let i = 0; i + 1 < ord.length; i++) {
+    const A = poolOf(m, ord[i].id, 0), Bb = poolOf(m, ord[i + 1].id, 0), pa = passRate(A, S.P), pb = passRate(Bb, S.P);
+    if (pa + 1.96 * Math.sqrt(pa * (1 - pa) / A.length + pb * (1 - pb) / Bb.length) + 1e-9 < pb) bads.push(`${ord[i].nm} ${pc(pa)} < ${ord[i + 1].nm} ${pc(pb)}`);
+  }
+  add(bads.length ? 'warn' : 'ok', bads.length ? 'Daha isabetli tip daha az geçiyor: ' + bads.join(', ') + ' (örneklem payı dışında; hassas ölç)' : 'Daha isabetli tip daha az geçmiyor (örneklem payı içinde)');
+  const hsA = hookScore(a.pop, n), comp = ['sD', 'sW', 'sQ', 'sB', 'sK'].map(q => hsA[q]);
+  add(comp.every(v => v >= 0 && v <= 1) && hsA.v === Math.round(100 * Math.pow(comp.reduce((x, y) => x * y, 1), 0.2)) ? 'ok' : 'bad', `Kanca = 5 hedef puanının geometrik ortalaması, her biri 0-1 arası (${comp.map(v => fmt(v, 2)).join(' · ')} → ${hsA.v})`);
+  const hs2 = hookScore(simLevel(n, S.P, S.B, 0, 7, true).pop, n).v;
+  add(Math.abs(hs2 - hsA.v) <= 4 ? 'ok' : 'warn', `Sanal oyuncuların tohumu değişince kanca neredeyse aynı (${hsA.v} → ${hs2}); fark büyükse ölçüm hassasiyetini artır`);
+  const g = Math.floor((n - 1) / 5), fs = [1, 2, 3, 4, 5].map(i => { const q = MEAS[g * 5 + i] && simLevel(g * 5 + i, S.P, S.B); return q && q.pop ? [1 - q.pop.first, q.pop.N] : null; });
+  if (fs.filter(Boolean).length > 1) { const bad = []; for (let i = 0; i < 4; i++) for (let j = i + 1; j < 5; j++) if (fs[i] && fs[j]) { const m2 = 1.96 * Math.sqrt(fs[i][0] * (1 - fs[i][0]) / fs[i][1] + fs[j][0] * (1 - fs[j][0]) / fs[j][1]); if (fs[j][0] + m2 < fs[i][0]) bad.push(`${i + 1}. > ${j + 1}.`); } add(bad.length ? 'warn' : 'ok', bad.length ? 'Bu kilitte zor basamak kolaydan az can yakıyor: ' + bad.join(', ') : 'Bu kilitte basamak arttıkça canı biten artıyor (ölçülen basamaklar, güven payı içinde)'); }
+  const gp = groupPop(0);
+  if (gp) { const x = proj(gp, S.B, 1000), y = proj(gp, S.B, 2000); add(Math.abs(y.rev - 2 * x.rev) < 1e-9 && Math.abs(y.lost - 2 * x.lost) < 1e-9 && Math.abs(y.views - 2 * x.views) < 1e-9 ? 'ok' : 'bad', 'Oyuncu sayısı 2 katı → günlük toplamlar 2 katı, oranlar aynı'); }
+  return out;
+};
+const histSvg = h => {
+  const mx = Math.max(...h, 1e-9);
+  return '<svg viewBox="0 0 320 122" width="100%" style="max-width:440px;display:block">' + h.map((v, i) => {
+    const bh = v / mx * 80, x = 6 + i * 31, col = i < 3 ? 'var(--bad)' : i < 6 ? 'var(--gold)' : 'var(--pea)';
+    return `<rect x="${x}" y="${98 - bh}" width="27" height="${Math.max(bh, 1)}" rx="5" fill="${col}" opacity=".9"/><text x="${x + 13.5}" y="${93 - bh}" font-size="9.5" fill="var(--ink2)" text-anchor="middle">${Math.round(v * 100)}</text><text x="${x + 13.5}" y="112" font-size="8.5" fill="var(--ink3)" text-anchor="middle">${i * 10}-${i * 10 + 10}</text>`;
+  }).join('') + '<text x="160" y="121" font-size="8.5" fill="var(--ink3)" text-anchor="middle">yandığı yer: bölümün yüzde kaçı</text></svg>';
+};
+const gauge = (ad, v, sub, cls, pm) => `<div class="g"><small>${ad}</small><b class="${cls || ''}">${typeof v === 'number' ? pc(v) : v}${pm ? ' <small>±' + Math.round(pm * 100) + '</small>' : ''}</b><small>${sub}</small>${typeof v === 'number' && v <= 1 ? `<i><em style="width:${Math.round(clamp(v, 0, 1) * 100)}%"></em></i>` : ''}</div>`;
+/* oyuncunun bölümdeki sonucu: her oyuncu tam bir gruba düşer (pasta gibi, toplam %100) */
+const OUTC = [['flow', 'Geçti, keyifle', 'en çok 3 denemede; ne çok kolay ne çok zor', 'var(--ok)'], ['hard', 'Geçti, zorlanarak', '4 ya da daha çok deneme', 'var(--gold)'], ['bored', 'Geçti ama sıkıldı', 'ilk denemede neredeyse hatasız', 'var(--lil)'], ['quit', 'Bıraktı', 'geçemeden vazgeçti', 'var(--bad)']];
+const outOf = x => ({ flow: x.flow / x.NP, bored: x.bored / x.NP, quit: x.quit / x.NP, hard: Math.max(0, x.pass - x.flow - x.bored) / x.NP });
+const outBar = (o, big) => `<div class="ob${big ? ' big' : ''}">${OUTC.map(([k, t, , c]) => o[k] > 0 ? `<em style="width:${o[k] * 100}%;background:${c}" title="${t} ${pc(o[k])}">${big && o[k] >= 0.07 ? pc(o[k]) : ''}</em>` : '').join('')}</div>`;
+const outLegend = o => '<div class="obl">' + OUTC.map(([k, t, d, c]) => `<span><i style="background:${c}"></i><b>${t}</b> ${pc(o[k])}<small>${d}</small></span>`).join('') + '</div>';
+/* bütün bölümler: ilk denemede canı biten (hedef çizgisi basamakla doğrusal artar), reklam izleyen ve kanca; noktaya dokununca o bölüme gider */
+const allHtml = () => {
+  const N = K.BL_N, rows = [];
+  for (let n = 1; n <= N; n++) { const s2 = MEAS[n] && simLevel(n, S.P, S.B); if (s2 && s2.pop) rows.push({ n, f: 1 - s2.pop.first, w: s2.pop.watch, a: s2.pop.adsPP, v: hookScore(s2.pop, n).v, G: goal(n), st: MEAS[n].h !== physHash(n) }); }
+  if (!rows.length) return '<div class="card2"><h3 class="sec" style="margin-top:0">Bütün bölümler</h3><p class="note">Henüz ölçülen bölüm yok. "Bütün bölümleri ölç" ile 80 bölümün zorluk eğrisini gör.</p></div>';
+  const X = n => 28 + (n - 1) / (N - 1) * 760, Y = v => 150 - v * 125, col = v => v >= 80 ? '#7bc8a4' : v >= 55 ? '#f2b73c' : '#f0657a';
+  let svg = `<svg class="tl" viewBox="0 0 800 196">`;
+  for (let g = 0; g < N / 5; g++) { const x0 = X(g * 5 + 1) - 4, x1 = X(g * 5 + 5) + 4; svg += `<rect x="${x0}" y="20" width="${x1 - x0}" height="132" rx="5" fill="#fff" opacity="${g % 2 ? 0.035 : 0.07}"/><text x="${(x0 + x1) / 2}" y="${g % 2 ? 176 : 166}" font-size="8.5" fill="#8076b0" text-anchor="middle">${(gIdx[g] || {}).name || ''}</text>`; }
+  [0, 0.25, 0.5, 0.75, 1].forEach(v => { svg += `<line x1="24" x2="790" y1="${Y(v)}" y2="${Y(v)}" stroke="#3a3268" stroke-width="1"/><text x="20" y="${Y(v) + 3}" font-size="8.5" fill="#8076b0" text-anchor="end">%${v * 100}</text>`; });
+  for (let g = 0; g < N / 5; g++) { const pts = [1, 2, 3, 4, 5].map(i => { const n = g * 5 + i, G0 = goal(n); return [X(n), G0]; }); svg += `<path d="M${pts.map(([x, G0]) => x + ' ' + Y(G0.F1)).join(' L')} L${pts.slice().reverse().map(([x, G0]) => x + ' ' + Y(G0.F0)).join(' L')}Z" fill="#7bc8a4" opacity=".16"/><polyline points="${pts.map(([x, G0]) => x + ',' + Y(G0.F)).join(' ')}" fill="none" stroke="#7bc8a4" stroke-dasharray="3 3" stroke-width="1.5"/>`; }
+  rows.forEach(r => { svg += `<rect x="${X(r.n) - 3}" y="${Y(r.w)}" width="6" height="${Math.max(1, 150 - Y(r.w))}" fill="#ff8e5c" opacity=".35"/>`; });
+  for (let g = 0; g < N / 5; g++) { const rr = rows.filter(r => Math.floor((r.n - 1) / 5) === g); if (rr.length > 1) svg += `<polyline points="${rr.map(r => X(r.n) + ',' + Y(r.f)).join(' ')}" fill="none" stroke="#f3f0ff" stroke-width="1.6" opacity=".7"/>`; }
+  rows.forEach(r => { svg += `<circle data-a="gol" data-k="${r.n}" cx="${X(r.n)}" cy="${Y(r.f)}" r="${r.n === curN() ? 6 : 4.2}" fill="${col(r.v)}" stroke="${r.n === curN() ? '#fff' : 'none'}" stroke-width="2" style="cursor:pointer"><title>Bölüm ${r.n}: canı biten ${pc(r.f)} (hedef ${pc(r.G.F)}), reklam izleyen ${pc(r.w)}, kanca ${r.v}${r.st ? ' · eski ölçüm' : ''}</title></circle>`; });
+  svg += `<text x="400" y="192" font-size="9.5" fill="#b6acdf" text-anchor="middle">● ilk denemede canı biten (renk = kanca)   <tspan fill="#7bc8a4">▬ hedef bandı</tspan>   <tspan fill="#ff8e5c">▮ reklam izleyen</tspan></text></svg>`;
+  const inB = rows.filter(r => r.f >= r.G.F0 && r.f <= r.G.F1).length, avg = Math.round(rows.reduce((a, r) => a + r.v, 0) / rows.length), st = rows.filter(r => r.st).length;
+  const ads5 = []; for (let g = 0; g < N / 5; g++) { const rr = rows.filter(r => Math.floor((r.n - 1) / 5) === g); if (rr.length === 5) ads5.push(rr.reduce((a, r) => a + r.a, 0)); }
+  const hell = rows.filter(r => r.n % 5 === 0), top = hell.filter(r => { const g = Math.floor((r.n - 1) / 5); return rows.filter(q => Math.floor((q.n - 1) / 5) === g).every(q => q.w <= r.w + 1e-9); }).length;
+  return `<div class="card2"><h3 class="sec" style="margin-top:0">Bütün bölümler: zorluk merdiveni</h3>${svg}
+    <p class="note">Ölçülen <b>${rows.length}/${N}</b> bölüm${st ? ` (${st} tanesi eski ölçüm)` : ''} · ortalama kanca <b>${avg}</b> · zorluğu hedef bandında olan <b class="${inB === rows.length ? 'okc' : 'amb'}">${inB}/${rows.length}</b>${ads5.length ? ` · 5 bölümde oyuncu başına reklam ort. <b>${fmt(ads5.reduce((a, b) => a + b, 0) / ads5.length, 2)}</b>` : ''}${hell.length ? ` · reklamın en çok izlendiği bölüm Cehennem olan grup <b>${top}/${hell.length}</b>` : ''}. Her kilidin 5 bölümünde canı biten oyuncu doğrusal artmalı (Kolay → Cehennem). Noktaya dokun: o bölüme gider.</p></div>`;
+};
+const renderAna = () => {
+  const el = $('b-ana'); if (!el || !S || !K) return;
+  const n = curN(), m = MEAS[n], B = S.B, P = S.P, stale = m && m.h !== physHash(n);
+  let h = `<p class="d">Seçili bölüm: <b>Bölüm ${n}</b> · ${gIdx[curG()] ? gIdx[curG()].name : ''} ${lv}. ${TIER[lv - 1]}. Bot, oyuncu tiplerinin isabetiyle gerçek oyun kodunu oynar; can, hasar, ikinci şans ve yıldız ayarları ölçümü bozmaz (anında hesaplanır). ${B.tgt !== 0 ? 'Sayılar <b>hedef kitleye</b> göre ağırlıklı (Oyuncular › tiplerin hedef ağırlığı); gelir projeksiyonu gerçek nüfusla.' : 'Sayılar bütün nüfusa göre.'}</p>
+  <div class="acts"><button class="btn sm pri" data-a="m1" ${MS.busy ? 'disabled' : ''}>Bu bölümü ölç</button><button class="btn sm" data-a="m5" ${MS.busy ? 'disabled' : ''}>Bu kilidin 5 bölümünü ölç</button><button class="btn sm" data-a="m80" ${MS.busy ? 'disabled' : ''}>Bütün bölümleri ölç</button>
+  <select class="sel" id="prec">${[[12, 'Hızlı · 12 koşu'], [30, 'Normal · 30 koşu'], [80, 'Hassas · 80 koşu']].map(([v, t]) => `<option value="${v}" ${(S.ui.prec || 12) === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+  ${MS.busy ? `<div class="prog" id="mprog"><em></em></div><span class="note" style="margin:0" id="mcur">ölçülüyor… Bölüm ${MS.cur || ''}</span><button class="btn sm ghost" data-a="mstop">Durdur</button>` : ''}
+  ${m ? `<span class="badge ${stale ? 'st' : ''}">${stale ? 'eski ölçüm: fizik değişti, yeniden ölç' : 'ölçüm güncel'} · tip başına ${m.N} koşu</span>` : ''}</div>`;
+  h += allHtml();
+  if (!m) { el.innerHTML = h + '<p class="note">Bu bölüm henüz ölçülmedi. Hızlı ölçüm birkaç saniye sürer.</p>' + honesty(); updProg(); return; }
+  const s = simLevel(n, P, B), r = s.pop;
+  if (r) {
+    const hs = hookScore(r, n), hci = hookCI(n), N = r.N, G0 = hs.G, cl = (ok) => ok ? 'okc' : 'warn';
+    h += '<div class="gauges">' + `<div class="g big"><small>Kanca puanı (genel not)</small><b class="${hs.v >= 80 ? 'okc' : hs.v >= 55 ? 'amb' : 'warn'}">${hs.v}<small> / 100${hci ? ' ±' + hci.pm : ''}</small></b><small>5 hedef: zorluk ${hs.sD === 1 ? '✓' : '✗'} · reklam ${hs.sW === 1 ? '✓' : '✗'} · bırakan ${hs.sQ === 1 ? '✓' : '✗'} · sıkılan ${hs.sB === 1 ? '✓' : '✗'} · kıl payı ${hs.sK === 1 ? '✓' : '✗'}${hci ? '<br>± = ölçümün güven payı (yeniden örnekleme)' : ''}</small></div>` +
+      gauge('İlk denemede canı biten', 1 - r.first, 'bu basamağın hedefi ' + pc(G0.F0) + '-' + pc(G0.F1), cl(1 - r.first >= G0.F0 && 1 - r.first <= G0.F1), ci(r.first, N)) + gauge('Sonunda geçen', r.pass, 'bırakmayanlar; ortalama ' + fmt(r.att, 1) + ' deneme', '', ci(r.pass, N)) +
+      gauge('Reklam izleyen', r.watch, 'en az 1 reklam · hedef ' + pc(G0.W0) + '-' + pc(G0.W1), cl(r.watch >= G0.W0 && r.watch <= G0.W1), ci(r.watch, N)) +
+      gauge('Oyuncu başına reklam', fmt(r.adsPP, 2), 'teklif edilince izleyen ' + pc(r.accept)) +
+      gauge('Kıl payı', hs.late, 'canın son %40\'ta bittiği pay · hedef ' + pc(G0.K) + ' üstü', cl(hs.late >= G0.K)) +
+      gauge('Sıkılan', r.bored, 'hedef ' + pc(G0.Bo) + ' altı', cl(r.bored <= G0.Bo), ci(r.bored, N)) +
+      gauge('Oynama süresi', fmt(r.minPP, 1) + ' dk', 'oyuncu başına, reklam dahil') +
+      gauge('Ortalama yıldız', r.pass ? fmt(r.stars, 1) + ' ★' : '-', r.pass ? 'yalnız geçenlerin · ort. ' + Math.round(r.gold) + ' altın' : 'geçen yok, yıldız yok') + '</div>';
+    const o = outOf({ NP: 1, pass: r.pass, flow: r.flow, bored: r.bored, quit: r.quit });
+    h += `<div class="card2"><h3 class="sec" style="margin-top:0">100 oyuncu bu bölümde ne yaşadı</h3>${outBar(o, 1)}${outLegend(o)}
+      <p class="note">Her oyuncu yalnız bir gruba girer, dördünün toplamı %100. Hedef: bırakan ${pc(G0.Q)} altı (şimdi <b class="${cl(r.quit <= G0.Q)}">${pc(r.quit)}</b>), sıkılan ${pc(B.tB)} altı (şimdi <b class="${cl(r.bored <= B.tB)}">${pc(r.bored)}</b>).
+      Reklam izlemek bu gruplardan ayrı bir şeydir, her grupta olabilir: reklam izleyen ${pc(r.watch)}; bunların ${pcS(r.watch ? r.wPass / r.watch : 0)} sonunda geçti, ${pcS(r.watch ? 1 - r.wPass / r.watch : 0)} yine de bıraktı.</p></div>`;
+    DX = dxList(n, r, s, m, stale);
+    h += '<h3 class="sec">Teşhis ve ne yapmalı</h3><div class="dx">' + DX.map((d, i) => `<div class="dxc ${d.sev}">${dxIcon(d.ic, d.sev)}<div><h4>${d.t}</h4><p>${d.why}</p>${d.act ? `<button class="btn sm ${d.sev === 'ok' ? 'ghost' : 'pri'}" data-a="dx" data-k="${i}">${d.act.label}</button>` : ''}</div></div>`).join('') + '</div>';
+    h += histHtml(n);
+    h += anchorHtml(r);
+    /* 5 bölümlük huni */
+    let reach = 1, fun = '';
+    for (let i = 1; i <= 5; i++) {
+      const sx = simLevel(curG() * 5 + i, P, B), q = sx && sx.pop;
+      if (!q) { fun += `<tr><td>${i}. ${TIER[i - 1]}</td><td colspan="5" class="note">ölçülmedi</td></tr>`; reach = NaN; continue; }
+      const kisi = isNaN(reach) ? '-' : `<b>${Math.round(reach * 100)}</b> kişi <div class="ob" style="margin-top:3px"><em style="width:${reach * 100}%;background:var(--lil)"></em></div>`;
+      const hv = hookScore(q, curG() * 5 + i).v;
+      fun += `<tr class="${i === lv ? 'on' : ''}"><td>${i}. ${TIER[i - 1]}</td><td class="${hv >= 80 ? 'okc' : hv >= 55 ? 'amb' : 'warn'}"><b>${hv}</b></td><td>${kisi}</td><td>${pc(q.pass)}</td><td class="${q.quit > goal(curG() * 5 + i).Q ? 'warn' : ''}">${pc(q.quit)}</td><td>${fmt(q.adsPP, 2)}</td></tr>`;
+      reach *= q.pass;
+    }
+    if (!isNaN(reach)) fun += `<tr><td colspan="2"><b>5 bölümü bitiren</b></td><td><b>${Math.round(reach * 100)}</b> kişi</td><td colspan="3"></td></tr>`;
+    h += `<div class="two" style="margin-top:12px"><div><h3 class="sec">Can nerede bitiyor</h3>${histSvg(r.histN)}<p class="note">Canın bittiği her an sayılır (ikinci şansla devam edilse de). Çubuklar bölümün başından sonuna 10 dilim; toplamı %100. Kırmızı: erken (bırakma riski), şeftali: sona yakın (reklamla devam etme isteği).</p></div>
+      <div><h3 class="sec">Bu kilidin 5 bölümü: 100 oyuncudan kaçı nereye gelir</h3><div class="tw"><table><tr><th>Bölüm</th><th>Kanca</th><th>Gelen</th><th>Geçen</th><th>Bırakan</th><th>Reklam / oyuncu</th></tr>${fun}</table></div><p class="note">1. bölüme 100 oyuncunun hepsi gelir. Sonraki bölüme yalnız öncekini geçenler gelir. Geçen ve Bırakan, o bölüme gelenlerin yüzdesidir (ikisinin toplamı %100).</p></div></div>`;
+  }
+  h += '<h3 class="sec">Oyuncu tiplerine göre</h3><div class="tw"><table><tr><th>Tip</th><th>Tepki</th><th>İlk denemede geçen</th><th>Hata / vuruş</th><th>Ort. deneme</th><th>Reklam izleyen</th><th style="min-width:180px">Ne yaşadı (keyif · zor · sıkıldı · bıraktı)</th><th>Yıldız</th></tr>' +
+    S.PS.filter(p => s.ps[p.id]).map(p => { const x = s.ps[p.id], R = v => pc(v / x.NP), o = outOf(x); return `<tr><td>${p.nm}${p.pay ? '' : ' <span class="note">(nüfusta yok)</span>'}</td><td>${Math.round(p.sg * 1000)} ms</td><td>${R(x.first)} <span class="note">±${Math.round(ci(x.first / x.NP, x.N) * 100)}</span></td><td>%${fmt(x.missRate * 100, 1)}</td><td>${fmt(x.att / x.NP, 1)}</td><td>${R(x.watchers)}</td><td>${outBar(o)}<span class="note">${OUTC.filter(([k]) => o[k] >= 0.005).map(([k, t]) => t.replace('Geçti, ', '').replace('Geçti ama ', '').toLocaleLowerCase('tr') + ' ' + pc(o[k])).join(' · ')}</span></td><td>${x.pass ? fmt(x.stars / x.pass, 1) + ' ★' + (x.pass < 30 ? ' <span class="note">(' + x.pass + ' kişi geçti)</span>' : '') : '<span class="note">geçen yok</span>'}</td></tr>`; }).join('') + '</table></div><p class="note">Yıldız yalnız geçenlerin ortalamasıdır; az kişi geçtiyse yanına kaç kişi olduğu yazılır. Tepki: tipin zamanlama sapması (küçük = daha isabetli).</p>';
+  h += '<h3 class="sec">Tutarlılık denetimleri</h3>' + runChecks(n).map(([st, t]) => `<div class="chk"><b class="${st === 'ok' ? 'okc' : st === 'warn' ? 'amb' : 'warn'}">${st === 'ok' ? '✓' : st === 'warn' ? '!' : '✗'}</b><span>${t}</span></div>`).join('');
+  const gp = groupPop(0), lo = groupPop(-B.sens), hi = groupPop(B.sens);
+  if (gp) {
+    const rows = [...new Set([1000, B.players, 25000, 100000])].sort((a, b) => a - b);
+    const $$ = v => '$' + (v < 10 ? fmt(v, 2) : nf(v));
+    h += `<h3 class="sec">Oyuncu sayısı projeksiyonu (bu kilidin ${gp.c} ölçülmüş bölümü)</h3><div class="tw"><table><tr><th>Aktif oyuncu</th><th>Günlük dk</th><th>Günlük reklam</th><th>Günlük gelir</th><th>Aylık gelir (kötümser – iyimser)</th><th>Günlük kaybedilen</th></tr>` +
+      rows.map(pl => { const x = proj(gp, B, pl), a = proj(lo, B, pl), c = proj(hi, B, pl); return `<tr class="${pl === B.players ? 'on' : ''}"><td>${nf(pl)}</td><td>${nf(x.min)}</td><td>${nf(x.views)}</td><td>${$$(x.rev)}</td><td>${$$(x.mon)} <span class="note">(${$$(a.mon)} – ${$$(c.mon)})</span></td><td>${fmt(x.lost, 1)}</td></tr>`; }).join('') +
+      `</table></div><p class="note">Oranlar oyuncu sayısıyla değişmez, toplamlar doğru orantılı büyür; az oyuncuda günden güne oynaklık yüksektir. Dakika başına ${fmt(gp.adsPerMin, 3)} reklam, ${fmt(gp.quitPerMin * 1000, 1)} bırakma / 1000 dk. Varsayımlar Oyuncular › Nüfus ve para'da.</p>`;
+  }
+  el.innerHTML = h + honesty(); updProg();
+};
+const honesty = () => `<details class="note" style="margin-top:10px"><summary style="cursor:pointer;color:var(--lil)">Denklemler</summary>
+  <p>Reklam izleme: p = σ( logit(temel) + sona yakınlık·(ilerleme − 0,5)·2 + emek·ln((sn + 5) ÷ reklam süresi) + takılma·min(kayıp, 4) − yorgunluk·izlenen + tipin eğilimi + kaydırma ). İzlemezse altınla devam olasılığı; ikisi de yoksa kayıp.</p>
+  <p>Bırakma (kayıptan sonra): q = σ( logit(temel) + erken·(0,5 − ilerleme)·2 + üst üste·kayıp − tipin sabrı ); en çok deneme dolunca kesin bırakır. Sıkılma: ilk denemede ikinci şanssız ve hiç hata yapmadan geçen zorluk ihtiyacı olasılıkla, tek hatayla geçen bunun %35'iyle sıkılır. Akış: geçti, sıkılmadı, en çok 3 deneme.</p>
+  <p>± değerleri %95 güven payıdır (ölçülen koşu sayısından). Kanca puanı = 100 × (beş hedef puanının çarpımının 5. kökü: zorluk, reklam, bırakan, sıkılan, kıl payı; hedefler basamağa göre). Kıl payı: canın bittiği anların bölümün son %40'ında olan payı; hedef puanı bant içinde 1, dışında yumuşak düşer (hedefin kendisi kadar taşınca 0,25). Tek bir hedef çok kötüyse puan belirgin düşer.</p></details>
+  <div class="honest"><b>Dürüst not:</b> Oyuncunun nerede yandığı gerçek oyun koduyla ölçülür. Reklam izleme ve bırakma kararları ise ayarlanabilir bir davranış modelidir; gerçek oyuncu verisi gelene kadar tahmindir. Sayıların kendisinden çok, bir ayarı değiştirince yönün nasıl değiştiğine bak. Bot yeni kuralı ilk görüşte bilir; insan biraz daha çok yanar.</div>`;
+let DX = [];
+const dxIcon = (ic, sev) => {
+  const c = sev === 'bad' ? '#f0657a' : sev === 'warn' ? '#f2b73c' : '#7bc8a4', A = (a0, a1, col) => `<path d="${arcP(18, a0, a1, 27, 27)}" stroke="${col}" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  const sym = { wall: A(5, 70, c), cliff: A(250, 345, c), easy: A(10, 150, '#ff8e5c'), tension: A(250, 350, '#3a3268') + A(20, 40, '#ff8e5c'), adpress: '<rect x="15" y="18" width="24" height="17" rx="3" fill="none" stroke="' + c + '" stroke-width="3"/><path d="M24 23 l7 4 l-7 4z" fill="' + c + '"/>', bore: T(27, 32, 12, 'zzz', c), grind: '<path d="M18 27 a9 9 0 1 1 9 9" stroke="' + c + '" stroke-width="3" fill="none"/><path d="M27 33 l0 6 l5 -3z" fill="' + c + '"/>', ladder: '<path d="M14 38 h8 v-7 h8 v-7 h8" stroke="' + c + '" stroke-width="3" fill="none"/><path d="M36 14 l4 4" stroke="' + c + '" stroke-width="3"/>', ideal: T(27, 34, 20, '!', c), redo: T(27, 34, 18, '↻', c), good: T(27, 34, 18, '✓', c), noad: T(27, 33, 11, 'AD', c) };
+  return `<svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="18" fill="none" stroke="#3a3268" stroke-width="6"/>${sym[ic] || ''}</svg>`;
+};
+/* teşhis: kanıt + tek dokunuşla uygulanan öneri (fizik değişirse bölüm kendiliğinden yeniden ölçülür) */
+const dxList = (n, r, s, m, stale) => {
+  const B = S.B, P = S.P, out = [], L = lv - 1, id = idOf(n), G0 = goal(n), fail = 1 - r.first, early = r.histN.slice(0, 3).reduce((a, b) => a + b, 0), late = r.histN.slice(7).reduce((a, b) => a + b, 0);
+  const win = f => ({ label: (curG() ? 'Pencereyi ' : 'Şeftaliyi ') + (f > 1 ? '%' + Math.round((f - 1) * 100) + ' genişlet' : '%' + Math.round((1 - f) * 100) + ' daralt'), phys: 1, fn: () => { if (curG()) S.KF[id] = (S.KF[id] || 1) * f; else S.P.wd[L] *= f; }, ch: (curG() ? 'Kilit katsayısı' : 'Genişlik') + ' ×' + fmt(f, 2) });
+  if (stale) out.push({ sev: 'warn', ic: 'redo', t: 'Ölçüm eski', why: 'Fizik ya da kurgu ölçümden sonra değişti; aşağıdaki sayılar eski hâli gösteriyor.', act: { label: 'Yeniden ölç', measure: 1 } });
+  const ir = poolOf(m, 'ideal', 0), ie = ir.reduce((a, x) => a + x.e.length, 0) + ir.filter(x => !x.x).length;
+  if (ie) out.push({ sev: 'bad', ic: 'ideal', t: 'Kusursuz oyunla bile hata', why: `İdealist ${ir.length} koşuda ${ie} kez yandı. Tuzak hedefin üstüne düşüyor ya da pimler sıkışık olabilir.`, act: { label: 'Pim aralığını +3° yap', phys: 1, fn: () => { S.P.gap += 3; }, ch: 'Pim aralığı +3°' } });
+  if (fail < G0.F0) out.push({ sev: 'warn', ic: 'easy', t: 'Fazla kolay', why: `İlk denemede canı biten ${pc(fail)}; bu basamakta hedef ${pc(G0.F0)}-${pc(G0.F1)}. Oyuncu zorlanmıyor, sıkılabilir.`, act: win(clamp(1 - (G0.F - fail) * 0.6, 0.75, 0.97)) });
+  else if (fail > G0.F1) out.push({ sev: 'warn', ic: 'wall', t: 'Fazla zor', why: `İlk denemede canı biten ${pc(fail)}; bu basamakta hedef ${pc(G0.F0)}-${pc(G0.F1)}. Zorluk merdivende sıçrıyor.`, act: win(clamp(1 + (fail - G0.F) * 0.6, 1.03, 1.3)) });
+  if (r.quit > G0.Q && early > 0.4) out.push(Object.assign({ sev: 'bad', ic: 'wall', t: 'Erken duvar', why: `Oyuncuların ${pcS(r.quit)} bırakıyor ve canın bittiği anların ${pcS(early)} bölümün ilk %30'unda: oyuncu ısınmadan yanıyor, emek vermeden vazgeçiyor.` }, { act: win(1.1) }));
+  else if (r.quit > G0.Q) out.push({ sev: 'bad', ic: 'cliff', t: 'Sonda acı kayıp', why: `Oyuncuların ${pcS(r.quit)} bırakıyor; çoğu bölümün sonuna yakın yanıp emeğini kaybediyor.`, act: P.regen > 1 ? { label: `Her ${P.regen - 1} dalgada +1 can`, fn: () => { S.P.regen--; }, ch: 'Can yenilenmesi ' + (P.regen - 1) } : P.lives < 3 ? { label: 'Canı ' + (P.lives + 1) + ' yap', fn: () => { S.P.lives++; }, ch: 'Can ' + (P.lives + 1) } : win(1.08) });
+  if (r.watch < G0.W0) {
+    if (!P.cont || !P.contAds) out.push({ sev: 'warn', ic: 'noad', t: 'Reklam kapısı kapalı', why: 'İkinci şans ya da reklam hakkı 0: kimse reklamla devam edemiyor.', act: { label: 'Reklamla 1 ikinci şans', fn: () => { S.P.cont = Math.max(1, S.P.cont); S.P.contAds = Math.max(1, S.P.contAds); }, ch: 'Reklam hakkı 1' } });
+    else if (fail < G0.F0) {} else if (lateOf(r) < G0.K) {}
+  }
+  if (lateOf(r) < G0.K) out.push({ sev: 'warn', ic: 'tension', t: 'Bir daha hissi zayıf', why: `Canın bittiği anların yalnız ${pcS(lateOf(r))} bölümün son %40'ında (hedef ${pc(G0.K)} üstü). Erken yanan oyuncu "bir daha" demez, bırakır; sona yakın yanan reklamla devam eder. Başı biraz yumuşat, sonu biraz sertleştir.`, act: { label: 'Baş −%4, son +%4 hız', phys: 1, fn: () => { S.P.phm[0] = Math.round((S.P.phm[0] - 0.04) * 100) / 100; S.P.phm[3] = Math.round((S.P.phm[3] + 0.04) * 100) / 100; }, ch: 'İbre hızı başta ×' + fmt(P.phm[0] - 0.04, 2) + ', bitişte ×' + fmt(P.phm[3] + 0.04, 2) } });
+  if (r.watch > G0.W1) out.push({ sev: 'warn', ic: 'adpress', t: 'Reklam baskısı', why: `Oyuncuların ${pcS(r.watch)} reklam izliyor; bu kadar sık reklam oyuncuyu yorar.`, act: P.contAds > 1 ? { label: 'Reklam hakkını ' + (P.contAds - 1) + ' yap', fn: () => { S.P.contAds--; }, ch: 'Reklam hakkı ' + (P.contAds - 1) } : win(1.06) });
+  if (r.bored > G0.Bo && fail >= G0.F0) out.push(Object.assign({ sev: 'warn', ic: 'bore', t: 'Sıkıcı', why: `Oyuncuların ${pcS(r.bored)} hiç ya da bir kez hata yapıp geçiyor ve sıkılıyor.` }, { act: win(0.92) }));
+  if (r.att > 4) out.push({ sev: 'warn', ic: 'grind', t: 'Çok deneme', why: `Geçen oyuncu ortalama ${fmt(r.att, 1)} deneme yapıyor; yardım geç geliyor.`, act: P.helpAt[0] > 1 ? { label: 'Yardımı ' + (P.helpAt[0] - 1) + ' kayıpta başlat', phys: 1, fn: () => { S.P.helpAt[0]--; }, ch: 'Yardım 1: ' + (P.helpAt[0] - 1) + ' kayıp' } : null });
+  if (lv > 1) { const q = simLevel(n - 1, P, B); if (q && q.pop && r.first > q.pop.first + 0.05) out.push({ sev: 'warn', ic: 'ladder', t: 'Merdiven ters', why: `Bu bölüm (${pc(r.first)}) bir öncekinden (${pc(q.pop.first)}) kolay geçiliyor.`, act: win(0.9) }); }
+  if (!out.length) out.push({ sev: 'ok', ic: 'good', t: 'Dengeli', why: 'Beş hedef de tutuyor (zorluk, reklam, bırakan, sıkılan, kıl payı). Telefonda oynayarak doğrula.' });
+  return out;
+};
+/* ayar geçmişi: her ölçümde ve ölçüm güncelken her tasarım değişikliğinde puan yazılır; hangi ayar işe yaradı görünür */
+const recHist = (n, meas) => {
+  const m = MEAS[n]; if (!m || m.h !== physHash(n)) return;
+  const s2 = simLevel(n, S.P, S.B); if (!s2 || !s2.pop) return;
+  const r = s2.pop, v = hookScore(r, n).v, H = S.H[n] = S.H[n] || [], ch = Object.values(S.ui.chg || {}).join(', ');
+  const last = H[H.length - 1];
+  if (!meas && !ch) return;
+  if (last && last.v === v && !ch && !meas) return;
+  H.push({ v, q: r.quit, w: r.watch, b: r.bored, f: r.first, ch: ch || (meas ? 'ölçüm' : ''), at: Date.now() });
+  if (H.length > 20) H.shift();
+  S.ui.chg = {}; save();
+};
+let histT = 0;
+const histSoon = () => { clearTimeout(histT); histT = setTimeout(() => { recHist(curN()); hookBadge(); if (S.ui.pg === 'ana') renderAna(); }, 1200); };
+const histHtml = n => {
+  const H = (S.H[n] || []).slice(-12); if (!H.length) return '';
+  const X = i => 20 + i / Math.max(1, H.length - 1) * 360, Y = v => 110 - v;
+  let svg = `<svg viewBox="0 0 400 125" class="tl"><line x1="20" y1="${Y(80)}" x2="380" y2="${Y(80)}" stroke="#7bc8a4" stroke-dasharray="3 3" opacity=".5"/><text x="384" y="${Y(80) + 3}" font-size="9" fill="#7bc8a4">80</text><polyline points="${H.map((x, i) => X(i) + ',' + Y(x.v)).join(' ')}" fill="none" stroke="#8e7bf2" stroke-width="2.5"/>`;
+  H.forEach((x, i) => { const d = i ? x.v - H[i - 1].v : 0; svg += `<circle cx="${X(i)}" cy="${Y(x.v)}" r="5" fill="${d > 0 ? '#7bc8a4' : d < 0 ? '#f0657a' : '#b6acdf'}"/><text x="${X(i)}" y="${Y(x.v) - 8}" font-size="9.5" fill="#f3f0ff" text-anchor="middle">${x.v}</text>`; });
+  svg += '</svg>';
+  const rows = H.map((x, i) => ({ x, p: i ? H[i - 1].v : null })).reverse().map(({ x, p }) => { const d = p == null ? 0 : x.v - p; return `<div class="hrow"><b class="${d > 0 ? 'okc' : d < 0 ? 'warn' : ''}">${p == null ? x.v : p + ' → ' + x.v}</b><span>${x.ch === 'ölçüm' ? 'yeniden ölçüldü' : x.ch}${d ? ` <b class="${d > 0 ? 'okc' : 'warn'}">(${d > 0 ? '+' : ''}${d})</b>` : ''}</span></div>`; }).join('');
+  const good = H.map((x, i) => ({ x, d: i ? x.v - H[i - 1].v : 0 })).filter(z => z.d >= 5).map(z => `<span class="tag" style="background:#7bc8a433;color:#7bc8a4">${z.x.ch} +${z.d}</span>`).join(' ');
+  return `<h3 class="sec">Değişiklik günlüğü: hangi ayar puanı artırdı</h3><p class="note">Bu bölümde her ayar değiştirdiğinde ya da yeniden ölçtüğünde kanca puanı buraya yazılır. Çizgi soldan sağa zamandır; yeşil nokta puanı artıran, kırmızı düşüren değişiklik. Sağdaki liste en yeniden eskiye: önceki puan → yeni puan ve ne değişti.</p><div class="hist"><div>${svg}</div><div>${rows}</div></div>${good ? '<p class="note">İşe yarayanlar: ' + good + '</p>' : ''}`;
+};
+/* gerçeklik çapası: modelin çıktısını sektör kaynaklarının aralıklarıyla karşılaştırır */
+const anchorHtml = r => {
+  const B = S.B, gp = groupPop(0) || { adsPerMin: r.minPP ? r.adsPP / r.minPP : 0 }, dayMin = B.sessions * B.sessMin * B.blShare, views = gp.adsPerMin * dayMin, arp = views * B.eCPM / 1000;
+  const A = (ad, v, ok, band, src) => `<div class="g"><small>${ad}</small><b class="${ok ? 'okc' : 'amb'}">${v}</b><small>kaynak aralığı: ${band}${src ? ' · ' + src : ''}</small></div>`;
+  return `<h3 class="sec">Gerçeklik çapası (sektör kaynaklarıyla karşılaştırma)</h3><div class="anc">` +
+    A('Reklam teklifi kabulü', pc(r.accept), r.accept >= 0.35 && r.accept <= 0.7, '%35-70', 'ödüllü reklam rehberleri') +
+    A('Bölümde kaçak (bırakan)', pc(r.quit), r.quit <= 0.2, 'en çok %20', 'seviye analizi rehberi') +
+    A('Oyuncu başına günlük reklam', fmt(views, 2), views >= 1 && views <= 4, '≈ 2 (doğrulanmamış)', '') +
+    A('Reklam geliri / günlük oyuncu', '$' + fmt(arp, 3), arp >= 0.05 && arp <= 0.3, '$0,05-0,30', 'türe ve ülkeye göre') +
+    `</div><div class="acts"><button class="btn sm" data-a="calib">Reklam kararını kalibre et (kabul %52)</button><span class="note" style="margin:0">Temel izleme olasılığını, ölçülmüş bölümlerde teklif kabulü kaynak aralığının ortasına gelecek şekilde ayarlar.</span></div>
+    <p class="note">Kaynaklar (sektör blogları ve satıcı rehberleri; hakemli çalışma değil): <a href="https://revenueflex.com/blog/rewarded-video-ads-mobile-game-monetization" target="_blank">RevenueFlex</a>, <a href="https://appsamurai.com/blog/rewarded-ads-in-mobile-games-strategy-data-and-best-practices/" target="_blank">AppSamurai</a>, <a href="https://maf.ad/en/blog/rewarded-ads-stats/" target="_blank">MAF</a>, <a href="https://support.costcenter.net/en/articles/10152964-guide-to-level-analysis-for-mobile-games" target="_blank">Cost Center seviye analizi</a>, <a href="https://businessofapps.com/?p=96993" target="_blank">Business of Apps churn</a>, <a href="https://pocketgamer.biz/how-saygames-uses-player-data-to-balance-difficulty-in-hybrid-puzzle-games" target="_blank">SayGames</a>. "Kaybedince ikinci şans reklamı" için yayımlanmış ölçüm bulunamadı; gerçek değer ancak kendi oyuncu verimizle (Firebase) çıkar.</p>`;
+};
+const calib = () => {
+  const ns = [1, 2, 3, 4, 5].map(i => curG() * 5 + i).filter(n => MEAS[n]); if (!ns.length) return toast('Önce ölç');
+  let lo = 0.02, hi = 0.98;
+  for (let it = 0; it < 14; it++) { const mid = (lo + hi) / 2, B = Object.assign(cp(S.B), { adBase: mid }); let a = 0, o = 0; ns.forEach(n => { const q = simLevel(n, S.P, B); if (q && q.pop) { a += q.pop.adsPP; o += q.pop.offPP; } }); if ((o ? a / o : 0) < 0.52) lo = mid; else hi = mid; }
+  const v = Math.round((lo + hi) / 2 * 100) / 100, old = S.B.adBase; S.B.adBase = v; S.ui.chg = S.ui.chg || {}; S.ui.chg['b.adBase'] = 'Kalibrasyon: temel izleme ' + fmt(old, 2) + '→' + fmt(v, 2);
+  changed(); render(); toast('Temel izleme olasılığı ' + fmt(v, 2) + ' oldu');
+};
+const hookBadge = () => {
+  const el = $('hk'); if (!el || !K) return;
+  const n = curN(), m = MEAS[n]; if (!m) { el.innerHTML = 'Kanca – <small>ölçülmedi</small>'; el.style.background = ''; return; }
+  const s2 = simLevel(n, S.P, S.B); if (!s2 || !s2.pop) return;
+  const v = hookScore(s2.pop, n).v, H = S.H[n] || [], prev = H.length > 1 ? H[H.length - 2].v : null, last = H.length ? H[H.length - 1].v : null, d = last != null && last !== v ? v - last : (prev != null ? last - prev : 0), stale = m.h !== physHash(n);
+  el.innerHTML = `Kanca ${v}${d ? `<small style="color:${d > 0 ? '#7bc8a4' : '#f0657a'}">${d > 0 ? '▲' : '▼'}${Math.abs(d)}</small>` : ''}${stale ? '<small style="color:#f2b73c">⟳ eski</small>' : ''}`;
+  el.style.background = v >= 80 ? 'rgba(123,200,164,.25)' : v >= 55 ? 'rgba(242,183,60,.22)' : 'rgba(240,101,122,.25)';
+};
+const anaClick = (a, k) => {
+  if (a === 'calib') return calib();
+  if (a === 'dx') { const d = DX[+k]; if (!d || !d.act) return; if (d.act.measure) return measureLevels([curN()]); d.act.fn(); normalize(S); S.ui.chg = S.ui.chg || {}; S.ui.chg['dx' + Date.now()] = d.act.ch || d.act.label; changed(); render(); start(); toast('Uygulandı: ' + d.act.label); if (d.act.phys) measureLevels([curN()]); else histSoon(); return; }
+  if (a === 'm1') measureLevels([curN()]);
+  else if (a === 'm5') measureLevels([1, 2, 3, 4, 5].map(i => curG() * 5 + i));
+  else if (a === 'm80') { toast('Bütün bölümler ölçülüyor; birkaç dakika sürer, laboratuvar açık kalsın'); measureLevels(Array.from({ length: K.BL_N }, (_, i) => i + 1)); }
+  else if (a === 'mstop') { MS.stop = true; toast('Ölçüm durduruluyor (ölçülen bölümler kalır)'); }
+  else if (a === 'gol') { const n = +k; step = STEPS().findIndex(x => x.g === Math.floor((n - 1) / 5)); lv = (n - 1) % 5 + 1; S.step = step; save(); render(); start(); scrollTo(0, 0); }
+};
+document.addEventListener('change', e => { if (e.target.id === 'prec') { S.ui.prec = +e.target.value; save(); } });
+/* ================= FİKİR PANOSU: oyun dilinde küçük çizimler (g anahtarı) ================= */
+const arcP = (r, a0, a1, cx = 60, cy = 40) => { const p = a => [cx + r * Math.sin(a * Math.PI / 180), cy - r * Math.cos(a * Math.PI / 180)].map(v => v.toFixed(1)).join(' '); return `M${p(a0)} A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${p(a1)}`; };
+const ringS = (o = {}) => `<circle cx="60" cy="40" r="26" fill="none" stroke="#3a3268" stroke-width="7"/>${o.noPeach ? '' : `<path d="${arcP(26, o.a0 ?? 30, o.a1 ?? 62)}" stroke="#ff8e5c" stroke-width="7" fill="none" stroke-linecap="round"/>`}${o.noPtr ? '' : `<line x1="60" y1="40" x2="${(60 + 22 * Math.sin((o.p ?? 300) * Math.PI / 180)).toFixed(1)}" y2="${(40 - 22 * Math.cos((o.p ?? 300) * Math.PI / 180)).toFixed(1)}" stroke="#f3f0ff" stroke-width="3" stroke-linecap="round"/><circle cx="60" cy="40" r="3.5" fill="#f3f0ff"/>`}`;
+const T = (x, y, s, t, c = '#f3f0ff', w = 800) => `<text x="${x}" y="${y}" font-size="${s}" font-weight="${w}" fill="${c}" text-anchor="middle" font-family="system-ui">${t}</text>`;
+const lock = (x, y, open) => `<rect x="${x - 7}" y="${y - 3}" width="14" height="11" rx="2.5" fill="#f2b73c"/><path d="M${x - 4} ${y - 3} v-4 a4 4 0 0 1 8 0 ${open ? 'v-2' : 'v4'}" stroke="#f2b73c" stroke-width="2.4" fill="none" ${open ? 'transform="translate(5 -3)"' : ''}/>`;
+const PIC = {
+  pct: () => ringS({ noPtr: 1 }) + `<path d="M40 52 Q60 47 80 52 L80 60 Q60 68 40 60Z" fill="#ff8e5c" opacity=".35"/>` + T(60, 46, 15, '%45'),
+  sweep: () => ringS({ noPtr: 1 }) + `<path d="${arcP(26, 200, 330)}" stroke="#fff" stroke-width="7" fill="none" opacity=".18" stroke-linecap="round"/><path d="${arcP(26, 300, 330)}" stroke="#fff" stroke-width="7" fill="none" opacity=".45" stroke-linecap="round"/>` + T(60, 45, 9, 'belli belirsiz', '#b6acdf', 600),
+  duvar: () => [0, 1, 2, 3, 4].map(i => `<circle cx="${14 + i * 23}" cy="40" r="8" fill="none" stroke="${i === 4 ? '#f0657a' : '#8e7bf2'}" stroke-width="3.5"/>${T(14 + i * 23, 44, 9, i + 1, '#b6acdf')}`).join('') + `<rect x="96" y="22" width="4" height="36" rx="2" fill="#f0657a"/>` + T(60, 72, 8.5, '5. bölüm duvarı', '#b6acdf', 600),
+  formul: () => ringS({ a0: 20, a1: 70, p: 45 }) + `<path d="${arcP(36, 20, 70)}" stroke="#8e7bf2" stroke-width="1.5" fill="none" stroke-dasharray="2 2"/>` + T(60, 76, 9.5, 'τ = genişlik ÷ hız', '#b6acdf', 700),
+  gelgit: () => ringS({ noPeach: 1, p: 120 }) + `<path d="${arcP(26, 0, 180)}" stroke="#8e7bf2" stroke-width="11" fill="none" opacity=".35"/><path d="${arcP(26, 40, 66)}" stroke="#ff8e5c" stroke-width="7" fill="none" stroke-linecap="round"/>` + T(60, 76, 8.5, 'hızlı yarı · yavaş yarı', '#b6acdf', 600),
+  kilit: () => ringS({ noPtr: 1, noPeach: 1 }) + lock(60, 41) + T(60, 76, 8.5, 'yakında', '#b6acdf', 600),
+  cark: () => [0, 1, 2, 3, 4, 5].map(i => `<path d="M60 40 L${(60 + 28 * Math.sin(i * 60 * Math.PI / 180)).toFixed(1)} ${(40 - 28 * Math.cos(i * 60 * Math.PI / 180)).toFixed(1)} A28 28 0 0 1 ${(60 + 28 * Math.sin((i + 1) * 60 * Math.PI / 180)).toFixed(1)} ${(40 - 28 * Math.cos((i + 1) * 60 * Math.PI / 180)).toFixed(1)}Z" fill="${['#8e7bf2', '#ff8e5c', '#2e2757', '#f2b73c', '#8e7bf2', '#2e2757'][i]}"/>`).join('') + `<path d="M56 6 L64 6 L60 14Z" fill="#f3f0ff"/><circle cx="60" cy="40" r="5" fill="#17132d"/>`,
+  altin: () => [0, 1, 2, 3].map(i => `<ellipse cx="${46 + (i % 2) * 4}" cy="${58 - i * 7}" rx="15" ry="5" fill="#f2b73c" stroke="#b8862a"/>`).join('') + `<path d="M74 60 L80 44 L86 52 L92 30 L98 38" stroke="#ff8e5c" stroke-width="2.5" fill="none" stroke-linecap="round"/>` + T(86, 72, 8.5, 'merdiven', '#b6acdf', 600),
+  misafir: () => `<circle cx="44" cy="30" r="8" fill="#8e7bf2"/><path d="M30 60 q14 -22 28 0" fill="#8e7bf2"/><circle cx="76" cy="32" r="7" fill="#ff8e5c"/><path d="M64 60 q12 -19 24 0" fill="#ff8e5c"/><rect x="54" y="38" width="12" height="20" rx="2.5" fill="none" stroke="#f3f0ff" stroke-width="1.6"/>`,
+  kanca: () => [0.05, 0.08, 0.06, 0.07, 0.09, 0.1, 0.12, 0.14, 0.15, 0.14].map((v, i) => `<rect x="${12 + i * 9.5}" y="${62 - v * 280}" width="7" height="${v * 280}" rx="2" fill="${i < 3 ? '#f0657a' : i < 6 ? '#f2b73c' : '#ff8e5c'}"/>`).join('') + `<path d="M102 10 v14 a6 6 0 0 1 -12 0" stroke="#f3f0ff" stroke-width="2.4" fill="none" stroke-linecap="round"/>` + T(60, 75, 8.5, 'sona yakın yanan → reklam', '#b6acdf', 600),
+  takvim: () => `<rect x="32" y="12" width="56" height="54" rx="7" fill="#2e2757" stroke="#8e7bf2" stroke-width="2"/><rect x="32" y="12" width="56" height="12" rx="6" fill="#8e7bf2"/>` + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => `<rect x="${37 + (i % 4) * 12.5}" y="${29 + (i / 4 | 0) * 11.5}" width="8" height="8" rx="2" fill="${i === 6 ? '#ff8e5c' : '#3a3268'}"/>`).join(''),
+  egri: () => `<path d="M14 64 H106 M14 64 V12" stroke="#3a3268" stroke-width="1.5"/><path d="M16 58 C40 54 50 44 64 36 S92 22 104 16" stroke="#ff8e5c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M16 60 L40 52 L64 40 L88 26 L104 20" stroke="#8e7bf2" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>` + T(70, 75, 8.5, 'oyuncuya göre ince ayar', '#b6acdf', 600),
+  veri: () => [24, 40, 30, 52, 46].map((v, i) => `<rect x="${20 + i * 17}" y="${66 - v}" width="11" height="${v}" rx="2.5" fill="${i === 3 ? '#ff8e5c' : '#8e7bf2'}"/>`).join('') + `<circle cx="98" cy="18" r="7" fill="none" stroke="#7bc8a4" stroke-width="2"/><path d="M95 18 l2 2 l4 -4" stroke="#7bc8a4" stroke-width="2" fill="none"/>`,
+  acik: () => ringS({ noPtr: 1, noPeach: 1 }) + lock(60, 41, 1) + T(60, 76, 8.5, 'yayında kapat', '#b6acdf', 600)
+};
+const ideaSvg = g => `<svg viewBox="0 0 120 80" aria-hidden="true">${(PIC[g] || (() => ringS()))()}</svg>`;
+const ST_COL = { 'fikir': '#8e7bf2', 'denemede': '#ff8e5c', 'karar bekliyor': '#f2b73c', 'yapılacak': '#f0657a', 'sonra': '#8076b0', 'açık': '#7bc8a4' };
+/* yedekteki kilitler (oyunun BL_YEDEK'i): ad, 5 bölümün kendi parçaları, ayarlar, son kilit katsayıları; salt okunur */
+const renderYedek = () => {
+  const Y = K.BL_YEDEK; if (!Y) return '<p class="note">Yedek yok.</p>';
+  return Y.gr.map(r => { const nm = r[0].split(' ')[0], mc = Y.mcat[nm], tags = [r[0], r[1], r[2]].concat(r[3] ? [r[4] + ' (' + r[3] + '. bölümden)'] : []);
+    const ps = mc ? Object.values(mc.p).map(d => `<li>${d.ad}: ${d.d.join(' / ')} ${d.u || ''}</li>`).join('') : '';
+    const kf = [1, 2, 3, 4, 5].map(k => { const v = Y.kf[nm + k]; return v ? k + '. c ' + v[1] : ''; }).filter(Boolean).join(' · ');
+    return `<div class="card2"><h3 class="sec" style="margin-top:0">${Y.ad[nm] ? Y.ad[nm][0] : nm}</h3><p class="note">Parçalar: ${tags.map(x => TAG_NM[x] || x).join(', ')}</p>${ps ? '<ul class="note">' + ps + '</ul>' : ''}<p class="note">Son kilit katsayıları (Kolay → Cehennem): ${kf || '-'}</p></div>`; }).join('') +
+    '<p class="note">Geri almak için: bana "yedekteki X kilidini geri al" de; kilit listeye eklenir ve bölümler yeniden ayarlanır.</p>';
+};
+const renderIdeas = () => {
+  const el = $('b-idea'); if (!el) return;
+  const fl = S.ui.iflt || '', sts = [...new Set(IDEAS.map(x => x.durum).filter(Boolean))];
+  const vis = IDEAS.filter(x => !S.ui.id[x.id] && (S.ui.showHidden || !S.ui.ih[x.id]) && (!fl || x.durum === fl)), del = IDEAS.filter(x => S.ui.id[x.id]);
+  const pgName = Object.fromEntries(PAGES);
+  el.innerHTML = '<p class="d">Konuştuğumuz seçenekler ve fikirler burada kalır. Gizle ya da sil; silinenler en altta, geri alınabilir.</p>' +
+    `<div class="flt"><button data-a="iflt" data-k="" class="${fl ? '' : 'on'}">Hepsi</button>${sts.map(s => `<button data-a="iflt" data-k="${s}" class="${fl === s ? 'on' : ''}">${s}</button>`).join('')}</div>` +
+    '<div class="ideas">' + vis.map(x => { const c = ST_COL[x.durum] || '#8076b0'; return `<div class="idea ${S.ui.ih[x.id] ? 'hid' : ''}" data-a="iopen" data-k="${x.id}"><div class="pic">${ideaSvg(x.g)}</div><div class="bd"><h4>${x.t} <span class="tag" style="background:${c}33;color:${c}">${x.durum || ''}</span></h4><p class="oz">${x.oz || ''}</p><div class="meta"><span>${x.kim || ''}</span>${x.pg && pgName[x.pg] ? `<button class="btn sm ghost" data-pg="${x.pg}">${pgName[x.pg]} ›</button>` : ''}<span style="flex:1"></span><button class="btn sm ghost" data-a="ihide" data-k="${x.id}">${S.ui.ih[x.id] ? 'Göster' : 'Gizle'}</button><button class="btn sm ghost" data-a="idel" data-k="${x.id}">Sil</button></div></div></div>`; }).join('') + '</div>' +
+    (del.length ? '<p class="note">Silinen fikirler: ' + del.map(x => `<button class="btn sm ghost" data-a="iundel" data-k="${x.id}">${x.t} ↶</button>`).join(' ') + '</p>' : '');
+};
+
+/* fikir kartına dokununca öne çıkan panel; arka plan bulanık */
+const openIdea = id => {
+  const x = IDEAS.find(y => y.id === id); if (!x) return;
+  const c = ST_COL[x.durum] || '#8076b0', pgName = Object.fromEntries(PAGES);
+  $('mbox').innerHTML = `<div class="pic">${ideaSvg(x.g)}</div><div class="in"><h3>${x.t}</h3><span class="tag" style="background:${c}33;color:${c}">${x.durum || ''}</span> <span class="note">${x.kim || ''}${x.yer ? ' · ' + x.yer : ''}</span><p><b>${x.oz || ''}</b></p><p>${x.d}</p><div class="acts">${x.pg && pgName[x.pg] ? `<button class="btn sm pri" data-pg="${x.pg}">${pgName[x.pg]} sayfasına git ›</button>` : ''}<button class="btn sm ghost" data-a="ihide" data-k="${x.id}">${S.ui.ih[x.id] ? 'Göster' : 'Gizle'}</button><button class="btn sm ghost" data-a="idel" data-k="${x.id}">Sil</button><span style="flex:1"></span><button class="btn sm" data-a="mclose">Kapat</button></div></div>`;
+  $('mod').classList.add('on');
+};
+$('mod').addEventListener('click', e => { if (e.target.id === 'mod') $('mod').classList.remove('on'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('mod').classList.remove('on'); });
+/* ================= açılış ================= */
+buildPanel();
+fr.onload = async () => {
+  const w = fr.contentWindow, k = w.__kp;
+  if (!k) { $('panel').innerHTML = '<p class="d">Oyun DEBUG=1 derlemesi değil: DEBUG=1 ./build.sh çalıştır.</p>'; return; }
+  K = k;
+  k.save.snd = false; k.save.music = false; for (let g = 0; g < k.BL_GR.length; g++) k.save.bl.seen[g] = 1;
+  groups = []; for (let g = 0; g < k.BL_GR.length; g++) if (!k.blSoon(g * 5 + 1)) groups.push({ g, name: k.STR.tr['bl_g' + g] });
+  gIdx = {}; groups.forEach(x => { gIdx[x.g] = x; });
+  REC = { P: cp(k.BL_P), KF: Object.fromEntries(Object.entries(k.BL_KF).map(([id, v]) => [id, v[1]])), M: cp(k.BL_M), B: cp(B0), PS: cp(PS0), OV: cp(k.BL_OV || {}), H: {} };
+  let saved = null; try { saved = JSON.parse(localStorage.getItem('kp-lab') || 'null'); } catch (e) {}
+  /* önerilen değerlerle başla; kayıtlı ayar varsa onu al, yeni eklenen alanları önerilenden tamamla */
+  S = cp(REC);
+  if (saved && saved.P) { Object.assign(S.P, saved.P); S.P.fx = Object.assign(cp(REC.P.fx), saved.P.fx || {}); Object.assign(S.KF, saved.KF || {}); for (const kd in S.M) for (const q in S.M[kd]) if (saved.M && saved.M[kd] && saved.M[kd][q]) S.M[kd][q] = saved.M[kd][q]; S.ok = saved.ok; }
+  if (saved && saved.B) Object.assign(S.B, saved.B);
+  if (saved && saved.OV) S.OV = saved.OV;
+  if (saved && saved.H) S.H = saved.H;
+  if (saved && saved.PS) S.PS = REC.PS.map(p => Object.assign(cp(p), saved.PS.find(q => q.id === p.id) || {}, { nm: p.nm }));
+  S.ui = Object.assign({ hidden: {}, deleted: {}, closed: {}, showHidden: false, ih: {}, id: {}, chg: {}, ovPh: 0, pg: 'fizik', aim: 'orta', aimMs: 80, imm: true, prec: 12, iflt: '' }, saved && saved.ui || {});
+  step = Math.min(saved && saved.step | 0 || 0, STEPS().length - 1); S.step = step;
+  normalize(S);
+  try { IDEAS = await (await fetch('lab-fikirler.json?' + Date.now())).json(); } catch (e) { IDEAS = []; }
+  save(); render(); start();
+  setInterval(autoTick, 8);
+};
+fr.src = 'index.html?lab&t=' + Date.now();   /* önbellek eski oyunu vermesin */
+mf.src = 'index.html?lab&t=' + Date.now();
+</script>
+</body>
+</html>
