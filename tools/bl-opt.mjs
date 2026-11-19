@@ -20,8 +20,8 @@ window.__setup = async (cfg, prec) => { for (let i = 0; i < 200 && !(K && S && d
   normalize(S); SIMC.clear(); try { fr.contentWindow.requestAnimationFrame = () => 0; } catch (e) {} };
 window.__fail = (n, c, prec) => {
   S.KF[idOf(n)] = c; SIMC.clear();
-  const w = mf.contentWindow, k = w.__kp, real = popW(); let f = 0, tw = 0;
-  for (const ps of S.PS) { if (ps.id === 'ideal') continue; const wt = (real[ps.id] || 0) * (ps.tg != null ? ps.tg : 1); if (!(wt > 0)) continue;
+  const w = mf.contentWindow, k = w.__kp, AW = audW(n); let f = 0, tw = 0;   /* basamağın hedef kitlesi (laboratuvar audW); asıl ayar aracı artık tools/bl-tune.mjs */
+  for (const ps of S.PS) { if (ps.id === 'ideal') continue; const wt = AW[ps.id] || 0; if (!(wt > 0)) continue;
     const runs = []; for (let i = 0; i < prec; i++) runs.push(runOne(w, k, n, ps, 0, hashS(n + '|' + ps.id + '|0|' + i)));
     f += wt * (1 - passRate(runs, S.P)); tw += wt; }
   return f / tw;
@@ -43,7 +43,7 @@ window.__cal = async (n, prec) => {
   /* ölçüm başka iş sürerken dönebilir (MS.busy): bitmesini bekle, ölçüm yoksa yeniden dene */
   for (let i = 0; i < 4; i++) { while (MS.busy) await new Promise(r => setTimeout(r, 50)); await measureLevels([n]); if (MEAS[n] && MEAS[n].h === physHash(n)) break; }
   const s = simLevel(n, S.P, S.B), r = s.pop, h = hookScore(r, n);
-  return { n, id: idOf(n), c: S.KF[idOf(n)], T, fc: best[1], it: tries.length, fa: 1 - s.all.first, qa: s.all.quit, ba: s.all.bored, f: 1 - r.first, w: r.watch, a: r.adsPP, q: r.quit, b: r.bored, k: h.late, v: h.v, sD: h.sD, sW: h.sW, sQ: h.sQ, sB: h.sB, sK: h.sK, G: h.G };
+  return { n, id: idOf(n), c: S.KF[idOf(n)], T, f0: tries[0][1], fc: best[1], it: tries.length, fa: 1 - s.all.first, qa: s.all.quit, ba: s.all.bored, f: 1 - r.first, w: r.watch, a: r.adsPP, q: r.quit, b: r.bored, k: h.late, v: h.v, sD: h.sD, sW: h.sW, sQ: h.sQ, sB: h.sB, sK: h.sK, G: h.G };
 };0`;
 const runVariant = async v => {
   const parts = Array.from({ length: J }, () => []); list.forEach((n, i) => parts[i % J].push(n));

@@ -34,8 +34,8 @@ await b.touch(195, 790);
 await b.sleep(250);
 T('halkanın dışına dokunuş oyun başlatmaz', await b.eval(`${G}.mode==='menu'`));
 /* beklemek yok: ibre dilimin tam karşısındayken */
-await b.eval(`${G}.ang=(105*Math.PI/180+Math.PI)`);
-const t0 = Date.now(); await b.tapSlice(105);
+await b.eval(`${G}.ang=(45*Math.PI/180+Math.PI)`);
+const t0 = Date.now(); await b.tapSlice(45);
 T('ibre karşıdayken bile Oyna hemen zorlukları açar', await b.wait(`${M}.lvl===1`, 600), Date.now() - t0 + ' ms');
 await b.wait(`${M}.hv===1`, 1500);
 await b.tapSlice(90);
@@ -46,7 +46,7 @@ await b.close();
 
 b = await open({});
 /* Oyna */
-await b.tapSlice(105);
+await b.tapSlice(45);
 T('Oyna dilimi: halka zorluklara döner', await b.wait(`${M}.lvl===1`, 600));
 await b.sleep(120); await shot(b, 'm3-gecis');
 T('Cehennem katmanı kayıyor', await b.eval(`getComputedStyle(document.getElementById('mHell')).visibility==='visible'`));
@@ -61,14 +61,14 @@ T('sola kaydırınca zorluklar', await b.wait(`${M}.lvl===1&&${M}.hv===1`, 1500)
 await b.touch(60, 760, 300);
 T('sağa kaydırınca geri', await b.wait(`${M}.lvl===0&&${M}.hv===0`, 1500));
 /* zorluk seçimi */
-await b.tapSlice(105); await b.wait(`${M}.hv===1`, 1500);
+await b.tapSlice(45); await b.wait(`${M}.hv===1`, 1500);
 await b.tapSlice(90);
 T('Normal dilimi: oyun başlar', await b.wait(`${G}.mode==='play'&&${S}.lvl==='normal'`, 800));
 T('arka plan açığa döner', await b.wait(`${M}.hv===0`, 1500));
 await b.close();
 
 b = await open({});
-await b.tapSlice(105); await b.wait(`${M}.hv===1`, 1500);
+await b.tapSlice(45); await b.wait(`${M}.hv===1`, 1500);
 await b.tapSlice(270);
 T('Cehennem dilimi: Cehennem başlar', await b.wait(`${G}.mode==='play'&&${S}.lvl==='cehennem'`, 800));
 await b.sleep(900); await shot(b, 'm5-cehennem');
@@ -78,13 +78,13 @@ await b.close();
 
 b = await open({});
 /* Mağaza, Defter: dilim ve etiket */
-await b.tapSlice(177);
+await b.tapSlice(135);
 T('Mağaza dilimi', await b.wait(`__kp.SS.open`, 800));
 await b.eval(`__kp.closeShop()`); await b.sleep(800);
-await b.tapSlice(252);
+await b.tapSlice(225);
 T('Öğretici dilimi: Bölümler listesi Öğretici satırı açık gelir', await b.wait(`document.getElementById('blList').classList.contains('on')&&__kp.save.bl.row===1`, 800));
 await b.eval(`document.getElementById('blClose').click()`); await b.sleep(300);
-await b.tapSlice(0);
+await b.tapSlice(-45);
 T('Bölümler dilimi', await b.wait(`document.getElementById('blList').classList.contains('on')`, 800));
 await b.eval(`document.getElementById('blClose').click()`); await b.sleep(300);
 /* yarım oyun */
@@ -92,7 +92,7 @@ await b.eval(`__kp.start();__kp.G.score=42;__kp.persistRun()`);
 await b.eval(`document.getElementById('pauseMenuBtn').click()`); await b.sleep(500);
 T('yarım oyun: Devam et', await b.eval(`document.getElementById('playT').textContent==='Devam et'&&!document.getElementById('newBtn').hidden`), await b.eval(`document.getElementById('mSub').textContent`));
 await shot(b, 'm6-devam');
-await b.tapSlice(105);
+await b.tapSlice(45);
 T('yarım oyunda Süreli zorluk halkasını açar', await b.wait(`${M}.lvl===1`, 800));
 const runLv = await b.eval(`__kp.save.run.lvl`);
 await b.sleep(700);
@@ -114,7 +114,7 @@ await shot(b, 'm7-kucuk');
 T('küçük ekran: halka ekrana sığar', await b.eval(`__kp.view.cx+__kp.view.r*1.17<innerWidth&&__kp.view.cx-__kp.view.r*1.17>0&&__kp.view.cy-__kp.view.r*1.17>0`));
 T('İngilizce başlık sığar', await b.eval(`document.querySelector('#mCenter .title').getBoundingClientRect().width<__kp.view.r*1.55`));
 await b.eval(`__kp.save.anim=false;__kp.applyMotion()`);
-await b.tapSlice(105);
+await b.tapSlice(45);
 T('animasyon kapalı: zorluklar hemen', await b.wait(`${M}.lvl===1&&${M}.hv===1`, 300));
 await b.tapSlice(0);
 T('animasyon kapalı: zorluk çalışır', await b.wait(`${G}.mode==='play'`, 300));
