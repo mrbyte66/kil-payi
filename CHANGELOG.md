@@ -3,6 +3,76 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V1.0.27 — Kaçan can, birikimli parkurlar (2026-11-19, deneme)
+
+- **Can kendiliğinden gelmiyor (Bölüm 4'ten itibaren):** yerine "Kaçan can" pimi var. Yalnız can eksikken çıkar, ince ve yeşildir, hızla kayar ve ibre bir kez üstünden geçince kaybolur. Tutturursan +1 can; boşa basarsan sıradan ıska (1 can). İki halka bölümlerinde çıkmaz. Bölüm 1-3 eskisi gibi.
+- **Parkurlar birikerek ilerler, hep aynı kuralla:** baş kısım yalnız parkurun kendi kilidi; orta kısım kendi kilidi + en yakın önceki parkurun kilidi + bir tuzak; son kısım kendi kilidi + önceki parkurların kilitleri (1-2. bölümde iki, 3-5. bölümde üç) + bir tuzak. Değirmen parkurunda Kasa ve Gelgit yerine Nefes ve Kayan gelir (değirmen kanatlarıyla çok sertleşiyordu).
+- **Kasa ibresi daha sık ve 1. bölümden itibaren ters döner** (1. bölümde 5, 5. bölümde 3 saniyede bir).
+- **Bölümler daha hızlı başlar:** hiçbir bölüm 130 °/sn'den yavaş başlamaz (eskiden 105).
+- Bütün bölümler yeniden ayarlandı (hedef kitle: iyi, usta, pro, kusursuz). Laboratuvar ölçümü, basamak ortalaması: kanca 83 / 93 / 95 / 97 / 98, sıkılan %13 / 10 / 6 / 6 / 6.
+- Laboratuvar: sıkılma artık bölümün tekdüzeliğiyle ölçülür (çeşitli, kombolu bölümü hatasız geçmek sıkmaz); sıkılma hedefi en çok %10.
+
+## V1.0.26 — Bölümler hedef kitleye göre (2026-11-19, deneme)
+
+- **Bütün bölümler hedef kitleye göre ayarlandı (Bölüm 4-55):** oyun yeni başlayana değil iyi, usta, pro ve kusursuz oyuncuya göre. Laboratuvar artık zorluğu bu oyuncuların ilk denemede yanma oranıyla ölçüyor: 1. basamak %25, 2. %36, 3. %42, 4. %48, 5. (Cehennem) %55. Önceki ayar bu oyuncular için kolaydı (özellikle 4. ve 5. basamak), şimdi çoğu bölüm daha hızlı ve dar; sıkılan oyuncu azaldı (4. ve 5. basamakta %16 ve %15'ten %11 ve %8'e), en çok reklam yine Cehennem'de.
+- Kasa kilidine laboratuvarda "pim sayısı" ayarı eklendi (2 ya da 3; şimdilik bütün bölümlerde 3).
+
+## V1.0.25 — İlk bölümlerde aksiyon, daha doğru analiz (2026-11-19, deneme)
+
+- **Her kilidin ilk bölümü artık tekdüze değil:** baş kısım yine yalnız yeni kilidi öğretir, orta ve son kısımda bir tuzak ve önceki kilitlerden bir dokunuş (kayan hedef, numaralı pimler, çoklu hedef) gelir. Kayan, Nefes, Kasa, Değirmen, Hayalet, Nabız, Işın ve İki halka 1. bölümleri; Bölüm 1-3'e dokunulmadı. Ölçümde "sıkılan" oyuncu belirgin azaldı (ör. Kayan 1 %28 → %19, İki halka 1 %36 → %24, Işın 1 %21 → %8).
+- **Laboratuvar analizi düzeltildi:** sıkılma artık yalnız "hatasız geçti" demek değil; bölüm baştan sona aynı ve engelsizse hata yapan da sıkılır (yeni ayar: Tekdüzelik sıkıntısı). Kanca puanına "erken ölüm" hedefi eklendi (başta yanan "bir daha" demez), zorluk bandı biraz gevşetildi (küçük sapma puanı tek başına çökertmesin). Analizde sıkılan kutusu bölümün tekdüzeliğini de gösterir.
+- **Erken yanma azaldı:** Nefes 1 ve İki halka 1 başta tek hedefle açılır, Nefes 1'in nefesi başta daha az kapanır; Kasa 1-2'de kasa pimleri daha geniş ve araları açık (üç pim arka arkaya sıkışmaz); Şipşak 1, Değirmen 1 ve Işın 1'in sonu biraz daha yumuşak ve sade. Ölçümde ilk bölümlerin kanca ortalaması 72 → 82 (Nefes 1 57 → 92, İki halka 1 64 → 86, Kasa 2 62 → 86); en zayıf kalan Kasa 1 (43 → 56).
+- Laboratuvardaki kayıtlı ayarlar oyunla eşitlendi (önceki hâli yedekte).
+
+## V1.0.24 — Zorluk sona doğru, temiz karar anı (2026-11-19, deneme)
+
+- **Zorluk yeniden sona doğru yükselir:** kısa ısınma ve süreler (35-85 sn) aynı; ibre ve şeftali bölüm boyunca düzgünce zorlaşır, zor içerik son kısımdadır. Laboratuvar ölçümünde oyuncular artık çoğunlukla bölümün sonuna yakın yanıyor ("az kaldı"), başta yanma azaldı.
+- **Temiz karar anı:** kayan tuzak, kayan düz tuzak ve değirmen kanatları hedefin üstünden yine geçer ama ibre hedefe yaklaşırken üstünde durmaz; kayan hedef duran tuzağın üstüne kaymaz (Bölüm 4'ten itibaren).
+- Birçok bölümde baş kısım yalnız kilidin kendisi, orta kısımda tek yeni şey, ağır içerik (dikenli nefes, kayan tuzak, ikinci nefes) son kısımda.
+
+## V1.0.23 — Kısa ısınma, uzun heyecan (2026-11-19, deneme)
+
+- **Bölüm 4-55 yeniden kuruldu (Bölüm 1-3 aynı):** her bölüm kısa bir ısınmayla (yaklaşık 9 sn, ibre en az 120 °/sn) başlar, ibre sürenin üçte birinde heyecan hızına çıkar ve bölümün geri kalanı orada geçer; zorlu kısımda her 4. dalga biraz yavaş, nefes aldırır. Süreler basamağa göre ~35 / 45 / 55 / 70 / 85 sn.
+- **Şeftali tatlı tonda:** en geniş 42° (ısınma), zorlu kısımda 36-38°; zorluk her bölüm için yeniden ayarlandı (çoğu bölümde ilk denemede kitlenin %35-55'inin canı biter).
+- Uzun zorlu kısma göre hafifletmeler: Nefes 2-5'in zorlu kısmında dikenli nefes yok (orta kısımda var), Kasa 1'de ibre yön değiştirmez ve üç hedef biraz geniş, Şipşak 3 ve Nefes 5'in sonunda tek tuzak.
+
+## V1.0.22 — Bölüm süreleri yeniden (2026-11-18, deneme)
+
+- **Bölümler kademeli uzar:** ilk 7 bölüm aynı; Bölüm 8 yaklaşık 75 sn, 9 85 sn, 10 100 sn. Nefes'ten itibaren her kilidin 1. bölümü ~52 sn, 2. bölümü 70, 3. bölümü 80, 4. bölümü 85, 5. bölümü 100 sn. Baş kısım aynı, orta ve son eşit uzar.
+
+## V1.0.21 — Uzun bölümler, Maraton'da tanıtım yok (2026-11-18, deneme)
+
+- **Bölüm 8-55 artık 100-110 saniye sürer** (ilk 7 bölüm aynı). Baş kısım hiç değişmedi; orta ve son kısma eşit sayıda dalga eklendi, hız ve şeftali eğrisi kısımlara göre uzadı.
+- **Maraton'da yeni kilit ilk geldiğinde oyunu durduran tanıtım kalktı.** Kilitleri Parkur'un dersleri öğretiyor.
+
+## V1.0.20 — Yeni öğretici sırası, bölüm arası geri sayım (2026-11-18, deneme)
+
+- **Öğretici sırası:** Parkur → ilk kilit → kısa Bölüm 1 (bitince 500 altın) → Çarşı'da kronometre → Maraton Normal. Önce biraz serbest oyun, sonra süre 4 sn'ye iner, kronometre ile 8'e çıkar; 3 sn sonra "Hazırsın!" ile öğretici yumuşakça biter, oyun normal sürer. Her adım dokunarak ilerler.
+- **Bölüm arası geri sayım geri geldi:** kart sıradakine kayınca kadranda şeftali halka, aynı anda Oyna'nın çevresinde aynı renk çerçeve dolar; dolunca bölüm başlar. Kartları kaydırırsan durur, Oyna'ya basarsan hemen başlar.
+
+## V1.0.19 — Öğretici dokunarak ilerler (2026-11-18, deneme)
+
+- **Öğreticinin sonu artık hiçbir yerde kendiliğinden geçmez:** el Maraton'u, sonra Rahat'ı gösterir; süre azalınca kronometreyi; jokerden sonra oyun durur ve ortada Devam düğmesi çıkar; ana ekranda el Parkur'u, listede Bölüm 1'i gösterir ve ders oradan başlar.
+- **Öğretici arka planı:** öğretim sürerken arka plan şeftali çizgili.
+- **Spot ışığı dilimin şeklinde:** menüde gösterilen dilim yuvarlak değil, kendi yay şekliyle aydınlanır.
+
+## V1.0.18 — Yeni ana menü, bölüm kartları, yeni öğretici (2026-11-18, deneme)
+
+- **Ana menü:** dört eşit dilim, açıklama yazısı ve ibre yok: **Parkur** (eski Bölümler), **Maraton** (eski Süreli), **Çarşı** (eski Mağaza), **Dersler** (eski Öğretici). Ortada yalnız "Kıl Payı" yazar. İbre artık yalnız oyun sırasında görünür.
+- **Bölüm kartları:** üstteki başlık ve 5 nokta yerine kaydırılabilir numara kartları; bitmiş bölümler yıldızlarıyla, açılmamışlar kilitli. Bölüm bitince yıldızlar karta işlenir, kart sıradakine kayar, "Oyna" ile başlar (geri sayım ve kendiliğinden başlama yok); bitmiş bölümde "Tekrar oyna".
+- **Altın sayacı:** Parkur'da sağ üstte; bölüm bitince kazanılan altın kadrandan sayaca uçar.
+- **Canlar bitince:** geri sayım yok, kadran sen seçene kadar durur. "Reklamla ya da altınla %62'den devam" (aynı renklerle), Reklam izle · 25 altın öde · Baştan başla, ortada Ana ekran, solda altın bakiyesi. Altın yetmezse o dilim söner. Devam 1 can verir.
+- **Öğretici:** ilk turda sol üstte "Öğretici" şeridi. Kronometrenin açıklaması yavaşça yazılır, Aç ondan sonra gelir; açılan joker yuvasına uçup takılır (her joker için). Çarşıdan çıkınca Maraton başlar, joker kullandırılır, biraz sonra Maraton biter ve Parkur Bölüm 1 dersiyle başlar.
+- **Yeni dersler:** Değirmen, Şipşak, Nabız ve İki halka'nın da öğreticisi var.
+- **Hayalet pim** söndükten sonra yeniden belirir (aç-kapa). **Şipşak bölümlerinde tuzak** var; Şipşak ve Hayalet bölümleri yeniden ayarlandı.
+
+## V1.0.17 — Yumuşak zorluk merdiveni (2026-11-17, deneme)
+
+- **4-11. kilitlerin 40 bölümü yeniden ayarlandı:** zorluk aa oyunu gibi adım adım artar; her basamak bir öncekinden aynı oranda zor, her yeni kilit bir öncekinden biraz zor başlar. İbre hızı Tek ve çift ile Kayan bölümlerindeki hızla aynı çizgide; zorluğu çoğunlukla şeftali genişliği belirler. Tek ve çift, Kayan ve Nefes bölümlerinin ayarları laboratuvarda nasıl bıraktıysan öyle.
+- **Kara delik şimdilik hiçbir bölümde yok.**
+- **Gelgit:** bant kısaldı, hızlandırma biraz güçlendi. Oklar ibrenin yönünde akar; ibre banda girince bant parlar ve arkasında hız izi kalır.
+- Laboratuvar: sayılar klavyeyle yazılır, başka yere tıklayınca alınır; hız ve genişlik tablosunda yalnız Başta ile Bitişte yazılır, aradakiler kendiliğinden dolar. Bölüm kurgusu sadeleşti (tuzak sayısı tek ayar, tuzak genişliği, canlı satır). Bot hedefin en güvenli yerine nişan alır.
+
 ## V1.0.16 — Genişlik ve hız sınırı (2026-11-16, deneme)
 
 - **Şeftali hiçbir bölümde 50°'yi geçmez, ibre hiçbir zaman 105 °/sn'nin altına inmez.** Diğer ayarlar aynı.

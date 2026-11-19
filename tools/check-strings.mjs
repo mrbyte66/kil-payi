@@ -41,7 +41,17 @@ for (const kd of [...goods, ...twins]) {
     if (ic !== null && kd in scenes && ic.split('|').length !== scenes[kd]) problems.push(kd + ': ' + lang + ' ic_ ' + ic.split('|').length + ' açıklama, sahne ' + scenes[kd] + ' bekliyor');
   }
 }
-for (const kd of Object.keys(scenes)) if (![...goods, ...twins].includes(kd)) problems.push(kd + ': INTRO sahnesi var ama IMPL_GOOD/IMPL_TWIN içinde yok');
+/* Bölümler'e özel kilitlerin dersleri (LES_KIND): Süreli'de yoklar, ama sahne, k_ ve ic_ satırı gerekir */
+const lesKinds = [...new Set(objKeys('LES_KIND').map(k => (src.match(new RegExp('const LES_KIND = \\{[^}]*\\b' + k + ": '(\\w+)'")) || [])[1]).filter(Boolean))].filter(k => ![...goods, ...twins, 'tek'].includes(k));
+for (const kd of lesKinds) {
+  if (!(kd in scenes)) problems.push(kd + ': ders sahnesi yok');
+  for (const lang of ['tr', 'en']) {
+    for (const pre of ['k_', 'ic_']) if (!keys[lang].has(pre + kd)) problems.push(kd + ': ' + lang + ' ' + pre + kd + ' yok');
+    const ic = rawValue(lang, 'ic_' + kd);
+    if (ic !== null && kd in scenes && ic.split('|').length !== scenes[kd]) problems.push(kd + ': ' + lang + ' ic_ ' + ic.split('|').length + ' açıklama, sahne ' + scenes[kd] + ' bekliyor');
+  }
+}
+for (const kd of Object.keys(scenes)) if (![...goods, ...twins, ...lesKinds].includes(kd)) problems.push(kd + ': INTRO sahnesi var ama IMPL_GOOD/IMPL_TWIN/LES_KIND içinde yok');
 for (const lang of ['tr', 'en']) for (const key of ['introGo']) if (!keys[lang].has(key)) problems.push(lang + ' ' + key + ' yok');
 
 /* Genel denetim (V0.9.2): iki dilin anahtarları aynı olmalı; kodda t('anahtar') ya da data-i18n="anahtar" ile geçen her anahtar iki dilde de bulunmalı. */

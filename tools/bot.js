@@ -3,7 +3,10 @@
      1. DEBUG=1 ./build.sh   (window.__kp test kancası eklenir)
      2. www/ klasörünü bir yerel sunucuyla aç (ör. python3 -m http.server 8780 --directory www)
      3. Tarayıcı konsoluna bu dosyanın içeriğini yapıştır (ya da sayfaya <script src="bot.js"> ekle), sonra:  bulk(['normal'], 40)
-   Bot: her hedef için zamanlama hatası ~ N(0, sigmaT) saniye örnekler; ibre hedef merkezine ona göre varınca dokunur.
+   Bot: her hedef için zamanlama hatası ~ N(0, sigmaT) saniye örnekler; ibre nişan noktasına ona göre varınca dokunur.
+   Nişan noktası (2026-11-17, kullanıcı: "hedefin herhangi bir yerine vursan kabul, engel varsa kenarına vurabilir"): yakında engel yoksa hedefin ortası
+   (zamanlama hatası simetrik olduğu için en iyisi); tuzak ya da değirmen kanadı hedefe yakınsa hedefin içinde beklenen kaybı (ıska 1, tuzak 2 can) en aza indiren nokta
+   (engellerin dokunuş anındaki yeri hızlarından kestirilir).
    Gelgit hızlanmasını (etaTo), kilitli halkayı, tut-bırak (bas ve bırak), trafik ışığı, bomba, sabır pimi ve hayalet pimi bilir.
    Işınlanma pininde ibre tünelde ya da önce kapıya varacaksa bekler; çıkışı gördükten sonra hedefe dokunur (süre tahminine ek 0,02 sn gürültü: çıkış anı bir uyarandır).
    Tuzakların (kayan tuzak, diken, lanetli altın, alarm, sahte nota, hayalet tuzak) üstündeyse trapAvoid olasılığıyla dokunmaz.
@@ -26,6 +29,38 @@
     if (ahead > 0) return k.etaTo(c, dir, ring ? 1 : 0);   /* V0.9.12: ibre hızı yumuşar (gecikme); etaTo bunu bilir */
     return ahead / (base * (ring ? 1 : k.ptrFactor()));
   };
+  /* nişan noktası: hedef merkezine göre açı farkı (rad). s = dokunuştaki açısal sapma (zamanlama sapması × ibre hızı).
+     Gerçek çizgi engel ve hedef sınırlarıyla parçalara bölünür; her parçanın olasılığı × sonucu (öncelikli tuzak > hedef > tuzak > ıska) toplanır. */
+  const erf = x => { const t = 1 / (1 + 0.3275911 * Math.abs(x)), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; };
+  const Phi = x => 0.5 * (1 + erf(x / Math.SQRT2));
+  const aimOff = (c, gh, s, horizon, vg) => {
+    const tr = [], hz = Math.max(0, Math.min(0.6, horizon));
+    for (const q of G.pins) {
+      if (q.kind !== 'trap' || q.done) continue;
+      const th = k.pinHw(q); if (!(th > 0)) continue;
+      const pc = k.pinCenter(q) + ((q._v || 0) - (vg || 0)) * hz;   /* dokunuş anında hedefe göre yeri: ikisinin şimdiki hızıyla */
+      const rel = ((pc - c + Math.PI + 4 * TAU) % TAU) - Math.PI;
+      if (Math.abs(rel) > gh + th + 4 * s) continue;
+      tr.push([rel - th, rel + th, !!q.prio, Math.abs((q._v || 0) - (vg || 0)) > 0.05]);
+    }
+    if (!tr.length) return 0;
+    const cut = [-gh, gh]; tr.forEach(t => cut.push(t[0], t[1]));
+    const cost = m => { if (tr.some(t => t[2] && m >= t[0] && m <= t[1])) return 2; if (m >= -gh && m <= gh) return 0; return tr.some(t => m >= t[0] && m <= t[1]) ? 2 : 1; };
+    const exp = x => {
+      const xs = cut.map(v => v - x).sort((a, b) => a - b); let e = 0, prev = -Infinity;
+      for (const b of xs.concat([Infinity])) { const pm = Phi(b / s) - (prev === -Infinity ? 0 : Phi(prev / s)); if (pm > 1e-9) e += pm * cost(x + (prev === -Infinity ? b - 1 : b === Infinity ? prev + 1 : (prev + b) / 2)); prev = b; }
+      return e;
+    };
+    /* kenara yalnız açık kazanç varsa kayılır (kayan ya da nefes alan hedefin kenarı dokunuşa kadar oynar): en çok genişliğin %70'i, kazanç en az 0,03 can */
+    const e0 = exp(0); let best = 0, be = e0;
+    for (let i = 0; i <= 20; i++) { const x = (-0.7 + 1.4 * i / 20) * gh, e = exp(x); if (e < be - 1e-6) { be = e; best = x; } }
+    if (be > e0 - 0.03) { best = 0; be = e0; }
+    /* hareketli engel (değirmen kanadı, kayan tuzak) hedefi kapatıyorsa insan bir sonraki turu bekler: engelin eklediği risk 0,15 canı aşarsa bu tur basılmaz */
+    const clean = 2 * Phi(-gh / s);
+    aimOff.last = { add: Math.max(0, be - clean), mov: tr.some(t => t[3]) };   /* ölçüm (tools/bl-fair.mjs): engelin bu vuruşa eklediği risk */
+    if (be >= 1.999 || (be - clean > 0.15 && tr.some(t => t[3]))) return NaN;
+    return best;
+  };
   /* tür başına istatistik: tur sayısı, toplam süre, dokunuş, vuruş (zorluk dengesi için) */
   window.__stats = {}; window.__hell = {}; window.__chalLog = [];  /* window.__logChal = true ise her turun başındaki süre ve hedef yarı genişliği (rad) burada toplanır */
   const hstat = L => window.__hell[L] || (window.__hell[L] = { enter: 0, pass: 0 });
@@ -40,6 +75,7 @@
     const seed = p => { if (p._aim === undefined) { p._aim = aimE(); p._aim2 = aimE() * 1.2; p._armed = false; } };
     while (G.mode === 'play' && t < tmax) {
       k.update(dt); t += dt;
+      for (const q of G.pins) if (q.kind === 'trap' || q.kind === 'gate') { const pc = k.pinCenter(q); if (q._pc != null) { let d = pc - q._pc; d = ((d + Math.PI + 4 * TAU) % TAU) - Math.PI; q._v = Math.abs(d) < 0.5 ? d / dt : 0; } q._pc = pc; }
       if (opt.stop && opt.stop()) break;
       if (G.ph !== prevPh || G.L !== prevL) {
         if (G.ph === 'hell') hstat(G.L).enter++;
@@ -70,6 +106,7 @@
         if (p.kind === 'gate') {
           if (p.locked) continue;
           if (p.gold) { if (p.wait || p.gone) continue; if (p._try === undefined) p._try = Math.random() < goldP; if (!p._try) continue; }
+          if (p.blLife) { if (p.gone) continue; if (p._try === undefined) p._try = Math.random() < 0.9; if (!p._try) continue; }   /* can pimi: insan neredeyse hep dener */
           c = k.pinCenter(p); gh = k.pinHw(p);
         } else if (p.kind === 'lockpin') { if (!p.open) continue; c = p.c0; gh = p.hw; }
         else if (p.kind === 'hold') { c = p.c0; gh = p.hw; }
@@ -84,15 +121,13 @@
         seed(p);
         const ring = p.ring && !(G.bl && G.bl.br) ? 1 : 0;   /* İki halka (şerit): tek ibre, iç halkadaki hedef de aynı ibreyle */
         const a = ring ? G.ang2 : G.ang, dir = ring ? G.dir2 : G.dir;
-        /* hedefin üstünde öncelikli tuzak varsa hedefin açıkta kalan parçasını hedefle (yeterince genişse) */
+        /* nişan: engel yoksa orta, varsa hedefin en güvenli noktası (hedefin her yeri sayılır) */
         let off = 0;
-        if (p.kind === 'gate') for (const q of G.pins) {
-          if (q.kind !== 'trap' || !q.prio || k.pinHw(q) <= 0) continue;
-          const tc = k.pinCenter(q), th = k.pinHw(q), rel = ((tc - c + Math.PI + 4 * TAU) % TAU) - Math.PI;
-          if (Math.abs(rel) < gh + th) {
-            const left = rel - th - (-gh), right = gh - (rel + th);
-            if (Math.max(left, right) > 0.14) off = left > right ? (-gh + (rel - th)) / 2 : ((rel + th) + gh) / 2; else off = NaN;
-          }
+        /* nişan noktası ibre yaklaşınca (0,3 sn kala) kilitlenir: insan son anda hedefin bir kenarından ötekine atlamaz (atlarsa geçilmiş noktaya hemen basardı) */
+        if (p.kind === 'gate') {
+          const om = Math.abs((ring ? G.omega2 : G.omega) * (ring ? 1 : k.ptrFactor()) * (G.slow > 0 ? G.slowMul : 1)) || 1, hz = eta(c, ring);
+          if (p._off != null && hz < 0.3) off = p._off; else { off = aimOff(c, gh, Math.max(0.004, sigmaT * om), hz, p._v); p._off = hz < 0.3 ? off : null; if (window.__fair && !p._dc && hz < 0.6 && hz > 0.35) { p._dc = 1; let cov = 0; const c0 = k.pinCenter(p); for (const q of G.pins) { if (q.kind !== 'trap' || q.done) continue; const th = k.pinHw(q), d = Math.abs(((k.pinCenter(q) - c0 + Math.PI + 4 * TAU) % TAU) - Math.PI); cov = Math.max(cov, Math.max(0, Math.min(gh, th + gh - d) * 2 / (2 * gh))); } window.__dec = window.__dec || []; window.__dec.push(cov); }   /* karar anı (varışa 0,6-0,35 sn): engel hedefin ne kadarını kapatıyor */
+          if (hz < 0.3 && !p._lg && window.__fair) { p._lg = 1; const L = aimOff.last || { add: 0 }; window.__fair.push([isNaN(off) ? 1 : 0, L.add || 0, L.mov ? 1 : 0, G.bl ? G.bl.wave / G.bl.waves : 0]); aimOff.last = null; } }
         }
         if (Number.isNaN(off)) continue;
         const e = eta(c + off, ring), ahead = sgn(c + off - a, dir);
@@ -116,7 +151,7 @@
       { const sx = stat(kd0); sx.taps++; if (G.n > n0) sx.hits++; else sx.pen++; }
       if (best.kind === 'hold') { best._armed = false; best._aim2 = aimE() * 1.2; }
       else if (G.n === n0 && G.time <= t0) miss++;
-      best._armed = false; best._aim = aimE();
+      best._armed = false; best._aim = aimE(); best._off = null;
     }
     return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss, kind: G.kind, chal: G.chal && G.chal.tw ? G.chal.tw : '', alive: G.mode === 'play', time: G.time, coins: G.gain || 0 };
   };
