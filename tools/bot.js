@@ -22,6 +22,7 @@
   const gauss = s => { let u = 0; while (!u) u = Math.random(); return s * Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * Math.random()); };
   const sgn = (a, dir) => { let x = nrm(a * dir); if (x > Math.PI) x -= TAU; return x; };
   /* ibrenin c açısına varma süresi (sn); işaretli: geçtiyse negatif. Gelgit ve girdap hızlanmaları hesaba katılır. */
+  const base0 = ring => (ring ? G.omega2 : G.omega) * (G.slow > 0 ? G.slowMul : 1) * (ring ? 1 : k.ptrFactor());
   const eta = (c, ring) => {
     const a = ring ? G.ang2 : G.ang, dir = ring ? G.dir2 : G.dir;
     const base = (ring ? G.omega2 : G.omega) * (G.slow > 0 ? G.slowMul : 1);
@@ -72,11 +73,29 @@
     const lapse = opt.lapse == null ? 0.01 + sigmaT * 0.15 : opt.lapse, aimE = () => gauss(sigmaT * (Math.random() < lapse ? 3 : 1)) + (G.kind === 'isin' ? gauss(opt.isinExtra == null ? 0.02 : opt.isinExtra) : 0);
     const lead = opt.lead || 0;  /* sn: kaba adımda (dt) vuruşun hep geç kalmasını dengeler (laboratuvarın İdealist oyuncusu) */
     const goldP = Math.max(0.15, Math.min(0.85, 0.95 - sigmaT * 6.5)), lightMis = sigmaT * 1.2;
-    const seed = p => { if (p._aim === undefined) { p._aim = aimE(); p._aim2 = aimE() * 1.2; p._armed = false; } };
+    /* İNSAN KATMANI (kzm-hf.js, V1.0.28): mekaniğin kendi belirsizliği (kayma fazı, hayalet hafızası, şipşak ölçekli zamanlaması, nabız, gelgit, değirmen, ritim...) vuruş zamanına
+       ek gürültü olarak biner; ters dönmede dur-sinyalini kaçırma olasılığı pfAmb. Betikli bölümde dalganın özelliklerinden (BL_SC) hesaplanır; eski bölümlerde etkisiz. opt.hf === false kapatır. */
+    const HFON = opt.hf !== false && !!window.KZM_HF && !!k.blOv;
+    const waveSpec = () => { if (!HFON || !G.bl) return null; const o = k.blOv(G.bl.n); return o && o.sc ? o.w[Math.min(G.bl.wave, o.w.length - 1)] : null; };
+    const hfx = p => {
+      const w = waveSpec(); if (!w) return 0;
+      let idx = 0;
+      if (p.kasa) { const d0 = sgn(p.c0 - G.ang, G.dir); for (const q of G.pins) if (q.kasa && q !== p && sgn(q.c0 - G.ang, G.dir) < d0) idx++; }
+      return window.KZM_HF.sigmaX(w, idx, G.bl.hp) / 1000;
+    };
+    const seed = p => { if (p._aim === undefined) { const x = hfx(p); p._aim = aimE() + (x ? gauss(x) : 0); p._aim2 = aimE() * 1.2 + (x ? gauss(x) : 0); p._armed = false; p._sx = x; } };
+    const reseed = p => { p._aim = aimE() + (p._sx ? gauss(p._sx) : 0); };
+    let lastDir = G.dir;
     while (G.mode === 'play' && t < tmax) {
       k.update(dt); t += dt;
       for (const q of G.pins) if (q.kind === 'trap' || q.kind === 'gate') { const pc = k.pinCenter(q); if (q._pc != null) { let d = pc - q._pc; d = ((d + Math.PI + 4 * TAU) % TAU) - Math.PI; q._v = Math.abs(d) < 0.5 ? d / dt : 0; } q._pc = pc; }
       if (opt.stop && opt.stop()) break;
+      if (G.dir !== lastDir) {   /* ters dönme: hazırlanmış vuruşlar için dur-sinyali yarışı */
+        lastDir = G.dir;
+        const lf = G.bl && G.bl.lastFlip;
+        if (HFON && lf && G.clock - lf.t < 0.2) for (const p of G.pins) if (p.kind === 'gate' && !p.done && p._armed && p._ePrev != null && p._ePrev > -0.05 && p._ePrev < 1.2 && Math.random() < window.KZM_HF.pfAmb(lf.tell, Math.max(0, p._ePrev))) p._blind = t + Math.max(0, p._ePrev + (p._aim || 0));
+      }
+      { let bl = null; for (const p of G.pins) if (p._blind != null && t >= p._blind) { bl = p; break; } if (bl) { bl._blind = null; bl._armed = false; reseed(bl); k.tap(); taps++; miss++; continue; } }
       if (G.ph !== prevPh || G.L !== prevL) {
         if (G.ph === 'hell') hstat(G.L).enter++;
         else if (prevPh === 'hell') hstat(prevL).pass++;
@@ -104,7 +123,7 @@
         if (p.done) continue;
         let c, gh;
         if (p.kind === 'gate') {
-          if (p.locked) continue;
+          if (p.locked || (p.slT != null && p.slt < 0.3)) continue;
           if (p.gold) { if (p.wait || p.gone) continue; if (p._try === undefined) p._try = Math.random() < goldP; if (!p._try) continue; }
           if (p.blLife) { if (p.gone) continue; if (p._try === undefined) p._try = Math.random() < 0.9; if (!p._try) continue; }   /* can pimi: insan neredeyse hep dener */
           c = k.pinCenter(p); gh = k.pinHw(p);
@@ -112,7 +131,7 @@
         else if (p.kind === 'hold') { c = p.c0; gh = p.hw; }
         else continue;
         /* ışınlanma pini: ibre tünelde ya da önce kapıya varacaksa hedefi bekle (çıkışı görünce hedefe giden yol serbest) */
-        if (G.kind === 'isin' && p.kind === 'gate') {
+        if ((G.kind === 'isin' || G.pins.some(q => q.kind === 'portal')) && p.kind === 'gate') {   /* yeni parkurda kapılar başka türlerle birlikte gelir */
           if (G.tun) continue;
           const pin = G.pins.find(q => q.kind === 'portal' && q.portal === 'in'), at = sgn(c - G.ang, G.dir);
           if (at > 0 && pin && nrm((pin.c0 - G.ang) * G.dir) < at) continue;
@@ -130,8 +149,12 @@
           if (hz < 0.3 && !p._lg && window.__fair) { p._lg = 1; const L = aimOff.last || { add: 0 }; window.__fair.push([isNaN(off) ? 1 : 0, L.add || 0, L.mov ? 1 : 0, G.bl ? G.bl.wave / G.bl.waves : 0]); aimOff.last = null; } }
         }
         if (Number.isNaN(off)) continue;
-        const e = eta(c + off, ring), ahead = sgn(c + off - a, dir);
-        if (G.bl && (G.bl.tags.includes('yon') || G.bl.tags.includes('kyon')) && ahead < -(gh + 0.08)) { p._armed = false; p._aim = aimE(); continue; }   /* Yön değiştir: ters dönünce arkada kalan hedef "yeni geçti" sanılmasın */
+        const ahead = sgn(c + off - a, dir);
+        let e = eta(c + off, ring);
+        /* hedefi geçmiş: kalan süre "geçeli ne kadar oldu" olarak gerçek saatten (hız değişse de doğru: nabız, gelgit, ters dönme) */
+        if (ahead <= 0) { if (p._tc == null) { const vv = Math.abs(ring ? G.vel2 : G.vel), sp = vv === vv && vv > 0 ? vv : Math.abs(base0(ring)); p._tc = G.clock + ahead / Math.max(0.4, sp); } e = -(G.clock - p._tc); } else p._tc = null;
+        if (G.bl && (G.bl.tags.includes('yon') || G.bl.tags.includes('kyon') || G.bl.lastFlip) && ahead < -(gh + 0.08)) { p._armed = false; reseed(p); continue; }   /* Yön değiştir: ters dönünce arkada kalan hedef "yeni geçti" sanılmasın */
+        p._ePrev = e;
         if (ahead > 0.15) p._armed = true;
         if (!p._armed) continue;
         if (e < bestEta) { best = p; bestEta = e; bestOff = off; }
@@ -142,16 +165,16 @@
       const gc = best.kind === 'hold' ? best.c0 : k.pinCenter(best), gh = best.kind === 'hold' ? best.hw : k.pinHw(best);
       const inGate = ad(a, gc) <= gh + 0.05;
       /* trafik ışığı: kırmızıya vurma (yeni oyuncular ara sıra yanılır) */
-      if (best.light && (!best.green || (G.bl && G.chal.light && G.chal.light.warn)) && Math.random() > lightMis) { best._armed = false; best._aim = aimE(); continue; }
+      if (best.light && (!best.green || (G.bl && G.chal.light && G.chal.light.warn)) && Math.random() > lightMis) { best._armed = false; reseed(best); continue; }
       const danger = G.pins.some(p => (p.kind === 'trap' && k.pinHw(p) > 0 && ad(G.ang, k.pinCenter(p)) <= k.pinHw(p) + 0.03 && (p.prio || !inGate)) ||
         (p.kind === 'lockpin' && !p.open && !p.done && best !== p && ad(G.ang, p.c0) <= p.hw + 0.03 && !inGate));
-      if (danger && Math.random() < trapAvoid) { best._armed = false; best._aim = aimE(); continue; }
+      if (danger && Math.random() < trapAvoid) { best._armed = false; reseed(best); continue; }
       const n0 = G.n, t0 = G.time, kd0 = G.kind;
       k.tap(); taps++;
       { const sx = stat(kd0); sx.taps++; if (G.n > n0) sx.hits++; else sx.pen++; }
       if (best.kind === 'hold') { best._armed = false; best._aim2 = aimE() * 1.2; }
       else if (G.n === n0 && G.time <= t0) miss++;
-      best._armed = false; best._aim = aimE(); best._off = null;
+      best._armed = false; reseed(best); best._off = null;
     }
     return { L: G.L, ph: G.ph, jt: G.jt, score: G.score, hits: G.n, taps, miss, kind: G.kind, chal: G.chal && G.chal.tw ? G.chal.tw : '', alive: G.mode === 'play', time: G.time, coins: G.gain || 0 };
   };

@@ -3,6 +3,69 @@
 Sürüm adları `V0.x.y` biçimindedir. Her sürümün APK'sı `kil-payi-v0.x.y.apk` adıyla verilir ve git'te `v0.x.y` etiketini taşır;
 "şu sürümdeki şu özelliği koru" denince bu adlar kullanılır. Her sürüm çıkarılınca bu dosya güncellenir, değişiklikler push'lanır.
 
+## V1.0.33 — Ters ibre 5°, ışınlanma düzeltmesi (2026-11-25, deneme)
+
+- **Ters ibre:** hedefe ya da tuzağa 3-8° kala (ölçüm: en yakın kenara 3-9°) kısa sarı uyarıdan sonra ters döner; her dalgada değil, rastgele.
+- **Işınlanma artık her dalgada çalışıyor:** hata, yeni dalganın hedefi eski yerinde ibrenin altında belirip art arda dokunuşla dalgayı atlatması ve kapının kayarken ibreyi kaçırmasıydı. İkisi düzeltildi (5 bölümde dalga başına ışınlanma %100).
+- **Işınlanma daha heyecanlı:** çıkıştan sonra hedef çoğu zaman 8-24° (bazen 24-50°) önünde; kapılar arası 50-160°, her dalgada farklı.
+- Yeni dalganın hedefi, eski yerinden ayrılana kadar (0,3 sn) vurulmaz.
+
+## V1.0.32 — Parkur: %50 uzun, ters ibre pusu, gelgit ataleti, kalp atışı (2026-11-25, deneme)
+
+- **Bölümler %50 uzun:** Bölüm 4+ yaklaşık 86 sn (en az 75 sn), Bölüm 2-3 yaklaşık 63 sn, Öğretici yaklaşık 17 sn. İbre %15, hedef genişliği %8 arttı.
+- **Kayma hızlı (0,5 sn) ve sönük değil.**
+- **Ters ibre:** yalnız önünde hedef ya da tuzak varken, ona 0,2-0,4 sn kala (aksiyon anında) döner; boş yolda dönmez.
+- **Gelgit fizikli:** banda girince hız hemen artar, çıkınca ~1,5 sn'de yavaş yavaş eski hıza iner. Bant üstünde hedef/tuzak olmaz.
+- **Nabız kalp atışı:** lub-dub (1,5-2,1 sn), her atışta kırmızı ekran flaşı, titreşim ve kalp sesi.
+- **Flaş:** ibre 2 sn görünür, 0,3 sn beyaz flaşla kaybolur.
+- **Işınlanma her dalgada var,** kapılar arası 50-130°, hedefle yan yana gelmez.
+- **Titrek** belirgin titrer (hızlı, ~4-5°).
+- **Dönen çember:** halka tasarımı eski haline döndü; dış çentikler Maraton'daki gibi çemberden 2,5 kat hızlı döner; dönüş %25 hızlandı (45 °/sn).
+- Süre biterken imleç hedefin içindeyse ölüm 0,15 sn bekler. Nefes hedefi genliği azaldı.
+
+## V1.0.31 — Parkur: çeşitlilik, kayma, gerçek dönen çember (2026-11-24, deneme)
+
+- **Her dalga farklı:** hedef sayısı 1-4, tuzak sayısı 0-3, hedefler arası boşluk (sık / orta / geniş / karışık), ilk hedefin uzaklığı, gelgit bandının genişliği ve gücü, bandla hedef arası mesafe (bazen hedef bandın kenarına bile biner), ışınlanma kapıları arası mesafe, hedef içi ayarlar (nefes süresi, kayma genişliği, hayalet görünme süresi) ve değirmen hızı her dalgada değişir. Tuzaklar hedefin hemen önüne, hemen arkasına, aralara ya da boş yere gelir; bazıları sallanır.
+- **Kayma yumuşak:** hedef vurulunca yeni dalganın parçaları eski parçaların yakınından 0,8 sn'de yumuşakça (iki ucu yavaş) kayarak yerine oturur; kayarken soluk durur ve dokunulamaz, eski işaretler sönerek gider. Işınlanma kapıları, gelgit bandı da kayar.
+- **Ters ibre pusu gibi:** artık zaman sayacı yok; bazı yaklaşmalarda, hedefe varmadan 0,4-0,8 sn önce (hedefin üstüne gelmeden) kısa sarı uyarıdan sonra ters döner; ileri bölümlerde ardışık iki kez de dönebilir.
+- **Flaş:** 2 sn görünür, 0,6 sn görünmez.
+- **Dönen çember gerçekten çember gibi dönüyor:** halka şeridinde çemberle dönen çizgiler ve parlak boncuklar, dıştaki çentikler ve ilerleme birlikte döner; iki halkada iç halka ters yöne. Dönüş biraz hızlı (36 °/sn), 4-7 sn'de bir yön değiştirir (önceden sarı ok uyarır).
+- **Bölümler en az 50 sn (Bölüm 4+):** dalga sayısı parkur ve bölüme göre ölçülüp ayarlandı (Bölüm 4+ ≈ 56-60 sn, Bölüm 2-3 ≈ 40 sn); yine de 50 sn dolmadan bölüm bitmez (yeterli dalga olmazsa dalgalar sürer).
+- **Süre Maraton gibi:** vuruş kazancı yeniden ayarlandı; süre gözle görülür iniyor çıkıyor. Öğretici bölümde süre belirgin azalır (6 → ~2,5 sn) ama 2 sn'nin altına inmez, yanmazsın.
+- Nabız her dalgada 2-3,2 sn aralıkla atıyor, titrek frekansı da dalgaya göre değişiyor, nefes alan çemberin hızı ve genliği değişiyor.
+
+## V1.0.30 — Parkur düzeltmeleri (2026-11-24, deneme)
+
+- **Engeller geldi, hedef sayısı arttı:** dalgada 2-4 hedef ve 0-2 tuzak (bölümle artar); tuzaklar çoğu zaman sıradaki hedefin hemen önünde. Değirmen'de kanatlar zaten engel olduğu için bir tuzak eksik.
+- **Bölümler yaklaşık 2 kat uzun** (çoğu 30-55 sn).
+- **Ani yer değiştirme yok:** hedef vurulunca hedefler, tuzaklar, kapılar ve gelgit bandı eski yerlerinden yeni yerlerine kayarak geçer.
+- **Ters ibre pusulu:** artık belli aralıkla dönmüyor; bazı yaklaşmalarda hedefe tam varmadan, kısa sarı uyarıdan sonra ters dönüyor.
+- **Flaş:** ibre bir süre görünüyor (0,8 sn), bir süre görünmüyor (0,6 sn); sürekli yanıp sönmüyor.
+- **Nabız ve Titrek seyrekleşti:** nabız 2,4 sn'de bir atıyor, titrek yavaş salınıyor.
+- **Dönen çember gerçekten dönüyor:** dıştaki çentikler (ilerleme dahil) ve halkanın üstündeki işaretler de çemberle birlikte dönüyor; iki halkada iç halka ters yöne.
+- **Öğretici bölümde süre akıyor:** ıska süre götürüyor ama yanmazsın (süre en az 1,2 sn'de durur).
+
+## V1.0.29 — Yeni Parkur: 5 hedef × 11 bölüm, süreli (2026-11-24, deneme)
+
+- **Parkur baştan kuruldu (senin planın).** Her hedef çeşidi bir parkur: Sabit hedef, Nefes, Kayan, Hayalet, Değirmen. Her parkurda 11 bölüm, bölümleri ibre ve çember belirliyor:
+  1 Öğretici (kısa, ceza yok) · 2 Ters dönen ibre · 3 Gelgit · 4 Nabız · 5 Flaş · 6 Işınlanma + Gelgit · 7 Nabız + Nefes alan çember · 8 Titrek + Nefes alan çember · 9 Işınlanma + Dönen çember · 10 Flaş + Dönen çember · 11 İki halka (yarısından sonra iç ve dış halka birbirine ters döner, ara ara yön değiştirir).
+- **İstisnalar (okunamayan birleşimler değişti):** Hayalet: Flaş yerine Titrek (5), Işınlanma yerine Ters ibre (6), 9 Ters + Nefes alan çember, 10 Titrek + Gelgit, 11 iki halka dönmeden. Değirmen: 5 Ters ibre, 8 Ters + Nefes alan çember, 10 yalnız Dönen çember, 11 Ters + Gelgit. Nefes: 7 Nabız + Dönen çember, 8 Titrek + Gelgit. Kayan: 9 Işınlanma + Nefes alan çember, 10 yalnız Flaş.
+- **Can yok, 8 saniyelik süre var.** Ortadaki sıvı süredir: durmadan akar, vurdukça dolar, ıskada 2,5 sn, tuzakta 4 sn gider; biterse yanarsın. İlerleme dıştaki çentiklerin uzamasıyla görünür.
+- **Yeni: Dönen çember.** Hedefler, kapılar ve gelgit bandı çemberle birlikte döner; yön değiştirmeden önce ortadaki küçük dönüş oku sarı yanar.
+- Gelgit bandı hedef genişliğinde (~42°) ve hedef bandın hemen arkasında; ışınlanma kapıları bantla hiç üst üste gelmez, kapıdan çıkınca hedefe en az yarım saniye var.
+- Hız bölümle 115 → 195 °/sn, hedef 48° → 34° (iki halka ve flaş bölümleri bir tık yavaş). Liste ve kartlar 11 bölüme göre; eski 55 bölümün yıldızları bu yeni bölümlere taşınmaz.
+- Laboratuvar: Parkur planı sayfası bu planı gösterir (Dönen çember önizlemede de çalışır).
+
+## V1.0.28 — Zorluk Modeli: Bölüm 4-55 baştan (2026-11-20, deneme)
+
+- **Bölüm 4-55 baştan, dalga dalga yazılı.** Her dalganın ibre hızı, hedef genişliği, mekanikleri ve tuzakları ayrı belirlenir; bölümler artık "parkurun kilidi + birkaç etiket" değil. Birikimli kadro: her parkur kendi kilidine önceki parkurların kilitlerini katar (nefes alan kasa, kayan kasa, nabızlı nefes… ama "tek kasa" ya da "çift kasa" yok).
+- **Matematiksel zorluk modeli:** her dalganın zorluğu ibre hızı, hedef genişliği, tuzak yakınlığı ve mekaniğin kendi belirsizliğinden (nabız, değirmen, hayalet, şipşak, ters dönme…) hesaplanır; bölümün zorluk puanı "bölümü yarı yarıya geçen oyuncunun refleks yüzdeliği"dir. Parkurların 1-5. bölümleri 85 / 88 / 91 / 94 / 96, tek parkurunun 4-5. bölümü 84 / 88 (puan tablosu `tools/kzm-gen.mjs` başında).
+- **Ritim:** her bölüm yükselen risk eğrisi üzerinde 5'lik cümlelerle ilerler (ısın, yüksel, sıçra, dinlen), sona doğru patron dalgası; sıkı (dar, yavaş) ve hızlı (geniş, hızlı) dalgalar karışık gelir. Yeni mekanik parkurun ilk dalgalarında geniş hedefle, tek başına öğretilir.
+- **Yeni kaldıraçlar:** *Pusu*: ibre hedefe yaklaşırken uyarı yanar (en az 0,45 sn), sonra tam hedefe varırken ters döner; *Küçülen hedef*: ibre yaklaşırken hedef daralır. Kasa ibresinin ters dönmesi parkurda sıklaştı.
+- Hız en az 155 °/sn, hedef 18-44°; Bölüm 1-3 (tek1-3) kullanıcının elle ayarıyla aynen duruyor.
+- Bölümler gerçek oyunda insan katmanlı botla oynatılıp ölçüldü ve hedefe oturtuldu (bot geçme oranı hedeften ortalama ≈ 5-6 puan sapar). Bot insan değildir: telefonda deneme şart. Ayrıntı: `docs/zorluk-modeli.md`.
+- Laboratuvar: Bölüm kurgusu sayfası betikli bölümleri salt okunur dalga listesi olarak gösterir.
+
 ## V1.0.27 — Kaçan can, birikimli parkurlar (2026-11-19, deneme)
 
 - **Can kendiliğinden gelmiyor (Bölüm 4'ten itibaren):** yerine "Kaçan can" pimi var. Yalnız can eksikken çıkar, ince ve yeşildir, hızla kayar ve ibre bir kez üstünden geçince kaybolur. Tutturursan +1 can; boşa basarsan sıradan ıska (1 can). İki halka bölümlerinde çıkmaz. Bölüm 1-3 eskisi gibi.

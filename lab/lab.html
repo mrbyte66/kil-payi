@@ -186,6 +186,49 @@ textarea{width:100%;height:80px;background:var(--sf2);border:1px solid var(--ln)
 .idea{cursor:pointer}
 @media (max-width:780px){.hist{grid-template-columns:1fr}}
 @media (max-width:780px){.main{grid-template-columns:1fr}.phone{position:static;max-width:300px;margin:0 auto}.row{grid-template-columns:120px 1fr 60px 64px}.two{grid-template-columns:1fr}.g.big{grid-column:span 1}}
+.card[data-c="plan"] .body>.d,.card[data-c="plb"] .body>.d{display:none}
+.pl-cv{width:100%;height:auto;display:block;aspect-ratio:3/2}
+.pl-3{display:grid;grid-template-columns:5fr 6fr 6fr;gap:12px}
+.pl-gp h4{margin:0 0 4px;font-size:12.5px;opacity:.7}
+.pl-gg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px}
+.pl-k{display:grid;gap:0;justify-items:center;align-content:start;background:#17132d;border:2px solid transparent;border-radius:10px;padding:2px 1px 4px;color:inherit;font:inherit;cursor:pointer;text-align:center;min-width:0}
+.pl-k .pl-cv{max-width:50px}.pl-k b{font-size:10px;line-height:1.1;letter-spacing:-.01em}
+.pl-k.on{border-color:#ff8e5c;background:#3a2a3e}.pl-k.no{opacity:.5}
+.pl-sw{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;background:#17132d;border-radius:12px;padding:6px 10px;margin-top:8px}
+.pl-l{font-size:12px;opacity:.65;font-weight:700}.pl-rg em{font-style:normal;font-size:12px;opacity:.6}
+.pl-rg{display:flex;align-items:center;gap:4px}.pl-rg i{font-style:normal;opacity:.5}
+.pl-n{display:block}.pl-n input{width:52px;background:#2e2757;color:#f3f0ff;border:1px solid #4a4180;border-radius:8px;padding:3px;font:inherit;font-size:14px;font-weight:700;text-align:center}.pl-n span{display:none}
+.pl-tip{font-size:12px;opacity:.75;margin-left:auto}
+.pl-h{font-size:18px;margin:20px 0 8px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.pl-h small{font-size:13px;font-weight:500;opacity:.6}
+.pl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pl-sq{display:grid;gap:8px;align-content:start;background:var(--sf2);border:2px solid transparent;border-radius:18px;padding:10px 12px;color:inherit;font:inherit;cursor:pointer;text-align:left}
+.pl-sq.on{border-color:#ff8e5c;background:#3a2a3e}
+.pl-sq .tp{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.pl-sq .n{font-size:24px;font-weight:800;line-height:1}.pl-sq .n small{font-size:13px;font-weight:600;opacity:.6}
+.pl-sq .df{height:8px;border-radius:4px;background:#17132d;overflow:hidden}.pl-sq .df em{display:block;height:100%}.pl-sq .ms{font-size:12.5px;font-weight:700}
+.pl-sq .cb{display:grid;grid-template-columns:1fr 14px 1fr;gap:6px;align-items:center}.pl-sq .cb>i{font-style:normal;font-weight:800;opacity:.45;text-align:center}
+.pl-sq .pc{display:grid;gap:2px;justify-items:center;align-content:center;text-align:center;background:#17132d;border-radius:12px;padding:4px;min-height:96px}.pl-sq .pc .pl-cv{max-width:120px}.pl-sq .pc b{font-size:13px;line-height:1.15}.pl-sq .pz{font-size:12.5px;opacity:.45;font-weight:700}
+.pl-sq .sw{display:flex;justify-content:space-between;font-size:12px;opacity:.85}.pl-sq .sw b{font-size:14.5px}
+@media (max-width:980px){.pl-grid{grid-template-columns:repeat(2,1fr)}.pl-3{grid-template-columns:1fr}}
+
+/* Parkur planı: kart kendine has arka planla; kategoriler hep aynı renk: Hedef şeftali, İbre nane, Çember lila */
+.card[data-c="plan"]{background:linear-gradient(135deg,#3b2440 0%,#2a2050 60%,#1f2a4a 100%);border:1px solid #ff8e5c55;box-shadow:inset 4px 0 0 #ff8e5c}
+.card[data-c="plan"] h2{font-size:17px}.pl-tt{background:#ff8e5c;color:#2a1a10;border-radius:8px;padding:1px 8px;margin-right:6px;font-size:13px;vertical-align:2px}
+.c-h{color:#ffb38a}.c-i{color:#7fe3b8}.c-c{color:#c4b8ff}
+.pl-gp{padding:0}
+.pl-gp h4{display:flex;align-items:center;gap:6px;color:var(--kc);opacity:1;font-size:13px}.pl-gp h4 i{width:9px;height:9px;border-radius:50%;background:var(--kc)}
+.k-h{--kc:#ffb38a;--kb:#ff8e5c18;--kl:#ff8e5c44}.k-i{--kc:#7fe3b8;--kb:#5fd6a414;--kl:#5fd6a444}.k-c{--kc:#c4b8ff;--kb:#a99bf01a;--kl:#a99bf04d}
+.pl-gp .pl-k.on{border-color:var(--kc);background:#ffffff14}
+.pl-sq .pc{background:var(--kb)}
+.pl-sq .pc small{font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--kc)}.pl-sq .pc b{color:var(--kc)}
+
+.pl-rk{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.pl-ri{display:grid;grid-template-columns:28px 92px 1fr 34px;gap:8px;align-items:center;background:var(--sf2);border:2px solid transparent;border-radius:14px;padding:6px 10px;color:inherit;font:inherit;cursor:pointer;text-align:left}
+.pl-ri.on{border-color:#ff8e5c}.pl-ri .rn{font-size:18px;font-weight:800;opacity:.6;text-align:center}.pl-ri .rc{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.pl-ri .rt{display:grid;line-height:1.25}.pl-ri .rt b{font-size:13px}.pl-ri .rt small{font-size:11.5px;opacity:.7}.pl-ri .rs{font-size:16px;font-weight:800;color:#7bc8a4;text-align:right}
+.pl-av{margin:14px 0 4px;font-size:13px;color:#f0657a}.pl-avl{margin:0;padding-left:18px;font-size:12.5px;opacity:.85}
+.pl-try{background:#f2b73c;color:#2a1a10;border-radius:8px;padding:1px 8px;font-size:12px}.pl-ex{font-style:normal;background:#f2b73c;color:#2a1a10;border-radius:6px;padding:0 5px;font-size:10px}
+.pl-sq .wy{font-size:11.5px;opacity:.7;line-height:1.3}
 </style>
 </head>
 <body>
@@ -223,8 +266,8 @@ let K = null, S = null, REC = null, step = 0, lv = 1, groups = [], gIdx = {}, re
 const toast = m => { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1800); };
 
 /* ---------- sayfalar ---------- */
-const PAGES = [['fizik', 'Oyun fiziği'], ['kurgu', 'Bölüm kurgusu'], ['tool', 'Tool'], ['tasarim', 'Oyun tasarımı'], ['gorunum', 'Görünüm'], ['oyuncu', 'Oyuncular'], ['ana', 'Analiz'], ['fikir', 'Fikirler'], ['yedek', 'Yedekte'], ['ayar', 'Ayarlar']];
-const NOPHONE = { ana: 1, fikir: 1, ayar: 1 }, NOCTX = { fikir: 1, ayar: 1 };
+const PAGES = [['plan', 'Parkur planı'], ['fizik', 'Oyun fiziği'], ['kurgu', 'Bölüm kurgusu'], ['tool', 'Tool'], ['tasarim', 'Oyun tasarımı'], ['gorunum', 'Görünüm'], ['oyuncu', 'Oyuncular'], ['ana', 'Analiz'], ['fikir', 'Fikirler'], ['yedek', 'Yedekte'], ['ayar', 'Ayarlar']];
+const NOPHONE = { ana: 1, fikir: 1, ayar: 1 }, NOCTX = { fikir: 1, ayar: 1, plan: 1 };
 
 /* ---------- oyuncu tipleri ve davranış modeli (önerilenler) ---------- */
 /* sg: zamanlama hatası (sn), av: tuzaktan kaçınma, pay: nüfus payı %, ad: reklam eğilimi, pat: sabır, need: zorluk ihtiyacı,
@@ -500,7 +543,16 @@ const kpPart = (ph, x) => {
   }
   return h + '</div>';
 };
+/* Zorluk Modeli betikli bölümler (4-55): salt okunur döküm; kurgu tools/kzm-gen.mjs ile üretilir (src/game.html BL_SC bloğu) */
+const scView = n => {
+  const id = K.blId(n), sc = K.BL_SC && K.BL_SC[id]; if (!sc) return null;
+  const rows = sc.w.map((w, i) => { const m = [].concat(w.m || [], w.e || [], (w.tr && w.tr.k) || [], w.x && w.x.shr ? ['küçülen'] : [], w.x && w.x.amb ? ['pusu'] : []).join(' + ') || '-';
+    return `<tr><td>${i + 1}</td><td>${w.s}${w.n > 1 ? ' ' + w.n : ''}</td><td>${m}</td><td>${w.v}</td><td>${w.d}</td><td>${(w.tr && w.tr.n) || 0}</td></tr>`; }).join('');
+  return `<div class="note" style="margin:8px 0"><b>${id}</b>: Zorluk Modeli betiği (hedef zorluk puanı ${sc.z}, ${sc.w.length} dalga). Bu bölümün kurgusu burada elle düzenlenmez: <code>node tools/kzm-gen.mjs</code> üretir, bölüm <code>src/game.html</code> içindeki BL_SC bloğunda durur. Değiştirmek istersen bana söyle (hedef puanı ya da kadro).</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="text-align:left;opacity:.7"><th>#</th><th>Yapı</th><th>Mekanik</th><th>Hız °/sn</th><th>Genişlik °</th><th>Tuzak</th></tr></thead><tbody>${rows}</tbody></table>`;
+};
 const renderKur = () => {
+  { const sv = scView(curN()); if (sv) return sv; }
   const n = curN(), o = ovOf(n), v = ovView(), ph = OVP(), tags = v.ph[ph].t, pl = v.ph[ph].lv;
   let h = `<div class="kur-wrap"><div><div class="tl-view kur-view"><canvas id="kuCv" width="640" height="640"></canvas></div><p class="note" style="text-align:center">Soldaki oyunun canlı görüntüsü: değiştirdiğin her şey burada hemen görünür.</p></div><div>`;
   h += `<div class="tl-h" style="margin-top:0">Bu bölümün ibre hızı ve şeftali genişliği</div>` + renderPts('lv');
@@ -528,6 +580,9 @@ const mechDefs = () => mechKinds(curG(), lv).flatMap(kd => Object.entries(K.BL_M
 })));
 /* kartlar: pg sayfa, c kimlik (kapalı/açık hafızası), defs satırlar; özel kartların gövdesi kendi çizicisinden */
 const SECS = [
+  { pg: 'plan', c: 'plan', t: () => planTitle(), d: 'Her hedef çeşidi bir parkur. Bölümleri ibre ve çember birleşimi şekillendirir; istisnalar dışında her parkurun aynı bölümü aynı birleşim, aynı hız ve genişlik aralığıdır. Bir şeye dokun: soldaki oyunda oynar.', sp: 'plan' },
+  { pg: 'plan', c: 'plb', t: () => 'Bölümler · her parkurda aynı, dokun oynasın', sp: 'plb' },
+  { pg: 'plan', c: 'plr', t: () => 'Uyum sıralaması · en heyecanlı birleşimler, dokun dene', sp: 'plr' },
   { pg: 'fizik', c: 'lv', t: () => (gIdx[curG()] ? gIdx[curG()].name : '') + ' · ' + lv + '. bölüm (' + TIER[lv - 1] + ')', defs: physDefs, eff: 1 },
   { pg: 'fizik', c: 'mech', t: () => 'Kilit ayarları', d: 'Bu bölümde görünen her kilit için ayrı ayar; yalnız bu basamağa uygulanır, Süreli etkilenmez.', defs: mechDefs, empty: 'Bu bölümde özel ayarı olan kilit yok (düz pim ve çift pim).' },
   { pg: 'fizik', c: 'lim', t: () => 'Sınırlar', d: 'Bütün bölümler için şeftali genişliği sınırları ve pim aralığı. Kaydırınca soldaki oyunda iki hedef bu genişliklerle durur.', defs: limDefs, pre: () => limSvg() },
@@ -630,7 +685,8 @@ let demoHold = 0;
 const start = (o = {}) => {
   const k = kp(); if (!k) return;
   apply(fr.contentWindow);
-  const tl = S.ui.pg === 'tool' && S.tool; fr.contentWindow.__labWave = tl ? S.tool : null;
+  const tl = (S.ui.pg === 'tool' && S.tool) || (S.ui.pg === 'plan' && planDesign()); fr.contentWindow.__labWave = tl || null;
+  try { const d = fr.contentDocument; if (!d.getElementById('labPlanCss')) { const st = d.createElement('style'); st.id = 'labPlanCss'; st.textContent = 'html.labplan #blCs{visibility:hidden}'; d.head.appendChild(st); } d.documentElement.classList.toggle('labplan', S.ui.pg === 'plan'); } catch (e) {}   /* Parkur planında oyunun 'Bölüm 1' kartı yanıltıyordu */
   const n = tl ? 1 : curN(); if (k.blSoon(n)) return;
   demoHold = 0; k.save.bl.f = {}; if (o.fv) k.save.bl.f[idOf(n)] = o.fv; k.blStart(n); winT = 0;
   if (o.ph > 0) { const B = k.G.bl, c = (ovOf(n) || {}).cut || [1 / 3, 2 / 3]; B.wave = Math.ceil(B.waves * c[o.ph - 1]); k.G.pins = []; k.spawn(true); }
@@ -686,13 +742,13 @@ const restartSoon = () => { clearTimeout(restartT); restartT = setTimeout(start,
 const gauss = s => { let u = 0; while (!u) u = Math.random(); return s * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random()); };
 const aimSg = () => { const a = S.ui.aim; if (a === 'ozel') return (S.ui.aimMs || 0) / 1000; const p = S.PS.find(x => x.id === a); return p ? p.sg : 0.08; };
 const autoTick = () => {
-  const k = kp(); const TL = S && S.ui.pg === 'tool' && S.tool; if (!k || !S || (S.ui.aim === 'ben' && !TL)) return;
+  const k = kp(); const TL = S && ((S.ui.pg === 'tool' && S.tool) || (S.ui.pg === 'plan' && fr.contentWindow.__labWave)); if (!k || !S || (S.ui.aim === 'ben' && !TL)) return;
   if (demoHold) { const G = k.G; if (G.bl && G.mode === 'play' && G.bl.lives > 0) { /* gösterim sürerken bot oynamaz */ } return; }
   const G = k.G; if (!G.bl) return;
   if (G.mode === 'blwin') { if (++winT > 110) start(); return; }
   if (G.mode === 'over' || G.mode === 'dead') { if (++winT > 70) start(); return; }
   if (G.mode !== 'play') return;
-  if (S.ui.imm !== false) G.bl.lives = Math.max(G.bl.lives, 1);
+  if (S.ui.imm !== false) { G.bl.lives = Math.max(G.bl.lives, 1); if (G.bl.timed) G.time = Math.max(G.time, 0.4); }
   if (TL && !TL.play) return;   /* Tool: otomatik oynat kapalıyken kimse vurmaz (sen dokunabilirsin) */
   if (G.holding) { const hp = G.pins.find(p => p.kind === 'hold' && p.st === 'hold'); if (hp && k.holdRel(hp) >= hp.len + (hp._lab || 0) * G.omega - 0.02) k.release(); return; }
   if (G.tun) return;
@@ -963,7 +1019,7 @@ const render = () => {
     const c = document.querySelector(`.card[data-c="${x.c}"]`), on = x.pg === pg;
     c.classList.toggle('pgoff', !on); c.classList.toggle('closed', !!S.ui.closed[x.c]);
     if (!on) return;
-    $('h-' + x.c).textContent = x.t();
+    $('h-' + x.c)[x.c === 'plan' ? 'innerHTML' : 'textContent'] = x.t();
     const ae = document.activeElement, body = $('b-' + x.c);
     if (ae && body.contains(ae) && (ae.tagName === 'INPUT') && ae.type !== 'checkbox' && !ae.hasAttribute('data-num')) {   /* yazılan/kaydırılan satır yerinde kalır, kartın geri kalanı (çizim, bağlı kaydırıcılar) canlı güncellenir */
       if (!x.defs) return;
@@ -979,6 +1035,9 @@ const render = () => {
     else if (x.sp === 'set') $('b-set').innerHTML = renderSet();
     else if (x.sp === 'yedek') $('b-yedek').innerHTML = renderYedek();
     else if (x.sp === 'pts') $('b-pts').innerHTML = renderPts('tier');
+    else if (x.sp === 'plb') $('b-plb').innerHTML = renderPlanB();
+    else if (x.sp === 'plr') $('b-plr').innerHTML = renderPlanR();
+    else if (x.sp === 'plan') { document.documentElement.style.setProperty('--hdh', document.querySelector('.hd').offsetHeight + 'px'); $('b-plan').innerHTML = renderPlan(); if (!fr.contentWindow.__labWave) setTimeout(start, 0); }
     else if (x.sp === 'tool') { $('b-tool').innerHTML = renderTool(); tlDraw(); tlMirror(); if (!fr.contentWindow.__labWave) setTimeout(start, 0); }
     else if (x.sp === 'ana' && typeof renderAna === 'function') renderAna();
     else if (x.sp === 'idea' && typeof renderIdeas === 'function') renderIdeas();
@@ -1471,6 +1530,150 @@ const anaClick = (a, k) => {
   else if (a === 'gol') { const n = +k; step = STEPS().findIndex(x => x.g === Math.floor((n - 1) / 5)); lv = (n - 1) % 5 + 1; S.step = step; save(); render(); start(); scrollTo(0, 0); }
 };
 document.addEventListener('change', e => { if (e.target.id === 'prec') { S.ui.prec = +e.target.value; save(); } });
+/* ================= PARKUR PLANI (2026-11-24, kullanıcı kararı) =================
+   Her hedef çeşidi bir parkur; bölümleri ibre + çember birleşimi (1'er tane) ve hız/genişlik aralığı şekillendirir.
+   İstisnalar dışında her parkurun n. bölümü aynı birleşim ve aynı aralıklar. Takip burada: S.plan (kp-lab).
+   Önizleme gerçek oyunla (blLabWave): motoru olan parçalar oynar, olmayanlar "henüz yok" yazar. */
+const PL_H = [
+  { k: 'sabit', ad: 'Sabit hedef', on: 1, d: 'yerinde duran şeftali', it: (a, w) => [{ t: 'gate', a, w }] },
+  { k: 'nefes', ad: 'Nefes', on: 1, d: 'genişleyip daralır', it: (a, w) => [{ t: 'nefes', a, w, br: 45, P: 1.6 }] },
+  { k: 'kayan', ad: 'Kayan', on: 1, d: 'iki yana kayar', it: (a, w) => [{ t: 'kayan', a, w, amp: 26, f: 0.36 }] },
+  { k: 'hayalet', ad: 'Hayalet', on: 1, d: 'görünüp kaybolur', it: (a, w) => [{ t: 'hayalet', a, w, vis: 0.8 }] },
+  { k: 'degirmen', ad: 'Değirmen', on: 1, d: 'dönen kanat uçları tuzak', it: (a, w) => [{ t: 'gate', a, w }] }];
+const PL_I = [
+  { k: '', ad: 'Düz', on: 1, d: 'davranışsız ibre' },
+  { k: 'isin', ad: 'Işınlanma', on: 1, d: 'kapıdan girip öbüründen çıkar', it: () => [{ t: 'portal', a: 152, skip: 48 }] },
+  { k: 'ters', ad: 'Ters dönen', on: 1, d: 'uyarıdan sonra yön değiştirir', tag: 'kyon' },
+  { k: 'titrek', ad: 'Titrek', on: 1, d: 'ucu ince titrer', tag: 'p_titrek' },
+  { k: 'flas', ad: 'Flaş', on: 1, d: 'yalnız flaş çakınca görünür', tag: 'p_flas' },
+  { k: 'nabiz', ad: 'Nabız', on: 1, d: 'küt-küt hızlanır', tag: 'nabiz' }];
+const PL_C = [
+  { k: '', ad: 'Düz', on: 1, d: 'davranışsız çember' },
+  { k: 'gelgit', ad: 'Gelgit', on: 1, d: 'bantta ibre hızlanır', it: () => [{ t: 'gelgit', a: 70, w: 30, m: 1.8 }] },   /* kısaltıldı (kullanıcı: 'gelgit fazla uzun'); hedefin hemen önünde */
+  { k: 'hortum', ad: 'Hortum', on: 1, d: 'ibreyi çeker (bugünkü girdap)', it: () => [{ t: 'girdap', a: 20, k: 1.2, r: 70, o: 50 }] },
+  { k: 'nefesc', ad: 'Nefes alan çember', on: 1, d: 'çember büyüyüp küçülür', tag: 'p_nefesc' },
+  { k: 'cdon', ad: 'Dönen çember', on: 1, d: 'hedefler çemberle döner, ara ara yön değiştirir', tag: 'p_cdon' },
+  { k: 'besik', ad: 'Sağa sola dönen', on: 1, d: 'beşik gibi sallanır', tag: 'p_besik' },
+  { k: 'iki', ad: 'İki halka', on: 0, d: 'içte ikinci halka', yer: 'oyunda var (İki halka parkuru), önizlemeye bağlanacak' }];
+/* uyum sıralaması (çok ajanlı değerlendirme, 2026-11-24): dokununca şablonu değiştirmeden dener (S.plan.try) */
+const PL_RANK = [{"h": "sabit", "i": "ters", "c": "gelgit", "score": 92, "why": "Bantta yön dönüşü temiz kıl payı üretir; sabit hedef her şeyi okunur tutar. Hedef bandın hemen arkasında olmalı, içinde değil."}, {"h": "degirmen", "i": "ters", "c": "gelgit", "score": 89, "why": "Üç ikilinin heyecanı yüksek: dönüş kanat aralığını açar, bantta kaçış gerilir."}, {"h": "nefes", "i": "ters", "c": "gelgit", "score": 88, "why": "Nefes evresi, yön dönüşü ve bant birbirine örülür; hepsi görünür."}, {"h": "degirmen", "i": "ters", "c": "", "score": 87, "why": "Dönüşle kanattan kıl payı kaçış; tek kaldıraç, çok okunur."}, {"h": "nefes", "i": "nabiz", "c": "", "score": 87, "why": "İki ritim üst üste biner; ikisi denk gelince gerilim tavan yapar."}, {"h": "sabit", "i": "flas", "c": "", "score": 86, "why": "İbreyi kafada izleme dersi; hedef sabit olduğu için adil. Flaş aralığı hıza göre kısalmalı."}, {"h": "sabit", "i": "nabiz", "c": "nefesc", "score": 86, "why": "Kalp atışı ve kadran nefesi organik bir his verir; zamanlama bozulmaz."}, {"h": "degirmen", "i": "nabiz", "c": "", "score": 85, "why": "Hamle kanat boşluğundan atlatır; ritimli kaçış."}, {"h": "degirmen", "i": "", "c": "gelgit", "score": 84, "why": "Bantta kanat da hızlanır; kaçış anları gergin ama görünür."}, {"h": "hayalet", "i": "ters", "c": "", "score": 84, "why": "Dönüş, hatırlanan yere ikinci kez geçme şansı verir; bellek ve tepki adil."}, {"h": "nefes", "i": "ters", "c": "", "score": 83, "why": "Uyarılı dönüş dar evreye denk gelebilir; okunur gerilim."}, {"h": "sabit", "i": "isin", "c": "", "score": 83, "why": "Çıkıştan sonra sabit hedefe hızlı tepki; temiz kıl payı."}, {"h": "sabit", "i": "", "c": "hortum", "score": 81, "why": "Kara deliğin çekip tutma ritmi sabit hedefi canlandırır."}, {"h": "nefes", "i": "", "c": "gelgit", "score": 81, "why": "Bant hızı hedefin nefesiyle çakışınca kıl payı anı doğar."}, {"h": "sabit", "i": "ters", "c": "nefesc", "score": 80, "why": "Görsel nefes dönüş uyarısını bozmaz; hafif bir göz yanıltması."}, {"h": "sabit", "i": "isin", "c": "gelgit", "score": 80, "why": "Kapılar banttan ayrık konursa çıkıştan sonra hızı okumak temiz bir sınav olur."}, {"h": "degirmen", "i": "", "c": "hortum", "score": 79, "why": "Heyecan yüksek ama adalet orta: kanat da delikte hızlanır. Temiz karar anı kuralı şart."}, {"h": "sabit", "i": "", "c": "iki", "score": 79, "why": "Çift dikkat sınavı; sabit hedefler sayesinde adil. Şablona girmez."}, {"h": "hayalet", "i": "ters", "c": "gelgit", "score": 78, "why": "Hafıza, dönüş ve bant hızı birlikte; ibre hep görünür. Hayalet parkurunun doruğu."}, {"h": "hayalet", "i": "ters", "c": "nefesc", "score": 77, "why": "Ölçek oynar ama açı aynı kalır; ezber ile dönüş birlikte."}, {"h": "degirmen", "i": "isin", "c": "", "score": 76, "why": "Çıkışta kanadı okumak gerekir; çıkış kanattan uzak tutulursa adil."}, {"h": "hayalet", "i": "nabiz", "c": "", "score": 76, "why": "İbre hep görünür; hafıza ile düzensiz hız iyi bir sınav."}, {"h": "nefes", "i": "nabiz", "c": "besik", "score": 75, "why": "Ritimli ibre sallanan kadranda okunur; nefes hedefiyle çakışmaz."}, {"h": "kayan", "i": "ters", "c": "gelgit", "score": 74, "why": "Göreli hız değişken ama her şey görünür; geç bölüm için."}, {"h": "hayalet", "i": "", "c": "gelgit", "score": 74, "why": "Bant hızı varış için ipucu verir; tek yük ezber."}];
+const PL_AVOID = [{"what": "hayalet + flas", "why": "Hedef de ibre de görünmez; okunacak hiçbir şey kalmaz."}, {"what": "degirmen + flas", "why": "Görünmez ibreyle dönen kanatları kafada izlemek adaletsiz."}, {"what": "flas + gelgit / hortum", "why": "İbre görünmezken hız değişir; kafada uzatmak imkânsızlaşır."}, {"what": "flas + iki", "why": "İki görünmez ibre aynı anda: kör tahmin."}, {"what": "flas + besik", "why": "Sallanan kadranda görünmez ibrenin dayanağı kaybolur."}, {"what": "nefes + nefesc", "why": "Hedef nefesi ile kadran nefesi aynı şekil, iki ayrı anlam."}, {"what": "kayan + besik", "why": "Hedefin salınımı ile kadranın sallanması ayırt edilemez."}, {"what": "hayalet + besik", "why": "Ezberlenen görünmez yer ekranda kayar."}, {"what": "ters + besik", "why": "Kadranın sallanması ibrenin yön dönüşünü taklit eder."}, {"what": "hayalet + isin", "why": "İbre tüneldeyken hedef de gizli; iki bilgi aynı anda yok."}, {"what": "degirmen + iki", "why": "Kanat uçlarının hangi halkaya ait olduğu belirsiz; aşırı yük."}, {"what": "iki halka genel olarak (sabit dışı)", "why": "Tek başına yükü 4; öteki hedeflerle her eşleşmesi zayıf, şablona girmez."}, {"what": "nabiz/ters + hortum", "why": "İki düzensiz hız kaynağı ya da yön değişince tersine dönen çekiş: varış anı öngörülemez."}, {"what": "nabiz + gelgit", "why": "İki hız değiştirici bantta çarpılır; adalet puanı 2, varış anı öngörülemez."}, {"what": "isin + hortum", "why": "Çıkış deliğe yakınsa hız belirsizleşir, tepki payı kaybolur."}, {"what": "degirmen + titrek", "why": "Kanat ucunun yanında titreyen uç tuzak mı hedef mi belirsizleştirir."}, {"what": "hızlı bölümde hedef gelgit bandının içinde", "why": "Tavan hız × 1,8 ile pencere 0,06 sn'nin altına iner; hedef bandın hemen arkasına konmalı."}];
+/* şablon v2: 3 açılı puanlama + sentez + eleştiri (iş akışı wf_f6070241-3f1). Mantık: 1 hedef tek başına; 2-7 zamanlamayı değiştiren her ibre/çember tek başına; 8-11 bilinenlerden ikililer; doruk Ters + Gelgit. Flaş, Beşik, İki halka çoğu hedefle adil değil: yalnız istisnada. */
+const PL_ROWS = [{"i": "", "c": "", "sp": [115, 130], "wd": [44, 48], "why": "Öğretici: hedefi tanı, çabuk biter, ceza yok."}, {"i": "ters", "c": "", "sp": [130, 150], "wd": [40, 44], "why": "Ters dönen ibre."}, {"i": "", "c": "gelgit", "sp": [135, 155], "wd": [39, 43], "why": "Gelgit: bant hedef genişliğinde (~42°), hedef bandın hemen arkasında."}, {"i": "nabiz", "c": "", "sp": [145, 165], "wd": [38, 42], "why": "Nabız ibresi."}, {"i": "flas", "c": "", "sp": [140, 160], "wd": [38, 42], "why": "Flaş ibresi (biraz yavaş)."}, {"i": "isin", "c": "gelgit", "sp": [155, 175], "wd": [37, 41], "why": "Işınlanma + Gelgit: bant çıkış kapısıyla hedef arasında, kapılarla üst üste gelmez."}, {"i": "nabiz", "c": "nefesc", "sp": [165, 185], "wd": [36, 40], "why": "Nabız + Nefes alan çember."}, {"i": "titrek", "c": "nefesc", "sp": [170, 190], "wd": [35, 39], "why": "Titrek + Nefes alan çember."}, {"i": "isin", "c": "cdon", "sp": [175, 195], "wd": [34, 38], "why": "Işınlanma + Dönen çember: kapılar ve hedefler çemberle döner."}, {"i": "flas", "c": "cdon", "sp": [165, 185], "wd": [35, 39], "why": "Flaş + Dönen çember (dönüş biraz yavaş)."}, {"i": "", "c": "iki", "sp": [155, 175], "wd": [38, 42], "why": "İki halka: yarısından sonra iç ve dış halka ters yönlere döner, ara ara yön değiştirir."}], PL_EX = {"nefes": {"6": {"i": "nabiz", "c": "cdon", "why": "Nefes alan çember Nefes hedefle aynı hareket: yerine Dönen çember."}, "7": {"i": "titrek", "c": "gelgit", "why": "Nefes alan çember yerine Gelgit."}}, "kayan": {"8": {"i": "isin", "c": "nefesc", "why": "Dönen çember kayan hedefle ayırt edilmez: yerine Nefes alan çember."}, "9": {"i": "flas", "c": "", "why": "Dönen çember çıkar, Flaş kalır."}}, "hayalet": {"4": {"i": "titrek", "c": "", "why": "Flaş + görünmez hedef: okunacak bir şey kalmaz. Yerine Titrek."}, "5": {"i": "ters", "c": "gelgit", "why": "Işınlanma + görünmez hedef çatışır: yerine Ters ibre."}, "8": {"i": "ters", "c": "nefesc", "why": "Işınlanma ve dönen çember (görünmez hedefin yeri kayar) yerine Ters + Nefes alan çember."}, "9": {"i": "titrek", "c": "gelgit", "why": "Flaş ve dönen çember yerine Titrek + Gelgit."}, "10": {"i": "", "c": "iki", "why": "İki halka dönmeden (görünmez hedefin yeri kaymasın)."}}, "degirmen": {"4": {"i": "ters", "c": "", "why": "Flaş + dönen kanat adil değil: yerine Ters ibre."}, "7": {"i": "ters", "c": "nefesc", "why": "Titrek uç kanat mı hedef mi belirsiz: yerine Ters ibre."}, "9": {"i": "", "c": "cdon", "why": "Flaş çıkar, Dönen çember kalır."}, "10": {"i": "ters", "c": "gelgit", "why": "Kanadın hangi halkada olduğu belirsiz: İki halka yerine Ters + Gelgit."}}}, PL_VER = 3;   /* 2026-11-24 kullanıcının 11 bölümlük planı + Claude istisnaları; oyunda aynısı PK_ROWS/PK_EX (src/game.html) */
+const plDef = () => ({ v: PL_VER, rows: cp(PL_ROWS), h: 0, b: 0, ex: cp(PL_EX) });
+const plNorm = s => { if (!s.plan || !Array.isArray(s.plan.rows) || !s.plan.rows.length || s.plan.v !== PL_VER) { const o = s.plan || {}; s.plan = plDef(); s.plan.h = o.h | 0; } const P = s.plan; P.ex = P.ex || {};
+  P.rows.forEach(r => { r.sp = [clamp(+r.sp[0] || 120, 60, 500), clamp(+r.sp[1] || 140, 60, 500)].sort((a, b) => a - b); r.wd = [clamp(+r.wd[0] || 30, 6, 50), clamp(+r.wd[1] || 34, 6, 50)].sort((a, b) => a - b); });
+  P.h = clamp(P.h | 0, 0, PL_H.length - 1); P.b = clamp(P.b | 0, 0, P.rows.length - 1); };
+const plRow = (h, b, tr) => { const r = Object.assign({}, S.plan.rows[b], (S.plan.ex[PL_H[h].k] || {})[b] || {}); const T = S.plan.try; if (tr && T) Object.assign(r, { i: T.i, c: T.c }); return r; };   /* istisna: parkura özel bölüm; try: sıralamadan deneme */
+const plIsEx = (h, b) => !!((S.plan.ex[PL_H[h].k] || {})[b]);
+const plOf = (L, k) => L.find(x => x.k === k) || L[0];
+/* gerçek oyun dalgası: iki hedef + çember parçası + ibre etiketi; hız ve genişlik aralıktan her dalgada rastgele */
+const planDesign = () => {
+  plNorm(S); const P = S.plan, r = plRow(P.h, P.b, true), H = PL_H[P.h], I = plOf(PL_I, r.i), C = plOf(PL_C, r.c);
+  const items = [...H.it(110, r.wd), ...H.it(235, r.wd)];
+  if (H.k === 'degirmen') items.push({ t: 'degirmen', a: 170, n: 2, w: 12, v: 60, d: 1 });
+  if (C.on && C.it) items.push(...C.it());
+  if (I.on && I.it) items.push(...I.it());
+  return { p0: 0, dir: 1, om: r.sp.slice(), play: true, timed: 1, waves: 12, items: items.map((x, i) => Object.assign({ id: i + 1 }, x)), chains: [], tags: [I, C].filter(x => x.on && x.tag).map(x => x.tag) };   /* süreli: 8 sn sıvı, ilerleme çentik uzaması; 12 dalga sonra baştan */
+};
+const plMiss = () => { const r = plRow(S.plan.h, S.plan.b, true), m = [plOf(PL_I, r.i), plOf(PL_C, r.c)].filter(x => !x.on).map(x => x.ad); return m; };
+const plPic = (kind, k) => {   /* oyun dilinde küçük çizim (Fikirler'deki ringS) */
+  const g = '#ff8e5c', base = ringS({ noPeach: 1, noPtr: 1 }), ptr = (p, extra = '') => `<line x1="60" y1="40" x2="${(60 + 22 * Math.sin(p * Math.PI / 180)).toFixed(1)}" y2="${(40 - 22 * Math.cos(p * Math.PI / 180)).toFixed(1)}" stroke="#f3f0ff" stroke-width="3" stroke-linecap="round" ${extra}/><circle cx="60" cy="40" r="3.5" fill="#f3f0ff"/>`;
+  const pe = (a0, a1, c = g, w = 7, o = 1) => `<path d="${arcP(26, a0, a1)}" stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" opacity="${o}"/>`;
+  if (kind === 'h') return base + ({ sabit: pe(40, 70), nefes: pe(35, 75, g, 9) + pe(48, 58, '#fff', 3, .5), kayan: pe(40, 70) + T(55, 18, 9, '‹ ›', '#b6acdf'), hayalet: pe(40, 70, g, 7, .35), degirmen: pe(40, 70) + `<line x1="38" y1="58" x2="82" y2="22" stroke="#f0657a" stroke-width="3"/>` + pe(124, 136, '#f0657a') + pe(304, 316, '#f0657a') }[k] || '') + ptr(300);
+  if (kind === 'i') return base + pe(40, 70) + ({ '': ptr(300), isin: ptr(300) + `<circle cx="38" cy="22" r="5" fill="none" stroke="#8e7bf2" stroke-width="2"/><circle cx="85" cy="52" r="5" fill="none" stroke="#8e7bf2" stroke-width="2"/>`, ters: ptr(300) + T(60, 64, 12, '⇄', '#f0657a'), titrek: ptr(296, 'opacity=".35"') + ptr(304), flas: ptr(300, 'opacity=".9"') + `<path d="M92 10 l-6 9 h5 l-5 9" stroke="#f2b73c" stroke-width="2" fill="none"/>`, nabiz: ptr(300) + `<path d="M46 62 h8 l3 -6 l4 10 l3 -4 h10" stroke="#f0657a" stroke-width="1.8" fill="none"/>` }[k] || ptr(300));
+  return ({ '': base, gelgit: base + `<path d="${arcP(26, 230, 370)}" stroke="#8e7bf2" stroke-width="11" fill="none" opacity=".35"/>`, hortum: base + `<path d="M60 40 m-10 0 a10 10 0 1 1 10 10 a6 6 0 1 1 -6 -6" stroke="#b49cff" stroke-width="2" fill="none"/>`, nefesc: `<circle cx="60" cy="40" r="30" fill="none" stroke="#3a3268" stroke-width="3" stroke-dasharray="3 4"/>` + base, besik: base + `<path d="M28 66 q32 14 64 0" stroke="#b6acdf" stroke-width="2" fill="none"/>` + T(60, 76, 9, '↶ ↷', '#b6acdf'), iki: base + `<circle cx="60" cy="40" r="16" fill="none" stroke="#2e2757" stroke-width="6"/>` }[k] || base) + pe(40, 70) + ptr(300);
+};
+/* görünüm (2026-11-24, kullanıcı: "arayüz anlaşılmıyor, kombo yapılan şeyleri görsellerle destekle, önemli şeyler küçük kalmış"):
+   üstte büyük birleşim (hedef + ibre + çember = bölüm), parkur sekmeleri, bölüm kartları şeridi, seçili bölümün düzenleyicisi (büyük simge düğmeleri). */
+const plIco = (kind, k) => `<canvas class="pl-cv" data-v="${kind}:${k}" width="240" height="160" aria-hidden="true"></canvas>`;
+/* canlı küçük çizimler (oyun dili: mor halka, şeftali hedef, beyaz ibre); açılar derece, 0 = tepe, saat yönü */
+const plDraw = (cv, t) => {
+  const c = cv.getContext('2d'), [kind, k] = cv.dataset.v.split(':'), R = 26, X = 60, Y = 40, rd = d => (d - 90) * Math.PI / 180, TW = Math.PI * 2;
+  c.setTransform(2, 0, 0, 2, 0, 0); c.clearRect(0, 0, 120, 80);
+  let sc = 1, rot = 0; if (kind === 'c' && k === 'nefesc') sc = 1 + 0.12 * Math.sin(t * 2.6); if (kind === 'c' && k === 'cdon') rot = Math.sin(t * 0.8) * 70; if (kind === 'c' && k === 'besik') rot = Math.sin(t * 1.3) * 34;
+  c.save(); c.translate(X, Y); c.scale(sc, sc); c.rotate(rot * Math.PI / 180); c.translate(-X, -Y);
+  const arc = (a0, a1, col, w = 7, r = R, al = 1) => { c.globalAlpha = al; c.beginPath(); c.arc(X, Y, r, rd(a0), rd(a1)); c.strokeStyle = col; c.lineWidth = w; c.lineCap = 'butt'; c.stroke(); c.globalAlpha = 1; };
+  const ptr = (a, col = '#f3f0ff', L = R - 3, al = 1) => { c.globalAlpha = al; c.beginPath(); c.moveTo(X, Y); c.lineTo(X + L * Math.cos(rd(a)), Y + L * Math.sin(rd(a))); c.strokeStyle = col; c.lineWidth = 3; c.lineCap = 'round'; c.stroke(); c.beginPath(); c.arc(X, Y, 3.5, 0, TW); c.fillStyle = col; c.fill(); c.globalAlpha = 1; };
+  arc(0, 360, '#3a3268');
+  if (kind === 'c' && k === 'iki') arc(0, 360, '#2e2757', 6, 15);
+  if (kind === 'c' && k === 'gelgit') arc(230, 370, '#8e7bf2', 11, R, 0.4);
+  const P = '#ff8e5c'; let a = (t * 130) % 360;
+  if (kind === 'h') {
+    if (k === 'nefes') { const w = 10 + 9 * (0.5 + 0.5 * Math.sin(t * 3)); arc(110 - w, 110 + w, P); }
+    else if (k === 'kayan') { const m = 110 + 26 * Math.sin(t * 2); arc(m - 14, m + 14, P); }
+    else if (k === 'hayalet') arc(96, 124, P, 7, R, 0.15 + 0.85 * (0.5 + 0.5 * Math.sin(t * 2.4)));
+    else arc(96, 124, P);
+    if (k === 'degirmen') { const m = (t * -70) % 360; for (const o of [0, 180]) { const q = m + o; c.globalAlpha = 0.35; c.beginPath(); c.moveTo(X, Y); c.lineTo(X + (R + 4) * Math.cos(rd(q)), Y + (R + 4) * Math.sin(rd(q))); c.strokeStyle = '#f0657a'; c.lineWidth = 2.5; c.stroke(); c.globalAlpha = 1; arc(q - 7, q + 7, '#f0657a'); } }
+    ptr(a); c.restore(); return;
+  }
+  arc(96, 124, P);
+  if (kind === 'i') {
+    if (k === 'isin') { const L = 360 / 130, u = t % L, A = 150, B = 205; arc(A - 6, A + 6, '#8e7bf2'); arc(B - 6, B + 6, '#f2b73c'); a = u * 130; if (a > A && a < A + 40) { c.restore(); c.beginPath(); c.arc(X, Y, 3.5, 0, TW); c.fillStyle = '#f3f0ff'; c.fill(); return; } if (a >= A + 40) a = B + (a - A - 40); }
+    else if (k === 'ters') { const L = 2.4, n = Math.floor(t / L), u = t % L; a = (n % 2 ? (L - u) : u) * 130; if (u > L - 0.6) { c.fillStyle = '#f0657a'; c.font = '800 12px system-ui'; c.textAlign = 'center'; c.fillText('⇄', X, Y - 8); } }
+    else if (k === 'titrek') a += Math.sin(t * 37) * 3 + Math.sin(t * 23) * 2;
+    else if (k === 'nabiz') { a = (t * 110 + 22 * Math.sin(t * 5.2)) % 360; c.beginPath(); c.arc(X, Y, 4 + 2 * Math.max(0, Math.sin(t * 5.2)), 0, TW); c.fillStyle = '#f0657a'; c.fill(); }
+    else if (k === 'flas') { if ((t % 0.3) >= 0.07) { c.restore(); c.beginPath(); c.arc(X, Y, 3.5, 0, TW); c.fillStyle = '#f3f0ff'; c.fill(); return; } }
+  } else {
+    if (k === 'gelgit') a = (t * 130 + 40 * Math.sin(t * 2.3)) % 360;
+    else if (k === 'hortum') { const q = 20; c.save(); c.translate(X + R * Math.cos(rd(q)), Y + R * Math.sin(rd(q))); c.rotate(-t * 4); c.beginPath(); for (let i = 0; i < 24; i++) { const r = 1 + i * 0.32, g = i * 0.55; c.lineTo(r * Math.cos(g), r * Math.sin(g)); } c.strokeStyle = '#b49cff'; c.lineWidth = 1.6; c.stroke(); c.restore(); a = (t * 130 + 30 * Math.sin(t * 2.3)) % 360; }
+    else if (k === 'iki') { arc(250, 280, '#a99bf0', 6, 15); ptr(-t * 90, '#cfc6ff', 14); }
+  }
+  ptr(a); c.restore();
+};
+let plAnimT = 0;
+const plAnim = now => { requestAnimationFrame(plAnim); if (!S || S.ui.pg !== 'plan' || now - plAnimT < 30) return; plAnimT = now; const t = now / 1000; document.querySelectorAll('.pl-cv').forEach(cv => plDraw(cv, t)); };
+requestAnimationFrame(plAnim);
+const plTau = r => Math.round(((r.wd[0] + r.wd[1]) / 2) / ((r.sp[0] + r.sp[1]) / 2) * 1000);   /* ibrenin şeftalide kaldığı ortalama ms */
+const plDiff = r => clamp((420 - plTau(r)) / 300, 0, 1);   /* 420 ms rahat, 120 ms çok zor */
+const plPick = (kind, L, cur) => `<div class="pl-pk">${L.map(x => `<button class="pl-pb ${x.k === cur ? 'on' : ''} ${x.on ? '' : 'no'}" data-a="plsel" data-t="${kind}" data-k="${x.k}">${plIco(kind, x.k)}<b>${x.ad}</b>${x.on ? '' : '<em>önizlemede yok</em>'}</button>`).join('')}</div>`;
+const plNum = (k, b, v, u) => `<label class="pl-n"><input type="text" inputmode="decimal" data-pl="${k}" data-b="${b}" value="${v}"><span>${u}</span></label>`;
+const renderPlan = () => {
+  plNorm(S); const P = S.plan, H = PL_H[P.h], r = plRow(P.h, P.b), I = plOf(PL_I, r.i), C = plOf(PL_C, r.c);
+  const grp = (kind, L, cur, title) => `<div class="pl-gp k-${kind}"><h4><i></i>${title}</h4><div class="pl-gg">${L.map(x => `<button class="pl-k ${x.k === cur ? 'on' : ''} ${x.on ? '' : 'no'}" data-a="plsel" data-t="${kind}" data-k="${x.k}" title="${x.ad}: ${x.on ? x.d : 'önizlemede henüz yok'}">${plIco(kind, x.k)}<b>${x.ad}</b></button>`).join('')}</div></div>`;
+  let h = `<div class="pl-3">${grp('h', PL_H, H.k, 'Hedef · parkur')}${grp('i', PL_I, r.i, 'İbre')}${grp('c', PL_C, r.c, 'Çember')}</div>
+    <div class="pl-sw"><span class="pl-l">İbre hızı</span><div class="pl-rg">${plNum('sp0', P.b, r.sp[0], 'en az')}<i>–</i>${plNum('sp1', P.b, r.sp[1], 'en çok')}<em>°/sn</em></div>
+      <span class="pl-l">Şeftali</span><div class="pl-rg">${plNum('wd0', P.b, r.wd[0], 'en dar')}<i>–</i>${plNum('wd1', P.b, r.wd[1], 'en geniş')}<em>°</em></div>
+      <span class="pl-tip">İbre şeftalide <b>${plTau(r)} ms</b></span></div>`;
+  return h;
+};
+const renderPlanR = () => {
+  if (!PL_RANK.length) return '<p class="note">Sıralama hazırlanıyor.</p>';
+  const T = S.plan.try, nm = (L, k) => plOf(L, k).ad;
+  return `<div class="pl-rk">${PL_RANK.map((q, n) => `<button class="pl-ri ${T && T.n === n ? 'on' : ''}" data-a="plrank" data-n="${n}"><span class="rn">${n + 1}</span><span class="rc">${plIco('i', q.i)}${plIco('c', q.c)}</span><span class="rt"><b><span class="c-h">${nm(PL_H, q.h)}</span> + <span class="c-i">${nm(PL_I, q.i)}</span> + <span class="c-c">${nm(PL_C, q.c)}</span></b><small>${q.why}</small></span><span class="rs">${q.score}</span></button>`).join('')}</div>${PL_AVOID.length ? `<h4 class="pl-av">Kaçınılacaklar</h4><ul class="pl-avl">${PL_AVOID.map(x => `<li><b>${x.what}</b> · ${x.why}</li>`).join('')}</ul>` : ''}`;
+};
+const planTitle = () => { if (!S) return 'Parkur planı'; plNorm(S); const P = S.plan, r = plRow(P.h, P.b); if (P.try) { const q = PL_RANK[P.try.n]; return `Parkur planı · <span class="pl-try">deneme ${P.try.n + 1}. sıra</span> <span class="c-h">${PL_H[P.h].ad}</span> + <span class="c-i">${plOf(PL_I, q.i).ad}</span> + <span class="c-c">${plOf(PL_C, q.c).ad}</span>`; }
+  return `Parkur planı · ${P.b + 1}. bölüm: <span class="c-h">${PL_H[P.h].ad}</span> + <span class="c-i">${plOf(PL_I, r.i).ad}</span> + <span class="c-c">${plOf(PL_C, r.c).ad}</span>`; };
+const renderPlanB = () => {
+  plNorm(S); const P = S.plan, H = PL_H[P.h]; let h = '';
+  h += `<div class="pl-grid">${P.rows.map((x, b) => { const q = plRow(P.h, b), qi = plOf(PL_I, q.i), qc = plOf(PL_C, q.c), d = plDiff(q);
+    const dc = d < .4 ? '#7bc8a4' : d < .7 ? '#f2b73c' : '#f0657a';
+    return `<button class="pl-sq ${b === P.b ? 'on' : ''}" data-a="plrow" data-b="${b}">
+      <span class="tp"><span class="n">${b + 1}<small>. bölüm${plIsEx(P.h, b) ? ` <em class="pl-ex" title="${((S.plan.ex[H.k] || {})[b] || {}).why || ''}">özel</em>` : ''}</small></span><span class="df"><em style="width:${Math.round(8 + d * 92)}%;background:${dc}"></em></span><small class="ms" style="color:${dc}">${plTau(q)} ms</small></span>
+      <span class="cb"><span class="pc k-i">${qi.k ? plIco('i', qi.k) : '<span class="pz">düz</span>'}<b>${qi.k ? qi.ad : ''}</b></span><i>+</i><span class="pc k-c">${qc.k ? plIco('c', qc.k) : '<span class="pz">düz</span>'}<b>${qc.k ? qc.ad : ''}</b></span></span>
+      <span class="wy">${(plIsEx(P.h, b) ? ((S.plan.ex[H.k] || {})[b] || {}).why : x.why) || ''}</span>
+      <span class="sw"><span><b>${q.sp[0]}–${q.sp[1]}</b> °/sn</span><span><b>${q.wd[0]}–${q.wd[1]}</b>° şeftali</span></span></button>`; }).join('')}</div>
+    <div class="acts"><button class="btn sm ghost" data-a="pladd">+ Bölüm ekle</button><button class="btn sm ghost" data-a="pldel">Son bölümü sil</button><button class="btn sm ghost" data-a="plreset">Önerilen şablona dön</button></div>`;
+  return h;
+};
+const plGo = () => { save(); render(); start(); };
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-a^="pl"]'); if (!t || !S || S.ui.pg !== 'plan' || e.target.closest('input')) return; const P = S.plan, a = t.dataset.a;
+  if (a === 'plrank') { const q = PL_RANK[+t.dataset.n]; P.h = PL_H.findIndex(x => x.k === q.h); P.try = { i: q.i, c: q.c, n: +t.dataset.n }; plGo(); return; }
+  if (a !== 'plsel' || t.dataset.t !== 'h') delete P.try;
+  if (a === 'plsel') { const k = t.dataset.k, kd = t.dataset.t; if (kd === 'h') P.h = PL_H.findIndex(x => x.k === k); else P.rows[P.b][kd] = k; }
+  else if (a === 'plrow') P.b = +t.dataset.b;
+  else if (a === 'pladd') { const L = P.rows[P.rows.length - 1]; P.rows.push({ i: '', c: '', sp: L.sp.map(v => v + 14), wd: L.wd.map(v => Math.max(6, v - 1.5)) }); P.b = P.rows.length - 1; }
+  else if (a === 'pldel') { if (P.rows.length > 1) P.rows.pop(); }
+  else if (a === 'plreset') { if (!sure('plreset', 'Şablon önerilene dönecek')) return; S.plan = plDef(); }
+  else return;
+  plGo();
+});
+document.addEventListener('change', e => {
+  const t = e.target.closest('[data-pl]'); if (!t || !S) return; const P = S.plan, b = +t.dataset.b, k = t.dataset.pl, row = P.rows[b];
+  const v = parseFloat(String(t.value).replace(',', '.')); if (Number.isFinite(v)) row[k.slice(0, 2)][+k[2]] = v;
+  P.b = b; plNorm(S); plGo();
+});
 /* ================= FİKİR PANOSU: oyun dilinde küçük çizimler (g anahtarı) ================= */
 const arcP = (r, a0, a1, cx = 60, cy = 40) => { const p = a => [cx + r * Math.sin(a * Math.PI / 180), cy - r * Math.cos(a * Math.PI / 180)].map(v => v.toFixed(1)).join(' '); return `M${p(a0)} A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${p(a1)}`; };
 const ringS = (o = {}) => `<circle cx="60" cy="40" r="26" fill="none" stroke="#3a3268" stroke-width="7"/>${o.noPeach ? '' : `<path d="${arcP(26, o.a0 ?? 30, o.a1 ?? 62)}" stroke="#ff8e5c" stroke-width="7" fill="none" stroke-linecap="round"/>`}${o.noPtr ? '' : `<line x1="60" y1="40" x2="${(60 + 22 * Math.sin((o.p ?? 300) * Math.PI / 180)).toFixed(1)}" y2="${(40 - 22 * Math.cos((o.p ?? 300) * Math.PI / 180)).toFixed(1)}" stroke="#f3f0ff" stroke-width="3" stroke-linecap="round"/><circle cx="60" cy="40" r="3.5" fill="#f3f0ff"/>`}`;
@@ -1490,6 +1693,8 @@ const PIC = {
   takvim: () => `<rect x="32" y="12" width="56" height="54" rx="7" fill="#2e2757" stroke="#8e7bf2" stroke-width="2"/><rect x="32" y="12" width="56" height="12" rx="6" fill="#8e7bf2"/>` + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => `<rect x="${37 + (i % 4) * 12.5}" y="${29 + (i / 4 | 0) * 11.5}" width="8" height="8" rx="2" fill="${i === 6 ? '#ff8e5c' : '#3a3268'}"/>`).join(''),
   egri: () => `<path d="M14 64 H106 M14 64 V12" stroke="#3a3268" stroke-width="1.5"/><path d="M16 58 C40 54 50 44 64 36 S92 22 104 16" stroke="#ff8e5c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M16 60 L40 52 L64 40 L88 26 L104 20" stroke="#8e7bf2" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/>` + T(70, 75, 8.5, 'oyuncuya göre ince ayar', '#b6acdf', 600),
   veri: () => [24, 40, 30, 52, 46].map((v, i) => `<rect x="${20 + i * 17}" y="${66 - v}" width="11" height="${v}" rx="2.5" fill="${i === 3 ? '#ff8e5c' : '#8e7bf2'}"/>`).join('') + `<circle cx="98" cy="18" r="7" fill="none" stroke="#7bc8a4" stroke-width="2"/><path d="M95 18 l2 2 l4 -4" stroke="#7bc8a4" stroke-width="2" fill="none"/>`,
+  hafiza: () => [0, 1, 2, 3, 4, 5, 6, 7].map(i => { const a = i * 45 * Math.PI / 180, x = 60 + 27 * Math.sin(a), y = 40 - 27 * Math.cos(a); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.5" fill="${i === 2 ? '#7bc8a4' : '#8e7bf2'}"/>` + T(x, y + 3, 8, i === 2 ? '🔑' : '?', '#2a2050'); }).join('') + `<line x1="60" y1="40" x2="79" y2="21" stroke="#f3f0ff" stroke-width="3" stroke-linecap="round"/><circle cx="60" cy="40" r="3.5" fill="#f3f0ff"/>`,
+  matematik: () => ['3', '7', '2', '5', '4', '1', '6', '8'].map((v, i) => { const a = i * 45 * Math.PI / 180, x = 60 + 27 * Math.sin(a), y = 40 - 27 * Math.cos(a); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6.5" fill="${i === 0 || i === 1 ? '#7bc8a4' : '#ff8e5c'}"/>` + T(x, y + 3, 8, v, '#2a1a10'); }).join('') + T(60, 44, 10, '=10', '#f3f0ff'),
   acik: () => ringS({ noPtr: 1, noPeach: 1 }) + lock(60, 41, 1) + T(60, 76, 8.5, 'yayında kapat', '#b6acdf', 600)
 };
 const ideaSvg = g => `<svg viewBox="0 0 120 80" aria-hidden="true">${(PIC[g] || (() => ringS()))()}</svg>`;
@@ -1677,7 +1882,7 @@ const renderIdeas = () => {
 const openIdea = id => {
   const x = IDEAS.find(y => y.id === id); if (!x) return;
   const c = ST_COL[x.durum] || '#8076b0', pgName = Object.fromEntries(PAGES);
-  $('mbox').innerHTML = `<div class="pic">${ideaSvg(x.g)}</div><div class="in"><h3>${x.t}</h3><span class="tag" style="background:${c}33;color:${c}">${x.durum || ''}</span> <span class="note">${x.kim || ''}${x.yer ? ' · ' + x.yer : ''}</span><p><b>${x.oz || ''}</b></p><p>${x.d}</p><div class="acts">${x.pg && pgName[x.pg] ? `<button class="btn sm pri" data-pg="${x.pg}">${pgName[x.pg]} sayfasına git ›</button>` : ''}<button class="btn sm ghost" data-a="ihide" data-k="${x.id}">${S.ui.ih[x.id] ? 'Göster' : 'Gizle'}</button><button class="btn sm ghost" data-a="idel" data-k="${x.id}">Sil</button><span style="flex:1"></span><button class="btn sm" data-a="mclose">Kapat</button></div></div>`;
+  $('mbox').innerHTML = `<div class="pic">${ideaSvg(x.g)}</div><div class="in"><h3>${x.t}</h3><span class="tag" style="background:${c}33;color:${c}">${x.durum || ''}</span> <span class="note">${x.kim || ''}${x.yer ? ' · ' + x.yer : ''}</span><p><b>${x.oz || ''}</b></p><p>${x.d}</p><div class="acts">${x.url ? `<a class="btn sm pri" href="${x.url}" target="_blank">Oyna ›</a>` : ''}${x.pg && pgName[x.pg] ? `<button class="btn sm pri" data-pg="${x.pg}">${pgName[x.pg]} sayfasına git ›</button>` : ''}<button class="btn sm ghost" data-a="ihide" data-k="${x.id}">${S.ui.ih[x.id] ? 'Göster' : 'Gizle'}</button><button class="btn sm ghost" data-a="idel" data-k="${x.id}">Sil</button><span style="flex:1"></span><button class="btn sm" data-a="mclose">Kapat</button></div></div>`;
   $('mod').classList.add('on');
 };
 $('mod').addEventListener('click', e => { if (e.target.id === 'mod') $('mod').classList.remove('on'); });
@@ -1699,6 +1904,7 @@ fr.onload = async () => {
   if (saved && saved.B) Object.assign(S.B, saved.B);
   if (saved && saved.OV) S.OV = saved.OV;
   if (saved && saved.tool) S.tool = saved.tool;
+  if (saved && saved.plan) S.plan = saved.plan;
   if (saved && saved.H) S.H = saved.H;
   if (saved && saved.PS) S.PS = REC.PS.map(p => Object.assign(cp(p), saved.PS.find(q => q.id === p.id) || {}, { nm: p.nm }));
   S.ui = Object.assign({ hidden: {}, deleted: {}, closed: {}, showHidden: false, ih: {}, id: {}, chg: {}, ovPh: 0, pg: 'fizik', aim: 'orta', aimMs: 80, imm: true, prec: 12, iflt: '' }, saved && saved.ui || {});

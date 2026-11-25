@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>İbre ve çember · deneme</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* Ayar Laboratuvarı: beğenilen ibre (Titrek, Flaş, Kalp atışı) ve çember (Beşik, Ters dönen) davranışlarının oynanabilir denemesi (2026-11-23).
+   İbre şeftalinin içindeyken dokun; ıska 1 can. Oyuna bağlı değil, tek başına çalışır. */
+:root{--bg:#1b1630;--card:#251e3f;--fg:#f2edfc;--mut:#a89fc6;--deep:#201a37;--pea:#ffb38a;--red:#ff6b7f;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 Nunito,system-ui,sans-serif;padding:14px 16px 30px}
+.w{max-width:520px;margin:0 auto;display:grid;gap:10px}
+h1{font:600 22px Fredoka,system-ui;margin:0}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.row>span{font-size:13px;color:var(--mut);min-width:52px}
+.row button,.btn{font:600 14px Fredoka,system-ui;border:0;border-radius:99px;padding:7px 13px;background:var(--card);color:var(--fg);cursor:pointer}
+.row button.on{background:var(--pea);color:#2a1a10}
+.top{display:flex;justify-content:space-between;font:600 16px Fredoka,system-ui}
+.lives span{color:var(--red);font-size:20px}.lives span.off{opacity:.2}
+#stage{position:relative;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+canvas{width:100%;aspect-ratio:1;display:block;border-radius:24px;background:var(--deep);cursor:pointer}
+.over{position:absolute;inset:0;display:none;place-items:center;background:#1b1630cc;border-radius:24px;text-align:center;font:600 22px Fredoka,system-ui}
+.over.on{display:grid}.over small{display:block;font:400 14px Nunito;color:var(--mut);margin:6px 0 12px}
+.btn.pri{background:var(--pea);color:#2a1a10}
+.ctl{background:var(--card);border-radius:16px;padding:10px 12px;display:grid;gap:8px;font-size:14px;color:var(--mut)}
+.ctl label{display:flex;gap:10px;align-items:center}.ctl input[type=range]{flex:1}.ctl b{color:var(--fg);min-width:70px;text-align:right}
+</style></head><body>
+<div class="w">
+  <h1>İbre ve çember</h1>
+  <div class="row" id="ib"><span>İbre</span></div>
+  <div class="row" id="ce"><span>Çember</span></div>
+  <div class="row" id="ek"><span>Ek</span><button data-x="mill">Değirmen</button><button data-x="iki">İki halka</button></div>
+  <div class="top"><span id="sc">Puan 0</span><span class="lives" id="lv"></span></div>
+  <div id="stage"><canvas id="cv" width="640" height="640" aria-label="Oyun halkası: ibre şeftalideyken dokun"></canvas>
+    <div class="over" id="ov"><div>Can bitti<small id="ovS"></small><button class="btn pri" id="again">Yeniden başla</button></div></div></div>
+  <div class="ctl">
+    <label>İbre hızı <input type="range" id="sp" min="80" max="320" step="5" value="160"><b id="spv"></b></label>
+    <label>Şeftali genişliği <input type="range" id="wd" min="10" max="50" step="1" value="30"><b id="wdv"></b></label>
+    <label>Davranış gücü <input type="range" id="pw" min="0.3" max="2" step="0.1" value="1"><b id="pwv"></b></label>
+    <label><input type="checkbox" id="auto" checked> Otomatik oynat (bot, gerçek ibreye bakar)</label>
+  </div>
+</div>
+<script>
+const TAU = Math.PI * 2, C = 320, R = 210;
+const cv = document.getElementById('cv'), c = cv.getContext('2d'), $ = id => document.getElementById(id);
+const IB = { normal: 'Normal', titrek: 'Titrek', flas: 'Flaş', kalp: 'Kalp atışı' };
+const CE = { sabit: 'Sabit', besik: 'Beşik', ters: 'Ters dönen' };
+let ib = 'titrek', ce = 'sabit', G;
+/* Ek (2026-11-24, kullanıcı: "değirmen + titrek + iki halka kombo"): Değirmen = dönen iki kanat, uçları iki halkada da öncelikli tuzak (ibre kanattayken dokunmak tuzak);
+   İki halka = içte lila halka ve kendi ibresi (dışın 0,7 katı hızla); dokunuş hangi ibre hedefteyse onu vurur. */
+const EK = { mill: true, iki: true }, R2 = 140, BW = 0.13;
+document.querySelectorAll('#ek button').forEach(b => { b.onclick = () => { EK[b.dataset.x] = !EK[b.dataset.x]; reset(); }; });
+const mkRow = (host, map, get, set) => { for (const [k, v] of Object.entries(map)) { const b = document.createElement('button'); b.textContent = v; b.dataset.k = k; b.onclick = () => { set(k); reset(); }; $(host).appendChild(b); } };
+mkRow('ib', IB, () => ib, k => ib = k); mkRow('ce', CE, () => ce, k => ce = k);
+const nm = a => ((a % TAU) + TAU) % TAU;
+const dA = (a, b) => Math.abs(((a - b + Math.PI) % TAU + TAU) % TAU - Math.PI);
+const bump = (k, x, w = .05) => Math.exp(-Math.pow((k - x) / w, 2));
+const pw = () => +$('pw').value;
+/* uyum (temiz karar anı): ibre hedefe vardığında kanat hedefin yakınında olmasın; iki halkanın hedefleri aynı anda gelmesin */
+const OM = () => +$('sp').value * Math.PI / 180;
+const arrive = (p, q, k) => nm(q + G.rot - p) / (OM() * k);   /* ibre p'den hedef q'ya kaç sn'de varır */
+const clean = (p, q, k) => { if (!EK.mill) return true; const t = arrive(p, q, k), m = G.mill - .9 * t; return [m, m + Math.PI].every(b => dA(nm(b), nm(q + G.rot)) > halfW() + BW + .35); };
+const away = (p, k, other) => { for (let i = 0; i < 200; i++) { const q = Math.random() * TAU; if (dA(q, nm(p - G.rot)) < 1.6) continue; if (!clean(p, q, k)) continue;
+  if (other != null && Math.abs(arrive(p, q, k) - other) < .6) continue; return q; } return nm(p - G.rot + Math.PI); };
+function spawn() { G.tg = away(G.base, 1, EK.iki && G.tg2 != null ? arrive(G.b2, G.tg2, .7) : null); }
+function spawn2() { G.tg2 = away(G.b2, .7, G.tg != null ? arrive(G.base, G.tg, 1) : null); }
+function reset() { G = { t: 0, base: -Math.PI / 2, b2: Math.PI / 2, mill: 0.4, rot: 0, rv: 0, rd: 1, rk: 0, lives: 3, score: 0, over: false, fl: 0 }; spawn(); spawn2();
+  for (const h of ['ib', 'ce']) [...$(h).querySelectorAll('button')].forEach(b => b.classList.toggle('on', b.dataset.k === (h === 'ib' ? ib : ce)));
+  document.querySelectorAll('#ek button').forEach(b => b.classList.toggle('on', !!EK[b.dataset.x])); $('ov').classList.remove('on'); ui(); }
+function ui() { $('sc').textContent = 'Puan ' + G.score; $('lv').innerHTML = [0, 1, 2].map(i => `<span class="${i < G.lives ? '' : 'off'}">♥</span>`).join(''); }
+/* gerçek ibre açısı (titreme dahil: gördüğün ibre vurur) */
+const jit = t => (Math.sin(t * 37) * .05 + Math.sin(t * 23) * .035) * pw();
+const ptrAng = () => G.base + (ib === 'titrek' ? jit(G.t) : 0);
+const ptrAng2 = () => G.b2 + (ib === 'titrek' ? jit(G.t + 3.1) : 0);
+const halfW = () => (+$('wd').value * Math.PI / 180) / 2;
+const inT = (p, q) => dA(nm(p), nm(q + G.rot)) < halfW();
+const blades = () => EK.mill ? [G.mill, G.mill + Math.PI] : [];
+const onBlade = p => blades().some(b => dA(nm(p), nm(b)) < BW);
+const inTarget = () => inT(ptrAng(), G.tg);
+const inTarget2 = () => EK.iki && inT(ptrAng2(), G.tg2);
+function hurt(n, trap) { G.miss = .35; G.trapFx = trap ? .5 : 0; G.lives -= n; navigator.vibrate?.(40); ui();
+  if (G.lives <= 0) { G.over = true; $('ovS').textContent = `${IB[ib]} + ${CE[ce]}${EK.mill ? ' + Değirmen' : ''}${EK.iki ? ' + İki halka' : ''}: ${G.score} puan`; $('ov').classList.add('on'); } }
+function tap() { if (G.over) return;
+  /* uyum: dokunuş hedefteki ibreye aittir; öbür ibrenin o an kanatta olması cezalandırmaz. Kanat yalnız hedefteki (ya da hiçbir hedefte olmayan) ibreyi yakar. */
+  const p1 = ptrAng(), p2 = ptrAng2();
+  if (inTarget()) { if (onBlade(p1)) return hurt(1, true); G.score++; G.hit = { q: G.tg, t: .35, r: R }; spawn(); ui(); return; }
+  if (inTarget2()) { if (onBlade(p2)) return hurt(1, true); G.score++; G.hit = { q: G.tg2, t: .35, r: R2 }; spawn2(); ui(); return; }
+  hurt(1, onBlade(p1) || (EK.iki && onBlade(p2))); }
+$('stage').addEventListener('pointerdown', e => { if (e.target.id === 'again') return; e.preventDefault(); tap(); });
+addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); tap(); } });
+$('again').onclick = reset;
+const lab = () => { $('spv').textContent = $('sp').value + ' °/sn'; $('wdv').textContent = $('wd').value + '°'; $('pwv').textContent = '×' + (+$('pw').value).toFixed(1); };
+for (const id of ['sp', 'wd', 'pw']) $(id).oninput = lab; lab();
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (G.over && $('auto').checked) { G.ot = (G.ot || 0) + dt; if (G.ot > 2) reset(); }   /* izleme kipinde kendiliğinden yeniden başlar */
+  if (!G.over) {
+    G.t += dt; const om = +$('sp').value * Math.PI / 180;
+    let v = om; if (ib === 'kalp') { const k = G.t % 1.5; v = om * (.7 + 2.6 * pw() * (bump(k, .1) + .85 * bump(k, .32))); }
+    G.base += v * dt; G.b2 += v * .7 * dt; G.mill -= .9 * dt; if (G.trapFx) G.trapFx = Math.max(0, G.trapFx - dt);
+    if (ce === 'besik') G.rot = Math.sin(G.t * 1.2) * .7 * pw();
+    if (ce === 'ters') { G.rk += dt; if (G.rk > 3.2) { G.rk = 0; G.rd *= -1; } G.rot += G.rd * .6 * pw() * dt; }
+    if (G.hit && (G.hit.t -= dt) <= 0) G.hit = null; if (G.miss) G.miss = Math.max(0, G.miss - dt);
+    if ($('auto').checked) { const w = halfW(), p1 = ptrAng(), p2 = ptrAng2();
+      const d1 = dA(nm(p1), nm(G.tg + G.rot)), d2 = EK.iki ? dA(nm(p2), nm(G.tg2 + G.rot)) : 9;
+      if ((d1 < w * .35 && !onBlade(p1 + .06)) || (d1 >= w && d2 < w * .35 && !onBlade(p2 + .05))) tap(); }
+  }
+  draw(); requestAnimationFrame(frame);
+}
+function draw() {
+  c.fillStyle = G.miss ? '#3a1a2a' : '#201a37'; c.fillRect(0, 0, 640, 640);
+  c.beginPath(); c.arc(C, C, R, 0, TAU); c.strokeStyle = '#3a3163'; c.lineWidth = 46; c.stroke();
+  if (EK.iki) { c.beginPath(); c.arc(C, C, R2, 0, TAU); c.strokeStyle = '#2f2858'; c.lineWidth = 40; c.stroke(); }
+  const w = halfW(), q = G.tg + G.rot;
+  c.beginPath(); c.arc(C, C, R, q - w, q + w); c.strokeStyle = '#ffb38a'; c.lineWidth = 62; c.stroke();
+  if (EK.iki) { const q2 = G.tg2 + G.rot; c.beginPath(); c.arc(C, C, R2, q2 - w, q2 + w); c.strokeStyle = '#a99bf0'; c.lineWidth = 54; c.stroke(); }
+  if (G.hit) { const h = G.hit.q + G.rot; c.globalAlpha = G.hit.t / .35; c.beginPath(); c.arc(C, C, G.hit.r, h - w, h + w); c.strokeStyle = '#5fd6a4'; c.lineWidth = 62; c.stroke(); c.globalAlpha = 1; }
+  for (const b of blades()) {   /* değirmen kanadı: gövde soluk, halkalardaki uçları kırmızı tuzak */
+    c.beginPath(); c.moveTo(C, C); c.lineTo(C + Math.cos(b) * (R + 34), C + Math.sin(b) * (R + 34)); c.strokeStyle = '#ff6b7f33'; c.lineWidth = 10; c.lineCap = 'round'; c.stroke();
+    for (const rr of EK.iki ? [R, R2] : [R]) { c.beginPath(); c.arc(C, C, rr, b - BW, b + BW); c.strokeStyle = G.trapFx ? '#ff2d55' : '#ff6b7f'; c.lineWidth = rr === R ? 62 : 54; c.lineCap = 'butt'; c.stroke(); } }
+  if (ce === 'ters' && G.rk > 2.5) { c.fillStyle = '#ff6b7f'; c.font = '700 64px Fredoka, system-ui'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('⟲', C, C - 90); }
+  let show = true; if (ib === 'flas') { const P = .28 / Math.max(.5, pw()) + .05; show = (G.t % P) < .06; if (show) { c.fillStyle = '#ffffff0c'; c.fillRect(0, 0, 640, 640); } }
+  const a = ptrAng();
+  if (show) { c.beginPath(); c.moveTo(C, C); c.lineTo(C + Math.cos(a) * (R + 30), C + Math.sin(a) * (R + 30)); c.strokeStyle = '#f2edfc'; c.lineWidth = 14; c.lineCap = 'round'; c.stroke();
+    if (EK.iki) { const a2 = ptrAng2(); c.beginPath(); c.moveTo(C, C); c.lineTo(C + Math.cos(a2) * (R2 + 26), C + Math.sin(a2) * (R2 + 26)); c.strokeStyle = '#cfc6ff'; c.lineWidth = 12; c.stroke(); } }
+  let hr = 22; if (ib === 'kalp') { const k = G.t % 1.5; hr *= 1 + .3 * (bump(k, .1) + bump(k, .32)); }
+  c.beginPath(); c.arc(C, C, hr, 0, TAU); c.fillStyle = ib === 'kalp' ? '#ff6b7f' : '#f2edfc'; c.fill();
+}
+reset(); requestAnimationFrame(frame);
+</script></body></html>
