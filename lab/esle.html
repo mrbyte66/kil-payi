@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Heyecan eşleştirme</title>
+<!-- Heyecan eşleştirme (2026-11-20, kullanıcı: "heyecan dengesi var, altı da üstü de sıkıcı; korelasyonu tarif edemiyorum"):
+     iki kısa sahne (SN sn) oynanır, oyuncu hangisinin daha heyecanlı olduğunu seçer; seçimlerden Bradley-Terry ile sahne puanları çıkar.
+     Sahneler laboratuvarın Tool dalga biçimindedir (blLabWave). Sonuç localStorage['kp-esle'] (ham seçimler + puanlar). Yalnız DEBUG derlemesi. -->
+<style>
+:root{--bg:#1d1830;--card:#2a2340;--ink:#f3eefc;--ink2:#b9b0d4;--pea:#ffb38a;--lil:#a99bf0}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f5f1fb;--card:#fff;--ink:#241d3a;--ink2:#6b6288}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;display:flex;gap:20px;padding:16px;flex-wrap:wrap;justify-content:center}
+#gw{position:relative;width:390px;max-width:100%;height:720px;border-radius:24px;overflow:hidden;background:#000}
+iframe{width:100%;height:100%;border:0}
+#ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#1d1830e6;pointer-events:none;transition:opacity .25s}
+#ov.off{opacity:0}#ov b{font-size:120px;line-height:1}#ov span{font-size:22px;color:#f3eefc;margin-top:8px}
+#tag{position:absolute;left:12px;bottom:12px;width:48px;height:48px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#1d1830;pointer-events:none}
+.cA{color:var(--lil)}.cB{color:var(--pea)}.bA{background:var(--lil)!important}.bB{background:var(--pea)!important}
+#side{width:340px;max-width:100%;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border-radius:16px;padding:16px}
+h1{font-size:20px;margin:0}
+.big{font-size:44px;font-weight:600;color:var(--pea);line-height:1}
+.sm{color:var(--ink2);font-size:14px}
+button{font:inherit;padding:12px 14px;border-radius:12px;border:0;background:var(--lil);color:#1d1830;font-weight:600;cursor:pointer}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--ink2)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row button{flex:1}
+#bar{height:6px;background:#0003;border-radius:3px;overflow:hidden}#bar i{display:block;height:100%;background:var(--pea);width:0}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:3px 0}td:last-child{text-align:right}
+</style></head><body>
+<div id="gw"><iframe id="fr" src="index.html?lab"></iframe><div id="ov" class="off"><b></b><span></span></div><div id="tag"></div></div>
+<div id="side">
+  <div class="card"><h1>Hangisi daha heyecanlı?</h1>
+    <p class="sm">İki kısa sahne gelecek. İkisini de gerçekten oyna (oyunun içine tıkla ya da boşluk tuşu). Sonra hangisinde daha çok heyecanlandığını seç. Kolay ya da zor değil, heyecan.</p>
+    <div id="bar"><i></i></div><p class="sm" id="prog"></p></div>
+  <div class="card"><div class="sm" id="lab">Hazır olunca başla</div><div class="big" id="tm">–</div></div>
+  <div class="card" id="act"><button id="go">Başla</button></div>
+  <div class="card" id="res" hidden><h1>Puanlar</h1><table id="tb"></table><p class="sm">Kaydedildi. Claude bunları okuyacak.</p></div>
+</div>
+<script>
+const SN = 20, NP = 20;   /* sahne süresi (sn), eşleşme sayısı */
+const G2 = (n, extra = {}) => ({ items: Array.from({ length: n }, (_, i) => Object.assign({ id: 'g' + i, t: 'gate', a: i ? 0 : [0, 360], w: 34 }, extra)), chains: n > 1 ? [{ ids: Array.from({ length: n }, (_, i) => 'g' + i), g: [40, 90] }] : [] });
+const mk = (om, base, more = []) => { const d = base; d.om = om; d.items = d.items.concat(more); return d; };
+/* sahneler: temel = 2 hedef, 180 °/sn; her biri tek bir şeyi değiştirir (öğe puanları buradan çıkar) */
+const SC = [
+  { id: 'temel', ad: '2 hedef · 180', d: () => mk(180, G2(2)) },
+  { id: 'h130', ad: '2 hedef · 130', d: () => mk(130, G2(2)) },
+  { id: 'h240', ad: '2 hedef · 240', d: () => mk(240, G2(2)) },
+  { id: 'h300', ad: '2 hedef · 300', d: () => mk(300, G2(2)) },
+  { id: 'tek', ad: '1 hedef · 180', d: () => mk(180, G2(1)) },
+  { id: 'dort', ad: '4 hedef · 180', d: () => mk(180, G2(4, { w: 28 })) },
+  { id: 'kayan', ad: '2 kayan', d: () => mk(180, G2(2, { t: 'kayan', amp: 22, f: 0.4 })) },
+  { id: 'kayan5', ad: '5 kayan', d: () => mk(180, G2(5, { t: 'kayan', amp: 22, f: 0.4, w: 24 })) },
+  { id: 'tuzak', ad: '2 hedef + tuzak', d: () => mk(180, G2(2), [{ id: 't0', t: 'trap', a: [0, 360], w: 24 }]) },
+  { id: 'degirmen', ad: '2 hedef + değirmen', d: () => mk(180, G2(2), [{ id: 'm0', t: 'degirmen', a: 0, n: 2, v: 60, w: 18 }]) },
+  { id: 'hayalet', ad: '2 hayalet', d: () => mk(180, G2(2, { t: 'hayalet', vis: 0.8 })) },
+  { id: 'nefes', ad: '2 nefes', d: () => mk(180, G2(2, { t: 'nefes', br: 40, P: 1.6 })) }
+];
+/* eşleşmeler: her sahne temelle bir kez + dengeli rastgele kalan (aynı ikili tekrar etmez) */
+const rnd = (() => { let s = 20261120; return () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648); })();
+const PAIRS = []; const seen = new Set(), key = (a, b) => [a, b].sort().join('|');
+for (let i = 1; i < SC.length; i++) { PAIRS.push([0, i]); seen.add(key(0, i)); }
+while (PAIRS.length < NP) { const a = (rnd() * SC.length) | 0, b = (rnd() * SC.length) | 0; if (a === b || seen.has(key(a, b))) continue; seen.add(key(a, b)); PAIRS.push([a, b]); }
+PAIRS.forEach((p, i) => { if (rnd() < 0.5) PAIRS[i] = [p[1], p[0]]; });
+for (let i = PAIRS.length - 1; i > 0; i--) { const j = (rnd() * (i + 1)) | 0; [PAIRS[i], PAIRS[j]] = [PAIRS[j], PAIRS[i]]; }
+let ST; try { ST = JSON.parse(localStorage.getItem('kp-esle') || 'null'); } catch (e) {}
+if (!ST || ST.np !== NP) ST = { np: NP, i: 0, ch: [] };
+const save = () => { try { localStorage.setItem('kp-esle', JSON.stringify(ST)); } catch (e) {} };
+const $ = id => document.getElementById(id), fr = $('fr');
+const kp = () => fr.contentWindow && fr.contentWindow.__kp;
+let tick = null;
+/* ibre hiç zıplamaz: her dalga ibrenin kaldığı yerden sürer (p0 = o anki açı), ilk hedef ibrenin önünde doğar */
+const live = (k, d) => { const deg = () => k.G.ang * 180 / Math.PI;
+  Object.defineProperty(d, 'p0', { get: deg });
+  if (d.items[0] && d.items[0].id === 'g0') Object.defineProperty(d.items[0], 'a', { get: () => [deg() + 70, deg() + 200], enumerable: true });
+  return d; };
+const intro = (L, cb) => { const ov = $('ov'), tag = $('tag'); tag.style.display = 'none'; ov.firstChild.textContent = L; ov.firstChild.className = 'c' + L;
+  let n = 3; ov.lastChild.textContent = (L === 'A' ? 'İlk sahne' : 'İkinci sahne') + ' · ' + n; ov.classList.remove('off');
+  const iv = setInterval(() => { n--; if (n > 0) { ov.lastChild.textContent = (L === 'A' ? 'İlk sahne' : 'İkinci sahne') + ' · ' + n; return; }
+    clearInterval(iv); ov.classList.add('off'); tag.textContent = L; tag.className = 'b' + L; tag.style.display = 'flex'; cb(); }, 800); };
+const play = (sc, L, done) => intro(L, () => {
+  const w = fr.contentWindow, k = kp(); w.__labWave = live(k, sc.d()); k.save.bl.f = {}; k.blStart(1);
+  let t = SN; $('lab').innerHTML = `<b class="c${L}">Sahne ${L}</b> oynanıyor`; $('tm').textContent = t;
+  clearInterval(tick); tick = setInterval(() => {
+    const B = k.G.bl; if (B) B.lives = 99;   /* sahne boyunca yanma yok: yalnız his */
+    t -= 0.25; $('tm').textContent = Math.ceil(t); if (t <= 0) { clearInterval(tick); w.__labWave = null; k.goMenu(); $('tag').style.display = 'none'; done(); }
+  }, 250);
+  try { fr.contentWindow.focus(); } catch (e) {}
+});
+const prog = () => { $('prog').textContent = `${Math.min(ST.i, NP)} / ${NP} eşleşme`; $('bar').firstChild.style.width = (100 * ST.i / NP) + '%'; };
+const ask = () => {
+  $('lab').textContent = 'Seç'; $('tm').textContent = '?';
+  $('act').innerHTML = '<p class="sm" style="margin:0 0 8px"><b class="cA">A</b> = ilk oynadığın, <b class="cB">B</b> = ikinci oynadığın</p><div class="row"><button class="bA" data-v="0">A daha heyecanlı</button><button class="bB" data-v="1">B daha heyecanlı</button></div><div class="row" style="margin-top:8px"><button class="alt" data-v="2">Aynı</button><button class="alt" data-v="r">Tekrar oynat</button></div>';
+  $('act').onclick = e => { const v = e.target.dataset.v; if (v == null) return;
+    if (v === 'r') { round(); return; }
+    const [a, b] = PAIRS[ST.i]; ST.ch.push([SC[a].id, SC[b].id, +v]); ST.i++; save(); prog(); round(); };
+};
+const round = () => {
+  if (ST.i >= NP) { finish(); return; }
+  const [a, b] = PAIRS[ST.i]; $('act').innerHTML = '<p class="sm">Oyna…</p>';
+  play(SC[a], 'A', () => play(SC[b], 'B', ask));
+};
+/* Bradley-Terry (eşitlik yarım galibiyet), MM yinelemesi; puan 0 ortalı log ölçekte, temel = 0 */
+const fit = () => {
+  const ids = SC.map(s => s.id), W = {}, N = {}; ids.forEach(a => { W[a] = 0.5; N[a] = {}; ids.forEach(b => N[a][b] = 0); });   /* 0,5: küçük önsel */
+  for (const [a, b, v] of ST.ch) { N[a][b]++; N[b][a]++; W[a] += v === 0 ? 1 : v === 2 ? 0.5 : 0; W[b] += v === 1 ? 1 : v === 2 ? 0.5 : 0; }
+  let p = Object.fromEntries(ids.map(a => [a, 1]));
+  for (let it = 0; it < 200; it++) { const q = {}; for (const a of ids) { let d = 0.1 / (p[a] + 1); for (const b of ids) if (N[a][b]) d += N[a][b] / (p[a] + p[b]); q[a] = W[a] / d; } const g = q.temel; for (const a of ids) p[a] = q[a] / g; }
+  return Object.fromEntries(ids.map(a => [a, Math.round(Math.log(p[a]) * 100) / 100]));
+};
+const finish = () => {
+  ST.score = fit(); ST.at = new Date().toISOString(); save(); prog();
+  $('act').innerHTML = '<button class="alt" id="again">Baştan yap</button>'; $('again').onclick = () => { ST = { np: NP, i: 0, ch: [] }; save(); $('res').hidden = true; prog(); round(); };
+  $('lab').textContent = 'Bitti, teşekkürler'; $('tm').textContent = '✓';
+  $('tb').innerHTML = SC.map(s => [s, ST.score[s.id]]).sort((x, y) => y[1] - x[1]).map(([s, v]) => `<tr><td>${s.ad}</td><td>${v > 0 ? '+' : ''}${v.toFixed(2)}</td></tr>`).join('');
+  $('res').hidden = false;
+};
+prog();
+$('go').onclick = () => { if (!kp()) return; round(); };
+if (ST.i >= NP) finish();
+</script></body></html>

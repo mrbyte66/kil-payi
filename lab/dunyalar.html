@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tema dünyaları · deneme</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* Ayar Laboratuvarı'nın tema dünyası denemesi (2026-11-23, kullanıcı: "hafıza ve matematiği lab'a ekle").
+   Oynanabilir: ibre doğru öğenin üstündeyken ekrana dokun. Iska ve yanlış öğe 1 can. Oyuna bağlı değil, tek başına çalışır. */
+:root{--bg:#1b1630;--card:#251e3f;--fg:#f2edfc;--mut:#a89fc6;--line:#352c55;--deep:#201a37;--pea:#ffb38a;--ok:#5fd6a4;--red:#ff6b7f;--lil:#a99bf0;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 Nunito,system-ui,sans-serif;padding:14px 16px 30px}
+.w{max-width:520px;margin:0 auto;display:grid;gap:12px}
+h1{font:600 22px Fredoka,system-ui;margin:0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button,.btn{font:600 14px Fredoka,system-ui;border:0;border-radius:99px;padding:7px 14px;background:var(--card);color:var(--fg);cursor:pointer}
+.tabs button.on{background:var(--pea);color:#2a1a10}
+.top{display:flex;justify-content:space-between;align-items:center;font:600 16px Fredoka,system-ui}
+.lives span{color:var(--red);font-size:20px;margin-left:2px}.lives span.off{opacity:.2}
+#stage{position:relative;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+canvas{width:100%;aspect-ratio:1;display:block;border-radius:24px;background:var(--deep);cursor:pointer}
+.bar{background:var(--deep);border-radius:16px;padding:10px;text-align:center;font:600 20px Fredoka,system-ui;min-height:62px;display:grid;align-content:center}
+.bar small{display:block;font:400 13px Nunito,system-ui;color:var(--mut)}
+.ctl{background:var(--card);border-radius:16px;padding:10px 12px;display:grid;gap:8px;font-size:14px;color:var(--mut)}
+.ctl label{display:flex;gap:10px;align-items:center}.ctl input[type=range]{flex:1}
+.ctl b{color:var(--fg);min-width:70px;text-align:right}
+.over{position:absolute;inset:0;display:none;place-items:center;background:#1b1630cc;border-radius:24px;text-align:center;font:600 22px Fredoka,system-ui}
+.over.on{display:grid}.over small{display:block;font:400 14px Nunito;color:var(--mut);margin:6px 0 12px}
+.btn.pri{background:var(--pea);color:#2a1a10}
+</style></head><body>
+<div class="w">
+  <h1>Tema dünyaları</h1>
+  <div class="tabs" id="tabs"></div>
+  <div class="top"><span id="sc">Puan 0</span><span class="lives" id="lv"></span></div>
+  <div id="stage"><canvas id="cv" width="640" height="640" aria-label="Oyun halkası: ibre doğru öğedeyken dokun"></canvas>
+    <div class="over" id="ov"><div><span id="ovT">Can bitti</span><small id="ovS"></small><button class="btn pri" id="again">Yeniden başla</button></div></div></div>
+  <div class="bar" id="bar"></div>
+  <div class="ctl">
+    <label>İbre hızı <input type="range" id="sp" min="60" max="320" step="5" value="150"><b id="spv"></b></label>
+    <label>Hafıza: açık kalma <input type="range" id="mem" min="0.6" max="4" step="0.1" value="2"><b id="memv"></b></label>
+    <label><input type="checkbox" id="auto"> Otomatik oynat (bot hatasız oynar)</label>
+  </div>
+</div>
+<script>
+const TAU = Math.PI * 2, C = 320, R = 218, PR = 50, HIT = 0.2;
+const cv = document.getElementById('cv'), c = cv.getContext('2d');
+const $ = id => document.getElementById(id);
+const rnd = n => Math.floor(Math.random() * n);
+const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = a => ((a % TAU) + TAU) % TAU;
+const angOf = i => norm(-Math.PI / 2 + i * TAU / 8);
+const dAng = (a, b) => Math.abs(((a - b + Math.PI) % TAU + TAU) % TAU - Math.PI);
+const EMO = ['🍎', '🚗', '⭐', '🐟', '🎈', '🔑', '🌙', '⚽', '🎸', '🧀', '🐢', '☂️', '🍩', '🚀', '🦆', '🎁'];
+const WORLDS = {
+  hafiza: { ad: 'Hafıza', make() { const it = shuf(EMO.slice()).slice(0, 8); const tg = rnd(8); return { items: it, ok: [tg], memT: +$('mem').value }; },
+    bar(r) { return r.memT > 0 ? `Ezberle!<small>${r.memT.toFixed(1)} sn sonra kapanacak</small>` : `${r.items[r.ok[0]]} neredeydi?<small>kapalı kartlardan doğrusunu vur</small>`; } },
+  toplam: { ad: 'Toplam 10', make() { let s; do { s = []; let t = 0; while (t < 10) { const v = 1 + rnd(Math.min(9, 10 - t)); s.push(v); t += v; } } while (s.length < 2 || s.length > 4);
+      const it = s.slice(); while (it.length < 8) it.push(1 + rnd(9)); const order = shuf([...Array(8).keys()]); const items = order.map(i => String(it[i]));
+      return { items, sum: 0, need: 10 }; },
+    bar(r) { const g = r.got.map(i => r.items[i]); return `${g.length ? g.join(' + ') + ' = ' + r.sum : '0'} / 10<small>toplamı tam 10 yap, geçersen yanarsın</small>`; } },
+  islem: { ad: 'İşlem', make() { const a = 2 + rnd(8), b = 2 + rnd(8), ans = a * b; const set = new Set([ans]);
+      for (const d of [a, b, -a, -b, 1, -1, 10, -10, 2]) { if (set.size >= 8) break; const v = ans + d; if (v > 0) set.add(v); }
+      while (set.size < 8) set.add(ans + rnd(20) - 10 || 1); const items = shuf([...set].slice(0, 8)).map(String);
+      return { items, ok: [items.indexOf(String(ans))], q: `${a} × ${b}` }; },
+    bar(r) { return `${r.q} = ${r.got.length ? r.items[r.ok[0]] : '?'}<small>doğru cevabı vur, yakın sayılar tuzak</small>`; } }
+};
+let wid = 'hafiza', G;
+const tabs = $('tabs'); for (const [k, w] of Object.entries(WORLDS)) { const b = document.createElement('button'); b.textContent = w.ad; b.dataset.k = k; b.onclick = () => { wid = k; reset(); }; tabs.appendChild(b); }
+function newRound() { G.r = Object.assign({ got: [], fx: [] }, WORLDS[wid].make()); G.flash = null; }
+function reset() { G = { a: -Math.PI / 2 - 0.4, lives: 3, score: 0, over: false }; newRound(); [...tabs.children].forEach(b => b.classList.toggle('on', b.dataset.k === wid)); $('ov').classList.remove('on'); ui(); }
+function ui() { $('sc').textContent = 'Puan ' + G.score; $('lv').innerHTML = [0, 1, 2].map(i => `<span class="${i < G.lives ? '' : 'off'}">♥</span>`).join(''); }
+function hurt(i) { G.flash = { i, t: 0.5, bad: 1 }; navigator.vibrate?.(40); G.lives--; ui(); if (G.lives <= 0) { G.over = true; $('ovT').textContent = 'Can bitti'; $('ovS').textContent = `${WORLDS[wid].ad}: ${G.score} puan`; $('ov').classList.add('on'); } }
+function win() { G.score++; ui(); G.wait = 0.7; }
+function under() { const r = G.r; let best = -1, bd = HIT; r.items.forEach((_, i) => { const d = dAng(norm(G.a), angOf(i)); if (d < bd) { bd = d; best = i; } }); return best; }
+function tap() {
+  if (G.over || G.wait > 0) return; const r = G.r;
+  if (wid === 'hafiza' && r.memT > 0) return;
+  const i = under(); if (i < 0 || r.got.includes(i)) return hurt(i);
+  if (wid === 'toplam') { r.sum += +r.items[i]; r.got.push(i); if (r.sum > 10) { hurt(i); r.sum = 0; r.got = []; return; } if (r.sum === 10) win(); return; }
+  if (r.ok.includes(i)) { r.got.push(i); win(); } else hurt(i);
+}
+$('stage').addEventListener('pointerdown', e => { if (e.target.id === 'again') return; e.preventDefault(); tap(); });
+addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); tap(); } });
+$('again').onclick = reset;
+const spv = () => { $('spv').textContent = $('sp').value + ' °/sn'; $('memv').textContent = (+$('mem').value).toFixed(1) + ' sn'; };
+$('sp').oninput = $('mem').oninput = spv; spv();
+function botWants(i) { const r = G.r; if (r.got.includes(i)) return false;
+  if (wid === 'toplam') { /* bot: geri kalan seçimle 10'a ulaşılabiliyorsa al */ const v = +r.items[i], left = 10 - r.sum - v; if (left < 0) return false; if (left === 0) return true;
+    const rest = r.items.map((x, j) => j).filter(j => j !== i && !r.got.includes(j)).map(j => +r.items[j]); const can = (k, s) => s === 0 || (k < rest.length && (can(k + 1, s) || (rest[k] <= s && can(k + 1, s - rest[k])))); return can(0, left); }
+  return r.ok.includes(i); }
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (!G.over) {
+    const r = G.r;
+    if (G.wait > 0) { G.wait -= dt; if (G.wait <= 0) newRound(); }
+    if (wid === 'hafiza' && r.memT > 0) r.memT = Math.max(0, r.memT - dt);
+    const prev = norm(G.a); G.a += dt * (+$('sp').value) * Math.PI / 180;
+    if ($('auto').checked && !(G.wait > 0) && !(wid === 'hafiza' && r.memT > 0)) r.items.forEach((_, i) => { const q = angOf(i), cur = norm(G.a); if (dAng(cur, q) < 0.03 && dAng(prev, q) >= dAng(cur, q) && botWants(i) && G.botLast !== i + ':' + r.got.length) { G.botLast = i + ':' + r.got.length; tap(); } });
+    if (G.flash) { G.flash.t -= dt; if (G.flash.t <= 0) G.flash = null; }
+  }
+  draw(); $('bar').innerHTML = WORLDS[wid].bar(G.r); requestAnimationFrame(frame);
+}
+function draw() {
+  const r = G.r; c.fillStyle = '#201a37'; c.fillRect(0, 0, 640, 640);
+  c.beginPath(); c.arc(C, C, R, 0, TAU); c.strokeStyle = '#3a3163'; c.lineWidth = 104; c.stroke();
+  const covered = wid === 'hafiza' && r.memT <= 0;
+  r.items.forEach((it, i) => {
+    const q = angOf(i), x = C + Math.cos(q) * R, y = C + Math.sin(q) * R, done = r.got.includes(i), bad = G.flash && G.flash.i === i;
+    c.beginPath(); c.arc(x, y, PR, 0, TAU);
+    if (covered && !done) { c.fillStyle = bad ? '#ff6b7f' : '#a99bf0'; c.fill(); c.fillStyle = '#2a2050'; c.font = '600 46px Fredoka, system-ui'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(bad ? it : '?', x, y + 2); return; }
+    const emo = /\p{Extended_Pictographic}/u.test(it);
+    c.fillStyle = bad ? '#ff6b7f' : done ? '#5fd6a4' : emo ? '#4a4075' : '#ffb38a'; c.fill();
+    c.fillStyle = '#2a1a10'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = emo ? '54px system-ui' : `600 ${it.length > 2 ? 34 : 44}px Fredoka, system-ui`; c.fillText(it, x, y + 3);
+  });
+  if (G.wait > 0) { c.fillStyle = '#5fd6a4'; c.font = '600 44px Fredoka, system-ui'; c.textAlign = 'center'; c.fillText('Doğru!', C, C - 70); }
+  const a = G.a; c.beginPath(); c.moveTo(C, C); c.lineTo(C + Math.cos(a) * (R - 64), C + Math.sin(a) * (R - 64)); c.strokeStyle = '#f2edfc'; c.lineWidth = 14; c.lineCap = 'round'; c.stroke();
+  c.beginPath(); c.arc(C, C, 20, 0, TAU); c.fillStyle = '#f2edfc'; c.fill();
+}
+reset(); requestAnimationFrame(frame);
+</script></body></html>

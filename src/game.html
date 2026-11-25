@@ -1391,6 +1391,7 @@ let SN = LANG === 'tr' ? 'sn' : 's';
 const STR = {
   tr: {
     m_coins: '{n} altın', m_chance: '+{a} {u} · {n} {v} içinde', m_diff: 'Zorluk', m_book: 'Defter', m_bolum: 'Parkur', blT: 'Parkur', bl_lv: 'Bölüm {n}', bl_out: 'Canlar bitti', bl_win: 'Bölüm {n} tamam!', bl_cont: '1 can · kaldığın yerden', bl_good: 'İyi', bl_row: 'Dersler', bl_new: 'yeni kilit · dokun, öğren', bl_early: 'Erken!', bl_late: 'Geç!', m_sure: 'Maraton', bl_menuSub: 'Bölüm {n} · {s} ★', bl_k0: 'öğren', bl_k1: 'alış', bl_k2: 'karışık', bl_k3: 'kombo', bl_k4: 'ustalık', bl_part: 'Bölüm {a}–{b}', bl_opens: 'Bölüm {n}\'de açılır', bl_surp: 'sürpriz kilit', bl_once: 'devamla geçildi: 1 yıldız', bl_soon: 'yakında', bl_stop: 'Dur · Liste', ob_tag: 'Öğretici', ob_ready: 'Hazırsın!', bl_list: 'Bölüm listesi', bl_again: 'Tekrar oyna', bl_play: 'Oyna', bl_locked: 'Kilitli', bl_life: '+1 can',
+    pk_g0: 'Sabit hedef', pk_g1: 'Nefes', pk_g2: 'Kayan', pk_g3: 'Hayalet', pk_g4: 'Değirmen', pk_ogr: 'Öğretici', pk_duz: 'Düz', pk_ters: 'Ters ibre', pk_nabiz: 'Nabız', pk_flas: 'Flaş', pk_isin: 'Işınlanma', pk_titrek: 'Titrek', pk_gelgit: 'Gelgit', pk_nefesc: 'Nefes alan çember', pk_cdon: 'Dönen çember', pk_iki: 'İki halka', bl_outT: 'Süre bitti', bl_contT: 'Süre doldu · kaldığın yerden',
     bl_g0: 'Tek ve çift', bl_g1: 'Kayan', bl_g2: 'Nefes', bl_g3: 'Kasa', bl_g4: 'Gelgit', bl_g5: 'Değirmen', bl_g6: 'Şipşak', bl_g7: 'Hayalet', bl_g8: 'Nabız', bl_g9: 'Işınlanma', bl_g10: 'İki halka',
     m_back: 'Geri', m_sureSub: 'Süre bitmeden en çok puan',
     title: 'Kıl Payı', tagline: 'Süre bitmek üzereyken vur, puan ×3.', play: 'Oyna', best: 'En iyi', runs: 'Oyun', bestLvl: 'Seviye',
@@ -1503,6 +1504,7 @@ const STR = {
   },
   en: {
     m_coins: '{n} coins', m_chance: '+{a}{u} · {n}{v} left', m_diff: 'Difficulty', m_book: 'Book', m_bolum: 'Course', blT: 'Course', bl_lv: 'Stage {n}', bl_out: 'Out of lives', bl_win: 'Stage {n} clear!', bl_cont: '1 life · pick up where you left off', bl_good: 'Good', bl_row: 'Lessons', bl_new: 'new lock · tap to learn', bl_early: 'Early!', bl_late: 'Late!', m_sure: 'Marathon', bl_menuSub: 'Stage {n} · {s} ★', bl_k0: 'learn', bl_k1: 'warm-up', bl_k2: 'mix', bl_k3: 'combo', bl_k4: 'mastery', bl_part: 'Stages {a}–{b}', bl_opens: 'opens at stage {n}', bl_surp: 'surprise lock', bl_once: 'cleared with a continue: 1 star', bl_soon: 'soon', bl_stop: 'Stop · List', ob_tag: 'Tutorial', ob_ready: 'You\'re ready!', bl_list: 'Stage list', bl_again: 'Play again', bl_play: 'Play', bl_locked: 'Locked', bl_life: '+1 life',
+    pk_g0: 'Fixed target', pk_g1: 'Breathing', pk_g2: 'Sliding', pk_g3: 'Ghost', pk_g4: 'Mill', pk_ogr: 'Tutorial', pk_duz: 'Plain', pk_ters: 'Reverse pointer', pk_nabiz: 'Pulse', pk_flas: 'Flash', pk_isin: 'Teleport', pk_titrek: 'Jitter', pk_gelgit: 'Tide', pk_nefesc: 'Breathing ring', pk_cdon: 'Spinning ring', pk_iki: 'Two rings', bl_outT: "Time's up", bl_contT: 'Time refilled · pick up where you left off',
     bl_g0: 'Single & double', bl_g1: 'Sliding', bl_g2: 'Breathing', bl_g3: 'Safe', bl_g4: 'Tide', bl_g5: 'Mill', bl_g6: 'Snap', bl_g7: 'Ghost', bl_g8: 'Pulse', bl_g9: 'Teleport', bl_g10: 'Two rings',
     m_back: 'Back', m_sureSub: 'Score as much as you can before time runs out',
     title: 'Close call', tagline: 'Hit it as time runs out for ×3.', play: 'Play', best: 'Best', runs: 'Runs', bestLvl: 'Level',
@@ -1710,7 +1712,7 @@ const sigOf = body => { const enc = new TextEncoder(); return Array.from(hmac(en
 let saveTampered = false;
 
 /* ---------- kayıt ---------- */
-const VERSION = 'V1.0.27';
+const VERSION = 'V1.0.33';
 const save = {
   coins: 0, runs: 0, snd: true, vib: true, music: true, anim: true, animV: 0, mbk: 0, autoJ: false, tut: false, lvl: 'normal', lang: '',
   bests: { rahat: 0, normal: 0, usta: 0, cehennem: 0 },
@@ -2677,14 +2679,16 @@ const spawnChallenge = (first, force, blTw) => {
   const km = JKIND[kind] || JKIND.tek;
   G.kind = kind; G.lastKind = kind; G.gainMul = km.gain * lv.gain;
   G.I = plan.I; G.relief = plan.relief;
-  G.omega = plan.omega * km.omMul * lv.om * pm.omM;
-  let hw = Math.min(lv.hwCap || 0.8, Math.max(HW_FLOOR, plan.hw * km.hwMul * lv.hw * pm.hwM * (PR || BLM ? 1 : wideAt(G.time, G.L, lv))));
+  const scs = !!(BLM && G.bl.sc && !G.bl.les);   /* betikli bölüm: genişlik ve hız tam dalganın değeri (tür çarpanı yok) */
+  G.omega = scs ? plan.omega : plan.omega * km.omMul * lv.om * pm.omM;
+  let hw = scs ? Math.max(HW_FLOOR, plan.hw) : Math.min(lv.hwCap || 0.8, Math.max(HW_FLOOR, plan.hw * km.hwMul * lv.hw * pm.hwM * (PR || BLM ? 1 : wideAt(G.time, G.L, lv))));
   if (can) hw = Math.min(0.8, hw * 1.15);
   const star = G.stars[kind] | 0, sIx = Math.min(2, star);
   G.chal = { kind, t: 0, star, tw: '' };
   G.holding = false; G.lockLeft = 0; G.tun = null; G.emerge = 0;
   const far = (G.firstOfKind || PR) ? [2.0, 2.6] : null;
-  const dist = (lo, hi) => far ? rnd(far[0], far[1]) : rnd(lo, hi);
+  const bmA = scs ? blAmbMin() : 0;   /* ters pusulu dalga: ilk hedef uyarı + L süresi kadar uzakta kurulur */
+  const dist = (lo, hi) => far ? rnd(far[0], far[1]) : (bmA > lo ? rnd(bmA, Math.max(bmA + 0.3, Math.min(TAU - 0.35, bmA + (hi - lo)))) : rnd(lo, hi));
   const gate = mkGate;
   const pins = [];
   if (kind === 'cift') {
@@ -2709,8 +2713,9 @@ const spawnChallenge = (first, force, blTw) => {
     pins.push(gate(0, ma, hw));
     pins.push(Object.assign(gate(0, ahead(ma, G.dir, hw + gh + rnd(MECH.goldGap[0], MECH.goldGap[1])), gh), { bonus: true, gold: true, wait: true }));
   } else if (kind === 'kasa') {
-    const hk = hw * (G.bl ? blMv('kasa', 'hk') : 0.85), step = 2 * hk + (G.bl ? blMv('kasa', 'gap') * Math.PI / 180 * rnd(0.85, 1.15) : rnd(0.55, 0.85)), a = ahead(G.ang, G.dir, dist(1.0, 1.8));
+    const hk = hw * (G.bl ? blMv('kasa', 'hk') : 0.85), step = 2 * hk + (G.bl ? blMv('kasa', 'gap') * Math.PI / 180 * rnd(0.85, 1.15) : rnd(0.55, 0.85)), a0 = ahead(G.ang, G.dir, dist(1.0, 1.8));
     const kn = G.bl ? clamp(Math.round(blMv('kasa', 'n')), 2, 3) : 3;   /* Bölümler: pim sayısı (Kasa 1 ikiyle açılır, 2026-11-19) */
+    const a = G.bl && aheadOf(a0) + (kn - 1) * step > TAU - 0.3 ? ahead(G.ang, G.dir, Math.max(0.9, TAU - 0.3 - (kn - 1) * step)) : a0;   /* zincir ibrenin arkasına sarmasın */
     for (let i = 0; i < kn; i++) pins.push(Object.assign(gate(0, ahead(a, G.dir, i * step), hk), { kasa: true }));
     G.chal.kasa = true;
   } else if (kind === 'ritim') {
@@ -2760,7 +2765,8 @@ const spawnChallenge = (first, force, blTw) => {
     if (angd(ba, n.c0) < hw + bh + 0.25) ba = norm(n.c0 + G.dir * (hw + bh + 0.5));
     pins.push(Object.assign(gate(0, ba, bh), { bomb: { fuse: f, max: f, st: 'arm' } }));
   } else {
-    const p = gate(0, ahead(G.ang, G.dir, first ? rnd(1.6, 2.3) : (can ? rnd(1.4, 2.2) : rnd(CFG.spawnMin, CFG.spawnMax))), hw);
+    let dd0 = first ? rnd(1.6, 2.3) : (can ? rnd(1.4, 2.2) : rnd(CFG.spawnMin, CFG.spawnMax)); if (bmA > dd0) dd0 = rnd(bmA, Math.max(bmA + 0.3, Math.min(TAU - 0.35, bmA + 0.8)));
+    const p = gate(0, ahead(G.ang, G.dir, dd0), hw);
     if (can) p.can = true;
     pins.push(p);
   }
@@ -3115,7 +3121,7 @@ const enterPortal = p => {
 };
 const exitPortal = () => {
   const out = outPortal();
-  G.ang = G.tun.to; G.tun = null; G.emerge = MECH.isinPop;
+  G.ang = out ? out.c0 : G.tun.to; G.tun = null; G.emerge = MECH.isinPop;   /* çıkış kapısının ŞİMDİKİ yeri (dönen çemberde kapı döner) */
   if (out) { const q = pinXY(out); fxRing(q.x, q.y, P.peach, 80, 0.5); burst(q.x, q.y, 14, [P.peach, P['peach-soft'], '#FFFFFF'], 190); }
   Snd.portalOut(); Platform.haptic('light');
 };
@@ -3189,7 +3195,7 @@ const tideF = a => {
    Kum saati, girdap ve kilit çarpanları ve ters yön olayı bir anda değişirdi. Artık olaylı çarpanlar (hız, kum saati, girdap, kilit, yön) birinci derece gecikmeyle (VEL_TAU) yumuşar: G.vel işaretli hızdır.
    Gelgit sürekli bir çarpandır (açıya bağlı), gecikmeden geçmez ve etaTo ile aynen hesaplanır. Işınlanmada (G.tun) ibre durur, çıkınca eski hızla sürer. */
 const VEL_TAU = 0.11;
-const ptrTide = () => (G.kind === 'gelgit' && G.tideC != null ? tideF(G.ang) : 1);
+const ptrTide = () => (G.bl && G.bl.pk ? (G.bl.tf || 1) : (G.kind === 'gelgit' && G.tideC != null ? tideF(G.ang) : 1));   /* parkurda gelgit hızı atalet taşır: bantta hızla artar, çıkınca yavaş yavaş eski hıza iner */
 const ptrBoost = () => (G.vort > 0 ? MECH.vortexMul : 1) * (G.lockLeft > 0 ? MECH.lockMul : 1);
 /* Kara delik girdabı (p.hole; Bölümler ve laboratuvar Tool'u, kullanıcı 2026-11-16; Süreli'deki girdap eski süreli itme): yaklaşırken ibreyi çeker (hızlanır), geçince bırakmaz (yavaşlar, zor kaçar).
    k: çekim gücü, r: çekim mesafesi (rad, önde), o: kaçış mesafesi (rad, arkada). Açıya bağlı sürekli çarpan; etaTo ve bot bilir. */
@@ -3209,11 +3215,14 @@ const etaTo = (target, dir, ring) => {
   const vt = (ring ? G.omega2 : G.omega) * (G.slow > 0 ? G.slowMul : 1) * (ring ? 1 : ptrBoost()), need = norm((target - a) * dd), kv = 1 - Math.exp(-0.01 / VEL_TAU);
   let v = (ring ? G.vel2 : G.vel) * dd, done = 0;   /* şimdiki hız (gidilecek yönde işaretli); ibre hedef hıza VEL_TAU ile yaklaşır */
   if (v !== v) v = vt;
-  const nb = !ring && G.bl && G.bl.tags && G.bl.tags.includes('nabiz'), nbT = nb ? G.bl.nbT || 0 : 0, nbP = nb ? blMv('nabiz', 'per') : 1;
+  const rv = G.bl && G.bl.cr ? pkRotV(ring) : 0;   /* yeni parkur: hedefler çemberle döner */
+  const pkT = !ring && G.bl && G.bl.pk; let tfs = pkT ? (G.bl.tf || 1) : 1;
+  const nb = !ring && G.bl && G.bl.tags && G.bl.tags.includes('nabiz'), nbT = nb ? G.bl.nbT || 0 : 0, nbP = nb ? blNbPer() : 1;
   while (done < need && t0 < 12) {
     v += (vt - v) * kv;
-    const f = (!ring && G.kind === 'gelgit' && G.tideC != null ? tideF(a) : 1) * (nb ? blPulseAt((nbT + t0) % nbP, false) : 1) * (ring ? 1 : holeF(a)), step = v * f * 0.01;
-    done += step; a = norm(a + dd * step); t0 += 0.01;
+    if (pkT) { const tg = G.kind === 'gelgit' && G.tideC != null ? tideF(a) : 1; tfs += (tg - tfs) * Math.min(1, (tg > tfs ? PK_TF_UP : PK_TF_DN) * 0.01); }
+    const f = (pkT ? tfs : (!ring && G.kind === 'gelgit' && G.tideC != null ? tideF(a) : 1)) * (nb ? blPulseAt((nbT + t0) % nbP, false) : 1) * (ring ? 1 : holeF(a)), step = v * f * 0.01;
+    done += step - dd * rv * 0.01; a = norm(a + dd * step); t0 += 0.01;
   }
   return t0;
 };
@@ -3238,11 +3247,11 @@ const tap = () => {
   }
   /* hedefin üstüne binen tuzaklar (kayan tuzak, diken) hedeften önce sayılır */
   for (const p of G.pins) {
-    if (p.kind === 'trap' && p.prio && laneOk(p) && angd(G.ang, pinCenter(p)) <= pinHw(p)) { trap(p); return; }
+    if (p.kind === 'trap' && p.prio && p.slT == null && laneOk(p) && angd(G.ang, pinCenter(p)) <= pinHw(p)) { trap(p); return; }
   }
   let best = null, bn = 9, bd = 0;
   for (const p of G.pins) {
-    if (p.kind !== 'gate' || p.done || p.locked || p.wait || p.gone || (p.ani && !p.ani.on) || !laneOk(p)) continue;
+    if (p.kind !== 'gate' || p.done || p.locked || (p.slT != null && p.slt < PK_GLIDE * 0.6) || p.wait || p.gone || (p.ani && !p.ani.on) || !laneOk(p)) continue;   /* yeni dalganın hedefi eski yerinden ayrılana kadar vurulmaz (art arda dokunuş dalgayı atlatmasın) */
     const h = pinHw(p), d = angd(p.ring ? G.ang2 : G.ang, pinCenter(p));
     if (d <= h + CFG.grace && d / h < bn) { best = p; bn = d / h; bd = d; }
   }
@@ -3264,7 +3273,7 @@ const tap = () => {
     if (p.kind === 'gate' && p.thorn && !p.done && angd(p.ring ? G.ang2 : G.ang, pinCenter(p)) <= p.hw + CFG.grace) { trap({ pen: 1.5, narrow: true }); return; }
   }
   for (const p of G.pins) {
-    if (p.kind === 'trap' && !p.prio && laneOk(p) && angd(G.ang, pinCenter(p)) <= pinHw(p)) { trap(p); return; }
+    if (p.kind === 'trap' && !p.prio && p.slT == null && laneOk(p) && angd(G.ang, pinCenter(p)) <= pinHw(p)) { trap(p); return; }
   }
   miss();
 };
@@ -4657,6 +4666,10 @@ const hellFx = raw => {
     HX.r += (Math.round(HX.r / TAU) * TAU - HX.r) * kk; HX.tr += (Math.round(HX.tr / q) * q - HX.tr) * kk;
     if (HX.s <= 0.003 && Math.abs(HX.r - Math.round(HX.r / TAU) * TAU) < 0.002 && Math.abs(HX.tr - Math.round(HX.tr / q) * q) < 0.002) { HX.r = 0; HX.tr = 0; HX.v = 0; HX.t = 0; HX.sg = 1; HX.tg = 1; HX.nx = 0; }
   }
+  /* Parkur planı (laboratuvar): nefes alan ve sağa sola dönen çember; bütün kadran (pimler + ibre) birlikte, yalnız görüntü */
+  const pt = !RM && G.bl && G.bl.tags && G.mode === 'play' ? G.bl.tags : null;
+  if (pt && pt.includes('p_nefesc')) { const nc = G.bl.nc || { P: 2.4, a: 0.1 }; HX.b = 1 - nc.a * (0.5 - 0.5 * Math.sin(G.clock * TAU / nc.P)); }
+  if (pt && pt.includes('p_besik')) HX.r = Math.sin(G.clock * 1.15) * 0.6;
 };
 let contLeft = 0;
 const setCd = () => { cdArc.style.strokeDashoffset = (176 * (1 - Math.max(0, Math.min(1, contLeft / CFG.contWait)))).toFixed(1); };
@@ -4712,7 +4725,8 @@ const update = (raw, elapsed = raw) => {
     updateChal(dt);
     if (G.bl && G.mode === 'play') blTick(dt);
     if (G.bl) G.bl.wv += ((RM || !BL_P.fx.drop ? blProg() : BX.lv) - G.bl.wv) * Math.min(1, raw * 7);
-    if (PR || G.bl) G.time = CFG.maxTime; else if (OBR) obDrain(raw); else G.time -= elapsed * G.tscale * pm.drain * (LV().drain || 1);
+    if (G.bl && G.bl.timed && G.mode === 'play' && !G.bl.les) { G.time -= raw * BL_P.tm.drain; if (G.bl.soft) G.time = Math.max(G.time, PK_SOFT); else if (G.time <= 0) { G.time = 0; const B2 = G.bl; if (G.pins.some(q => q.kind === 'gate' && !q.done && !q.ring && angd(G.ang, pinCenter(q)) <= pinHw(q) + CFG.grace) && (B2.dg = (B2.dg || 0) + raw) < 0.15) { /* imleç hedefin içindeyken ölüm 0,15 sn bekler: vuruşa şans */ } else die(); } }   /* Öğretici: süre akar, ıska süre götürür ama yanmazsın */
+    else if (PR || G.bl) G.time = CFG.maxTime; else if (OBR) obDrain(raw); else G.time -= elapsed * G.tscale * pm.drain * (LV().drain || 1);
     if (G.slow > 0) G.slow -= raw;
     if (G.boostT > 0) G.boostT = Math.max(0, G.boostT - raw);
     if (G.narrow > 0) G.narrow = Math.max(0, G.narrow - raw);
@@ -5015,7 +5029,7 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
   if (p.kind === 'lockpin') { drawLockpin(c, cx, cy, Rr, RWr, p, gk); return; }
   const ce = pinCenter(p), hwv = pinHw(p), hw = hwv * (0.35 + 0.65 * gk);
   const a0 = ce - hw - HALF, a1 = ce + hw - HALF;
-  const ga = ghostAlpha(p);
+  const ga = ghostAlpha(p) * (p.fo != null ? p.fo : 1);   /* eski işaret sönerek gider (kayan yeni parça sönük DEĞİL) */
   c.lineCap = 'butt';
   if (ga <= 0.01) return;
   if (p.kind === 'trap') {
@@ -5043,7 +5057,7 @@ const drawPin = (c, cx, cy, Rr, RWr, p, gk, idx, numbered) => {
   }
   if (p.bomb) { if (p.bomb.st === 'boom') return; drawBombPin(c, cx, cy, Rr, RWr, p, gk, ce, hw); return; }
   if (p.done) {
-    c.globalAlpha = 0.5;
+    c.globalAlpha = 0.5 * (p.fo != null ? p.fo : 1);
     c.lineWidth = RWr; c.strokeStyle = p.can ? P.life : (p.gold ? GOLD : P.lilac); arc(c, cx, cy, Rr, a0, a1);
     const mx = cx + Math.cos(ce - HALF) * Rr, my = cy + Math.sin(ce - HALF) * Rr, s = RWr * 0.2;
     c.globalAlpha = 0.9; c.strokeStyle = '#FFFFFF'; c.lineWidth = 3; c.lineCap = 'round';
@@ -5855,7 +5869,7 @@ const mixCol = (a, b, k) => { const x = parseCol(a), y = parseCol(b); return toC
 const drawTimeVessel = (c, cx, cy, R, RW, R2, RW2, two, mult, part) => {
   const rin = two ? R2 - RW2 / 2 : R - RW / 2, rv = Math.max(12, rin - Math.max(4, R * 0.05));
   /* Bölümler: süre yok; kap dalga ilerledikçe dolar, ortada dalga yazar */
-  const B = G.bl, tl = B ? CFG.maxTime : Math.max(0, G.time), lv = B ? clamp(0.12 + 0.88 * B.wv, 0, 1) : clamp(G.tvis / CFG.maxTime, 0, 1), light = onColor(P.bg) === '#29233F';
+  const B = G.bl && !G.bl.timed ? G.bl : null, tl = B ? CFG.maxTime : Math.max(0, G.time), lv = B ? clamp(0.12 + 0.88 * B.wv, 0, 1) : clamp(G.tvis / CFG.maxTime, 0, 1), light = onColor(P.bg) === '#29233F';
   const kw = B ? 0 : clamp((2.5 - tl) / 0.12, 0, 1), kc = B ? 0 : clamp((CFG.nearAt - tl) / 0.12, 0, 1);   /* sarıya ve kırmızıya hızlı geçiş: uzun karışım çamurlu bir ara renk veriyordu */
   const amp = RM || tl < CFG.nearAt ? 0 : rv * 0.035 + (B ? BX.slosh * rv * 0.07 : 0), top = cy + rv - (2 * rv + 3 * amp) * lv;
   if (part === 0) {
@@ -5914,11 +5928,16 @@ const render = () => {
   const iv = G.mode === 'menu' ? 0 : G.Ivis;
   c.lineCap = 'round'; c.strokeStyle = mixHex(P.tick, P.rose, 0.8 * iv);
   const mfk = 1 - Math.max(MN.mf, OV.k);   /* kadran menüde ve ikinci şansta çentik yok; oyuna geçerken belirir */
+  /* süreli parkur: bölüm ilerlemesi "çentik uzaması" (kullanıcı seçimi 2026-11-24): geçilen çentikler uzar ve şeftali olur, önde ince bir dalga yürür */
+  const tp = G.bl && G.bl.timed ? G.bl.wv : -1, tk0 = c.strokeStyle;
   for (let i = 0; i < 60 && mfk > 0.01; i++) {
-    const a = i / 60 * TAU - HALF + HX.tr, long = i % 5 === 0, r1 = r0 + (long ? 13 + 5 * iv : 7 + 3 * iv), ca = Math.cos(a), sa = Math.sin(a);
-    c.globalAlpha = (long ? 0.95 : 0.55 + 0.3 * iv) * mfk; c.lineWidth = (long ? 2.6 : 1.6) + 0.6 * iv;
+    const a = i / 60 * TAU - HALF + HX.tr + (G.bl && G.bl.cr ? (G.bl.cr.ang || 0) * 2.5 : 0), long = i % 5 === 0,   /* Maraton'daki gibi çentikler çemberden 2,5 kat hızlı döner */
+        ca = Math.cos(a), sa = Math.sin(a);
+    let r1 = r0 + (long ? 13 + 5 * iv : 7 + 3 * iv); c.globalAlpha = (long ? 0.95 : 0.55 + 0.3 * iv) * mfk; c.lineWidth = (long ? 2.6 : 1.6) + 0.6 * iv; c.strokeStyle = tk0;
+    if (tp >= 0) { const x = tp * 60 - i; if (x >= 0) { r1 = r0 + (long ? 19 : 12); c.strokeStyle = P['peach-deep'] || P.peach; c.globalAlpha = mfk; c.lineWidth = long ? 3.4 : 2.4; } else if (!RM) { const wv = Math.exp(-(((x + 1.5) / 1.2) ** 2)); r1 += 6 * wv; c.globalAlpha = Math.min(1, c.globalAlpha + 0.4 * wv) * mfk; } }
     c.beginPath(); c.moveTo(cx + ca * r0, cy + sa * r0); c.lineTo(cx + ca * r1, cy + sa * r1); c.stroke();
   }
+  c.strokeStyle = tk0;
   c.globalAlpha = 1;
 
   c.lineCap = 'butt'; c.lineWidth = RW + (R * MENU_LW - RW) * Math.max(MN.mf, OV.k); c.strokeStyle = MN.hv > 0.5 ? 'rgba(255,255,255,.14)' : P.track;
@@ -5967,7 +5986,9 @@ const render = () => {
   /* ibre yalnız oyunda (kullanıcı 2026-11-18: "oyun haricinde ibre hiçbir yerde olmasın"): menüde, oyuna geçişte (menü sönene kadar), oyun sonu kadranlarında ve bölüm kutlamasında yok */
   const psc = ptrScale() * (G.mode === 'over' ? 1 - OV.k : 1) * clamp((0.15 - MN.mf) / 0.15, 0, 1) * (G.mode === 'blwin' && G.bl ? clamp(1 - G.bl.winT / 0.35, 0, 1) : 1);   /* Bölümler devam kadranında ibre yok (kullanıcı 2026-11-18) */
   const lkv = G.bl && G.bl.br ? G.bl.lkv : 0, pR = R + (R2 - R) * lkv, pRW = RW + (RW2 - RW) * lkv;
-  if (psc > 0.03) { c.globalAlpha = psc; drawPointer(c, cx, cy, pR, pRW, G.ang, G.dir, MN.hv > 0.5 ? '#FFFFFF' : P.ink, trail, psc); c.globalAlpha = 1; if (MN.hv > 0.5) { const q = ptXY(cx, cy, G.ang, R); c.fillStyle = '#7A1E14'; c.beginPath(); c.arc(q[0], q[1], RW * 0.17, 0, TAU); c.fill(); } }
+  const fls = G.bl && G.bl.tags && G.bl.tags.includes('p_flas') && G.mode === 'play' && pkFlashOff();   /* flaş ibre: bir süre görünür, bir süre görünmez (PK_FLV/PK_FLH) */   /* iki flaş arasında ibre hedef genişliğinden fazla ilerlemez */   /* Parkur planı (laboratuvar): flaş ibre yalnız çakınca görünür */
+  if (fls) { c.fillStyle = P.ink; c.beginPath(); c.arc(cx, cy, pRW * 0.35, 0, TAU); c.fill(); }
+  else if (psc > 0.03) { c.globalAlpha = psc; drawPointer(c, cx, cy, pR, pRW, G.ang, G.dir, MN.hv > 0.5 ? '#FFFFFF' : P.ink, trail, psc); c.globalAlpha = 1; if (MN.hv > 0.5) { const q = ptXY(cx, cy, G.ang, R); c.fillStyle = '#7A1E14'; c.beginPath(); c.arc(q[0], q[1], RW * 0.17, 0, TAU); c.fill(); } }
   if (two && !dm) { if (G.lockLeft > 0) c.globalAlpha = 0.4; drawPointer(c, cx, cy, R2, RW2, G.ang2, G.dir2, P.btn, trail); c.globalAlpha = 1; }
   if (G.mode === 'play') drawBoost(c, cx, cy, R, RW);
   if (G.bl && G.mode === 'play') blDrawFront(c, cx, cy, pR, pRW, R);
@@ -6040,8 +6061,8 @@ const render = () => {
   }
   drawObFx(c);
   if (G.flash > 0) {
-    c.globalAlpha = Math.min(0.22, G.flash * 0.7);
-    c.fillStyle = G.flashKind === 'rose' ? P.rose : P.peach;
+    const fk = G.flashKind; c.globalAlpha = Math.min(fk === 'white' ? 0.5 : fk === 'heart' ? 0.3 : 0.22, G.flash * (fk === 'white' ? 2.4 : 0.9));
+    c.fillStyle = fk === 'white' ? '#FFFFFF' : fk === 'heart' ? '#FF2D55' : fk === 'rose' ? P.rose : P.peach;
     c.fillRect(0, 0, view.w, view.h);
     c.globalAlpha = 1;
   }
@@ -6173,18 +6194,23 @@ $('coinBtn').addEventListener('click', () => {
 /* ---------- Bölümler (V1.1): 80 bölüm, 16 kilit, dalga ve can; tasarım docs/bolumler-plani.md, canlı görünüm docs/bolumler-80.html ----------
    Bölüm verisi bolumler-80.html'deki phases() kuralının aynısıdır (orada değişirse burada da değişmeli). Dalga, Süreli motorunun tur kurucusunu (spawnChallenge) kullanır:
    her dalgada bir "ana" kilit kurulur, diğer kilitlerin hedefe giydirilen özellikleri (kayma, nefes, hayalet) eklenir, hedef sayısı basamağa göre tamamlanır. Süre yoktur; ıska 1, tuzak 2 can. */
-const BL_GR = [
+/* YENİ PARKUR (2026-11-24, kullanıcı planı): her hedef çeşidi bir parkur, her parkur 11 bölüm (PK_ROWS). Eski 11 kilitlik düzen (satırlar aşağıda BL_GR_OLD)
+   yalnız eski araçlar ve Bölüm kurgusu verisi için durur; oyunda bölümleri pkWave kurar. */
+const BL_GR_OLD = [
   ['tek', 'tuzak', 'cift'], ['kayan', 'kayanT', 'kayan2'], ['nefes', 'diken', 'nefes2', 4, 'donen'], ['kasa', 'alarm', 'karisik'], ['gelgit', 'girdap', 'kaybant'], ['degirmen', 'hizkanat', 'degk'], ['ani', 'yalanci', 'yakin', 3, 'nefesc'], ['hayalet cift', 'hayaletT', 'hayalet2'], ['nabiz', 'tuzak', 'nabizk', 3, 'ayna'], ['isin', 'tuzak', 'isin2'], ['serit', 'kilitli', 'seritk']];
-const BL_N = BL_GR.length * 5, BL_MODS = ['donen', 'donen2', 'yayilan', 'nefesc', 'ayna'];
-const blGi = nm => BL_GR.findIndex(r => r[0].split(' ')[0] === nm);
-const blGName = g => t('bl_g' + g);
+const BL_GR = [['sabit'], ['nefes'], ['kayan'], ['hayalet'], ['degirmen']];
+const BL_K = 11;   /* parkur başına bölüm */
+const blK5 = k => clamp(Math.ceil(k * 5 / BL_K), 1, 5);   /* 11 bölümü eski 5 basamaklı ayar tablolarına (BL_M, BL_P.gold) eşler */
+const BL_N = BL_GR.length * BL_K, BL_MODS = ['donen', 'donen2', 'yayilan', 'nefesc', 'ayna'];
+const blGi = nm => BL_GR_OLD.findIndex(r => r[0].split(' ')[0] === nm);
+const blGName = g => t('pk_g' + g);
 const BL_SOON = [];
 /* şimdilik hiçbir bölümde olmayan parçalar (kullanıcı 2026-11-17: "kara delik şeysini şimdilik hiçbir bölüme koyma"); kod ve laboratuvar Tool'u yerinde */
 const BL_OFF = ['girdap'];
 const BL_G0 = [[['tek'], ['tek'], ['tek']], [['tek'], ['cift'], ['cift']], [['cift'], ['cift', 'tuzak'], ['tek', 'cift', 'tuzak']], [['cift', 'tuzak'], ['tek', 'cift', 'tuzak', 'dar'], ['cift', 'tuzak2']], [['cift', 'tuzak'], ['uc3', 'tuzak'], ['uc3', 'tuzak2', 'dar']]];
 const blOwn = (g, k) => {
   if (g === 0) return BL_G0[k - 1][2].slice();
-  const r = BL_GR[g], tg = r[0].split(' ');
+  const r = BL_GR_OLD[g], tg = r[0].split(' ');
   if (k >= 2) tg.push(r[1]);
   if (k >= 3) tg.push(r[2]);
   if (k === 5) tg.push('dar', 'tuzak2');
@@ -6212,7 +6238,7 @@ const blFixT = (tg, g) => {
 };
 const blPhases = (g, k) => {
   if (g === 0) return BL_G0[k - 1].map((tg, i) => ({ t: tg.slice(), from: 0 }));
-  const me = blOwn(g, k), late = BL_GR[g][2];
+  const me = blOwn(g, k), late = BL_GR_OLD[g][2];
   const bas = me.filter(x => x !== 'tuzak2' && x !== 'dar' && !(k <= 4 && x === late) && x !== 'donen2' && !(k <= 4 && x === 'donen'));
   let A, B;
   const O = (s, e) => blOther(g, k, e, s);
@@ -6236,9 +6262,9 @@ const blPhases = (g, k) => {
   if (g === 2 && (k === 3 || k === 5) && !son.includes('nefes2')) son.push('nefes2');
   return [{ t: blFixT(bas, g), from: 0 }, { t: blFixT(mix(A), g), from: A.n }, { t: blFixT(son, g), from: B.n }].map(p => ({ t: p.t.filter(x => !BL_OFF.includes(x)), from: p.from }));
 };
-const blGK = n => ({ g: Math.floor((n - 1) / 5), k: (n - 1) % 5 + 1 });
+const blGK = n => ({ g: Math.floor((n - 1) / BL_K), k: (n - 1) % BL_K + 1 });
 /* Kalıcı kimlik: kilit adı + basamak (yeni kilit sona eklenince numaralar kayabilir, kimlik kaymaz) */
-const blId = n => { const { g, k } = blGK(n); return BL_GR[g][0].split(' ')[0] + k; };
+const blId = n => { const { g, k } = blGK(n); return 'p' + BL_GR[g][0] + k; };   /* 'p' öneki: eski kilit kimlikleriyle (kayan3...) karışmasın */
 const blSoon = n => !(n >= 1 && n <= BL_N) || BL_SOON.includes(BL_GR[blGK(n).g][0].split(' ')[0]);
 const blStars = n => (save.bl.st[blId(n)] | 0);
 
@@ -6266,6 +6292,8 @@ const BL_P = {
      Bölüm 4'ten itibaren kendiliğinden can yenilenmesi yok (regen yalnız Bölüm 1-3'te); can eksikken dalgada p olasılıkla ince yeşil can pimi çıkar,
      hızla kayar (amp °, f Hz), ibre bir kez üstünden geçince kaybolur; dokunuş tutmazsa sıradan ıska (1 can). w: hedef genişliğinin katı. */
   life: { from: 4, p: 0.35, w: 0.6, amp: 24, f: 0.55 },
+  /* süreli parkur (2026-11-24, kullanıcı: "3 can yerine 8 sn süre; ıskada süre dramatik azalır, süre biterse yanarsın"): B.timed iken can yok, sıvı süredir */
+  tm: { max: 8, start: 6, drain: 1, miss: 2.5, trap: 4 },
   /* bölüm boyunca hız ve genişlik, her basamak için ayrı 4 nokta (başta, orta başında, son başında, bitişte); basamak hızının/genişliğinin çarpanı.
      Laboratuvar bunları °/sn ve ° olarak gösterir (kullanıcı 2026-11-16: "başta 120, ortada 150 dersem her vuruştaki artış kendiliğinden hesaplansın") */
   phm: [[0.7, 0.85, 1.05, 1.35], [0.7, 0.85, 1.05, 1.35], [0.62, 0.85, 1.05, 1.43], [0.7, 0.85, 1.05, 1.35], [0.7, 0.85, 1.05, 1.35]], pwm: [0, 1, 2, 3, 4].map(() => [1.15, 1.05, 0.95, 0.85]),
@@ -6351,9 +6379,39 @@ const BL_OV = {
   serit4: {"ph":[{"t":["serit","kilitli"],"om":1,"wd":1,"lv":{},"set":{}},{"t":["serit","kilitli","seritk","donen","donen2","nabiz"],"om":1,"wd":1,"lv":{},"set":{"trapN":2}},{"t":["serit","kilitli","seritk","donen","ayna","nabiz","hayalet","ani"],"om":1,"wd":1,"lv":{},"set":{"trapN":1}}],"cut":[0.25535,0.62744],"wv":43,"sp":[130,140,147,197],"wp":[42,40,38,37]},
   serit5: {"ph":[{"t":["serit","kilitli","seritk"],"om":1,"wd":1,"lv":{},"set":{}},{"t":["serit","kilitli","seritk","dar","donen2","nabiz"],"om":1,"wd":1,"lv":{},"set":{"trapN":2}},{"t":["serit","kilitli","seritk","dar","donen2","nabiz","hayalet","ani"],"om":1,"wd":1,"lv":{},"set":{"trapN":3}}],"cut":[0.24958,0.62458],"wv":48,"sp":[130,140,141,183],"wp":[42,40,38,37]}
 };
-const blOvPh = B => { const o = B && BL_OV[blId(B.n)]; return o && o.ph ? o.ph[B.ph] : null; };
+/* ---------- BETİKLİ BÖLÜMLER (V1.0.28, Zorluk Modeli; kullanıcı 2026-11-19: "baştan kurgula, kümülatif parkurlar, matematiksel zorluk"): bölüm = dalga listesi.
+   Her dalga: s yapı (tek, cift, kasa, isin, gelgit), n hedef sayısı, m değiştiriciler (kayan, nefes, hayalet, ani; hepsi kasa pimlerine de giydirilir),
+   e çevre (nabiz, nabizk, degirmen, deg3, hizkanat, kyon, serit), tr tuzaklar {n, w, g, k}, v ibre hızı °/sn (v1: dalga sonunda), d hedef genişliği °,
+   p ayar ('m.<tür>.<ayar>': değer), x kaldıraçlar { shr: {f, t} (ibre yaklaşırken hedef f katına daralır), amb: {L, tell, n} (ibre hedefe L sn kala ters döner, tell sn önce uyarır) }.
+   Veri tools/kzm-gen.mjs'den gelir (BL_SC-START/END arası); model tools/kzm-core.mjs, belge docs/zorluk-modeli.md. Betikli bölümde ibre ve genişlik TAM dalganın değeridir
+   (tür çarpanları JKIND.hwMul/omMul uygulanmaz); ibre hiçbir zaman BL_SC_OMMIN altına inmez. */
+const BL_SC = {
+/*BL_SC-START*/
+tek4:{z:69,w:[{s:"cift",n:2,v:173,v1:174,d:39.9},{s:"tek",n:1,v:174,v1:176,d:39.6},{s:"cift",n:3,v:176,v1:178,d:39.3},{s:"cift",n:3,v:178,v1:179,d:39.1},{s:"cift",n:3,v:179,v1:181,d:38.8},{s:"cift",n:3,tr:{n:1,w:25,g:11},v:181,v1:182,d:38.5},{s:"tek",n:1,tr:{n:1,w:25,g:11},v:182,v1:184,d:38.2},{s:"tek",n:2,v:184,v1:185,d:37.9},{s:"cift",n:2,tr:{n:2,w:24,g:11},v:185,v1:187,d:37.6},{s:"cift",n:3,v:187,v1:189,d:37.3},{s:"cift",n:3,tr:{n:1,w:24,g:10},v:189,v1:190,d:37},{s:"tek",n:1,tr:{n:1,w:24,g:10},v:190,v1:192,d:36.7},{s:"tek",n:1,v:192,v1:193,d:36.5},{s:"tek",n:2,tr:{n:2,w:23,g:10},v:193,v1:195,d:36.2},{s:"cift",n:3,v:195,v1:196,d:35.9},{s:"cift",n:3,tr:{n:1,w:23,g:9},v:196,v1:198,d:35.6},{s:"tek",n:1,tr:{n:1,w:23,g:9},v:198,v1:200,d:35.3},{s:"tek",n:1,v:200,v1:201,d:35},{s:"cift",n:2,tr:{n:2,w:22,g:9},v:201,v1:203,d:34.7},{s:"cift",n:3,v:203,v1:204,d:34.4},{s:"cift",n:3,tr:{n:1,w:22,g:8},v:204,v1:206,d:34.2},{s:"tek",n:1,tr:{n:1,w:22,g:8},v:206,v1:207,d:33.9},{s:"tek",n:2,v:207,v1:209,d:33.6},{s:"tek",n:1,tr:{n:2,w:21,g:8},v:209,v1:211,d:33.3},{s:"cift",n:3,v:211,v1:212,d:33},{s:"cift",n:3,tr:{n:1,w:21,g:8},v:212,v1:214,d:32.7},{s:"tek",n:2,tr:{n:1,w:20,g:7},v:214,v1:215,d:32.4},{s:"tek",n:2,v:215,v1:217,d:32.1},{s:"cift",n:3,tr:{n:2,w:20,g:7},v:217,v1:218,d:31.8}]},
+tek5:{z:72,w:[{s:"cift",n:2,v:174,v1:176,d:39.6},{s:"tek",n:1,v:176,v1:177,d:39.3},{s:"cift",n:3,v:177,v1:179,d:39},{s:"cift",n:3,v:179,v1:180,d:38.7},{s:"cift",n:3,v:180,v1:182,d:38.5},{s:"cift",n:3,tr:{n:1,w:25,g:11},v:182,v1:183,d:38.2},{s:"tek",n:1,tr:{n:1,w:25,g:11},v:183,v1:185,d:37.9},{s:"tek",n:1,v:185,v1:186,d:37.7},{s:"cift",n:3,tr:{n:2,w:24,g:11},v:186,v1:188,d:37.4},{s:"cift",n:3,v:188,v1:189,d:37.1},{s:"cift",n:3,tr:{n:1,w:24,g:10},v:189,v1:191,d:36.8},{s:"tek",n:2,tr:{n:1,w:24,g:10},v:191,v1:192,d:36.6},{s:"tek",n:1,v:192,v1:194,d:36.3},{s:"tek",n:1,tr:{n:2,w:23,g:10},v:194,v1:195,d:36},{s:"cift",n:3,v:195,v1:197,d:35.8},{s:"cift",n:3,tr:{n:1,w:23,g:10},v:197,v1:198,d:35.5},{s:"tek",n:1,tr:{n:1,w:23,g:9},v:198,v1:200,d:35.2},{s:"tek",n:3,v:200,v1:201,d:34.9},{s:"cift",n:2,tr:{n:2,w:23,g:9},v:201,v1:203,d:34.7},{s:"cift",n:3,v:203,v1:204,d:34.4},{s:"cift",n:3,tr:{n:1,w:22,g:9},v:204,v1:206,d:34.1},{s:"tek",n:1,tr:{n:1,w:22,g:9},v:206,v1:207,d:33.8},{s:"tek",n:1,v:207,v1:209,d:33.6},{s:"tek",n:2,tr:{n:2,w:22,g:8},v:209,v1:210,d:33.3},{s:"cift",n:3,v:210,v1:212,d:33},{s:"cift",n:3,tr:{n:1,w:21,g:8},v:212,v1:213,d:32.8},{s:"tek",n:2,tr:{n:1,w:21,g:8},v:213,v1:215,d:32.5},{s:"tek",n:2,v:215,v1:216,d:32.2},{s:"cift",n:2,tr:{n:2,w:21,g:7},v:216,v1:218,d:31.9},{s:"cift",n:3,v:218,v1:219,d:31.7},{s:"cift",n:3,tr:{n:1,w:20,g:7},v:219,v1:221,d:31.4},{s:"tek",n:3,tr:{n:2,w:20,g:7},v:221,v1:222,d:31.1}]},
+kayan1:{z:70.4,w:[{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":14,"m.kayan.f":0.28},v:167,v1:169,d:41.5},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":14,"m.kayan.f":0.29},v:169,v1:170,d:41.2},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":15,"m.kayan.f":0.29},v:170,v1:172,d:40.8},{s:"cift",n:2,tr:{n:1,w:25,g:11},v:172,v1:174,d:40.5},{s:"cift",n:3,v:174,v1:175,d:40.1},{s:"cift",n:2,m:["kayan"],tr:{n:1,w:24,g:11},p:{"m.kayan.amp":16,"m.kayan.f":0.31},v:175,v1:177,d:39.8},{s:"tek",n:2,m:["kayan"],tr:{n:1,w:24,g:10},p:{"m.kayan.amp":17,"m.kayan.f":0.32},v:177,v1:179,d:39.5},{s:"tek",n:1,m:["kayan"],p:{"m.kayan.amp":17,"m.kayan.f":0.32},v:179,v1:180,d:39.1},{s:"cift",n:3,m:["kayan"],tr:{n:1,w:23,g:10},x:{shr:{f:0.64,t:0.82}},p:{"m.kayan.amp":18,"m.kayan.f":0.33},v:180,v1:182,d:38.8},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":18,"m.kayan.f":0.34},v:182,v1:184,d:38.4},{s:"cift",n:2,m:["kayan"],tr:{n:1,w:23,g:9},p:{"m.kayan.amp":18,"m.kayan.f":0.34},v:184,v1:185,d:38.1},{s:"tek",n:2,v:185,v1:187,d:37.7},{s:"cift",n:3,tr:{n:1,w:22,g:9},v:187,v1:189,d:37.4},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:9},x:{shr:{f:0.6,t:0.76}},p:{"m.kayan.amp":20,"m.kayan.f":0.36},v:189,v1:190,d:37.1},{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":20,"m.kayan.f":0.37},v:190,v1:192,d:36.7},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:8},p:{"m.kayan.amp":21,"m.kayan.f":0.37},v:192,v1:194,d:36.4},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":21,"m.kayan.f":0.38},v:194,v1:195,d:36},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:8},p:{"m.kayan.amp":22,"m.kayan.f":0.39},v:195,v1:197,d:34.7},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:20,g:7},x:{shr:{f:0.56,t:0.71}},p:{"m.kayan.amp":22,"m.kayan.f":0.39},v:197,v1:199,d:35.4},{s:"cift",n:3,m:["kayan"],x:{shr:{f:0.55,t:0.7}},p:{"m.kayan.amp":22,"m.kayan.f":0.4},v:199,v1:201,d:35}]},
+kayan2:{z:73.4,w:[{s:"tek",n:1,m:["kayan"],p:{"m.kayan.amp":15,"m.kayan.f":0.29},v:169,v1:170,d:41.1},{s:"cift",n:2,v:170,v1:172,d:40.7},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":16,"m.kayan.f":0.3},v:172,v1:173,d:40.4},{s:"tek",n:2,v:173,v1:175,d:40.1},{s:"tek",n:1,m:["kayan"],p:{"m.kayan.amp":16,"m.kayan.f":0.31},v:175,v1:177,d:39.8},{s:"tek",n:1,m:["kayan"],tr:{n:1,w:25,g:11},p:{"m.kayan.amp":17,"m.kayan.f":0.32},v:177,v1:178,d:39.5},{s:"cift",n:3,m:["kayan"],tr:{n:1,w:24,g:11},p:{"m.kayan.amp":17,"m.kayan.f":0.33},v:178,v1:180,d:39.2},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":18,"m.kayan.f":0.33},v:180,v1:181,d:38.8},{s:"tek",n:2,m:["kayan"],tr:{n:2,k:["kayanT"],w:24,g:10},x:{shr:{f:0.65,t:0.83}},p:{"m.kayan.amp":18,"m.kayan.f":0.34},v:181,v1:183,d:38.5},{s:"cift",n:3,v:183,v1:185,d:38.2},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:23,g:10},p:{"m.kayan.amp":19,"m.kayan.f":0.35},v:185,v1:186,d:37.9},{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":19,"m.kayan.f":0.35},v:186,v1:188,d:37.6},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:23,g:9},p:{"m.kayan.amp":19,"m.kayan.f":0.36},v:188,v1:190,d:37.3},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:9},x:{shr:{f:0.61,t:0.78}},p:{"m.kayan.amp":20,"m.kayan.f":0.36},v:190,v1:191,d:36.9},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":20,"m.kayan.f":0.37},v:191,v1:193,d:36.6},{s:"tek",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:9},p:{"m.kayan.amp":21,"m.kayan.f":0.37},v:193,v1:194,d:36.3},{s:"cift",n:2,v:194,v1:196,d:36},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:8},p:{"m.kayan.amp":21,"m.kayan.f":0.38},v:196,v1:198,d:35.7},{s:"cift",n:2,m:["kayan"],tr:{n:2,k:["kayanT"],w:21,g:8},x:{shr:{f:0.58,t:0.74}},p:{"m.kayan.amp":22,"m.kayan.f":0.39},v:198,v1:199,d:35.4},{s:"tek",n:3,m:["kayan"],p:{"m.kayan.amp":22,"m.kayan.f":0.4},v:199,v1:201,d:35.1},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:7},p:{"m.kayan.amp":23,"m.kayan.f":0.4},v:201,v1:202,d:34.7},{s:"cift",n:2,tr:{n:1,w:20,g:7},v:202,v1:204,d:34.4},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:20,g:7},x:{shr:{f:0.55,t:0.7}},p:{"m.kayan.amp":23,"m.kayan.f":0.41},v:204,v1:206,d:33.7}]},
+kayan3:{z:76.4,w:[{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":16,"m.kayan.f":0.31},v:169,v1:170,d:40.9},{s:"cift",n:3,v:170,v1:172,d:40.6},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":16,"m.kayan.f":0.32},v:172,v1:173,d:40.4},{s:"tek",n:1,v:173,v1:175,d:40.1},{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":17,"m.kayan.f":0.32},v:175,v1:176,d:39.8},{s:"tek",n:1,m:["kayan"],tr:{n:1,w:25,g:11},p:{"m.kayan.amp":17,"m.kayan.f":0.33},v:176,v1:178,d:39.5},{s:"cift",n:3,m:["kayan"],tr:{n:1,w:25,g:11},p:{"m.kayan.amp":18,"m.kayan.f":0.33},v:178,v1:179,d:39.2},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":18,"m.kayan.f":0.34},v:179,v1:181,d:38.9},{s:"cift",n:3,m:["kayan"],tr:{n:1,w:24,g:10},x:{shr:{f:0.65,t:0.84}},p:{"m.kayan.amp":18,"m.kayan.f":0.34},v:181,v1:182,d:38.7},{s:"cift",n:2,v:182,v1:184,d:38.4},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:24,g:10},p:{"m.kayan.amp":19,"m.kayan.f":0.35},v:184,v1:185,d:38.1},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:23,g:10},p:{"m.kayan.amp":19,"m.kayan.f":0.36},v:185,v1:187,d:37.8},{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":20,"m.kayan.f":0.36},v:187,v1:188,d:37.5},{s:"cift",n:2,m:["kayan"],tr:{n:2,k:["kayanT"],w:23,g:9},x:{shr:{f:0.62,t:0.8}},p:{"m.kayan.amp":20,"m.kayan.f":0.37},v:188,v1:190,d:37.3},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":21,"m.kayan.f":0.37},v:190,v1:191,d:37},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:9},p:{"m.kayan.amp":21,"m.kayan.f":0.38},v:191,v1:192,d:36.7},{s:"cift",n:3,v:192,v1:194,d:36.4},{s:"tek",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:9},p:{"m.kayan.amp":22,"m.kayan.f":0.39},v:194,v1:195,d:36.1},{s:"tek",n:1,m:["kayan"],tr:{n:2,k:["kayanT"],w:22,g:8},x:{shr:{f:0.59,t:0.76}},p:{"m.kayan.amp":22,"m.kayan.f":0.39},v:195,v1:197,d:35.8},{s:"tek",n:1,m:["kayan"],p:{"m.kayan.amp":22,"m.kayan.f":0.4},v:197,v1:198,d:35.6},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":23,"m.kayan.f":0.4},v:198,v1:200,d:35.3},{s:"tek",n:2,tr:{n:1,w:21,g:8},v:200,v1:201,d:35},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:8},p:{"m.kayan.amp":23,"m.kayan.f":0.41},v:201,v1:203,d:34.7},{s:"cift",n:3,m:["kayan"],x:{shr:{f:0.56,t:0.72}},p:{"m.kayan.amp":24,"m.kayan.f":0.41},v:203,v1:204,d:34.4},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":24,"m.kayan.f":0.42},v:204,v1:206,d:34.1},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:20,g:7},x:{shr:{f:0.55,t:0.7}},p:{"m.kayan.amp":24,"m.kayan.f":0.42},v:206,v1:207,d:31.7}]},
+kayan4:{z:79.4,w:[{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":17,"m.kayan.f":0.32},v:173,v1:174,d:39.9},{s:"cift",n:3,v:174,v1:176,d:39.6},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":17,"m.kayan.f":0.33},v:176,v1:178,d:39.3},{s:"tek",n:1,v:178,v1:179,d:39.1},{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":18,"m.kayan.f":0.34},v:179,v1:181,d:38.8},{s:"tek",n:2,m:["kayan"],tr:{n:1,w:25,g:11},p:{"m.kayan.amp":18,"m.kayan.f":0.34},v:181,v1:182,d:38.5},{s:"cift",n:2,m:["kayan"],tr:{n:1,w:25,g:11},p:{"m.kayan.amp":19,"m.kayan.f":0.34},v:182,v1:184,d:38.2},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":19,"m.kayan.f":0.35},v:184,v1:185,d:37.9},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:24,g:11},x:{shr:{f:0.66,t:0.84}},p:{"m.kayan.amp":19,"m.kayan.f":0.35},v:185,v1:187,d:37.6},{s:"cift",n:2,v:187,v1:189,d:37.3},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:24,g:10},p:{"m.kayan.amp":20,"m.kayan.f":0.36},v:189,v1:190,d:37},{s:"tek",n:1,m:["kayan"],p:{"m.kayan.amp":20,"m.kayan.f":0.37},v:190,v1:192,d:36.8},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:23,g:10},p:{"m.kayan.amp":20,"m.kayan.f":0.37},v:192,v1:193,d:36.5},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:23,g:10},x:{shr:{f:0.63,t:0.81}},p:{"m.kayan.amp":21,"m.kayan.f":0.37},v:193,v1:195,d:34.7},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":21,"m.kayan.f":0.38},v:195,v1:196,d:35.9},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:23,g:9},p:{"m.kayan.amp":21,"m.kayan.f":0.38},v:196,v1:198,d:35.6},{s:"cift",n:2,v:198,v1:200,d:35.3},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:9},p:{"m.kayan.amp":22,"m.kayan.f":0.39},v:200,v1:201,d:35},{s:"cift",n:2,m:["kayan"],tr:{n:2,k:["kayanT"],w:22,g:9},x:{shr:{f:0.6,t:0.77}},p:{"m.kayan.amp":22,"m.kayan.f":0.39},v:201,v1:203,d:34.7},{s:"tek",n:3,m:["kayan"],p:{"m.kayan.amp":22,"m.kayan.f":0.4},v:203,v1:204,d:34.4},{s:"tek",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:8},p:{"m.kayan.amp":23,"m.kayan.f":0.4},v:204,v1:206,d:34.2},{s:"tek",n:1,tr:{n:1,w:22,g:8},v:206,v1:207,d:33.9},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":23,"m.kayan.f":0.41},v:207,v1:209,d:33.6},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:8},x:{shr:{f:0.58,t:0.74}},p:{"m.kayan.amp":24,"m.kayan.f":0.42},v:209,v1:211,d:33.3},{s:"cift",n:3,v:211,v1:212,d:33},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:8},p:{"m.kayan.amp":24,"m.kayan.f":0.42},v:212,v1:214,d:32.7},{s:"tek",n:1,m:["kayan"],p:{"m.kayan.amp":25,"m.kayan.f":0.43},v:214,v1:215,d:32.4},{s:"tek",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:20,g:7},p:{"m.kayan.amp":25,"m.kayan.f":0.43},v:215,v1:217,d:32.1},{s:"cift",n:2,m:["kayan"],tr:{n:2,k:["kayanT"],w:20,g:7},x:{shr:{f:0.55,t:0.7}},p:{"m.kayan.amp":25,"m.kayan.f":0.44},v:217,v1:218,d:31.8}]},
+kayan5:{z:82.4,w:[{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":18,"m.kayan.f":0.33},v:174,v1:176,d:39.5},{s:"cift",n:3,v:176,v1:177,d:39.3},{s:"cift",n:2,m:["kayan"],p:{"m.kayan.amp":18,"m.kayan.f":0.34},v:177,v1:179,d:39},{s:"tek",n:2,v:179,v1:180,d:38.7},{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":19,"m.kayan.f":0.35},v:180,v1:182,d:38.4},{s:"tek",n:2,m:["kayan"],tr:{n:1,w:25,g:11},p:{"m.kayan.amp":19,"m.kayan.f":0.35},v:182,v1:183,d:38.2},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":19,"m.kayan.f":0.35},v:183,v1:185,d:37.9},{s:"cift",n:2,m:["kayan"],tr:{n:1,w:25,g:11},p:{"m.kayan.amp":19,"m.kayan.f":0.36},v:185,v1:186,d:37.6},{s:"cift",n:3,m:["kayan"],x:{shr:{f:0.66,t:0.85}},p:{"m.kayan.amp":20,"m.kayan.f":0.36},v:186,v1:188,d:37.3},{s:"cift",n:3,v:188,v1:189,d:37.1},{s:"tek",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:24,g:10},p:{"m.kayan.amp":20,"m.kayan.f":0.37},v:189,v1:191,d:36.8},{s:"cift",n:3,m:["kayan"],tr:{n:1,k:["kayanT"],w:24,g:10},p:{"m.kayan.amp":21,"m.kayan.f":0.37},v:191,v1:192,d:34.3},{s:"tek",n:1,m:["kayan"],p:{"m.kayan.amp":21,"m.kayan.f":0.38},v:192,v1:194,d:36.2},{s:"cift",n:2,m:["kayan"],tr:{n:1,w:23,g:10},x:{shr:{f:0.64,t:0.82}},p:{"m.kayan.amp":21,"m.kayan.f":0.38},v:194,v1:196,d:36},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":21,"m.kayan.f":0.38},v:196,v1:197,d:35.7},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:23,g:10},p:{"m.kayan.amp":22,"m.kayan.f":0.39},v:197,v1:199,d:35.4},{s:"cift",n:3,tr:{n:1,w:23,g:9},v:199,v1:200,d:35.2},{s:"tek",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:23,g:9},p:{"m.kayan.amp":22,"m.kayan.f":0.4},v:200,v1:202,d:34.9},{s:"tek",n:1,m:["kayan"],tr:{n:2,k:["kayanT"],w:23,g:9},x:{shr:{f:0.61,t:0.78}},p:{"m.kayan.amp":22,"m.kayan.f":0.4},v:202,v1:203,d:34.6},{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":23,"m.kayan.f":0.4},v:203,v1:205,d:34.3},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:9},p:{"m.kayan.amp":23,"m.kayan.f":0.41},v:205,v1:206,d:34.1},{s:"tek",n:3,tr:{n:1,w:22,g:9},v:206,v1:208,d:33.8},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":24,"m.kayan.f":0.42},v:208,v1:209,d:33.5},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:22,g:8},x:{shr:{f:0.59,t:0.75}},p:{"m.kayan.amp":24,"m.kayan.f":0.42},v:209,v1:211,d:33.2},{s:"cift",n:2,v:211,v1:212,d:33},{s:"tek",n:1,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:8},p:{"m.kayan.amp":24,"m.kayan.f":0.43},v:212,v1:214,d:32.7},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:21,g:8},p:{"m.kayan.amp":25,"m.kayan.f":0.43},v:214,v1:215,d:32.4},{s:"tek",n:2,m:["kayan"],p:{"m.kayan.amp":25,"m.kayan.f":0.43},v:215,v1:217,d:32.1},{s:"tek",n:2,m:["kayan"],tr:{n:2,k:["kayanT"],w:21,g:7},x:{shr:{f:0.56,t:0.72}},p:{"m.kayan.amp":25,"m.kayan.f":0.44},v:217,v1:218,d:31.9},{s:"cift",n:3,m:["kayan"],p:{"m.kayan.amp":25,"m.kayan.f":0.44},v:218,v1:220,d:31.6},{s:"cift",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:20,g:7},p:{"m.kayan.amp":26,"m.kayan.f":0.45},v:220,v1:221,d:31.3},{s:"tek",n:2,m:["kayan"],tr:{n:1,k:["kayanT"],w:20,g:7},x:{shr:{f:0.55,t:0.7}},p:{"m.kayan.amp":26,"m.kayan.f":0.45},v:221,v1:223,d:31}]},
+/*BL_SC-END*/
+};
+const BL_SC_OMMIN = 155;
+const BL_KYONOK = ['kasa', 'tek', 'cift', 'kayan', 'nefes', 'hayalet'];   /* periyodik ters dönme (kyon) bu yapılarda çalışır */
+const blWavePh = w => {
+  const tr = w.tr || {}, set = {}, n = Math.max(1, w.n || 1), t = [].concat(w.m || [], w.e || [], tr.k || []);
+  set.size = [n, n]; set.trapN = tr.n || 0;
+  if (tr.w != null) set.trapW = tr.w;
+  if (tr.g != null) set.gap = tr.g;
+  if (w.s === 'kasa') set['m.kasa.n'] = clamp(Math.round(w.p && w.p['m.kasa.n'] != null ? w.p['m.kasa.n'] : (w.n || 3)), 2, 3);
+  Object.assign(set, w.p || {});
+  return { t, s: w.s, set, lv: {}, om: 1, wd: 1, x: w.x || null, v: w.v, v1: w.v1 || 0, d: w.d };
+};
+const blScOv = sc => sc._ov || (sc._ov = { sc: 1, wv: sc.w.length, z: sc.z, w: sc.w, ph: sc.w.map(blWavePh) });
+const blOv = n => { const id = blId(n), s = BL_SC[id]; return s ? blScOv(s) : BL_OV[id]; };
+const blOvPh = B => { const o = B && blOv(B.n); return o && o.ph ? o.ph[Math.min(B.ph, o.ph.length - 1)] : null; };
 const blPS = (key, def) => { const p = blOvPh(G.bl); return p && p.set && p.set[key] != null ? p.set[key] : def; };
-const blMv = (kind, key) => { const B = G.bl, p = blOvPh(B), L = p && p.lv && p.lv[kind]; if (p && p.set && p.set['m.' + kind + '.' + key] != null) return p.set['m.' + kind + '.' + key]; return BL_M[kind][key][(L || (B ? B.k : 1)) - 1]; };
+const blMv = (kind, key) => { const B = G.bl, p = blOvPh(B), L = p && p.lv && p.lv[kind]; if (p && p.set && p.set['m.' + kind + '.' + key] != null) return p.set['m.' + kind + '.' + key]; return BL_M[kind][key][(L || (B ? blK5(B.k) : 1)) - 1]; };
 const MECH_BAK = JSON.parse(JSON.stringify(MECH));
 const blMechRestore = () => { for (const q in MECH_BAK) MECH[q] = JSON.parse(JSON.stringify(MECH_BAK[q])); };
 const blMechApply = k => {
@@ -6362,7 +6420,7 @@ const blMechApply = k => {
 };
 /* kurguda kısma özel kilit basamağı: kısım değişince MECH'e yeniden yazılır */
 const blMechPh = B => {
-  blMechApply(B.k); const p = blOvPh(B);
+  blMechApply(blK5(B.k)); const p = blOvPh(B);
   if (p && p.lv) for (const kind in p.lv) if (BL_MCAT[kind]) for (const q in BL_MCAT[kind].p) if (BL_MCAT[kind].p[q].mech) { const v = BL_M[kind][q][p.lv[kind] - 1]; MECH[q] = Array.isArray(MECH[q]) ? MECH[q].map(() => v) : v; }
   if (p && p.set) for (const key in p.set) { const [m, kind, q] = key.split('.'); if (m === 'm' && BL_MCAT[kind] && BL_MCAT[kind].p[q] && BL_MCAT[kind].p[q].mech) { const v = p.set[key]; MECH[q] = Array.isArray(MECH[q]) ? MECH[q].map(() => v) : v; } }
 };
@@ -6384,7 +6442,7 @@ const BL_YEDEK = {
 /* Gizli yardım: aynı bölümde 1 kayıptan sonra hedef ×1,2, 3 kayıptan sonra ×1,4 (2026-11-15: Cehennem bırakmasını azaltır); ekranda işaret yok */
 const blHelp = (n = G.bl.n) => { const f = (save.bl.f[blId(n)] | 0); return f >= BL_P.helpAt[1] ? BL_P.help[1] : (f >= BL_P.helpAt[0] ? BL_P.help[0] : 1); };
 /* bölüme özel dalga sayısı (BL_OV[id].wv; 2026-11-18, kullanıcı: "ilk 7 bölüm hariç 100-110 sn; baş kısım aynı, orta ve son eşit uzasın") */
-const blWaves = (n, k) => { const kf = BL_KF[blId(n)], ov = BL_OV[blId(n)]; if (ov && ov.wv) return ov.wv; return Math.max(4, Math.round(BL_P.t[k - 1] / (kf ? kf[0] : 2))); };
+const blWaves = (n, k) => { const kf = BL_KF[blId(n)], ov = blOv(n); if (ov && ov.wv) return ov.wv; return Math.max(4, Math.round(BL_P.t[k - 1] / (kf ? kf[0] : 2))); };
 /* ibre hızı (2026-11-16, kullanıcı: "ortaya gelince aniden hızlanıyor, her pim vuruşunda hız biraz artsın"): kısım başlarında ve bölüm sonunda
    kısmın taban hızı × BL_P.phm[i] (son nokta son kısmın tabanı × phm[3]); x = bölüm ilerlemesi (dalga + vurulan hedef payı), arada doğrusal.
    Taban: kısma özel om (rad/sn) yoksa basamak hızı; c penceresi gibi ÷√c, genişlik sınıra dayanırsa kalan pay hızdan; kurgunun hız katı (ph[i].om) */
@@ -6393,8 +6451,11 @@ const blLerp = (A, x, c) => { const X = [0, c[0], c[1], 1], i = x < c[0] ? 0 : (
 /* kısım i'nin taban genişliği (°): kilit katsayısı c ile genişlik ×√c, sınıra dayanırsa sınırda; kurgunun kısma özel genişliği ve katı */
 const blBaseW = (i, k0, rc, o) => { const p = o && o.ph && o.ph[i], st = p && p.set || {}, want = (st.wd != null ? st.wd : BL_P.wd[k0]) * rc; return { want, wd: clamp(want, BL_P.wMin, BL_P.wMax), m: p && p.wd || 1 }; };
 const BL_BREATH = 0.9, BL_BREATH_N = 4;   /* Bölüm 1-3 hariç (kullanıcı 2026-11-19) */
+/* betikli bölüm: dalga içinde hedeflerin kaçı vuruldu (hız v → v1 geçişi için) */
+const blWaveFrac = () => { const B = G.bl; if (!B || !B.gTot) return 0; let d = 0; for (const p of G.pins) if (p.gx && p.done) d++; return d / B.gTot; };
 const blOmAt = x => {
-  const B = G.bl, k0 = B.k - 1, kf = BL_KF[blId(B.n)], rc = Math.sqrt(kf ? kf[1] : 1), o = BL_OV[blId(B.n)], c = o && o.cut || [1 / 3, 2 / 3], ph = blPts(BL_P.phm, k0);
+  const B = G.bl, k0 = B.k - 1, kf = BL_KF[blId(B.n)], rc = Math.sqrt(kf ? kf[1] : 1), o = blOv(B.n), c = o && o.cut || [1 / 3, 2 / 3], ph = blPts(BL_P.phm, k0);
+  if (o && o.sc) { const w = o.ph[Math.min(B.wave, o.ph.length - 1)], v1 = w.v1 || w.v; return Math.max(BL_SC_OMMIN, w.v + (v1 - w.v) * blWaveFrac()) * Math.PI / 180; }
   const base = i => { const p = o && o.ph && o.ph[i], st = p && p.set || {}, w = blBaseW(i, k0, rc, o); return (st.om != null ? st.om : BL_P.om[k0]) / rc * (w.wd / w.want) * (p && p.om || 1); };
   const b2 = base(2), A = [base(0) * ph[0], base(1) * ph[1], b2 * ph[2], b2 * ph[3]];
   if (o && o.sp) o.sp.forEach((v, i) => { if (v != null) A[i] = v * Math.PI / 180; });   /* bölüme özel nokta: doğrudan °/sn */
@@ -6406,7 +6467,8 @@ const blOmAt = x => {
 };
 /* şeftali genişliği (°) bölüm ilerlemesi x'te: hız gibi 4 nokta arasında her vuruşta düzgün değişir (yardım ve Dar hedef sonra uygulanır) */
 const blWdDeg = x => {
-  const B = G.bl, k0 = B.k - 1, kf = BL_KF[blId(B.n)], rc = Math.sqrt(kf ? kf[1] : 1), o = BL_OV[blId(B.n)], c = o && o.cut || [1 / 3, 2 / 3], pw = blPts(BL_P.pwm, k0);
+  const B = G.bl, k0 = B.k - 1, kf = BL_KF[blId(B.n)], rc = Math.sqrt(kf ? kf[1] : 1), o = blOv(B.n), c = o && o.cut || [1 / 3, 2 / 3], pw = blPts(BL_P.pwm, k0);
+  if (o && o.sc) return o.ph[Math.min(B.wave, o.ph.length - 1)].d;
   const W = [0, 1, 2, 2].map((ph, i) => { const w = blBaseW(ph, k0, rc, o); return w.wd * w.m * pw[i]; });
   if (o && o.wp) o.wp.forEach((v, i) => { if (v != null) W[i] = v; });   /* bölüme özel nokta: doğrudan ° */
   return blLerp(W, x, c);
@@ -6419,7 +6481,236 @@ const blPlan = () => {
   const hw = blWdDeg(B.wave / B.waves) * Math.PI / 360 * (B.tags.includes('dar') ? 0.9 : 1) * B.hp;
   return { I: 0.2 + 0.15 * k0, omega: blOmAt(B.wave / B.waves), hw: Math.min(hw, BL_P.wMax * Math.PI / 360), relief: false };
 };
-const blPhaseAt = B => { const o = BL_OV[blId(B.n)], c = o && o.cut || [1 / 3, 2 / 3]; return B.wave < B.waves * c[0] ? 0 : (B.wave < B.waves * c[1] ? 1 : 2); };
+const blPhaseAt = B => { const o = blOv(B.n), c = o && o.cut || [1 / 3, 2 / 3]; if (o && o.sc) return Math.min(B.wave, o.ph.length - 1); return B.wave < B.waves * c[0] ? 0 : (B.wave < B.waves * c[1] ? 1 : 2); };
+
+/* ---------- YENİ PARKUR kurucusu (2026-11-24, kullanıcı planı) ----------
+   Her parkur (hedef çeşidi) 11 bölüm; her bölümü 1 ibre + 1 çember ve hız/genişlik aralığı şekillendirir, istisnalar dışında her parkurda aynı:
+   1 Öğretici (çabuk biter, ceza yok), 2 Ters dönen ibre, 3 Gelgit, 4 Nabız, 5 Flaş, 6 Işınlanma + Gelgit, 7 Nabız + Nefes alan çember, 8 Titrek + Nefes alan çember,
+   9 Işınlanma + Ters dönen çember, 10 Flaş + Ters dönen çember, 11 İki halka (yarısından sonra iç ve dış halka birbirine ters döner, ara ara yön değiştirir).
+   sp: ibre hızı [başta, sonda] °/sn, wd: şeftali genişliği [başta, sonda] °, w: dalga (dalgada 2 hedef). Kural: can yok, 8 sn süre sıvısı (BL_P.tm). */
+const PK_ROWS = [
+  { i: '', c: '', sp: [115, 130], wd: [48, 44], w: 8, soft: 1 },
+  { i: 'ters', c: '', sp: [130, 150], wd: [44, 40], w: 20 },
+  { i: '', c: 'gelgit', sp: [135, 155], wd: [43, 39], w: 21 },
+  { i: 'nabiz', c: '', sp: [145, 165], wd: [42, 38], w: 24 },
+  { i: 'flas', c: '', sp: [140, 160], wd: [42, 38], w: 32 },
+  { i: 'isin', c: 'gelgit', sp: [155, 175], wd: [41, 37], w: 32 },
+  { i: 'nabiz', c: 'nefesc', sp: [165, 185], wd: [40, 36], w: 26 },
+  { i: 'titrek', c: 'nefesc', sp: [170, 190], wd: [39, 35], w: 37 },
+  { i: 'isin', c: 'cdon', sp: [175, 195], wd: [38, 34], w: 36 },
+  { i: 'flas', c: 'cdon', sp: [165, 185], wd: [39, 35], w: 35 },
+  { i: '', c: 'iki', sp: [155, 175], wd: [42, 38], w: 29 }];
+/* dalga sayısı parkur ve bölümle (tools/pk-cal.mjs, pro bot: saniye/dalga ölçülüp hedef süre / saniye-dalga; Bölüm 4+ ≈ 57 sn, Bölüm 2-3 ≈ 42 sn, Öğretici 8 dalga). Yavaş oyuncu daha uzun sürer; PK_MINT hiçbir zaman 50 sn altına düşürmez */
+const PK_W = { sabit: [12, 27, 51, 49, 60, 68, 50, 66, 62, 64, 58], nefes: [12, 30, 50, 49, 61, 68, 49, 77, 62, 64, 55], kayan: [12, 28, 53, 47, 60, 85, 51, 67, 70, 65, 52], hayalet: [12, 29, 51, 46, 62, 59, 50, 64, 45, 75, 51], degirmen: [12, 34, 48, 50, 41, 71, 47, 45, 62, 57, 55] };
+/* İstisnalar (Claude'un uyum değerlendirmesi; kullanıcı 2026-11-24: "önerilerini, özellikle istisnalarını dikkate alacağım, unutma"):
+   Hayalet Flaş ve Işınlanma almaz (hedef de ibre de görünmez kalır), dönen çemberde de görünmez hedefin yeri kayar; Değirmen Flaş, Titrek ve İki halka almaz
+   (görünmez ibreyle dönen kanat, titreyen uç kanat mı hedef mi belirsiz, kanadın hangi halkada olduğu belirsiz); Nefes, Nefes alan çember almaz (aynı hareket iki anlam);
+   Kayan dönen çember almaz (hedefin kayması ile çemberin dönüşü ayırt edilmez). Anahtar: 1'den başlayan bölüm numarası. */
+const PK_EX = {
+  nefes: { 7: { c: 'cdon' }, 8: { c: 'gelgit' } },
+  kayan: { 9: { c: 'nefesc' }, 10: { c: '' } },
+  hayalet: { 5: { i: 'titrek' }, 6: { i: 'ters' }, 9: { i: 'ters', c: 'nefesc' }, 10: { i: 'titrek', c: 'gelgit' }, 11: { rot: 0 } },
+  degirmen: { 5: { i: 'ters' }, 8: { i: 'ters' }, 10: { i: '' }, 11: { i: 'ters', c: 'gelgit' } } };   /* Değirmen 10: Flaş çıkar, dönen çember kalır (nabız + dönen çember + kanat botta %0'dı) */
+/* süre: vuruş başına kazanç ×PK_GAIN; Öğretici bölümde kazanç PK_SOFTG kat (süre belli belirsiz değil, gözle görülür azalır) ama PK_SOFT'un altına inmez (yanmazsın) */
+const PK_GAIN = 2.6, PK_SOFT = 2, PK_SOFTG = 0.4;
+/* V1.0.31 (kullanıcı: "bölümler en az 50 sn, ilk 3 hariç"; "her şey sabit, hipnotik, tekdüze asla olmamalı"; "kayma olsun, bir koltuktan ötekine oturmak gibi"):
+   bölüm 4+ en az PK_MINT sn sürer (dalga sayısı yetmezse dalgalar sürer); dalga düzeni her seferinde rastgele (hedef 1-4, tuzak 0-3, boşluklar, bant, kapı aralığı...);
+   elemanlar bir sonraki dalgaya PK_GLIDE sn'de yumuşakça kayar ve kayarken dokunulamaz (soluk), eski işaretler PK_FADE sn'de söner. */
+const PK_TF_UP = 14, PK_TF_DN = 1.4;   /* gelgit: banda girince hız ~0,1 sn'de artar, çıkınca ~0,7 sn'de eski hıza iner */
+const PK_MINT = 75, PK_GLIDE = 0.5, PK_FADE = 0.4, PK_REACT = 0.4, PK_SPD = 1.15;   /* V1.0.32: bölümler %50 uzun (en az 75 sn), kayma hızlı (0,5 sn), ibre %15 hızlı */
+/* Flaş: 2 sn görünür, 0,6 sn görünmez (kullanıcı 2026-11-24); nabız atış aralığı ve titrek her dalgada biraz değişir */
+const PK_FLV = 2.0, PK_FLH = 0.3, PK_AMB = [0.55, 0.72];   /* flaş: 2 sn görünür, kısa (0,3 sn) beyaz flaşla kaybolur */
+const pkFlashOff = () => (((G.clock + ((G.bl && G.bl.flPh) || 0)) % (PK_FLV + PK_FLH)) >= PK_FLV);
+const tg0 = (B, x) => !!(B.tags && B.tags.includes(x));
+/* nabız: her atışta kırmızı kalp flaşı, titreşim ve kalp sesi (lub-dub: güçlü atış, kısa sonra hafif atış) */
+const pkBeat = strong => { flash('heart', strong ? 0.3 : 0.2); Platform.haptic(strong ? 'medium' : 'light'); Snd.tone(strong ? 62 : 52, 0.14, 'sine', strong ? 0.3 : 0.2); };
+const blNbPer = () => (G.bl && G.bl.pk ? (G.bl.nbPer || 2.4) : blMv('nabiz', 'per'));
+const pkRow = n => { const { g, k } = blGK(n), h = BL_GR[g][0], ex = (PK_EX[h] || {})[k]; return Object.assign({ h, k, ex: !!ex, rot: 1 }, PK_ROWS[k - 1], { w: (PK_W[h] || [])[k - 1] || PK_ROWS[k - 1].w }, ex || {}); };
+const pkName = n => { const r = pkRow(n); if (r.soft) return t('pk_ogr'); return [r.i && t('pk_' + r.i), r.c && t('pk_' + r.c)].filter(Boolean).join(' + ') || t('pk_duz'); };
+const pkTags = r => [r.i === 'nabiz' && 'nabiz', r.i === 'titrek' && 'p_titrek', r.i === 'flas' && 'p_flas', r.c === 'nefesc' && 'p_nefesc'].filter(Boolean);
+const pkPick = w => { let s = 0; for (const x of w) s += x[1]; let r = Math.random() * s; for (const x of w) if ((r -= x[1]) <= 0) return x[0]; return w[w.length - 1][0]; };
+/* dalgadaki hedef ve tuzak sayısı: bölümle artar, her dalgada değişir */
+const pkNT = R => pkPick(R.k <= 1 ? [[1, .15], [2, .55], [3, .3]] : R.k <= 3 ? [[1, .1], [2, .45], [3, .45]] : R.k <= 7 ? [[1, .05], [2, .35], [3, .45], [4, .15]] : [[2, .2], [3, .45], [4, .35]]);
+const pkNTr = R => { let n = R.k <= 1 ? 0 : pkPick(R.k <= 3 ? [[0, .25], [1, .6], [2, .15]] : R.k <= 5 ? [[0, .1], [1, .5], [2, .4]] : R.k <= 7 ? [[1, .45], [2, .55]] : [[1, .25], [2, .55], [3, .2]]); return R.h === 'degirmen' ? Math.max(0, n - 1) : n; };
+/* ters dönen çember (tek halka) ve iki halka dönüşü: hedefler, kapılar, gelgit bandı, değirmen ve çemberin kendisi (çentikler, halka işaretleri) döner; ibre dönmez */
+const pkSpinOf = r => (r.c === 'cdon' ? 45 * (r.i === 'flas' ? 0.75 : r.i === 'nabiz' ? 0.85 : 1) : r.c === 'iki' && r.rot ? 35 : 0) * (r.h === 'kayan' ? 0.7 : 1) * Math.PI / 180;
+const pkSpin = dt => {
+  const B = G.bl, Q = B.cr; if (!Q) return;
+  Q.on = !B.pk || B.pk.c === 'cdon' || B.wave >= Math.floor(B.waves / 2);   /* iki halka: bölümün yarısından sonra */
+  if (!Q.on) { Q.v = 0; Q.tell = false; return; }
+  Q.t += dt; Q.tell = Q.t > Q.nx - 0.7;
+  if (Q.t >= Q.nx) { Q.t = 0; Q.nx = rnd(4, 7); Q.tg = -Q.tg; Q.tell = false; Snd.rev(); Platform.haptic('light'); }
+  Q.sg += (Q.tg - Q.sg) * Math.min(1, dt / 0.45);
+  Q.v = Q.s * Q.sg;
+  const d = Q.v * dt;
+  Q.ang = (Q.ang || 0) + d;
+  for (const p of G.pins) if (p.mill == null) { const e = p.ring ? -d : d; if (p.slT != null) { p.slF += e; p.slT += e; } else p.c0 = norm(p.c0 + e); }
+  if (B.mill) B.mill.a = norm(B.mill.a + d);
+  if (B.tdS) { B.tdS.f += d; B.tdS.t += d; } else if (G.tideC != null) G.tideC = norm(G.tideC + d);
+};
+const pkRotV = ring => { const Q = G.bl && G.bl.cr; return Q && Q.on ? (ring ? -Q.v : Q.v) : 0; };
+/* hedef vurulunca parçalar yerinden sıçramaz: eski yerinden yeni yerine kayar (kullanıcı: "bi koltuktan diğerine oturması gibi"); kayarken soluk ve dokunulamaz */
+const pkEase = u => u * u * u * (u * (u * 6 - 15) + 10);
+const pkSlide = dt => {
+  const B = G.bl;
+  for (const p of G.pins) if (p.slT != null) { p.slt += dt; const u = pkEase(clamp(p.slt / PK_GLIDE, 0, 1)); p.c0 = norm(p.slF + sdiff(p.slT, p.slF) * u); if (p.slt >= PK_GLIDE) { p.c0 = norm(p.slT); p.slT = null; } }
+  const S = B.tdS;
+  if (S) { S.tt += dt; const u = pkEase(clamp(S.tt / PK_GLIDE, 0, 1)); G.tideC = norm(S.f + sdiff(S.t, S.f) * u); MECH.tideW = S.w0 + (S.w1 - S.w0) * u; MECH.tideV = [S.v0 + (S.v1 - S.v0) * u, 0, 0].map((v, i, a) => a[0]); if (S.tt >= PK_GLIDE) { G.tideC = norm(S.t); B.tdS = null; } }
+  if (B.gh) { for (const g of B.gh) g.p.fo = Math.max(0, 1 - (g.t += dt) / PK_FADE); B.gh = B.gh.filter(g => g.p.fo > 0); }
+};
+/* eski wave'in pinleri bu dalganın pinlerine eşlenir: en yakın çiftler önce, kaynağı bitenler en yakın eski pinden başlar; kalanlar söner */
+const pkGlideSet = (olds, news) => {
+  const kd = p => (p.kind === 'portal' ? 'P' + p.portal : p.kind === 'gate' ? 'G' + (p.ring | 0) : 'T'), B = G.bl;
+  const nw = news.filter(p => p.mill == null), used = new Set(), pairs = [];
+  for (const q of nw) for (const o of olds) if (kd(o) === kd(q)) pairs.push([angd(o.c0, q.c0), q, o]);
+  pairs.sort((a, b) => a[0] - b[0]);
+  const got = new Map();
+  for (const [, q, o] of pairs) if (!got.has(q) && !used.has(o)) { got.set(q, o); used.add(o); }
+  for (const q of nw) if (!got.has(q) && q.kind !== 'portal') { let b = null, bd = 9; for (const o of olds) if (o.kind !== 'portal' && (o.kind === q.kind || o.kind === 'gate' || o.kind === 'trap')) { const d = angd(o.c0, q.c0); if (d < bd) { bd = d; b = o; } } if (b) got.set(q, b); }
+  for (const [q, o] of got) if (angd(o.c0, q.c0) > 0.02) { const st = q.kind === 'portal' ? norm(q.c0 + clamp(sdiff(o.c0, q.c0), -0.4, 0.4)) : o.c0; q.slF = st; q.slT = q.c0; q.slt = 0; q.c0 = st; }   /* kapı en çok 23° kayar: ibre kayarken geçerse de ışınlanma çalışır */
+  B.gh = (B.gh || []).concat(olds.filter(p => p.kind !== 'portal').map(p => { p.fo = 1; return { p, t: 0 }; }));
+};
+/* çemberin kendi işaretleri: dönen çemberde halka şeridinde çemberle dönen çizgiler ve parlak boncuklar (dönen şeyin hedef değil çember olduğu görünsün) */
+const pkDrawRing = (c, cx, cy, R, RW, R2, RW2, two) => {
+  const Q = G.bl.cr, a0 = Q.ang || 0;
+  c.save(); c.lineCap = 'round';
+  const band = (r, w, a, bead) => {
+    c.strokeStyle = 'rgba(243,240,255,.55)'; c.lineWidth = 2.6;
+    for (let i = 0; i < 36; i++) { const q = a + i * TAU / 36 - HALF, x = Math.cos(q), y = Math.sin(q); c.beginPath(); c.moveTo(cx + x * (r - w * 0.4), cy + y * (r - w * 0.4)); c.lineTo(cx + x * (r + w * 0.4), cy + y * (r + w * 0.4)); c.stroke(); }
+    c.fillStyle = bead;
+    for (let i = 0; i < 6; i++) { const q = a + i * TAU / 6 - HALF; c.beginPath(); c.arc(cx + Math.cos(q) * r, cy + Math.sin(q) * r, w * 0.3, 0, TAU); c.fill(); }
+  };
+  band(R, RW, a0, '#B7A8FF');
+  if (two) band(R2, RW2, -a0, '#FFB38A');
+  c.restore();
+};
+/* dalga düzeni: ibrenin önünden saat yönünde derece (u); hedef, tuzak, ışınlanma kapısı, gelgit bandı ve ters pusu her dalgada rastgele dizilir.
+   Dizilim: hedeflerin önüne bant ve kapı serpiştirilir, aralar boşluk stilinden (sık, orta, geniş, karışık) çekilir; sığmazsa boşluk kısılır, sonra hedef eksilir. */
+const pkLayout = (R, deg, wd, o) => {
+  o = o || {};
+  const k = R.k, ex = R.h === 'kayan' ? 14 : 0, gw = wd + 2 * ex, need = deg * 0.45, REACT0 = PK_REACT * deg;
+  const wantP = !o.plain && R.i === 'isin', wantB = !o.plain && R.c === 'gelgit' && Math.random() < 0.95;
+  const A = !o.plain && R.i === 'ters' && Math.random() < PK_AMB[k <= 4 ? 0 : 1] ? { L: rnd(3, 8) / deg, tell: 0.3, n: k >= 8 && Math.random() < 0.35 ? 2 : 1 } : null;
+  let n = o.n || pkNT(R);
+  const lenient = false;   /* gelgit bandının üstünde hiçbir şey olmaz */
+  for (let tr = 0; tr < 18; tr++) {
+    const sh = tr < 10 ? 1 : tr < 14 ? 0.7 : tr < 16 ? 0.45 : 0.25, REACT = REACT0 * (sh < 1 ? 0.8 : 1);
+    if (tr > 0 && tr % 6 === 0 && n > 1) n--;
+    const sty = pkPick([['t', .3], ['e', .35], ['w', .2], ['m', .15]]), gg = () => (sty === 't' ? rnd(18, 42) : sty === 'e' ? rnd(44, 85) : sty === 'w' ? rnd(86, 140) : rnd(18, 140)) * sh;
+    const bw = rnd(34, 50), pg = tr >= 16 ? 50 : Math.max(50, rnd(60, 160) * (sh < 1 ? 0.7 : 1)), ib = wantB ? (Math.random() * n) | 0 : -1, ip = wantP ? (Math.random() * n) | 0 : -1, sq = [];
+    for (let i = 0; i < n; i++) { const st = []; if (i === ib) st.push('b'); if (i === ip) st.push('p'); if (st.length === 2 && Math.random() < 0.5) st.reverse(); st.forEach(x => sq.push(x)); sq.push('g'); }
+    const build = ex0 => {
+      let c = need + ex0, prev = 's'; const out = { gates: [], items: [], tide: null, portal: null }, ov = lenient && Math.random() < 0.7;
+      for (const it of sq) {
+        let gap = 0;
+        if (it === 'g') gap = prev === 'g' ? gg() : prev === 'b' ? (ov ? -rnd(0.3, 0.6) * wd : rnd(4, 70) * sh) : prev === 'p' ? (Math.random() < 0.6 ? rnd(8, 24) : rnd(24, 50)) : 0;
+        else if (it === 'b') gap = prev === 's' ? 0 : rnd(10, 60) * sh;
+        else gap = prev === 's' ? 0 : rnd(12, 55) * sh;
+        c += gap + (it === 'p' ? deg * 0.2 : 0);   /* kapı kayma bitmeden ibreye değmesin */
+        if (it === 'g') { out.gates.push(c + gw / 2); out.items.push([c - 4, c + gw + 4]); c += gw; }
+        else if (it === 'b') { out.tide = { c: c + bw / 2, w: bw / 2, v: rnd(0.7, 1.3) }; out.items.push([c, c + bw]); c += bw; }
+        else { out.portal = { a: c + 10, b: c + 10 + pg }; out.items.push([c - 2, c + 10 + pg + 12]); c += pg + 22; }
+        prev = it;
+      }
+      out.end = c; return out;
+    };
+    const ex1 = rnd(0, wantP ? 20 : 40); let L = build(ex1);
+    if (A) { const need1 = deg * (A.L + A.tell + 0.14) + gw / 2 - L.gates[0]; if (need1 > 0) L = build(ex1 + need1 + 6); }
+    if (L.end <= 348) { L.amb = A; L.ambMin = A ? deg * (A.L + A.tell + 0.14) : 0; L.need = need; L.ex = ex; L.gw = gw; return L; }
+  }
+  { let c = need + 8; const F = { gates: [], items: [], tide: null, portal: null, amb: null, need, ex, gw };   /* sığmazsa en küçük düzen: bant ve kapı yine VAR */
+    if (wantB) { F.tide = { c: c + 22, w: 22, v: 1 }; F.items.push([c, c + 44]); c += 56; }
+    if (wantP) { F.portal = { a: c + 10, b: c + 60 }; F.items.push([c - 2, c + 72]); c += 72 + 14; }
+    F.gates.push(c + gw / 2); F.items.push([c - 4, c + gw + 4]); F.end = c + gw; return F; }
+};
+const pkTraps = (R, L, wd, nTr) => {
+  const tw0 = clamp(wd * 0.42, 13, 19), occ = L.items.slice(), out = [], gs = L.gates, gw = L.gw;
+  const moving = R.k >= 4 && R.h !== 'degirmen' && R.c !== 'iki';
+  for (let j = 0; j < nTr; j++) {
+    const tw = tw0 + rnd(-2, 3), mv = moving && Math.random() < 0.25 + 0.02 * R.k, amp = mv ? rnd(8, 15) : 0, pad = tw / 2 + amp + 3;
+    for (let at = 0; at < 24; at++) {
+      const mode = pkPick(R.i === 'ters' ? [['f', .25], ['b', .45], ['m', .2], ['r', .1]] : [['f', .35], ['b', .25], ['m', .25], ['r', .15]]), gi = (Math.random() * gs.length) | 0;
+      let u;
+      if (mode === 'f') u = gs[gi] - gw / 2 - tw / 2 - rnd(3, 14);
+      else if (mode === 'b') u = gs[gi] + gw / 2 + tw / 2 + rnd(3, 14);
+      else if (mode === 'm' && gs.length > 1) { const i2 = Math.min(gi, gs.length - 2); u = (gs[i2] + gs[i2 + 1]) / 2 + rnd(-12, 12); }
+      else u = rnd(L.need * 0.9, 340);
+      if (u - pad < L.need * 0.7 || u + pad > 352 || (L.ambMin && u - pad < L.ambMin)) continue;
+      if (occ.some(([a, b]) => u + pad > a && u - pad < b)) continue;
+      out.push({ u, w: tw, amp, f: amp ? rnd(0.18, 0.34) : 0 }); occ.push([u - pad, u + pad]); break;
+    }
+  }
+  return out;
+};
+/* kanat (değirmen) hedefin üstünde varış anında olmasın: hedef kendi yerinden birkaç derece kayar (kanat sıçramaz, hedef zaten kayarak gelir) */
+const pkMillFix = (L, deg, wd, M, d0, gw) => {
+  const bh = 6 * Math.PI / 180, rd = Math.PI / 180, cover = u => { let c = 0; const ga = norm(G.ang + d0 * u * rd); for (let t = Math.max(0, u / deg - 0.3); t <= u / deg + 0.1; t += 0.05) for (let b = 0; b < 2; b++) if (angd(ga, M.a + M.s * t + b * Math.PI) < wd * rd * 0.5 + bh) c++; return c; };
+  L.gates = L.gates.map((u, i) => {
+    let best = u, bv = cover(u);
+    for (const dl of [6, -6, 12, -12, 20, -20, 30, -30]) { if (bv === 0) break; const v = u + dl; if (v < L.need || v > 340 || L.gates.some((o, j) => j !== i && Math.abs(o - v) < gw + 12)) continue;
+      if (L.items.some(([a, b]) => (v + gw / 2 + 4 > a && v - gw / 2 - 4 < b) && !(u + gw / 2 + 5 > a && u - gw / 2 - 5 < b && b - a < gw + 12))) continue;   /* bant, kapı, tuzak üstüne kaymaz */ const cv = cover(v); if (cv < bv) { bv = cv; best = v; } }
+    return best;
+  });
+};
+/* dalga kurucu: ibre yerinde kalır, parçalar ibrenin önüne kurala göre dizilir */
+const pkWave = () => {
+  const B = G.bl, R = B.pk, rd = d => d * Math.PI / 180, x = B.waves > 1 ? clamp(B.wave / (B.waves - 1), 0, 1) : 0;
+  const deg = (R.sp[0] + (R.sp[1] - R.sp[0]) * x) * PK_SPD * rnd(0.94, 1.07), wd = Math.min(BL_P.wMax, (R.wd[0] + (R.wd[1] - R.wd[0]) * x) * rnd(0.93, 1.1) * B.hp * 1.08), hw = rd(wd) / 2;
+  G.omega = rd(deg); G.gainMul = (window.__pkGain || PK_GAIN) * (R.soft ? PK_SOFTG : 1) * (R.i === 'ters' ? 1.2 : 1) * (R.h === 'degirmen' ? 1.3 : 1); G.I = 0.3; G.relief = false; G.vort = 0; G.lockLeft = 0;
+  if (B.flPh == null) B.flPh = rnd(0, PK_FLV + PK_FLH);
+  B.nbPer = rnd(1.5, 2.1); if (!B.nc) B.nc = { P: rnd(2, 3.2), a: rnd(0.07, 0.13) }; B.tj = { f1: rnd(19, 27), f2: rnd(11, 16), a: rnd(0.85, 1.05) };
+  const olds = G.pins.filter(p => p.mill == null), oldTide = G.tideC, oldW = MECH.tideW, oldV = MECH.tideV[0];
+  G.pins = []; G.tideC = null; B.tdS = null;
+  G.kind = R.c === 'iki' ? 'iki' : R.c === 'gelgit' ? 'gelgit' : 'tek';
+  const d0 = G.dir, at = u => ahead(G.ang, d0, rd(u));
+  const mk = (ring, c, h) => {
+    const p = mkGate(ring, c, h);
+    if (R.h === 'nefes') p.br = { a: rnd(0.25, 0.4), P: rnd(1.3, 2), ph: -TAU * G.pt / 1.6 };   /* açık başlar */
+    else if (R.h === 'kayan') { p.amp = rd(rnd(10, 14)); p.f = rnd(0.28, 0.45); p.ph = rnd(0, TAU); }
+    else if (R.h === 'hayalet') { p.ghost = { vis: PK_GLIDE + rnd(0.7, 1.3) }; p.age = 0; }
+    return p;
+  };
+  const trap = (c, w, amp, f) => ({ kind: 'trap', tw: 'tuzak', ring: 0, c0: c, amp: rd(amp), f, ph: rnd(0, TAU), hw: rd(w) / 2, done: false });
+  const M = R.h === 'degirmen' ? (B.mill || (B.mill = { a: norm(G.ang + d0 * rnd(2.4, 3.6)), s: 0, s0: 0, t: 0, tg: null, tell: false })) : null;
+  if (!M) B.mill = null; else { M.s0 = M.s0 ? Math.sign(M.s0) : (Math.random() < 0.5 ? -1 : 1); M.tg = M.s0 * rd(rnd(32, 40) + 2.5 * R.k); if (!M.s) M.s = M.tg; }
+  let L, L2 = null, tr = [];
+  if (G.kind === 'iki') {
+    if (!B.ikiOn) { B.ikiOn = 1; G.ang2 = norm(G.ang + Math.PI); G.vel2 = NaN; }
+    G.dir2 = -G.dir; G.omega2 = G.omega * 0.85;
+    L = pkLayout(R, deg, wd, { plain: true, n: pkPick([[1, .35], [2, .65]]) });
+    L2 = pkLayout(R, deg * 0.85, wd * 1.1, { plain: true, n: pkPick([[1, .55], [2, .45]]) });
+    tr = pkTraps(R, L, wd, pkNTr(R) > 1 ? 1 : 0);
+    L.gates.forEach(u => G.pins.push(mk(0, at(u), hw)));
+    L2.gates.forEach(u => G.pins.push(mk(1, ahead(G.ang2, G.dir2, rd(u)), hw * 1.1)));
+  } else {
+    /* üç aday dizilim çekilir, eski yerlere en yakın olan seçilir: kayma kısa ve doğal kalır, yine de her dalga farklıdır */
+    const nTr = pkNTr(R); let bestC = 1e9;
+    for (let ci = 0; ci < 3; ci++) {
+      const Lc = pkLayout(R, deg, wd); if (M) pkMillFix(Lc, deg, wd, M, d0, Lc.gw);
+      const tc = pkTraps(R, Lc, wd, nTr);
+      const cost = olds.length ? Lc.gates.concat(tc.map(q => q.u)).reduce((a, u) => a + Math.min(...olds.map(o => angd(at(u), o.c0))), 0) * rnd(0.85, 1.15) : 0;
+      if (cost < bestC) { bestC = cost; L = Lc; tr = tc; }
+    }
+    if (L.portal) {
+      G.pins.push({ kind: 'portal', portal: 'in', ring: 0, c0: at(L.portal.a), amp: 0, f: 0, ph: 0, hw: MECH.isinPortalHw, done: false, wait: MECH.isinWait[0], prev: null },
+        { kind: 'portal', portal: 'out', ring: 0, c0: at(L.portal.b), amp: 0, f: 0, ph: 0, hw: MECH.isinPortalHw, done: false });
+    }
+    if (L.tide) { G.tideC = at(L.tide.c); MECH.tideBase = 1; MECH.tideW = rd(L.tide.w); MECH.tideV = [L.tide.v, L.tide.v, L.tide.v]; }
+    L.gates.forEach(u => G.pins.push(mk(0, at(u), hw)));
+  }
+  tr.forEach(q => G.pins.push(trap(at(q.u), q.w, q.amp, q.f)));
+  if (M) { const bh = rd(12) / 2; for (let i = 0; i < 2; i++) G.pins.push({ kind: 'trap', tw: 'tuzak', mill: i * Math.PI, ring: 0, c0: norm(M.a + i * Math.PI), amp: 0, f: 0, ph: 0, hw: bh, prio: true, pen: 1, done: false }); }
+  /* kayma: her yeni parça eski bir parçanın yerinden yeni yerine kayar */
+  if (!RM && olds.length) {
+    pkGlideSet(olds, G.pins);
+    if (oldTide != null && G.tideC != null) { B.tdS = { f: oldTide, t: G.tideC, tt: 0, w0: oldW, w1: MECH.tideW, v0: oldV, v1: MECH.tideV[0] }; G.tideC = oldTide; MECH.tideW = oldW; }
+  }
+  for (const p of G.pins) p.gx = p.kind === 'gate' && !p.ring ? 1 : 0;
+  /* ters ibre: bazı yaklaşmalarda hedefe tam varmadan, kısa sarı uyarıdan sonra ters döner (pusu); uyarı hemen başlar */
+  B.amb = L.amb ? { n: L.amb.n, left: L.amb.n, L: L.amb.L, tell: L.amb.tell, t0: G.clock, up: 0, tt: 0 } : null;
+  B.tags = pkTags(R); B.prim = 'tek';
+  G.chal = { kind: G.kind, t: 0, star: 0, tw: '' }; G.gateT = Math.max(G.gateT, olds.length ? 1 : 0.9);
+};
 
 const OB_L1_WAVES = 4;
 const blStart = (n, les) => {
@@ -6429,11 +6720,14 @@ const blStart = (n, les) => {
   runEpoch++; if (activeReward) activeReward();
   Snd.ui();
   Object.assign(G, runState(1));
-  const { g, k } = blGK(n);
-  blMechApply(k);
-  G.bl = { n, g, k, hp: blHelp(n), died: false, ph: 0, wave: 0, waves: blWaves(n, k), lives: BL_P.lives, miss: 0, cont: false, phs: BL_OV[blId(n)] && BL_OV[blId(n)].ph ? BL_OV[blId(n)].ph.map(p => ({ t: p.t.filter(x => !BL_OFF.includes(x)), from: 0 })) : blPhases(g, k), lph: -1, nbT: 0, nbX: false, mill: null, flipT: 0, tell: 0, br: null, lk: 0, lkv: 0, tags: [], prim: '', alt: 0, lifeFx: [-9, -9, -9], winT: 0, wv: 0, les: les || null, only: !!(les && les.only) };
+  const { g, k } = blGK(n), pk = pkRow(n), sp = pkSpinOf(pk);
+  blMechApply(blK5(k));
+  const LW = !!window.__labWave;   /* laboratuvar önizlemesi kendi dalgasını kurar */
+  G.bl = { n, g, k, pk: LW ? null : pk, timed: LW ? 0 : 1, soft: !LW && pk.soft ? 1 : 0, minT: !LW && !window.__noMinT && pk.k >= 4 ? PK_MINT : 0, tm: 0, cr: sp && !LW ? { s: sp, sg: 1, tg: 1, t: 0, nx: rnd(4, 7), v: 0, on: false, tell: false } : null, hp: blHelp(n), died: false, ph: 0, wave: 0, waves: pk.w, lives: BL_P.lives, miss: 0, cont: false, sc: !!(blOv(n) && blOv(n).sc), amb: null, lastFlip: null, gTot: 0, phs: [], lph: -1, nbT: 0, nbX: false, mill: null, flipT: 0, tell: 0, br: null, lk: 0, lkv: 0, tags: [], prim: '', alt: 0, lifeFx: [-9, -9, -9], winT: 0, wv: 0, les: les || null, only: !!(les && les.only) };
   if (save.ob === OB_L1 && n === 1) G.bl.waves = Math.min(G.bl.waves, OB_L1_WAVES);   /* öğretimde Bölüm 1 çabuk biter */
   G.mode = 'play'; G.time = CFG.maxTime; G.dir = 1;
+  if (G.bl.timed) G.time = G.tvis = BL_P.tm.start;   /* süreli parkur: 8 sn sıvı 6 sn'den başlar */
+  if (G.bl.cr && Math.random() < 0.5) G.bl.cr.sg = G.bl.cr.tg = -1;
   G.open = Object.keys(IMPL_GOOD); Object.keys(IMPL_TWIN).forEach(x => { G.eng[x] = true; });
   G.thT = 0; thWx = 0; applyTheme(true);
   hide(menuEl); hide(bookEl); hide(blListEl); LS.on = false; LS.go = null; hide($('pracDone')); hide(overEl); hide(pauseEl); hideShop(); ovStage(''); app.classList.remove('ovr', 'prac');
@@ -6471,13 +6765,17 @@ const blLabWave = (D, keep) => {   /* keep: canlı düzenleme, ibre yerinde kal�
     else if (x.t === 'hayalet') G.pins.push(Object.assign(mkGate(0, c, hw), { ghost: { vis: x.vis || 0.8 }, age: 0, lab: 1 }));
     else if (x.t === 'trap') G.pins.push({ kind: 'trap', tw: 'tuzak', ring: 0, c0: c, amp: 0, f: 0, ph: 0, hw, done: false });
     else if (x.t === 'girdap') G.pins.push({ kind: 'vortex', ring: 0, c0: c, amp: 0, f: 0, ph: 0, hw: MECH.vortexHw, done: false, hole: { k: x.k != null ? x.k : 1.2, r: r(x.r || 70), o: r(x.o || 50) } });
+    else if (x.t === 'portal') { G.pins.push({ kind: 'portal', portal: 'in', ring: 0, c0: c, amp: 0, f: 0, ph: 0, hw: MECH.isinPortalHw, done: false, wait: MECH.isinWait[0], prev: null }, { kind: 'portal', portal: 'out', ring: 0, c0: norm(c + r(x.skip || 50)), amp: 0, f: 0, ph: 0, hw: MECH.isinPortalHw, done: false }); }
     else if (x.t === 'gelgit') { G.kind = 'gelgit'; G.tideC = c; MECH.tideW = hw; MECH.tideV = [0, 1, 2].map(() => Math.max(0, (x.m || 1.8) - MECH.tideBase)); }
     else if (x.t === 'degirmen') {
       const n = Math.round(x.n || 2), M = B.mill = { a: mA != null ? mA : c, s: r(x.v || 60) * (x.d === -1 ? -1 : 1), s0: 0, t: 0, tg: null, tell: false };
       M.s0 = M.s; for (let i = 0; i < n; i++) G.pins.push({ kind: 'trap', tw: 'tuzak', mill: i * TAU / n, ring: 0, c0: norm(M.a + i * TAU / n), amp: 0, f: 0, ph: 0, hw, prio: true, pen: 1, done: false });
     }
   }
-  G.ang = keep ? ang : norm(r(D.p0 || 0)); G.dir = D.dir === -1 ? -1 : 1; G.omega = r(D.om || 180); G.vel = NaN;
+  G.ang = keep ? ang : norm(r(D.p0 || 0)); G.dir = D.dir === -1 ? -1 : 1; G.omega = r(V(D.om || 180)); G.vel = NaN;   /* om [en az, en çok] ise her dalgada aralıktan */
+  if (D.timed && !B.timed) { B.timed = 1; G.time = G.tvis = BL_P.tm.start; }
+  if (D.waves) B.waves = D.waves;   /* süreli önizleme: bölüm sonu var, ilerleme çentiklerde */
+  if (D.tags) { B.tags = D.tags.slice(); B.prim = 'tek'; B.nbT = B.nbT || 0; B.flipT = B.flipT || 0; }   /* Parkur planı (laboratuvar): ibre davranışı etiketle (nabiz, kyon) */
   for (const p of G.pins) {   /* nefes açık başlar; diken oyundaki gibi ibre gelirken kapanacak biçimde zamanlanır */
     if (p.br && !p.thorn) p.br.ph = -TAU * G.pt / p.br.P;
     if (p.thorn) { const w = p.thw, P = w.att + w.hold + w.rel, tIn = Math.max(0, (aheadOf(p.c0) - p.hw) / G.omega); w.o = (((w.att + 0.15 - G.pt - tIn) % P) + P) % P; }
@@ -6521,8 +6819,10 @@ const blPlaceTrap = (hw, tw) => {   /* tw: kurgunun tuzak genişliği (°); yoks
 };
 const blSpawn = first => {
   const B = G.bl;
+  if (window.__labWave) { G.gainMul = 1; G.kind = 'tek'; blLabWave(window.__labWave); return; }   /* laboratuvar: tasarlanan dalga aynen */
+  if (B.pk) { pkWave(); return; }   /* yeni parkur */
   B.ph = blPhaseAt(B);
-  const ov = BL_OV[blId(B.n)];
+  const ov = blOv(B.n);
   if (B.ph !== B.lph) { B.lph = B.ph; if (ov) blMechPh(B); }
   const tags = B.tags = B.phs[B.ph].t;
   const own = BL_GR[B.g][0].split(' ')[0];
@@ -6538,6 +6838,8 @@ const blSpawn = first => {
   if (B.g === 0 && !ov) prim = tags.includes('cift') ? 'cift' : 'tek';
   else if (ov && prim === 'tek' && tags.includes('cift') && !tags.includes('tek')) prim = 'cift';
   if (B.les) prim = B.les.kind;
+  const phS = ov && ov.sc && !B.les && blOvPh(B) ? blOvPh(B).s : null;   /* betikli dalga: yapı açıkça verilir */
+  if (phS) prim = phS;
   B.prim = prim;
   const k0 = B.k - 1, sIx = [0, 1, 1, 2, 2][k0];
   G.stars[prim] = sIx;
@@ -6551,7 +6853,8 @@ const blSpawn = first => {
   B.inSpawn = true;
   spawnChallenge(false, prim, forceTw);
   B.inSpawn = false;
-  B.omMul = JKIND[prim] ? JKIND[prim].omMul : 1; G.omega = Math.max(blPlan().omega * B.omMul, BL_P.omMin * Math.PI / 180);
+  const scx = !!(ov && ov.sc && !B.les);
+  B.omMul = scx ? 1 : (JKIND[prim] ? JKIND[prim].omMul : 1); G.omega = Math.max(blPlan().omega * B.omMul, (scx ? BL_SC_OMMIN : BL_P.omMin) * Math.PI / 180);
   /* hedefe giydirilen özellikler: kayma, nefes, hayalet (ana kilit zaten değilse) */
   const gates = () => G.pins.filter(p => p.kind === 'gate' && !p.bonus && !p.light && !p.note && !p.kasa && p.ring === 0);
   const dress = (p, i) => {
@@ -6559,14 +6862,15 @@ const blSpawn = first => {
     if ((tags.includes('nefes') || tags.includes('nefes2')) && !p.br) p.br = { a: blMv('nefes', 'a') / 100, P: blMv('nefes', 'P'), ph: tags.includes('nefes2') ? i * 2.1 : 0 };
     if (tags.includes('hayalet') && !p.ghost) { const v = blMv('hayalet', 'vis'); p.ghost = { vis: tags.includes('hayalet2') ? [v * 0.73, v * 1.36, v][i % 3] : v }; }
   };
-  gates().forEach(dress);
+  const gatesAll = () => G.pins.filter(p => p.kind === 'gate' && !p.bonus && !p.light && !p.note && p.ring === 0);   /* betikli bölümde kasa pimleri de giydirilir (nefesli kasa, kayan kasa) */
+  (scx ? gatesAll() : gates()).forEach(dress);
   /* dalga boyu: tek hedefli kilitlerde basamağa göre ek hedef */
   const [lo, hi] = tags.includes('uc3') ? [3, 3] : blPS('size', BL_P.size[k0]);
   const want = lo + (Math.random() < 0.5 ? 0 : hi - lo);
   if (['tek', 'cift', 'kayan', 'nefes', 'hayalet', 'gelgit'].includes(prim)) {
     const hw = blPlan().hw;
     for (let tries = 0; gates().length < want && tries < 40; tries++) {
-      const c = ahead(G.ang, G.dir, rnd(1.0, 5.6));
+      const bmX = blAmbMin(), c = ahead(G.ang, G.dir, rnd(Math.max(1.0, bmX), Math.max(Math.max(1.0, bmX) + 0.3, 5.6)));
       if (G.pins.some(p => angd(c, p.c0) < (p.hw || 0.2) + hw + 0.3)) continue;
       const p = mkGate(0, c, hw); p.blx = 1; dress(p, gates().length); G.pins.push(p);
     }
@@ -6584,13 +6888,21 @@ const blSpawn = first => {
     }
     if (tags.includes('tuzakk')) G.pins.forEach(p => { if (p.kind === 'trap' && !p.amp) { p.amp = 0.45; p.f = 0.3; p.ph = rnd(0, TAU); } });
   }
-  blSpawnNew(tags, gates);
+  blSpawnNew(tags, scx ? gatesAll : gates);
   blUntangle();
   if (B.n >= BL_FAIR_N) blFairFix();
   if (B.lw) { B.lw.got = G.pins.filter(p => p.kind === 'trap' && p.tw === 'tuzak').length; B.lw.gates = G.pins.filter(p => (p.kind === 'gate' && !p.bonus) || p.kind === 'hold' || p.kind === 'lockpin').length; B.lw.traps = G.pins.filter(p => p.kind === 'trap').length; B.lw.ph = B.ph; }   /* laboratuvar: son dalgada ne kuruldu */
   if (window.__labWave) { blLabWave(window.__labWave); return; }   /* laboratuvar Tool sayfası: tasarlanan dalga aynen */
   { const wx = blWdDeg(B.wave / B.waves), cap = BL_P.wMax * Math.PI / 360; for (const p of G.pins) if (p.kind === 'gate' && !p.done) { p.hw = Math.min(p.hw, cap); p.hw0 = p.hw; p.wx0 = wx; } }   /* kilit çarpanı (ör. nefes ×1,1) sınırı aşmasın */   /* her vuruşta daralma için kuruluş genişliği */
   blLifeSpawn();
+  /* betikli dalga: vurulması gereken hedefler işaretlenir (hız v→v1 ilerlemesi), daralan hedef ve ters pusu kurulur */
+  B.gTot = 0; B.amb = null;
+  for (const p of G.pins) { p.gx = 0; if (isReq(p) && p.kind === 'gate' && !p.ring) { p.gx = 1; B.gTot++; } }
+  if (scx) {
+    const ph = blOvPh(B), x = ph && ph.x;
+    if (x && x.shr) for (const p of G.pins) if (p.gx) p.shr = { f: x.shr.f, t: x.shr.t };
+    if (x && x.amb) B.amb = { n: x.amb.n || 1, left: x.amb.n || 1, L: x.amb.L, tell: x.amb.tell, t0: G.clock, up: 0, tt: 0 };
+  }
   /* numaralı hedefler (kullanıcı 2026-11-16): sıra rastgele, 1 vurulmadan 2 açılmaz */
   B.ord = false;
   if (G.kind === 'cift') {
@@ -6699,12 +7011,22 @@ const blPulseAt = (t, x) => { const beats = x ? [0, 0.24, 0.62] : [0, 0.24]; let
 const blPulse = () => { const B = G.bl; return B && B.tags && B.tags.includes('nabiz') && G.mode === 'play' ? blPulseAt(B.nbT || 0, B.nbX) : 1; };
 /* Yön değiştir: ibre ters döner (hız işaretli yumuşatmadan geçer, ani sıçrama yok) */
 const BL_FLIPOK = ['tek', 'cift', 'kayan', 'nefes', 'hayalet'];   /* yapısal kilitlerin sırası (nota, kasa, tut, sabır, ışın, gelgit, trafik) ters dönmeyle bozulur */
-const blFlip = () => { G.dir = -G.dir; G.revT = 0.8; Snd.rev(); Platform.haptic('light'); };
+/* ters pusu: ilk hedefin ibreye en az uzaklığı (rad) = (L + uyarı + pay) × ibre hızı */
+const blAmbMin = () => { const B = G.bl, ph = B && B.sc && !B.les ? blOvPh(B) : null, a = ph && ph.x && ph.x.amb; return a ? Math.min(TAU - 0.6, (a.L + a.tell + 0.12) * G.omega) : 0; };
+const blFlip = tell => { G.dir = -G.dir; G.revT = 0.8; if (G.bl) G.bl.lastFlip = { t: G.clock, tell: tell || 0, n: ((G.bl.lastFlip && G.bl.lastFlip.n) || 0) + 1 }; Snd.rev(); Platform.haptic('light'); };
+/* Daralan hedef: ibre hedefe t sn kala hedef f katına doğru küçülür (yaklaşırken görülür); ibre geçince yeniden açılır */
+const blShrink = p => {
+  const sh = p.shr, d = aheadOf(p.c0);
+  if (d > (sh.t + 0.4) * G.omega * 3.2) return 1;
+  const e = etaTo(pinCenter(p));
+  return e >= sh.t ? 1 : 1 - (1 - sh.f) * (1 - Math.max(0, e) / sh.t);
+};
 const blTick = dt => {
   const B = G.bl, tg = B.tags || [];
   if (B.ord) { let nx = 99; for (const p of G.pins) if (p.ord && !p.done && p.ord < nx) nx = p.ord; for (const p of G.pins) if (p.ord) p.locked = !p.done && p.ord !== nx; }
-  if (B.omMul && !window.__blForce) { const x = blProg(), om = Math.max(blOmAt(x) * B.omMul, BL_P.omMin * Math.PI / 180); if (om !== G.omega) { if (G.omega2) G.omega2 *= om / G.omega; G.omega = om; } const wx = blWdDeg(x); for (const p of G.pins) if (p.hw0 && !p.done) p.hw = Math.min(p.hw0 * wx / p.wx0, BL_P.wMax * Math.PI / 360); }
-  if (tg.includes('nabiz')) { const per = blMv('nabiz', 'per'); B.nbT += dt; if (B.nbT >= per) { B.nbT -= per; B.nbX = tg.includes('nabizk') && Math.random() < blMv('nabiz', 'extra'); } }
+  if (B.omMul && !window.__blForce) { const x = blProg(), om = Math.max(blOmAt(x) * B.omMul, BL_P.omMin * Math.PI / 180); if (om !== G.omega) { if (G.omega2) G.omega2 *= om / G.omega; G.omega = om; } const wx = blWdDeg(x); for (const p of G.pins) if (p.hw0 && !p.done) { p.hw = Math.min(p.hw0 * wx / p.wx0, BL_P.wMax * Math.PI / 360); if (p.shr) p.hw *= blShrink(p); } }
+  if (tg.includes('p_titrek')) { const tj = B.tj || { f1: 9, f2: 5.3, a: 1 }, j = (Math.sin(G.clock * tj.f1) * 0.05 + Math.sin(G.clock * tj.f2) * 0.035) * tj.a * (G.mode === 'play' ? 1 : 0); G.ang = norm(G.ang - (B.jit || 0) + j); B.jit = j; }   /* Parkur planı (laboratuvar): titrek ibre; gördüğün ibre vurur */
+  if (tg.includes('nabiz')) { const per = blNbPer(); B.nbT += dt; if (B.pk && G.mode === 'play') { if (B.nbT >= 0.24 && !B.nb2) { B.nb2 = 1; pkBeat(false); } } if (B.nbT >= per) { B.nbT -= per; B.nb2 = 0; if (B.pk && G.mode === 'play') pkBeat(true); B.nbX = tg.includes('nabizk') && Math.random() < blMv('nabiz', 'extra'); } }
   const M = B.mill;
   if (M) {
     if (tg.includes('hizkanat') || tg.includes('degk')) { M.t += dt; const ch = blMv('degirmen', 'chg'); M.tell = M.t > ch - 0.45; if (M.t > ch) { M.t = 0; const o = [1.6, -0.8, -1.2, 0.5]; M.tg = M.s0 * o[(Math.random() * o.length) | 0]; } }
@@ -6718,8 +7040,27 @@ const blTick = dt => {
     M.a = norm(M.a + M.s * mf * dt);
     for (const p of G.pins) if (p.mill != null) p.c0 = norm(M.a + p.mill);
   }
-  const kf = tg.includes('kyon') && B.prim === 'kasa' ? blMv('kasa', 'flip') : 0;
-  if ((tg.includes('yon') && tg.includes('yonk') && BL_FLIPOK.includes(B.prim)) || kf > 0) { const au = kf > 0 ? kf : blMv('yon', 'auto'); B.flipT += dt; B.tell = B.flipT > au - (kf > 0 ? blMv('kasa', 'tell') : blMv('yon', 'tell')) ? 1 : 0; if (B.flipT > au) { B.flipT = rnd(-0.6, 0.6); B.tell = 0; blFlip(); } } else B.tell = 0;
+  const kf = tg.includes('kyon') && BL_KYONOK.includes(B.prim) ? blMv('kasa', 'flip') : 0;
+  if (B.pk) {
+    pkSlide(dt); pkSpin(dt); B.tm = (B.tm || 0) + dt;
+    { const tg = G.kind === 'gelgit' && G.tideC != null ? tideF(G.ang) : 1; B.tf = B.tf || 1; B.tf += (tg - B.tf) * Math.min(1, (tg > B.tf ? PK_TF_UP : PK_TF_DN) * dt); }
+    if (tg0(B, 'p_flas')) { const off = pkFlashOff(); if (off && !B.flWas) flash('white', 0.22); B.flWas = off; }
+  }
+  else if (tg.includes('p_cdon')) { if (!B.cr) B.cr = { s: 30 * Math.PI / 180, sg: 1, tg: 1, t: 0, nx: 3.4, v: 0, on: false, tell: false }; pkSpin(dt); }   /* laboratuvar Parkur planı önizlemesi */
+  let tellK = 0;
+  if ((tg.includes('yon') && tg.includes('yonk') && BL_FLIPOK.includes(B.prim)) || kf > 0) { const au = kf > 0 ? kf : blMv('yon', 'auto'), tl = kf > 0 ? blMv('kasa', 'tell') : blMv('yon', 'tell'); B.flipT += dt; tellK = B.flipT > au - tl ? 1 : 0; if (B.flipT > au) { B.flipT = rnd(-0.6, 0.6); tellK = 0; blFlip(tl); } }
+  /* ters pusu (amb): ibre vurulacak ilk hedefe L sn kala ters döner; tell sn önceden ibrenin ucunda sarı uyarı yanar */
+  let tellA = 0;
+  const A = B.amb;
+  if (A && A.left > 0 && G.mode === 'play' && !G.tun && G.clock >= A.t0) {
+    /* en yakın eleman (hedef, tuzak): ibre aksiyona hazırlanırken ters döner; boş yolda dönmez */
+    let e = 99; for (const p of G.pins) if ((p.gx || (p.kind === 'trap' && p.mill == null)) && !p.done && !p.locked && !p.wait && !p.gone) { const t = etaTo(p.slT != null ? p.slT : pinCenter(p)) - (p.hw || 0) / Math.max(0.5, G.omega); if (t < e) e = t; }   /* kayan hedefin son yeri sayılır */
+    /* uyarı yalnız tam süre görülebilecekse yanar (yaklaşma uzaktan başladıysa); ibre çok yakından başlarsa o yaklaşmada pusu yok */
+    if (e > A.L + A.tell + 0.05) { A.up = 1; A.tt = 0; }
+    else if (e > A.L + 0.015) { if (A.up) { A.tt += dt; tellA = 1; } }
+    else { if (A.up && A.tt >= A.tell * 0.85) { A.left--; blFlip(A.tell); A.t0 = G.clock + 0.9; } A.up = 0; A.tt = 0; }
+  }
+  B.tell = tellK || tellA ? 1 : 0;
   for (const p of G.pins) if (p.ani && !p.ani.on && !p.done) {
     const d = norm((pinCenter(p) - G.ang) * G.dir), v = Math.max(0.4, Math.abs(G.vel === G.vel ? G.vel : G.omega));
     if (d / v < p.ani.lead || d > TAU - (p.hw || 0.1) - 0.05) { p.ani.on = G.clock; const q = pinXY(p); fxRing(q.x, q.y, '#F2B73C', 44, 0.35); }
@@ -6757,6 +7098,7 @@ const blSpawnNew = (tags, gates) => {
 };
 const blDrawMid = (c, cx, cy, R, RW, R2, RW2) => {
   const B = G.bl;
+  if (B.gh) for (const g of B.gh) { c.save(); drawPin(c, cx, cy, g.p.ring ? R2 : R, g.p.ring ? RW2 : RW, g.p, 1, 0, false); c.restore(); }   /* eski işaretler sönerek gider */
   if (B.mill) {
     c.lineCap = 'round';
     for (const p of G.pins) if (p.mill != null) { const q = ptXY(cx, cy, p.c0, R - RW * 0.55); c.strokeStyle = 'rgba(201,190,238,.7)'; c.lineWidth = RW * 0.3; c.beginPath(); c.moveTo(cx, cy); c.lineTo(q[0], q[1]); c.stroke(); }
@@ -6778,6 +7120,14 @@ const blDrawMid = (c, cx, cy, R, RW, R2, RW2) => {
 };
 const blDrawFront = (c, cx, cy, pR, pRW, R) => {
   const B = G.bl;
+  if (B.cr && B.cr.on) {
+    /* dönen çember: ortada küçük dönüş oku, yön değişmeden önce sarı yanıp söner (ters ibre uyarısı gibi) */
+    const Q = B.cr, y = cy + R * (G.kind === 'iki' ? 0.46 : 0.64), r = R * 0.1, k = Q.tell ? 0.5 + 0.5 * Math.sin(G.clock * 22) : 0, sg = Q.sg >= 0 ? 1 : -1, a0 = -HALF - sg * 0.3, a1 = a0 + sg * 4.4;
+    c.strokeStyle = Q.tell ? 'rgba(242,183,60,' + (0.55 + 0.45 * k).toFixed(2) + ')' : 'rgba(243,240,255,.38)'; c.lineWidth = 2.4; c.lineCap = 'round';
+    c.beginPath(); c.arc(cx, y, r, Math.min(a0, a1), Math.max(a0, a1)); c.stroke();
+    const ex = cx + Math.cos(a1) * r, ey = y + Math.sin(a1) * r, ta = a1 + sg * HALF;
+    c.beginPath(); c.moveTo(ex + Math.cos(ta - 0.5) * r * 0.55, ey + Math.sin(ta - 0.5) * r * 0.55); c.lineTo(ex, ey); c.lineTo(ex + Math.cos(ta + 0.5 - Math.PI) * r * 0.55, ey + Math.sin(ta + 0.5 - Math.PI) * r * 0.55); c.stroke();
+  }
   if (B.tell) { const q = ptXY(cx, cy, G.ang, pR), k = 0.5 + 0.5 * Math.sin(G.clock * 22); c.fillStyle = 'rgba(242,183,60,' + (0.3 + 0.4 * k).toFixed(2) + ')'; c.beginPath(); c.arc(q[0], q[1], pRW * (0.55 + 0.2 * k), 0, TAU); c.fill(); }
   if (B.tags && B.tags.includes('nabiz')) {
     /* ortada sade, ince, soluk tek atışlık EKG; çemberle dönmez; fazladan atış gelecekse sarı */
@@ -6795,14 +7145,15 @@ const blHurt = (n, label) => {
   n = BL_P.dmg[big ? 1 : 0];
   G.mev = (G.mev || 0) + 1;
   /* ders dalgası: ıska öğretir, can ve yıldız gitmez */
-  if (!B.les) { B.miss += n; for (let i = 0; i < n; i++) if (B.lives > 0) { B.lives--; B.lifeFx[B.lives] = G.clock; } }
+  if (B.timed) { if (!B.les) { B.miss += n; G.time = Math.max(B.soft ? PK_SOFT : 0, G.time - (big ? BL_P.tm.trap : BL_P.tm.miss)); } }   /* Öğretici bölüm (soft): süre en çok PK_SOFT'a iner */   /* süreli: can yerine süre gider */
+  else if (!B.les) { B.miss += n; for (let i = 0; i < n; i++) if (B.lives > 0) { B.lives--; B.lifeFx[B.lives] = G.clock; } }
   G.combo = 0; G.perf = 0; G.missRun++;
   shake(big ? 0.5 : 0.3);
   blMissFx(big ? 2 : 1, label);
   if (big) Snd.alarm(); else Snd.miss();
   Platform.haptic(big ? 'error' : 'warn');
   updateHud();
-  if (B.lives <= 0) die();
+  if (B.timed ? G.time <= 0 : B.lives <= 0) die();
 };
 const blWaveDone = () => {
   const B = G.bl;
@@ -6815,14 +7166,15 @@ const blWaveDone = () => {
   /* yeni dalga mola olmadan gelir: halkada dönen ışık ve sayının zıplaması haber verir */
   BX.sweep = G.clock; BX.slosh = Math.max(BX.slosh, 0.8);
   updateHud();
-  if (B.wave >= B.waves) { blWin(); return; }
+  if (B.wave >= B.waves && B.minT && (B.tm || 0) < B.minT) { /* en az süre dolmadı: dalgalar sürer */ }
+  else if (B.wave >= B.waves) { if (window.__labWave) { B.wave = 0; G.bl.wv = 0; BX.lv = 0; G.time = G.tvis = BL_P.tm.start; BX.pulse = 1.5; BX.pc = GOLD; Snd.fanfare(); spawnConf(50, { x0: view.cx - 20, x1: view.cx + 20, y0: view.cy - 10, vx: 420, vy0: -520, vy1: 260, delay: 0, spread: 0.25, life: 2.2 }); } else { blWin(); return; } }   /* laboratuvar önizlemesi kayda yazmadan baştan başlar */
   spawnChallenge(false);
 };
 const blWin = () => {
   const B = G.bl, id = blId(B.n);
   const st = B.cont ? 1 : (B.miss <= BL_P.star[0] ? 3 : (B.miss <= BL_P.star[1] ? 2 : 1));
   /* bölüm ödülü yalnız ilk geçişte; taslak formül (ekonomi kurulunca yeniden hesaplanır, docs/bolumler-plani.md 5) */
-  const gold = (save.bl.st[id] | 0) > 0 ? 0 : BL_P.gold[B.k - 1] + BL_P.goldG * B.g;
+  const gold = (save.bl.st[id] | 0) > 0 ? 0 : BL_P.gold[blK5(B.k) - 1] + BL_P.goldG * B.g;
   save.coins += gold;
   let gift = 0; if (save.ob === OB_L1) { gift = OB_GIFT; save.coins += gift; save.ob = OB_TOSHOP; }   /* öğretim: Bölüm 1 bitince 500 altın, sonra çarşı */
   save.bl.st[id] = Math.max(save.bl.st[id] | 0, st);
@@ -6831,7 +7183,7 @@ const blWin = () => {
   persist();
   G.mode = 'blwin'; G.pins.forEach(q => { if (!q.done && q.kind !== 'portal') bxShatter(q, [P.peach, P['peach-deep'], P['peach-soft']]); }); G.pins = []; G.holding = false; B.winT = 0; B.stars = st; B.gold = gold + gift;
   BX.pulse = 1.5; BX.pc = GOLD; BX.slosh = 1;
-  spawnConf(B.k === 5 ? 140 : 50, { x0: view.cx - 20, x1: view.cx + 20, y0: view.cy - 10, vx: 420, vy0: -520, vy1: 260, delay: 0, spread: 0.25, life: 2.2 });
+  spawnConf(B.k === BL_K ? 140 : 50, { x0: view.cx - 20, x1: view.cx + 20, y0: view.cy - 10, vx: 420, vy0: -520, vy1: 260, delay: 0, spread: 0.25, life: 2.2 });
   Snd.fanfare(); Platform.haptic('medium'); setCoinN(save.coins);
   blGoldSet(save.coins - gold - gift); B.gfT = gold + gift > 0 && !RM ? BL_GFLY : -1;   /* altın, yıldızlar ve +N yerleştikten sonra sayaca uçar (kullanıcı 2026-11-18) */
   updateHud();
@@ -6840,7 +7192,7 @@ const blWin = () => {
 /* Kutlamadan sonra: grubun içinde sonraki bölüm aynı halkada başlar; grup bitince liste */
 const blStep = raw => {
   const B = G.bl;
-  if (G.mode === 'play') G.time = CFG.maxTime;
+  if (G.mode === 'play' && !B.timed) G.time = CFG.maxTime;
   if (G.mode === 'blwin') {
     B.winT += raw;
     if (B.gfT > 0 && !B.gfOn && B.winT >= B.gfT) { B.gfOn = 1; blGoldFly(B.gold, view.cx, view.cy + view.r * 0.24); }
@@ -6876,14 +7228,14 @@ const blGoldFly = (amt, x0, y0) => {
 const BC = { i: 0, n0: 0, drag: null, win: false, cdT: -1, cdN: 0 };
 const blCardStar = on => '<svg viewBox="0 0 24 24"><path class="' + (on ? 'y' : 'x') + '" d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.4l-6 3.5 1.5-6.8L2.3 9.5l6.9-.7z"/></svg>';
 const blCardsBuild = (B, at) => {
-  const el = $('blCs'), n0 = B.g * 5 + 1, lockIc = '<svg class="pl" viewBox="0 0 24 24"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V8a3 3 0 0 0-6 0z"/></svg>';
+  const el = $('blCs'), n0 = B.g * BL_K + 1, lockIc = '<svg class="pl" viewBox="0 0 24 24"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V8a3 3 0 0 0-6 0z"/></svg>';
   BC.n0 = n0;
   let h = '';
-  for (let k = 1; k <= 5; k++) {
+  for (let k = 1; k <= BL_K; k++) {
     const n = n0 + k - 1, stars = save.bl.st[blId(n)] | 0, open = BL_OPEN_ALL || n <= Math.max(B.n + (BC.win ? 1 : 0), lsAt()), cur = n === at;
     const stH = stars ? '<span class="st">' + [0, 1, 2].map(i => blCardStar(i < stars)).join('') + '</span>' : !open ? lockIc : '';
     const act = BC.win && cur ? (n === B.n ? '<button class="go re" type="button" data-go="' + n + '">' + t('bl_again') + '</button>' : open ? '<button class="go" type="button" data-go="' + n + '">' + t('bl_play') + '</button>' : '') : '';
-    const sub = blGName(B.g) + ' · ' + t('bl_k' + (k - 1));
+    const sub = blGName(B.g) + ' · ' + pkName(n);
     const body = cur ? '<b class="t">' + t('bl_lv', { n }) + '</b>' + stH + '<small class="s">' + sub + '</small>' + act : '<b class="n">' + n + '</b>' + stH;
     h += '<div class="blk' + (open ? '' : ' lock') + (cur ? ' on' : '') + '" data-n="' + n + '">' + body + '</div>';
   }
@@ -6907,12 +7259,12 @@ $('blCs').addEventListener('pointerdown', e => { BC.drag = { x: e.clientX }; });
 $('blCs').addEventListener('pointerup', e => {
   const d = BC.drag; BC.drag = null; if (!d || !BC.win || !G.bl) return;
   const dx = e.clientX - d.x, B = G.bl;
-  if (Math.abs(dx) > 30) { BC.cdT = -1; const n = clamp(BC.n0 + BC.i + (dx < 0 ? 1 : -1), BC.n0, BC.n0 + 4); blCardsBuild(B, n); blCardsGo(BC.n0 + BC.i, true); requestAnimationFrame(() => blCardsGo(n)); return; }
+  if (Math.abs(dx) > 30) { BC.cdT = -1; const n = clamp(BC.n0 + BC.i + (dx < 0 ? 1 : -1), BC.n0, BC.n0 + BL_K - 1); blCardsBuild(B, n); blCardsGo(BC.n0 + BC.i, true); requestAnimationFrame(() => blCardsGo(n)); return; }
   const b = e.target.closest && e.target.closest('[data-go]'), cd = e.target.closest && e.target.closest('.blk');
   if (b) { Snd.unlock(); blStopShow(false); blCardsEnd(); blStart(+b.dataset.go); }
   else if (cd) { BC.cdT = -1; const n = +cd.dataset.n; blCardsBuild(B, n); blCardsGo(BC.n0 + BC.i, true); requestAnimationFrame(() => blCardsGo(n)); }
 });
-const blNext = B => { const nx = B.n + 1; return B.k < 5 && nx <= BL_N && !blSoon(nx) ? nx : 0; };
+const blNext = B => { const nx = B.n + 1; return B.k < BL_K && nx <= BL_N && !blSoon(nx) ? nx : 0; };
 /* geri sayım ilerlemesi 0-1 (yoksa -1) */
 /* geri sayım (kullanıcı 2026-11-18, ikinci kez: "kadranda eski dolan halka gelsin, aynı anda Oyna'nın çevresinde aynı renk çerçeve tur atsın, süre dolunca kendiliğinden başlasın"):
    kart sıradakine kaydıktan sonra BL_P.cd sn; kartları kaydırırsan durur, Oyna'ya basarsan hemen başlar */
@@ -6932,7 +7284,7 @@ const blDie = () => {
 const blShowOver = () => {
   const B = G.bl;
   G.mode = 'over'; G.overAt = performance.now();
-  const line = t('bl_out');
+  const line = t(B.timed ? 'bl_outT' : 'bl_out');
   const ovT = $('ovTitle'); ovT.textContent = line; ovT.className = 'eyebrow';
   $('ovHead').textContent = line; $('ovHead').classList.remove('gold');
   const canQ = G.contN < BL_P.cont;
@@ -6949,7 +7301,7 @@ const blShowOver = () => {
   $('ovTop').innerHTML = chip + '<span class="chip sm ovcoin"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle class="f" cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.2" fill="none" stroke-width="2.4" style="stroke:var(--peach-soft)"/></svg><b>' + save.coins + '</b></span>';
   const canCont = G.contN < BL_P.cont, cost = contCost(G.contN), adOk = G.contN < contAdsNow();
   contEl.hidden = !canCont; contEl.classList.remove('fade');
-  $('contSub').textContent = t('bl_cont');
+  $('contSub').textContent = t(B.timed ? 'bl_contT' : 'bl_cont');
   $('coinCost').textContent = String(cost);
   $('coinBtn').setAttribute('aria-disabled', save.coins < cost ? 'true' : 'false');
   $('adBtn').hidden = !adOk; contActsEl.classList.toggle('one', !adOk);
@@ -6965,7 +7317,7 @@ const blContinue = () => {
   const B = G.bl;
   B.lives = BL_P.contL > 0 ? Math.min(BL_P.contL, BL_P.lives) : BL_P.lives; B.cont = true; G.time = CFG.maxTime;
   BX.pulse = 1.2; BX.pc = P.lilac; BX.sweep = G.clock; blLastLives = -1;
-  pop(t('bl_cont'), 'perfect');
+  pop(t(B.timed ? 'bl_contT' : 'bl_cont'), 'perfect');
 };
 let blLastLives = -1, blHeadKey = '';
 const blHeadSwap = () => { const h = $('blHead'); if (RM) return; h.classList.add('sw'); setTimeout(() => h.classList.remove('sw'), 260); };
@@ -6976,13 +7328,14 @@ const blHud = () => {
     blHeadKey = key;
     const set = () => {
       /* Öğretici'den açılan ders: başlık kilidin adı, alt satır Öğretici */
-      $('blTitle').textContent = B.only ? blGName(B.g) : t('bl_lv', { n: B.n }); $('blSub').textContent = B.only ? t('bl_row') : blGName(B.g) + ' · ' + t('bl_k' + (B.k - 1));
+      $('blTitle').textContent = B.only ? blGName(B.g) : t('bl_lv', { n: B.n }); $('blSub').textContent = B.only ? t('bl_row') : blGName(B.g) + ' · ' + pkName(B.n);
       [...$('blDots').children].forEach((d, i) => { d.className = B.only ? '' : (i < B.k - 1 ? 'on' : (i === B.k - 1 ? 'cur' : '')); });
     };
     if ($('blHead').classList.contains('sw')) setTimeout(set, 130); else set();
     if (!BC.win) blGoldSet(save.coins);
     if (B.only) app.classList.remove('bcs'); else if (!BC.win) { blCardsBuild(B, B.n); requestAnimationFrame(() => blCardsGo(B.n, true)); }
   }
+  $('blLife').style.visibility = B.timed ? 'hidden' : '';
   if (B.lives !== blLastLives) {
     const li = $('blLife').children;
     for (let i = 0; i < 3; i++) {
@@ -7017,7 +7370,8 @@ const blDrawPct = (c, cx, cy, rv, top) => {
 const blProg = () => {
   const B = G.bl, gs = G.pins.filter(p => (p.kind === 'gate' && !p.bonus && !p.side) || p.kind === 'hold' || p.kind === 'lockpin');
   const f = gs.length ? gs.filter(p => p.done).length / gs.length : 0;
-  return clamp((B.wave + f) / B.waves, 0, 1);
+  const pr = clamp((B.wave + f) / B.waves, 0, 1);
+  return B.minT ? Math.min(pr, clamp((B.tm || 0) / B.minT, 0, 1)) : pr;
 };
 
 /* ---------- Bölümler efektleri (V2 akış önizlemesi, docs/bolumler-akis-onizleme-v2.html): hedef parçalanır, şok halkası, halka parıltısı, ibre ucu büyür, sıvı çalkalanır; ıskada X, kırmızı kenar, "Erken!/Geç!"; yeni dalgada halkada dönen ışık ---------- */
@@ -7257,7 +7611,7 @@ const lsPadlock = (c, x, y, s, col) => {
   c.beginPath(); c.roundRect(-12, -6, 24, 19, 5); c.fill(); c.fillStyle = P.surface; c.beginPath(); c.arc(0, 2, 3, 0, TAU); c.fill(); c.restore();
 };
 /* grubun dersi hangi kilidin gösterisiyle verilir (oyunun INTRO sahneleri) */
-const LES_KIND = { tek: 'cift', kayan: 'kayan', nefes: 'nefes', kasa: 'kasa', gelgit: 'gelgit', hayalet: 'hayalet', isin: 'isin', degirmen: 'degirmen', ani: 'ani', nabiz: 'nabiz', serit: 'serit' };
+const LES_KIND = { sabit: '', tek: 'cift', kayan: 'kayan', nefes: 'nefes', kasa: 'kasa', gelgit: 'gelgit', hayalet: 'hayalet', isin: 'isin', degirmen: 'degirmen', ani: 'ani', nabiz: 'nabiz', serit: 'serit' };
 const lsLes = g => LES_KIND[lsOwn(g)] || '';
 const lsHasLes = g => !!lsLes(g) && !BL_SOON.includes(lsOwn(g)) && !!INTRO[lsLes(g)];
 const lsSeen = g => !!save.bl.seen[g];
@@ -7304,27 +7658,27 @@ const lsMini = (c, kind, cx, cy, R, seed) => {
   c.restore(); G.pt = pt0; G.ang = ang0;
 };
 const lsMedal = (c, g, cx, cy) => {
-  const R0 = LS_R, at = lsAt(), curG = lsCurG(), open = BL_OPEN_ALL || g <= curG, next = !open && g === curG + 1, seg = TAU / 5, soonG = BL_SOON.includes(lsOwn(g));
+  const R0 = LS_R, at = lsAt(), curG = lsCurG(), open = BL_OPEN_ALL || g <= curG, next = !open && g === curG + 1, seg = TAU / BL_K, soonG = BL_SOON.includes(lsOwn(g));
   c.globalAlpha = open ? 1 : 0.55; c.fillStyle = P.surface; c.beginPath(); c.arc(cx, cy, R0 + 16, 0, TAU); c.fill(); c.globalAlpha = 1;
   const bk = LS.brk && LS.brk.g === g ? LS.brk.t : -1, shk = bk >= 0 && bk < 0.9 && !RM ? Math.sin(bk * 58) * 3.5 * clamp(bk / 0.6, 0, 1) : 0;
   c.save(); c.translate(shk, 0);
   c.lineCap = 'butt';
-  for (let i = 0; i < 5; i++) {
-    const n = g * 5 + i + 1, done = n < at || blStars(n) > 0, cur = n === at && !soonG && open, q = (i + 0.5) * seg - HALF;
-    let w = 26;
+  for (let i = 0; i < BL_K; i++) {
+    const n = g * BL_K + i + 1, done = n < at || blStars(n) > 0, cur = n === at && !soonG && open, q = (i + 0.5) * seg - HALF;
+    let w = 24;
     if (cur && !RM) { w += 4 * Math.sin(G.clock * 5); const tp = (G.clock - LS.tapT) / 0.35; if (LS.tapN === n && tp > 0 && tp < 1) w += 8 * Math.sin(tp * Math.PI); }
     const col = done ? P.btn : (cur ? P.peach : P.track), hw = seg / 2 - 0.06;
     c.strokeStyle = col; c.lineWidth = w; c.beginPath(); c.arc(cx, cy, R0, q - hw, q + hw); c.stroke();
     if (cur) { c.globalAlpha = RM ? 0.3 : 0.3 + 0.2 * Math.sin(G.clock * 5); c.lineWidth = w + 12; c.beginPath(); c.arc(cx, cy, R0, q - hw, q + hw); c.stroke(); c.globalAlpha = 1; }
     const nx = cx + Math.cos(q) * R0, ny = cy + Math.sin(q) * R0;
     if (open || next) { c.font = '800 11px ' + FB; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = done || cur ? '#FFFFFF' : P['ink-3']; c.fillText(String(n), nx, ny + 0.5); }
-    if (done) { const st = blStars(n), sx = cx + Math.cos(q) * (R0 + 21), sy = cy + Math.sin(q) * (R0 + 21); for (let k = 0; k < 3; k++) drawStar(c, sx + (k - 1) * 7, sy, 3.2, k < st ? GOLD : P.track); }
+    if (done) { const st = blStars(n), sx = cx + Math.cos(q) * (R0 + 21), sy = cy + Math.sin(q) * (R0 + 21); for (let k = 0; k < 3; k++) drawStar(c, sx + (k - 1) * 5, sy, 2.4, k < st ? GOLD : P.track); }
   }
   const ir = R0 - 17, les = lsHasLes(g);
-  if ((open || next) && les) {
-    c.globalAlpha = next ? 0.5 : 1; lsMini(c, lsLes(g), cx, cy, ir * 0.66, g * 1.7); c.globalAlpha = 1;
+  if (open || next) {
+    c.globalAlpha = next ? 0.5 : 1; lsMini(c, lsLes(g) || (lsOwn(g) === 'sabit' ? 'tek' : lsOwn(g)), cx, cy, ir * 0.66, g * 1.7); c.globalAlpha = 1;
     /* izlenmemiş kilit: asma kilit ortada; ilk dokunuşta titreyip kırılır (A), sonra ders */
-    if (!lsSeen(g) && open) {
+    if (les && !lsSeen(g) && open) {
       if (bk < 0 || bk < 0.9) { c.globalAlpha = 0.55; c.fillStyle = P.surface; c.beginPath(); c.arc(cx, cy, ir, 0, TAU); c.fill(); c.globalAlpha = 1; lsPadlock(c, cx, cy + 3, 1.15 * (1 + 0.08 * clamp(bk / 0.9, 0, 1)), P['ink-2']); }
       else { const kk = bk - 0.9; c.globalAlpha = 1 - clamp(kk / 0.5, 0, 1); lsPadlock(c, cx + kk * 30, cy + 3 + kk * kk * 420, 1.25, P['ink-2']); c.globalAlpha = 1; }
     }
@@ -7399,14 +7753,14 @@ const lsDraw = () => {
     }
     lsMedal(c, g, cx, y0);
     const open = BL_OPEN_ALL || g <= curG, next = !open && g === curG + 1, soonG = BL_SOON.includes(lsOwn(g)), ax = L ? cx + LS_R + 44 : cx - LS_R - 44;
-    let gs = 0; for (let k = 1; k <= 5; k++) gs += blStars(g * 5 + k);
+    let gs = 0; for (let k = 1; k <= BL_K; k++) gs += blStars(g * BL_K + k);
     c.textAlign = L ? 'left' : 'right'; c.textBaseline = 'alphabetic';
     c.font = '600 19px ' + FD; c.fillStyle = open || next ? P.ink : P['ink-3'];
     c.fillText(open || next ? blGName(g) : '???', ax, y0 - 12);
     c.font = '800 12px ' + FB; c.fillStyle = P['ink-2'];
-    c.fillText(t('bl_part', { a: g * 5 + 1, b: g * 5 + 5 }), ax, y0 + 8);
+    c.fillText(t('bl_part', { a: g * BL_K + 1, b: g * BL_K + BL_K }), ax, y0 + 8);
     c.fillStyle = open && !soonG ? '#B88A1E' : P['ink-3'];
-    c.fillText(soonG && (open || next) ? t('bl_soon') : (next ? t('bl_opens', { n: g * 5 + 1 }) : (!open ? t('bl_surp') : (lsHasLes(g) && !lsSeen(g) ? t('bl_new') : '★ ' + gs + ' / 15'))), ax, y0 + 28);
+    c.fillText(soonG && (open || next) ? t('bl_soon') : (next ? t('bl_opens', { n: g * BL_K + 1 }) : (!open ? t('bl_surp') : (lsHasLes(g) && !lsSeen(g) ? t('bl_new') : '★ ' + gs + ' / ' + BL_K * 3))), ax, y0 + 28);
   }
   for (const q of LS.sp) { const k = q.t / 0.7; c.globalAlpha = 1 - k; c.fillStyle = q.c; c.beginPath(); c.arc(q.x + q.vx * q.t, q.y + q.vy * q.t + 60 * q.t * q.t, 3 * (1 - k) + 1, 0, TAU); c.fill(); }
   c.globalAlpha = 1;
@@ -7426,7 +7780,7 @@ const lsFrame = raw => {
     if (b.t >= (RM ? 0.95 : 1.6)) { LS.brk = null; LS.go = { les: b.g, n: b.n, x: lsX(b.g), y: lsY(b.g), t: 0 }; }
   }
   if (LS.go) { if (!LS.go.d && save.ob === OB_PARK) LS.go.d = 1.5;   /* öğretimin sonunda Bölüm 1'e yakınlaşma yavaş (kullanıcı 2026-11-18: "hemen geçiyor, biraz daha soft") */
-    LS.go.t += raw; if (LS.go.t >= (RM ? 0 : LS.go.d || 0.7)) { const o = LS.go; LS.go = null; if (o.les != null) blLesson(o.les, o.n); else blStart(o.n); return; } }
+    LS.go.t += raw; if (LS.go.t >= (RM ? 0 : LS.go.d || 0.7)) { const o = LS.go; LS.go = null; if (o.les != null) blLesson(o.les, o.n); else if (save.ob === OB_PARK) blLesson(blGK(o.n).g, o.n); else blStart(o.n); return; } }
   else if (!LS.drag || LS.drag.row) {
     if (LS.v) { LS.sc += LS.v * raw; LS.v *= Math.exp(-4 * raw); if (Math.abs(LS.v) < 5) LS.v = 0; }
     const m = lsMax();
@@ -7473,10 +7827,10 @@ const lsTap = (x, y) => {
     const dx = x - lsX(g), dy = y - lsY(g), d = Math.hypot(dx, dy);
     if (d > LS_R + 24) continue;
     let n;
-    if (d < LS_R - 16) { n = Math.min(Math.max(at, g * 5 + 1), g * 5 + 5); while (n > g * 5 + 1 && !blCan(n)) n--; }
-    else n = g * 5 + 1 + Math.floor(((Math.atan2(dx, -dy) + TAU) % TAU) / (TAU / 5));
-    if (n < g * 5 + 1 || !blCan(n)) { Platform.haptic('light'); return; }
-    const q = (n - g * 5 - 0.5) * TAU / 5 - HALF;
+    if (d < LS_R - 16) { n = Math.min(Math.max(at, g * BL_K + 1), g * BL_K + BL_K); while (n > g * BL_K + 1 && !blCan(n)) n--; }
+    else n = g * BL_K + 1 + Math.floor(((Math.atan2(dx, -dy) + TAU) % TAU) / (TAU / BL_K));
+    if (n < g * BL_K + 1 || !blCan(n)) { Platform.haptic('light'); return; }
+    const q = (n - g * BL_K - 0.5) * TAU / BL_K - HALF;
     lsEnter(g, n, lsX(g) + Math.cos(q) * LS_R, lsY(g) + Math.sin(q) * LS_R);
     return;
   }
@@ -7527,7 +7881,7 @@ const blLesson = (g, n) => {
   if (save.ob === OB_PARK) { save.ob = OB_L1; persist(); setTimeout(() => { if (G.bl) G.obTag = true; }, 0); }
   const kind = lsLes(g);
   if (!kind) { if (n) blStart(n); return; }
-  if (!blStart(n || g * 5 + 1, { g, kind, only: !n })) return;
+  if (!blStart(n || g * BL_K + 1, { g, kind, only: !n })) return;
   introNow(kind);
   Platform.track('bl_lesson', { g, kind, first: !!n });
 };
